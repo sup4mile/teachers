@@ -22,8 +22,13 @@ if getvalues == "on"
     e_O = d["e_O"]
     s_O = d["s_O"]
     t = d["t"]
+    E_O = d["E_O"]
+    E_T = d["E_T"]
+    mass_O = d["mass_O"]
+    mass_T = d["mass_T"]
+    f_1 = d["f_1"]
+    f_2 = d["f_2"]
 end
-
 
 # Parameters:
 M=1.0 # population measure
@@ -96,6 +101,8 @@ H_T_0 = Array{Float64,1}(undef,n_g)
 H_T = Array{Float64,1}(undef,length(H_grid))
 mass_T = Array{Float64,2}(undef,length(H_grid),n_g)
 mass_O = Array{Float64,2}(undef,length(H_grid),n_g)
+f_1 = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
+f_2 = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
 # Only initialize the following arrays if not already loaded from previous solution:
 if getvalues != "on"
     s_T = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
@@ -212,16 +219,16 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                         a_O_thresh[ia,iH,iG] = spl(a)
                         # Density:
                         if a_T_thresh[ia,iH,iG]>0.0
-                            f_1 = quadgk(aa -> pdf(Frechet(θ),aa),a_T_thresh[ia,iH,iG],1e3)
-                            f_2 = quadgk(aa -> pdf(Frechet(θ),aa),0,a_T_thresh[ia,iH,iG])
+                            f_1[ia,iH,iG], err = quadgk(aa -> pdf(Frechet(θ),aa),a_T_thresh[ia,iH,iG],1e3)
+                            f_2[ia,iH,iG], err = quadgk(aa -> pdf(Frechet(θ),aa),0,a_T_thresh[ia,iH,iG])
                             #f_1 = quadgk(aa -> pdf(Frechet(θ),aa),0,a_O_thresh[ia,iH,iG])
                             #f_2 = quadgk(aa -> pdf(Frechet(θ),aa),a_O_thresh[ia,iH,iG],1e3)
                         else
-                            f_1 = 1.0
-                            f_2 = 0.0
+                            f_1[ia,iH,iG] = 1.0
+                            f_2[ia,iH,iG] = 0.0
                         end
-                        f_T[ia,iH,iG] = pdf(Frechet(θ),a)*f_1[1]
-                        f_O[ia,iH,iG] = pdf(Frechet(θ),a)*f_2[1]
+                        f_T[ia,iH,iG] = pdf(Frechet(θ),a)*f_1[ia,iH,iG]
+                        f_O[ia,iH,iG] = pdf(Frechet(θ),a)*f_2[ia,iH,iG]
                     end
                     # Fit spline to (h^T)^(β/σ) and 'a_grid' to compute HHH_T:
                     spl_T[iG] = Spline1D(a_grid,((2*H/M).^σ .* a_grid.^α .* s_T[:,iH,iG].^ϕ .* e_T[:,iH,iG].^η).^(β/σ))
@@ -357,4 +364,4 @@ end
 # filename = string("results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
 filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
 
-save(filename,"H_grid",H_grid,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t)
+save(filename,"H_grid",H_grid,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2)
