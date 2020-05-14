@@ -8,7 +8,7 @@ include("opt_thresh.jl")
 getvalues = "on"
 if getvalues == "on"
     # Change path to match architecture on local machine:
-    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.1 0.0]_tauE=[0.1 0.0].jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=1.0_A=1.0.jld")
     # d = load("Z:/teachers_julia/results_2_groups_tauW=[0.0 0.0]_tauE=[0.1 0.0].jld")
     # Extract arrays from dictionary 'd':
     H_grid = d["H_grid"]
@@ -53,7 +53,7 @@ end
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_w[1,1] = 0.1
+# τ_w[1,1] = 0.1
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
 τ_e[1,1] = 0.1
 
@@ -64,7 +64,7 @@ end
 gm[end] = M/2 - sum(gm)
 α=.75
 β=.5
-σ=.625
+σ=.4 # .625
 η=.5
 μ=1/2
 ϕ=1/3
@@ -362,6 +362,6 @@ end
 # println("__________________________")
 # Save grids, expected aggregate human capital in teaching, initial guesses for 's' and 'e' (in each occupation):
 # filename = string("results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
-filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
+filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=1),"_A=",round(A,digits=1),".jld")
 
-save(filename,"H_grid",H_grid,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2)
+save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2)
