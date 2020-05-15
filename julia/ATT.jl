@@ -8,7 +8,7 @@ include("opt_thresh.jl")
 getvalues = "on"
 if getvalues == "on"
     # Change path to match architecture on local machine:
-    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=1.0_A=1.5.jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_with_new_H_grid_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=0.8_A=1.0.jld")
     # d = load("Z:/teachers_julia/results_2_groups_tauW=[0.0 0.0]_tauE=[0.1 0.0].jld")
     # Extract arrays from dictionary 'd':
     H_grid = d["H_grid"]
@@ -68,7 +68,7 @@ gm[end] = M/2 - sum(gm)
 η=.5
 μ=1/2
 ϕ=1/3
-A=1.5 # productivity in 'Other'
+A=1 # productivity in 'Other'
 if getvalues != "on"
     t=zeros(length(H_grid),2) # lump sum tax
     t=fill(0.65,(length(H_grid),2))
@@ -76,7 +76,8 @@ end
 θ=3 # skill dispersion (high θ = small dispersion)
 
 # State space (endogenous state variables): aggregate human capital in teaching today:
-H_grid=collect(0.35:0.05:1.15) # Spline doesn't work for values below 0.4. Why?
+# H_grid=collect(0.05:0.05:.85) # Spline doesn't work for values below 0.4. Why?
+H_grid=range(.0001,stop=0.01,length=17)
 # State space (exogenous state variables): idiosyncratic ability
 a_grid=quantile.(Frechet(θ),.005:.015:1)
 # Initialize arrays for 'VV', 's', and 'e':
@@ -362,6 +363,6 @@ end
 # println("__________________________")
 # Save grids, expected aggregate human capital in teaching, initial guesses for 's' and 'e' (in each occupation):
 # filename = string("results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
-filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=1),"_A=",round(A,digits=2),".jld")
+filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_with_new_H_grid_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=1),"_A=",round(A,digits=2),".jld")
 
 save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2)
