@@ -8,7 +8,8 @@ include("opt_thresh.jl")
 getvalues = "on"
 if getvalues == "on"
     # Change path to match architecture on local machine:
-    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_with_new_H_grid_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=0.8_A=1.0.jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=1.15_A=2.0.jld")
+    # results_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=1.25_A=1.0.jld
     # d = load("Z:/teachers_julia/results_2_groups_tauW=[0.0 0.0]_tauE=[0.1 0.0].jld")
     # Extract arrays from dictionary 'd':
     H_grid = d["H_grid"]
@@ -34,7 +35,7 @@ end
 M=1.0 # population measure
 g = ["female","male"] # no discrimination / no barrier group last
 occ = ["teaching","other"]
-ν = 0.8 # weight on HH_T (expected H') vs HHH_T (realized H') when we update HH_T
+ν = 0.9 # weight on HH_T (expected H') vs HHH_T (realized H') when we update HH_T
 if getvalues == "on"
     # Check if number of groups in previous results is equal to number of elements in g:
     if size(HH_T,2) < size(g,1)
@@ -53,9 +54,9 @@ end
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-# τ_w[1,1] = 0.1
+τ_w[1,1] = 0.1
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
-# τ_e[1,1] = 0.1
+τ_e[1,1] = 0.1
 
 gm=zeros(1,n_g) # measure of in individuals in groups 1,...,n_g
 for iG in 1:n_g-1
@@ -63,23 +64,27 @@ for iG in 1:n_g-1
 end
 gm[end] = M/2 - sum(gm)
 α=.75
-β=.5
-σ=.625
-η=.5
+η=.75
+β=.15
+σ=.13
 μ=1/2
 ϕ=1/3
-A=1 # productivity in 'Other'
-if getvalues != "on"
-    t=zeros(length(H_grid),2) # lump sum tax
-    t=fill(0.65,(length(H_grid),2))
-end
+A=2 # productivity in 'Other'
 θ=3 # skill dispersion (high θ = small dispersion)
+
+# Calculate fixed point for aggregate human capital (when tax is proportional and for a single location):
+# TO BE COMPLETED!
 
 # State space (endogenous state variables): aggregate human capital in teaching today:
 # H_grid=collect(0.05:0.05:.85) # Spline doesn't work for values below 0.4. Why?
-H_grid=range(.0001,stop=0.01,length=17)
+H_grid=range(.05,stop=1.4,length=17)
 # State space (exogenous state variables): idiosyncratic ability
 a_grid=quantile.(Frechet(θ),.005:.015:1)
+# Initial guess for taxes that balance local budgets (marginal or lump sum):
+if getvalues != "on"
+    T=zeros(length(H_grid),2) # lump sum tax
+    t=zeros(length(H_grid),2) # proportional tax
+end
 # Initialize arrays for 'VV', 's', and 'e':
 VV_T = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
 VV_O = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
@@ -92,10 +97,12 @@ spl_T = Array{Spline1D,1}(undef,n_g)
 spl_O = Array{Spline1D,1}(undef,n_g)
 spl_TT = Array{Spline1D,1}(undef,n_g)
 spl_ω = Array{Spline1D,1}(undef,n_g)
+spl_w = Array{Spline1D,1}(undef,n_g)
 spl_h_O = Array{Spline1D,1}(undef,n_g)
-T_g = Array{Float64,1}(undef,n_g)
-E_T = Array{Float64,1}(undef,n_g)
-E_O = Array{Float64,1}(undef,n_g)
+wb_T = Array{Float64,2}(undef,length(H_grid),n_g)
+wb_O = Array{Float64,2}(undef,length(H_grid),n_g)
+E_T = Array{Float64,2}(undef,length(H_grid),n_g)
+E_O = Array{Float64,2}(undef,length(H_grid),n_g)
 HHH_T_0 = Array{Float64,1}(undef,n_g)
 H_O_0 = Array{Float64,1}(undef,n_g)
 H_T_0 = Array{Float64,1}(undef,n_g)
@@ -133,11 +140,11 @@ targetmass_T = 0.1 # Target measure of teachers
 maxupdate = 0.01 # Maxumum update for lambda
 # end
 
-tolH = 2e-3 # convergence criterion for HH_T (expected) and HHH_T (realized)
-tolω = 2e-1 #tolH
-tolT= 2e-2
+tolH = 2.5e-3 # convergence criterion for HH_T (expected) and HHH_T (realized)
+tolω = tolH
+tolT= tolH
 maxiterT = 100
-maxiterHH = 100
+maxiterHH = 1000
 
 tolM = 1e-3 # convergence criterion for mass_T (actual) and targetmass_T (targeted, if at all)
 maxiterM = 100
@@ -168,7 +175,7 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
         H_O[iH] = H_grid[iH]
         λ[iH,1] = H_O[iH]*A/(M/2)
     end
-    # Initiate 'while' loop ('not indexed') over the lump sum tax:
+    # Initiate 'while' loop ('not indexed') over the tax rate:
     convT = 1; iterT = 1
     while convT > tolT && iterT < maxiterT
         println("    T: iteration ",iterT)
@@ -182,6 +189,7 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
             convH = 1 # convergence criterion (1)
             convω = 1 # convergence criterion (2)
             iHH = 1 # iteration counter for HH_T
+            # Initiate 'while' loop over future (aggregate) human capital in teaching and ω:
             while (convH > tolH || convω > tolω) && iHH < maxiterHH
                 println("    H': iteration ",iHH)#," (H = ",H,", E[H'] = ", round.(HH_T[iH],digits=3),", E[H_O'] = ",round.(H_O[iH],digits=3),")")
                 # Initiate 'for' loop over groups (indexed by 'iG'):
@@ -203,12 +211,12 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                             e_O[ia,iH,iG] = e_O[ia-1,iH,iG]
                         end
                         VV_T[ia,iH,iG],s_T[ia,iH,iG],e_T[ia,iH,iG] = optiminv_T(λ[iH,1],M,HH_T[iH],H,α,β,σ,η,μ,ϕ,0,0,t[iH,1],a,s_T[ia,iH,iG],e_T[ia,iH,iG])
-                        ω[ia,iH,iG,1] = λ[iH,1]*M/(2*HH_T[iH])*a^α*s_T[ia,iH,iG]^ϕ*e_T[ia,iH,iG]^η*(2*HH_T[iH]/M)^σ
+                        ω[ia,iH,iG,1] = λ[iH,1]*M/(2*HH_T[iH])*(a^α*s_T[ia,iH,iG]^ϕ*e_T[ia,iH,iG]^η*(2*H/M)^σ).^(β/σ)
                         VV_O[ia,iH,iG],s_O[ia,iH,iG],e_O[ia,iH,iG] = optiminv_O(A,M,H,α,σ,η,μ,ϕ,τ_w[iG],τ_e[iG],t[iH,1],a,s_O[ia,iH,iG],e_O[ia,iH,iG])
                     end
                     # Compute occupational threshold using VV_O and VV_T for given ('iH','iHH','iG'):
                     # for iG in 1:n_g
-                    println("      iter(group) = ", iG,": ", g[iG])
+                    # println("      iter(group) = ", iG,": ", g[iG])
                     for ia in 1:length(a_grid) # 'a_grid[ia]' indexes ability in 'other'(?)
                         a_T_thresh[ia,iH,iG] = opt_thresh(a_grid,VV_T[:,iH,iG],a_grid[ia],VV_O[ia,iH,iG])
                     end
@@ -232,35 +240,25 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                         f_O[ia,iH,iG] = pdf(Frechet(θ),a)*f_2[ia,iH,iG]
                     end
                     # Fit spline to (h^T)^(β/σ) and 'a_grid' to compute HHH_T:
-                    spl_T[iG] = Spline1D(a_grid,((2*H/M).^σ .* a_grid.^α .* s_T[:,iH,iG].^ϕ .* e_T[:,iH,iG].^η).^(β/σ))
-                    # Fit spline to h^O and 'a_grid' (note that exponent sigma/beta is absent):
-                    spl_O[iG] = Spline1D(a_grid,(2*H/M).^σ .* a_grid.^α .* s_O[:,iH,iG].^ϕ .* e_O[:,iH,iG].^η)
-                    h_O[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_O[:,iH,iG].^ϕ .* e_O[:,iH,iG].^η
-                    # Fit another spline to h^T and 'a_grid' to compute 'H_T':
-                    spl_TT[iG] = Spline1D(a_grid,(2*H/M).^σ .* a_grid.^α .* s_T[:,iH,iG].^ϕ .* e_T[:,iH,iG].^η)
                     h_T[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_T[:,iH,iG].^ϕ .* e_T[:,iH,iG].^η
+                    spl_T[iG] = Spline1D(a_grid,h_T[:,iH,iG].^(β/σ))
+                    # Fit spline to h^O and 'a_grid' (note that exponent sigma/beta is absent):
+                    h_O[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_O[:,iH,iG].^ϕ .* e_O[:,iH,iG].^η
+                    spl_O[iG] = Spline1D(a_grid,h_O[:,iH,iG])
+                    # Fit another spline to h^T and 'a_grid' to compute 'H_T':
+                    spl_TT[iG] = Spline1D(a_grid,h_T[:,iH,iG])
                     function f_T_pwl(aa)
                         # Locate closest gridpoint:
                         ind = min(maximum(findall(x -> x <= aa, a_grid)),length(a_grid)-1)
                         mu = (aa - a_grid[ind])/(a_grid[ind+1]-a_grid[ind])
                         return (mu*f_T[ind+1,iH,iG] + (1-mu)*f_T[ind,iH,iG])*gm[iG]
                     end
-                    # function f_T_pwl(aa)
-                    #     # Locate closest gridpoint:
-                    #     ind = min(maximum(findall(x -> x <= aa, a_grid)),length(a_grid)-1)
-                    #     mu = (aa - a_grid[ind])/(a_grid[ind+1]-a_grid[ind])
-                    #     return mu*f_T[ind+1,iHH,iH] + (1-mu)*f_T[ind,iHH,iH]
-                    # end
                     function f_O_pwl(aa)
                         # Locate closest gridpoint:
                         ind = min(maximum(findall(x -> x <= aa, a_grid)),length(a_grid)-1)
                         mu = (aa - a_grid[ind])/(a_grid[ind+1]-a_grid[ind])
                         return (mu*f_O[ind+1,iH,iG] + (1-mu)*f_O[ind,iH,iG])*gm[iG]
                     end
-                    # Investments by high-ability individuals (95th percentile):
-                    # println(" Group: ",g[iG])
-                    # println("   High ability T: ",[s_T[end-6,1,iG] e_T[end-6,1,iG]])
-                    # println("   High ability O: ",[s_O[end-6,1,iG] e_O[end-6,1,iG]])
                     # Measure of teachers:
                     global mass_T[iH,iG], err = quadgk(aa -> f_T_pwl(aa),a_grid[1],a_grid[end])
                     # println(" Measure of teachers = ",mass_T[1])
@@ -273,30 +271,30 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                     # Calculate H^O:
                     H_O_0[iG], err = quadgk(aa -> spl_O[iG](aa)*f_O_pwl(aa),a_grid[1],a_grid[end])
                     # Calculate H^T:
-                    H_T_0[iG], err = quadgk(aa -> spl_TT[iG](aa)*f_O_pwl(aa),a_grid[1],a_grid[end])
+                    H_T_0[iG], err = quadgk(aa -> spl_TT[iG](aa)*f_T_pwl(aa),a_grid[1],a_grid[end])
                 end
                 HHH_T = sum(HHH_T_0)
                 H_O[iH] = sum(H_O_0)
                 H_T[iH] = sum(H_T_0)
 
                 # COMPUTE λ and ω (loop over 'a')!
-                println("        H[T]' implied by law of motion: ", round.(HHH_T,digits=3))
-                println("        H[T]' anticipated by agents: ", round.(HH_T[iH],digits=3))
-                println("        H[O]' anticipated by agents: ", round.(H_O[iH],digits=3))
-                println("    __________________________")
-                println("")
+                # println("        H[T]' implied by law of motion: ", round.(HHH_T,digits=3))
+                # println("        H[T]' anticipated by agents: ", round.(HH_T[iH],digits=3))
+                # println("        H[O]' anticipated by agents: ", round.(H_O[iH],digits=3))
+                # println("    __________________________")
+                # println("")
                 # Update λ':
-                λ[iH,2] = H_O[iH]*A/(M/2*sum(mass_T[iH,:]))
-                λ[iH,1] = ν*λ[iH,1]+(1-ν)*λ[iH,2]
-                # Check for convergence of H[T]' and update:
-                convH = abs(HH_T[iH]-HHH_T[1])
-                HH_T[iH] = ν*HH_T[iH]+(1-ν)*HHH_T[1]
+                λ[iH,2] = H_O[iH]*A/(M/2*sum(mass_O[iH,:]))
                 # Update wage profile ω':
                 for ia in 1:length(a_grid)
-                    ω[ia,iH,iG,2] = λ[iH,1]*M/(2*HH_T[iH])*a_grid[ia]^α*s_T[ia,iH,iG]^ϕ*e_T[ia,iH,iG]^η*(2*HH_T[iH]/M)^σ
+                    ω[ia,iH,iG,2] = λ[iH,2]*M/(2*HH_T[iH])*h_T[ia,iH,iG].^(β/σ) # a_grid[ia]^α*s_T[ia,iH,iG]^ϕ*e_T[ia,iH,iG]^η*(2*HH_T[iH]/M)^σ
                 end
                 # Check for convergence of ω' and update:
                 convω = maximum(abs.(ω[10:end-10,iH,iG,2] - ω[10:end-10,iH,iG,1]))
+                # Check for convergence of H[T]' and update:
+                convH = abs(HH_T[iH]-HHH_T[1])
+                HH_T[iH] = ν*HH_T[iH]+(1-ν)*HHH_T[1]
+                λ[iH,1] = ν*λ[iH,1]+(1-ν)*λ[iH,2]
                 ω[:,iH,iG,1] = ν*ω[:,iH,iG,1] + (1-ν)*ω[:,iH,iG,2]
                 # Update counter for inner loop (over H'(T)):
                 iHH = iHH+1
@@ -308,6 +306,7 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
         end
         for iG in 1:n_g
             spl_ω[iG] = Spline1D(a_grid,ω[:,iH,iG,1])
+            spl_w[iG] = Spline1D(a_grid,h_O[:,iH,iG].*A)
             # Density function of teachers by groups:
             function f_T_pwl(aa)
                 # Locate closest gridpoint:
@@ -315,10 +314,10 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                 mu = (aa - a_grid[ind])/(a_grid[ind+1]-a_grid[ind])
                 return (mu*f_T[ind+1,iH,iG] + (1-mu)*f_T[ind,iH,iG])*gm[iG]
             end
-            # Total wages paid to each group
-            T_g[iG], er = quadgk(aa -> f_T_pwl(aa)*spl_ω[iG](aa),a_grid[1],a_grid[end])
-            # Total earnings of teachers for each group
-            E_T[iG], er = quadgk(aa -> (1-τ_w[iG])*f_T_pwl(aa)*spl_ω[iG](aa),a_grid[1],a_grid[end])
+            # Total wage bill for teachers in each group:
+            wb_T[iH,iG], er = quadgk(aa -> f_T_pwl(aa)*spl_ω[iG](aa),a_grid[1],a_grid[end])
+            # Total earnings of teachers in each group:
+            E_T[iH,iG], er = quadgk(aa -> (1-τ_w[iG])*f_T_pwl(aa)*spl_ω[iG](aa),a_grid[1],a_grid[end])
 
             spl_h_O[iG] = Spline1D(a_grid,ω[:,iH,iG,1])
             # Density function of teachers by groups:
@@ -328,14 +327,16 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                 mu = (aa - a_grid[ind])/(a_grid[ind+1]-a_grid[ind])
                 return (mu*f_O[ind+1,iH,iG] + (1-mu)*f_O[ind,iH,iG])*gm[iG]
             end
-            # Total earnings of other for each group
-            E_O[iG], er = quadgk(aa -> (1-τ_w[iG])*f_O_pwl(aa)*A*spl_h_O[iG](aa),a_grid[1],a_grid[end])
+            # Total wage bill for 'others' in each group:
+            wb_O[iH,iG], er = quadgk(aa -> f_O_pwl(aa)*spl_w[iG](aa),a_grid[1],a_grid[end])
+            # Total earnings of 'others' in each group:
+            E_O[iH,iG], er = quadgk(aa -> (1-τ_w[iG])*f_O_pwl(aa)*A*spl_h_O[iG](aa),a_grid[1],a_grid[end])
         end
-        t[iH,2]=sum(T_g)/(sum(E_T)+sum(E_O))
+        t[iH,2]=sum(E_T[iH,:])/(sum(E_T[iH,:])+sum(E_O[iH,:]))
         convT = abs(t[iH,2]-t[iH,1])
-        println("convT=",convT)
-        println("t[iH,:]=",t[iH,:])
-        t[iH,1] = ν*t[iH,1]+(1-ν)*t[iH,2]
+        println("convT=",round(convT,digits=3))
+        println("t[iH,:]=",round.(t[iH,:],digits=3))
+        t[iH,1] = min(t[iH,2],1-1e-3) # ν*t[iH,1]+(1-ν)*t[iH,2]
         iterT = iterT+1
     end
     # println("__________________________")
@@ -347,7 +348,7 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
         global maxiterH = min(iH+10, length(H_grid))
         global flag = 1
     end
-    if getvalues != "on"
+    if getvalues != "on" && iH < maxiterH-1
         # Update H'(O):
         H_O[iH+1] = H_O[iH]
         # Update initial guesses for HH_T:
@@ -363,6 +364,6 @@ end
 # println("__________________________")
 # Save grids, expected aggregate human capital in teaching, initial guesses for 's' and 'e' (in each occupation):
 # filename = string("results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,".jld")
-filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_with_new_H_grid_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=1),"_A=",round(A,digits=2),".jld")
-
+# filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_with_new_H_grid_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=1),"_A=",round(A,digits=2),".jld")
+filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=2),"_A=",round(A,digits=2),".jld")
 save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"λ",λ,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2)

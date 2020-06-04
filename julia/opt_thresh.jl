@@ -1,5 +1,5 @@
 function opt_thresh(a_grid,vT,aO,vO)
-    # 'vO' is a scalar, 'vT' and 'a_grid' are one-dimensional arrays; 'aO' is an initial guess (used in 'nlsolve' below).
+    # 'vO' is a scalar, 'vT' and 'a_grid' are one-dimensional arrays; 'aO' is an initial guess (used in 'find_zero').
 
     # Fit spline to 'a_grid' and 'vT':
     spl = Spline1D(a_grid,vT)
