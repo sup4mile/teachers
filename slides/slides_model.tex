@@ -300,8 +300,8 @@ e^{O} & = \left( \frac{(1-t)(1-{\tau'}^{O,w})\left(\tfrac{2}{M}\right)^\sigma {A
 \frametitle{Occupational Choice Boundary\ldots}
 \framesubtitle{\ldots does not depend on aggregate state $\widetilde{H^T}$} 
 \begin{align}
-\left(\frac{1-{\tau'}^{O,w}}{1-{\tau'}^{T,w}}\right) \left(\frac{1-\eta}{1-\tfrac{\eta\beta}{\sigma}}\right)  \left(\frac{1-s^{O}}{1-s^{T}}\right)^{\frac{1}{\mu}}  \left(\frac{(a^O)^\frac{\alpha}{1-\eta}}{\big(\alert{\bar{a}^T(a^O)}\big)^\frac{\alpha\beta}{\sigma-\eta\beta}}\right) \nonumber\\
-= \left(\frac{\int_0^\infty a^\frac{\alpha}{1-\eta} \alert{f^O(a)} da}{\int_0^\infty \alert{f^O(a)} da} \right) \left(\int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta} \alert{f^T(a)} da\right)^{-1} \nonumber
+\left(\frac{1-{\tau'}^{O,w}}{1-{\tau'}^{T,w}}\right) \left(\frac{1-\eta}{1-\tfrac{\eta\beta}{\sigma}}\right)  \left(\frac{1-s^{O}}{1-s^{T}}\right)^{\frac{1}{\mu}}  \left(\frac{(a^O)^\frac{\alpha}{1-\eta}}{\big(\alert{\bar{a}^T(a^O)}\big)^\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} \right) \nonumber\\
+= \left(\frac{\int_0^\infty a^\frac{\alpha}{1-\eta} \alert{f^O(a)} da}{\int_0^\infty \alert{f^O(a)} da} \right) \left(\int_0^\infty a^\frac{\alpha}{\frac{\sigma}{\beta}-\eta} \alert{f^T(a)} da\right)^{-1} \nonumber
 \end{align}
 \end{frame}
 
@@ -408,10 +408,11 @@ The equilibrium is characterized by:
 \begin{itemize}
   \item Multiple locations:
   \begin{itemize}
-  \item finite number of locations, use Lucas \& Moll (2014) and Martellini (2019) to solve
-  \item teachers' salaries funded by local lump-sum taxes
+  \item finite number of locations
+  \item teachers' salaries funded by combination of local lump-sum (property) and proportional (sales) taxes
+  \item one location with $T=0$, all locations have $t \in (0,1)$
   \item sorting of teachers and children into locations (high wage = high tax)
-  \item not sure if variation in lump-sum tax is sufficient to prevent everyone from locating in a single location, may need to think of additional congestion forces
+  \item sorting breaks global monotonicity between teacher's $h^T$ and class size (still holds locally, with random within-district assignment)
   \item to start with, solve with two locations (``high vs.~low'') 
   \end{itemize}
 \end{itemize}
