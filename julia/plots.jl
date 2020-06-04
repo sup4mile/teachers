@@ -128,7 +128,7 @@ savefig(plt6,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/plo
 savefig(plt7,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/plots/frac_teachers_by_a_tauW_"*string(τ_w[1,1])*"_tauE_"*string(τ_e[1,1])*"_A="*string(round(A,digits=2))*".eps")
 # Plot effect of wedges (τ_w and τ_e) on occupational choice (male vs. female)
 d8 = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.0 0.0]_tauE=[0.0 0.0]_beta-to-sigma=1.15_A=2.0.jld")
-a_grid = d["a_grid"]
+a_grid = d8["a_grid"]
 β = d8["β"]
 σ = d8["σ"]
 f_1 = d8["f_1"]
@@ -146,7 +146,7 @@ f_2 = d9["f_2"]
 τ_e = d9["τ_e"]
 τ_w = d9["τ_w"]
 plt8 = plot!(plt8,a_grid,sum(f_1[:,1,1],dims=2)./(sum(f_1[:,1,1],dims=2)+sum(f_2[:,1,1],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", female"),xlabel=L"$a$",ylabel="fraction of teachers")
-plt8 = plot!(plt8,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
+plt8 = plot!(plt8,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[2])*", \\tau^w = "*string(τ_w[2])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
 savefig(plt8,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/plots/frac_teachers_by_a_tauW_"*string(τ_w[1,1])*"_tauE_"*string(τ_e[1,1])*"_A="*string(round(A,digits=2))*".eps")
 d10 = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.0 0.0]_tauE=[0.1 0.0]_beta-to-sigma=1.15_A=2.0.jld")
 β = d10["β"]
@@ -156,7 +156,7 @@ f_2 = d10["f_2"]
 τ_e = d10["τ_e"]
 τ_w = d10["τ_w"]
 plt9 = plot!(plt9,a_grid,sum(f_1[:,1,1],dims=2)./(sum(f_1[:,1,1],dims=2)+sum(f_2[:,1,1],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", female"),xlabel=L"$a$",ylabel="fraction of teachers")
-plt9 = plot!(plt9,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
+plt9 = plot!(plt9,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[2])*", \\tau^w = "*string(τ_w[2])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
 savefig(plt9,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/plots/frac_teachers_by_a_tauW_"*string(τ_w[1,1])*"_tauE_"*string(τ_e[1,1])*"_A="*string(round(A,digits=2))*".eps")
 d11 = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.1 0.0]_tauE=[0.1 0.0]_beta-to-sigma=1.15_A=2.0.jld")
 β = d11["β"]
@@ -166,5 +166,5 @@ f_2 = d11["f_2"]
 τ_e = d11["τ_e"]
 τ_w = d11["τ_w"]
 plt10 = plot!(plt10,a_grid,sum(f_1[:,1,1],dims=2)./(sum(f_1[:,1,1],dims=2)+sum(f_2[:,1,1],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", female"),xlabel=L"$a$",ylabel="fraction of teachers")
-plt10 = plot!(plt10,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[1])*", \\tau^w = "*string(τ_w[1])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
+plt10 = plot!(plt10,a_grid,sum(f_1[:,1,2],dims=2)./(sum(f_1[:,1,2],dims=2)+sum(f_2[:,1,2],dims=2)),grid=:none,label=latexstring("\\tau^e = "*string(τ_e[2])*", \\tau^w = "*string(τ_w[2])*", male"),xlabel=L"$a$",ylabel="fraction of teachers")
 savefig(plt10,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/plots/frac_teachers_by_a_tauW_"*string(τ_w[1,1])*"_tauE_"*string(τ_e[1,1])*"_A="*string(round(A,digits=2))*".eps")
