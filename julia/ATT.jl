@@ -111,6 +111,13 @@ mass_T = Array{Float64,2}(undef,length(H_grid),n_g)
 mass_O = Array{Float64,2}(undef,length(H_grid),n_g)
 f_1 = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
 f_2 = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
+
+########## Closed form solution
+f_T2 = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
+HH_T_cf = Array{Float64,1}(undef,length(H_grid))
+H_O_cf = Array{Float64,1}(undef,length(H_grid))
+##########
+
 # Only initialize the following arrays if not already loaded from previous solution:
 if getvalues != "on"
     s_T = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
@@ -239,6 +246,23 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                         f_T[ia,iH,iG] = pdf(Frechet(θ),a)*f_1[ia,iH,iG]
                         f_O[ia,iH,iG] = pdf(Frechet(θ),a)*f_2[ia,iH,iG]
                     end
+
+########## Closed form solution
+                    # f_2[] is f_O(a_O)
+                    spl_1=Spline1D(a_grid[:],a_grid[:].^(α/(1-η)).*pdf(Frechet(θ),a_grid[:]).*f_2[:,iH,iG])
+                    global f1=quadgk(aa -> spl_1(aa),0.0,1e3)[1]
+                    spl_2=Spline1D(a_grid[:],pdf(Frechet(θ),a_grid[:]).*f_2[:,iH,iG])
+                    global f2=quadgk(aa -> spl_2(aa),0.0,1e3)[1]
+
+                    f_T2[ia,iH,iG]=0.0
+                    for ia in 1:length(a_grid)
+                        f_T2[ia,iH,iG]=quadgk(aa -> pdf(Frechet(θ),aa),0.0,a_O_thresh[ia,iH,iG])[1]
+                    end
+                    # f_T2[] is f_T(a_T)
+                    spl_3=Spline1D(a_grid[:],a_grid[:].^(α*β/(σ-β*η)).*pdf(Frechet(θ),a_grid[:]).*f_T2[:,iH,iG])
+                    global f3=quadgk(aa -> spl_3(aa),0.0,1e3)[1]
+##########
+
                     # Fit spline to (h^T)^(β/σ) and 'a_grid' to compute HHH_T:
                     h_T[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_T[:,iH,iG].^ϕ .* e_T[:,iH,iG].^η
                     spl_T[iG] = Spline1D(a_grid,h_T[:,iH,iG].^(β/σ))
@@ -303,6 +327,17 @@ flag = 0 # Flag for steady state (i.e. H = HHH_T), change the signH = sign(HH_T-
                 convM = targetM*abs(targetmass_T-sum(mass_T[iH,:]))+(1-targetM)*0
             end
             iterM = iterM+1
+
+########## Closed form solution
+            HH_T_cf[iH]=f3^((σ-β*η)/σ)*(f1/f2)^(η*β/σ)*s_T[1,iH,1]^(ϕ*β/σ)*s_O[1,iH,1]^(ϕ*β*η/(σ-σ*η))*((1-t[iH,1])*η*A)^(η*β/(σ-σ*η))*(β/σ)^(η*β/σ)*((1-τ_w[iG])/(1+τ_e[iG]))^(η*η*β/(σ-σ*η))*(2*H/M)^(β/(1-η))
+            H_O_cf[iH]=f1*((1-t[iH,1])*(1-τ_w[iG])/(1+τ_e[iG])*η*A)^(η/(1-η))*s_O[1,iH,1]^(ϕ/(1-η))*(2*H/M)^(σ/(1-η))
+
+            println("HH_T=", HH_T[iH])
+            println("HH_T_cf=", HH_T_cf[iH])
+            println("H_O=", H_O[iH])
+            println("H_O_cf=", H_O_cf[iH])
+##########
+
         end
         for iG in 1:n_g
             spl_ω[iG] = Spline1D(a_grid,ω[:,iH,iG,1])
