@@ -6,20 +6,19 @@ function opt_thresh(a_grid,vT,aO,vO)
     # Solve for the threshold 'aT' such that 'spl(aT)' = 'vO':
     function f(x)
         if x <= a_grid[1]
-            # Linear extrapolation such that ability threshold is strictly positive:
-            mu_lo = (-a_grid[1])/(a_grid[2]-a_grid[1])
-            vT_lo = min(mu_lo*vT[2] + (1-mu_lo)*vT[1],vO)
-            mu = x/a_grid[1]
-            vO - (mu*vT[1] + (1-mu)*vT_lo)
+            # Non-linear extrapolation to guarantee existence of an inverse function (to characterize a threshold of a^O as a function of a^T):
+            # Functional form: V = α + βa^γ
+            α = -1e6
+            γ = derivative(spl,a_grid[1])*a_grid[1]/(vT[1]-α)
+            β = derivative(spl,a_grid[1])/(γ*a_grid[1]^(γ-1))
+            vO - (α+β*x^γ)
         elseif x >= a_grid[end]
             mu = (x-a_grid[end-1])/(a_grid[end]-a_grid[end-1])
             vO - (mu*vT[end] + (1-mu)*vT[end-1])
-
         else
             vO - spl(x)
         end
     end
-
-    r = find_zero(f,aO)
+    r = find_zero(f,(0,a_grid[end])) # bisection method
     return r
 end
