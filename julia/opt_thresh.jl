@@ -8,17 +8,19 @@ function opt_thresh(a_grid,vT,aO,vO)
         if x <= a_grid[1]
             # Non-linear extrapolation to guarantee existence of an inverse function (to characterize a threshold of a^O as a function of a^T):
             # Functional form: V = α + βa^γ
-            α = -1e6
+            α = -1e3
             γ = derivative(spl,a_grid[1])*a_grid[1]/(vT[1]-α)
             β = derivative(spl,a_grid[1])/(γ*a_grid[1]^(γ-1))
             vO - (α+β*x^γ)
         elseif x >= a_grid[end]
-            mu = (x-a_grid[end-1])/(a_grid[end]-a_grid[end-1])
-            vO - (mu*vT[end] + (1-mu)*vT[end-1])
+            α = -1e3
+            γ = derivative(spl,a_grid[end])*a_grid[end]/(vT[end]-α)
+            β = derivative(spl,a_grid[end])/(γ*a_grid[end]^(γ-1))
+            vO - (α+β*x^γ)
         else
             vO - spl(x)
         end
     end
-    r = find_zero(f,(0,a_grid[end])) # bisection method
+    r = find_zero(f,(0,1e2)) # bisection method
     return r
 end
