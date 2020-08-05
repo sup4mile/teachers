@@ -21,14 +21,15 @@ gm[end] = M/2 - sum(gm)
 α=.75
 η=.75
 β=.15
-σ=.13
+σ=.12
 μ=1/2
 ϕ=1/3
 A=2 # productivity in 'Other'
 θ=3
 
 H_grid=range(.05,stop=1.4,length=17)
-a_grid=quantile.(Frechet(θ),.005:.015:1)
+# a_grid=quantile.(Frechet(θ),.005:.015:1)
+a_grid=exp.(quantile.(Normal(0,1),.005:.015:1))
 
 s_T=μ*ϕ/(μ*ϕ+σ/β-η)
 s_O=μ*ϕ/(μ*ϕ+1-η)
@@ -44,7 +45,7 @@ t=zeros(length(H_grid),2)
 
 a_O_thresh = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
 a_T_thresh_new = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/results_2_groups_tauW=[0.1 0.0]_tauE=[0.1 0.0]_beta-to-sigma=1.15_A=2.0.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_tauW=[0.1 0.0]_tauE=[0.1 0.0]_beta-to-sigma=1.15_A=2.0.jld")
 a_T_thresh=d["a_T_thresh"]
 
 f_O = Array{Float64,3}(undef,length(a_grid),length(H_grid),n_g)
