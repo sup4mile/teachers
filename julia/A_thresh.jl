@@ -29,7 +29,7 @@ A=2 # productivity in 'Other'
 
 H_grid=range(.05,stop=1.4,length=17)
 # a_grid=quantile.(Frechet(θ),.005:.015:1)
-a_grid=exp.(quantile.(Normal(0,1),.005:.015:1))
+a_grid=exp.([quantile.(Normal(0,1),.001:.001:.004) ; quantile.(Normal(0,1),.005:.015:1))]
 
 s_T=μ*ϕ/(μ*ϕ+σ/β-η)
 s_O=μ*ϕ/(μ*ϕ+1-η)
