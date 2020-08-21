@@ -9,7 +9,7 @@ occ = ["teaching","other"]
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_w[1,1] = 0.0
+τ_w[1,1] = 0.1
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
 τ_e[1,1] = 0.0
 
@@ -21,7 +21,7 @@ gm[end] = M/2 - sum(gm)
 α=.75
 η=.75
 β=.15
-σ=.12
+σ=.13
 μ=1/2
 ϕ=1/3
 A=2 # productivity in 'Other'
@@ -243,8 +243,20 @@ for iH in 1:length(H_grid)
     end
 end
 
+N=zeros(length(a_grid),length(H_grid),n_g)
+for iH in 1:length(H_grid)
+    H=H_grid[iH]
+    for iG in 1:n_g
+        for ia in 1:length(a_grid)
+            N[ia,iH,iG]=M/2/H*(h_T[ia,iH,iG])^(β/σ)
+        end
+    end
+end
+
+#/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/
+
 filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=2),"_A=",round(A,digits=2),".jld")
-save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf)
+save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N)
 
 # Find steady state
 using Roots
