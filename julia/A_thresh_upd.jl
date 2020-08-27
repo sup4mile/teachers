@@ -1,5 +1,7 @@
 using Distributions, Dierckx, QuadGK, JLD, Plots, LaTeXStrings
 
+# Load occupational threshold from previous parameterization:
+previous = 1;
 # Parameters:
 M=1.0 # population measure
 g = ["female","male"] # no discrimination / no barrier group last
@@ -18,22 +20,22 @@ for iG in 1:n_g-1
     gm[iG] = M/(2*n_g)
 end
 gm[end] = M/2 - sum(gm)
-α=.75
-η=.75
+α=.5
+η=.5
 β=.15
-σ=.13
+σ=.16
 μ=1/2
 ϕ=1/3
 A=2 # productivity in 'Other'
 θ=3
 
+quantile_top = .999
 #H_grid=collect(range(.05,stop=1.4,length=17))
 H_grid=collect(range(.0005,stop=1.0,length=20))
 # a_grid=quantile.(Frechet(θ),.005:.015:1)
 mean_a=0
 std_a=1
-a_grid=exp.(append!(quantile.(Normal(mean_a,std_a),.001:.001:.004), append!(quantile.(Normal(mean_a,std_a),.005:.015:.979), quantile.(Normal(mean_a,std_a),.980:.002:.995))))
-temp=exp.(append!(quantile.(Normal(mean_a,std_a),.001:.001:.004), append!(quantile.(Normal(mean_a,std_a),.005:.015:.979), quantile.(Normal(mean_a,std_a),.980:.002:.995))))
+a_grid=exp.(append!(quantile.(Normal(mean_a,std_a),.001:.001:.004), append!(quantile.(Normal(mean_a,std_a),.005:.015:.979), quantile.(Normal(mean_a,std_a),.980:.002:quantile_top))))
 s_T=μ*ϕ/(μ*ϕ+σ/β-η)
 s_O=μ*ϕ/(μ*ϕ+1-η)
 cnst=(1-η)/(1-η*β/σ)*((1-s_O)/(1-s_T))^(1/μ)
@@ -46,17 +48,26 @@ maxiterT = 100
 
 # Integral bounds
 lowbnd=0.0
-upbnd=25.0 # s.t. pdf(LogNormal(mean_a,std_a),upbnd) < 1e-4
+upbnd=quantile.(Normal(mean_a,std_a),quantile_top) # set to largest element in 'a_grid'
 
 t=zeros(length(H_grid),2)
 
 a_T_thresh = Array{Float64,2}(undef,length(a_grid),n_g)
 a_O_thresh = Array{Float64,2}(undef,length(a_grid),n_g)
 a_T_thresh_new = Array{Float64,2}(undef,length(a_grid),n_g)
-#d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_tauW=[0.1 0.0]_tauE=[0.1 0.0]_beta-to-sigma=1.15_A=2.0.jld")
-#a_T_thresh=d["a_T_thresh"]
-for iG in 1:n_g
-    a_T_thresh[:,iG]=temp.^0.7
+if previous == 1
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
+    a_T_thresh=d["a_T_thresh"]
+    t = d["t"]
+    HH_T = d["HH_T"]
+    H_O = d["H_O"]
+else
+    for iG in 1:n_g
+        a_T_thresh[:,iG]=a_grid.^0.7
+    end
+    t[1,1] = 0
+    HH_T = H_grid
+    H_O = H_grid
 end
 
 f_O = Array{Float64,2}(undef,length(a_grid),n_g)
@@ -92,9 +103,6 @@ E_O = Array{Float64,2}(undef,length(H_grid),n_g)
 HHH_T_0 = Array{Float64,1}(undef,n_g)
 H_O_0 = Array{Float64,1}(undef,n_g)
 
-HH_T = Array{Float64,1}(undef,length(H_grid))
-H_O = Array{Float64,1}(undef,length(H_grid))
-
 mass_T = Array{Float64,1}(undef,n_g)
 mass_O = Array{Float64,1}(undef,n_g)
 f_1 = Array{Float64,2}(undef,length(a_grid),n_g)
@@ -116,8 +124,6 @@ for iG in 1:n_g
         f_O[:,iG] = pdf.(LogNormal(mean_a,std_a),a_grid).*f_2[:,iG] # mass of other given a_O
 
         spl_T_thresh = Spline1D(a_grid, a_T_thresh[:,iG],bc="extrapolate")
-
-        quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa),lowbnd,upbnd)[1]
 
         f1[iG]=quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
         mass_O[iG]=quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
@@ -160,6 +166,8 @@ for iH in 1:length(H_grid)
     convT = 1; iterT = 1
     while convT > tolT && iterT < maxiterT
         println("    T: iteration ",iterT)
+        println("HH_T[iH]=",round(HH_T[iH],digits=3))
+        println("t[iH,:]=",round.(t[iH,:],digits=3))
         for iG in 1:n_g
             for ia in 1:length(a_grid)
                 a=a_grid[ia]
@@ -191,6 +199,7 @@ for iH in 1:length(H_grid)
         convT = abs(t[iH,2]-t[iH,1])
         println("convT=",round(convT,digits=3))
         println("t[iH,:]=",round.(t[iH,:],digits=3))
+        println("HH_T[iH]=",round(HH_T[iH],digits=3))
         t[iH,1] = min(t[iH,2],1-1e-3) # ν*t[iH,1]+(1-ν)*t[iH,2]
 
         iterT = iterT+1
@@ -255,10 +264,12 @@ end
 
 #/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/
 
-filename = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_beta-to-sigma=",round(β/σ,digits=2),"_A=",round(A,digits=2),".jld")
-save(filename,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"β",β,"σ",σ,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N)
+filename1 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_tauW=",τ_w,"_tauE=",τ_e,"_A=",round(A,digits=2),"_α=",round(α,digits=2),"_β=",round(β,digits=2),"_η=",round(η,digits=2),"_σ=",round(σ,digits=2),".jld")
+save(filename1,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N)
+filename2 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
+save(filename2,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N)
 
 # Find steady state
-using Roots
-f(x)=x-gm[1]/sum(gm)*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[1,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[1])/(1+τ_e[1]))^(η*η*β/σ/(1-η))*(2/M)^(β/(1-η))*f2[1]^(1-β*η/σ)*(f3[1]/f1[1])^(η*β/σ)*x^(β/(1-η))-gm[2]/sum(gm)*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[1,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[2])/(1+τ_e[2]))^(η*η*β/σ/(1-η))*(2/M)^(β/(1-η))*f2[2]^(1-β*η/σ)*(f3[2]/f1[2])^(η*β/σ)*x^(β/(1-η))
-find_zero(f,2)
+# using Roots
+# f(x)=x-gm[1]/sum(gm)*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[1,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[1])/(1+τ_e[1]))^(η*η*β/σ/(1-η))*(2/M)^(β/(1-η))*f2[1]^(1-β*η/σ)*(f3[1]/f1[1])^(η*β/σ)*x^(β/(1-η))-gm[2]/sum(gm)*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[1,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[2])/(1+τ_e[2]))^(η*η*β/σ/(1-η))*(2/M)^(β/(1-η))*f2[2]^(1-β*η/σ)*(f3[2]/f1[2])^(η*β/σ)*x^(β/(1-η))
+# find_zero(f,2)
