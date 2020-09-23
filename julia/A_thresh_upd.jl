@@ -48,7 +48,7 @@ maxiterT = 100
 
 # Integral bounds
 lowbnd=0.0
-upbnd=quantile.(Normal(mean_a,std_a),quantile_top) # set to largest element in 'a_grid'
+upbnd=quantile.(LogNormal(mean_a,std_a),quantile_top) # set to largest element in 'a_grid'
 
 t=zeros(length(H_grid),2)
 
@@ -263,7 +263,7 @@ for iH in 1:length(H_grid)
     H=HH_T[iH] # H_grid[iH]
     for iG in 1:n_g
         for ia in 1:length(a_grid)
-            N[ia,iH,iG]=M/2/H*(h_T[ia,iH,iG])^(β/σ)
+            N[ia,iH,iG]=(M/2)/H*(h_T[ia,iH,iG])^(β/σ)
         end
     end
 end
