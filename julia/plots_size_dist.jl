@@ -11,7 +11,7 @@ fracteach = Vector{Float64}(undef,pltnm)
 
 pyplot()
 # Plot #1.1:
-d1 = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[0.1 0.0]_τE=[0.0 0.0]_A=10.0_α=0.5_β=0.3_η=0.5_σ=0.3.jld")
+d1 = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_tauW=[0.1 0.0]_tauE=[0.0 0.0]_A=10.0_α=0.5_β=0.3_η=0.5_σ=0.25.jld")
 H_grid = d1["H_grid"]
 a_grid = d1["a_grid"]
 a_T_thresh = d1["a_T_thresh"]
@@ -27,7 +27,8 @@ mass_O = d1["mass_O"]
 mass_T = d1["mass_T"]
 f_1 = d1["f_1"]
 N=d1["N"]
-plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+cvN=d1["cvN"]
+plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.2:
@@ -46,8 +47,9 @@ HH_T_cf = d2["HH_T_cf"]
 mass_O = d2["mass_O"]
 mass_T = d2["mass_T"]
 f_1 = d2["f_1"]
+cvN=d2["cvN"]
 N=d2["N"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.3:
@@ -66,8 +68,9 @@ HH_T_cf = d3["HH_T_cf"]
 mass_O = d3["mass_O"]
 mass_T = d3["mass_T"]
 f_1 = d3["f_1"]
+cvN=d3["cvN"]
 N=d3["N"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.4:
@@ -86,8 +89,9 @@ HH_T_cf = d4["HH_T_cf"]
 mass_O = d4["mass_O"]
 mass_T = d4["mass_T"]
 f_1 = d4["f_1"]
+cvN=d4["cvN"]
 N=d4["N"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.5:
@@ -106,8 +110,9 @@ HH_T_cf = d5["HH_T_cf"]
 mass_O = d5["mass_O"]
 mass_T = d5["mass_T"]
 f_1 = d5["f_1"]
+cvN=d5["cvN"]
 N=d5["N"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.1:
@@ -126,8 +131,9 @@ HH_T_cf = d6["HH_T_cf"]
 mass_O = d6["mass_O"]
 mass_T = d6["mass_T"]
 f_1 = d6["f_1"]
+cvN=d6["cvN"]
 N=d6["N"]
-plt2 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt2 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.2:
@@ -146,8 +152,9 @@ HH_T_cf = d7["HH_T_cf"]
 mass_O = d7["mass_O"]
 mass_T = d7["mass_T"]
 f_1 = d7["f_1"]
+cvN=d7["cvN"]
 N=d7["N"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.3:
@@ -166,8 +173,9 @@ HH_T_cf = d8["HH_T_cf"]
 mass_O = d8["mass_O"]
 mass_T = d8["mass_T"]
 f_1 = d8["f_1"]
+cvN=d8["cvN"]
 N=d8["N"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.4:
@@ -186,8 +194,9 @@ HH_T_cf = d9["HH_T_cf"]
 mass_O = d9["mass_O"]
 mass_T = d9["mass_T"]
 f_1 = d9["f_1"]
+cvN=d9["cvN"]
 N=d9["N"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.5:
@@ -206,8 +215,9 @@ HH_T_cf = d10["HH_T_cf"]
 mass_O = d10["mass_O"]
 mass_T = d10["mass_T"]
 f_1 = d10["f_1"]
+cvN=d10["cvN"]
 N=d10["N"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", c.v. = "*string(round(cvN,digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Save plots:
