@@ -20,8 +20,8 @@ for iG in 1:n_g-1
     gm[iG] = M/(2*n_g)
 end
 gm[end] = M/2 - sum(gm)
-α=.5
-η=.75
+α=.75
+η=.5
 β=.3
 σ=.3
 μ=1/2
@@ -269,15 +269,17 @@ for iH in 1:length(H_grid)
 end
 # Compute mean and c.v. associated with class size distribution (calculate first and second moment
 for iG in 1:n_g
-    # First moment:
+    # Splines for 'N' and pdf of teachers:
     spl_EN = Spline1D(a_grid,N[:,1,iG])
-    EN[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN(aa),lowbnd,upbnd)[1]
+    spl_pdf_T = Spline1D(a_grid,(cdf.(LogNormal(mean_a,std_a),a_O_thresh[:,iG])).*pdf.(LogNormal(mean_a,std_a),a_grid))
+    # First moment:
+    EN[iG] = quadgk(aa -> spl_pdf_T(aa) * spl_EN(aa),lowbnd,upbnd)[1]
     # Second moment:
     spl_EN2 = Spline1D(a_grid,N[:,1,iG].^2)
-    EN2[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN2(aa),lowbnd,upbnd)[1]
+    EN2[iG] = quadgk(aa -> spl_pdf_T(aa) * spl_EN2(aa),lowbnd,upbnd)[1]
 end
-EN_agg = gm./(sum(gm))*EN
-EN2_agg = gm./(sum(gm))*EN2
+EN_agg = (gm./(sum(gm))*EN)[1]
+EN2_agg = (gm./(sum(gm))*EN2)[1]
 cvN = (EN2_agg - EN_agg.^2).^(.5)./EN_agg
 #/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/
 filename1 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_τW=",τ_w,"_τE=",τ_e,"_A=",round(A,digits=2),"_α=",round(α,digits=2),"_β=",round(β,digits=2),"_η=",round(η,digits=2),"_σ=",round(σ,digits=2),".jld")
