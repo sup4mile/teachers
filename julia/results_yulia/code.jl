@@ -271,10 +271,10 @@ end
 for iG in 1:n_g
     # First moment:
     spl_EN = Spline1D(a_grid,N[:,1,iG])
-    EN[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN(aa),lowbnd,upbnd)[1]
+    EN[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN(aa),lowbnd,upbnd)[1]/mass_T[iG]
     # Second moment:
     spl_EN2 = Spline1D(a_grid,N[:,1,iG].^2)
-    EN2[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN2(aa),lowbnd,upbnd)[1]
+    EN2[iG] = quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa) * spl_EN2(aa),lowbnd,upbnd)[1]/(mass_T[iG]^2)
 end
 EN_agg = gm./(sum(gm))*EN
 EN2_agg = gm./(sum(gm))*EN2
