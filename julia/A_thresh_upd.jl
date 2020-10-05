@@ -11,19 +11,19 @@ occ = ["teaching","other"]
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_w[1,1] = 0.1
+τ_w[1,1] = 0
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
 τ_e[1,1] = 0.0
-
+τ_e[1,2] = τ_e[1,1]
 gm=zeros(1,n_g) # measure of in individuals in groups 1,...,n_g
 for iG in 1:n_g-1
     gm[iG] = M/(2*n_g)
 end
 gm[end] = M/2 - sum(gm)
-α=.75
-η=.5
-β=.3
-σ=.3
+α=.5
+η=.6
+β=.4
+σ=.4
 μ=1/2
 ϕ=1/3
 A=10 # productivity in 'Other'
