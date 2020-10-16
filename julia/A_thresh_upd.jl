@@ -168,6 +168,54 @@ for iG in 1:n_g
         a_T_thresh[:,iG]=ν.*a_T_thresh_new[:,iG] + (1-ν).*a_T_thresh[:,iG]
     end
 end
+# CONVERT TO 'WHILE' LOOP FOR CONTRACTION OVER H_T AND HH_T
+for iH in 1:length(H_grid)
+    println("H: gridpoint ", iH," of ", length(H_grid)," (H = ", H_grid[iH],")")
+    println("")
+    H = H_grid[iH] # today's aggregate human capital in teaching
+    # Initiate 'while' loop ('not indexed') over the tax rate:
+    convT = 1; iterT = 1
+    while convT > tolT && iterT < maxiterT
+        println("    T: iteration ",iterT)
+        println("HH_T[iH]=",round(HH_T[iH],digits=3))
+        println("t[iH,:]=",round.(t[iH,:],digits=3))
+        for iG in 1:n_g
+            for ia in 1:length(a_grid)
+                a=a_grid[ia]
+                e_T[ia,iH,iG]=((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*a^(α/(σ/β-η))*f3[iG]/f1[iG]/f2[iG]
+                e_O[ia,iH,iG]=((1-t[iH,1])*(1-τ_w[iG])/(1+τ_e[iG])*A*η*s_O^ϕ*(2*H/M)^σ*a^α)^(1/(1-η))
+            end
+            # Compute HHH_T:
+            h_T[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_T.^ϕ .* e_T[:,iH,iG].^η
+            #spl_e_T=Spline1D(a_grid,e_T[:,iH,iG],bc="extrapolate")
+            spl_O_thresh=Spline1D(a_grid, a_O_thresh[:,iG],bc="extrapolate")
+            #HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
+            HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+            # Compute H_O: (note that exponent sigma/beta is absent):
+            h_O[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_O.^ϕ .* e_O[:,iH,iG].^η
+            spl_e_O=Spline1D(a_grid,e_O[:,iH,iG],bc="extrapolate")
+            spl_T_thresh=Spline1D(a_grid, a_T_thresh[:,iG],bc="extrapolate")
+            H_O_0[iG]=(2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+
+            # Total earnings of teachers in each group:
+            E_T[iH,iG] =  H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+            #H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
+            # Total earnings of others in each group:
+            E_O[iH,iG] = (1-τ_w[iG])*A*(2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+        end
+        HH_T[iH]=sum(HHH_T_0.*gm)
+        H_O[iH]=sum(H_O_0.*gm)
+
+        t[iH,2]=sum(E_T[iH,:].*gm)/(sum(E_T[iH,:].*gm)+sum(E_O[iH,:].*gm))
+        convT = abs(t[iH,2]-t[iH,1])
+        println("convT=",round(convT,digits=3))
+        println("t[iH,:]=",round.(t[iH,:],digits=3))
+        println("HH_T[iH]=",round(HH_T[iH],digits=3))
+        t[iH,1] = min(t[iH,2],1-1e-3) # ν*t[iH,1]+(1-ν)*t[iH,2]
+
+        iterT = iterT+1
+    end
+end
 
 for iH in 1:length(H_grid)
     println("H: gridpoint ", iH," of ", length(H_grid)," (H = ", H_grid[iH],")")
@@ -217,9 +265,6 @@ for iH in 1:length(H_grid)
     end
 end
 
-#plt1 = plot(a_grid,a_T_thresh[:,1,1])
-#plt2 = plot(a_grid,a_O_thresh[:,1,1])
-
 for iH in 1:length(H_grid)
     H = H_grid[iH] # today's aggregate human capital in teaching
     # Initiate 'while' loop ('not indexed') over the tax rate:
@@ -253,15 +298,15 @@ for iH in 1:length(H_grid)
 end
 
 #### Group-specific barriers
-HH_T_cf=zeros(length(H_grid))
-H_O_cf=zeros(length(H_grid))
-for iH in 1:length(H_grid)
-    H=H_grid[iH]
-    for iG in 1:n_g
-        HH_T_cf[iH]+=(gm[iG]/sum(gm))*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[iH,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[iG])/(1+τ_e[iG]))^(η*η*β/σ/(1-η))*(2*H/M)^(β/(1-η))*f2[iG]^(1-β*η/σ)*(f3[iG]/f1[iG])^(η*β/σ)
-        H_O_cf[iH]+=(gm[iG]/sum(gm))*(A*η*(1-t[iH,1])*(1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*s_O^(ϕ/(1-η))*(2*H/M)^(σ/(1-η))*f3[iG]
-    end
-end
+# HH_T_cf=zeros(length(H_grid))
+# H_O_cf=zeros(length(H_grid))
+# for iH in 1:length(H_grid)
+#     H=H_grid[iH]
+#     for iG in 1:n_g
+#         HH_T_cf[iH]+=(gm[iG]/sum(gm))*s_T^(ϕ*β/σ)*s_O^(ϕ*β*η/σ/(1-η))*((1-t[iH,1])*η*A)^(η*β/σ/(1-η))*(β/σ)^(η*β/σ)*((1-τ_w[iG])/(1+τ_e[iG]))^(η*η*β/σ/(1-η))*(2*H/M)^(β/(1-η))*f2[iG]^(1-β*η/σ)*(f3[iG]/f1[iG])^(η*β/σ)
+#         H_O_cf[iH]+=(gm[iG]/sum(gm))*(A*η*(1-t[iH,1])*(1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*s_O^(ϕ/(1-η))*(2*H/M)^(σ/(1-η))*f3[iG]
+#     end
+# end
 
 N=zeros(length(a_grid),length(H_grid),n_g)
 for iH in 1:length(H_grid)
