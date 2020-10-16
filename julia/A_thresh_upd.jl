@@ -6,13 +6,13 @@ previous = 1;
 M=1.0 # population measure
 g = ["female","male"] # no discrimination / no barrier group last
 occ = ["teaching","other"]
-ν = 0.9
+ν = 0.2
 
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_w[1,1] = -1
-τ_w[1,2] = τ_w[1,1]
+τ_w[1,1] = -3
+τ_w[1,2] = -4
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
 τ_e[1,1] = 0.0
 τ_e[1,2] = τ_e[1,1]
@@ -41,7 +41,7 @@ s_T=μ*ϕ/(μ*ϕ+σ/β-η)
 s_O=μ*ϕ/(μ*ϕ+1-η)
 cnst=(1-η)/(1-η*β/σ)*((1-s_O)/(1-s_T))^(1/μ)
 
-maxiterAA=200
+maxiterAA=1e5
 tol_a=1e-6
 
 tolT= 2.5e-4
@@ -57,6 +57,7 @@ a_T_thresh = Array{Float64,2}(undef,length(a_grid),n_g)
 a_O_thresh = Array{Float64,2}(undef,length(a_grid),n_g)
 a_T_thresh_new = Array{Float64,2}(undef,length(a_grid),n_g)
 if previous == 1
+    # d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.8 -0.8]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
     d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
     a_T_thresh=d["a_T_thresh"]
     t = d["t"]
@@ -159,10 +160,12 @@ for iG in 1:n_g
         ratio=f1[iG]*f2[iG]/f3[iG]
 
         a_T_thresh_new[:,iG]=((1-τ_w[iG])*cnst*ratio.*(a_grid.^(α/(1-η)))).^((σ/β-η)/α)
-
-        conv_a=maximum(abs.(a_T_thresh_new[:,iG] .- a_T_thresh[:,iG]))
-        println("error=", conv_a)
-        a_T_thresh[:,iG]=a_T_thresh_new[:,iG]
+        abs_err = abs.(a_T_thresh_new[:,iG] .- a_T_thresh[:,iG])
+        ind_max_err = findall(x->x==maximum(abs_err),abs_err)
+        sign_max_err = sign.(a_T_thresh_new[ind_max_err,iG] .- a_T_thresh[ind_max_err,iG])
+        conv_a=maximum(abs_err)
+        println("error=", conv_a.*sign_max_err[1])
+        a_T_thresh[:,iG]=ν.*a_T_thresh_new[:,iG] + (1-ν).*a_T_thresh[:,iG]
     end
 end
 

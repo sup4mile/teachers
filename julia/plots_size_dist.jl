@@ -14,6 +14,7 @@ pyplot()
 d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[0.0 0.0]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -30,13 +31,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt1 = plot(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w = "*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*", S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 # plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\% in  T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))))
 fracteach[1]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 # Plot #1.2:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.25 -0.25]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.2 -0.2]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -53,13 +56,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[2]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.3:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.375 -0.375]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.4 -0.4]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -76,13 +81,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[3]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.4:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.7 -0.7]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.6 -0.6]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -99,13 +106,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[4]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #1.5:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-1.0 -1.0]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.8 -0.8]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -122,13 +131,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt1 = plot!(plt1,a_grid,N[:,1,1],grid=:none,title="Class Size",xlabel=latexstring("a^T"),ylabel=latexstring("N(a^T)"),label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[5]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.1:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.9 -0.9]_τE=[0.0 0.0]_A=10.0_α=0.5_β=0.3_η=0.5_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-1.0 -1.0]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -145,13 +156,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt2 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt2 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt2 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[6]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.2:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-1 -1]_τE=[0.0 0.0]_A=10.0_α=0.55_β=0.3_η=0.5_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-1.5 -1.5]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -168,13 +181,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[7]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.3:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[0.0 0.0]_τE=[0.0 0.0]_A=10.0_α=0.6_β=0.3_η=0.5_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-2.0 -2.0]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -191,13 +206,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[8]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.4:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[0.0 0.0]_τE=[0.0 0.0]_A=10.0_α=0.65_β=0.3_η=0.5_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-2.5 -2.5]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -214,13 +231,15 @@ f_1 = d["f_1"]
 N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[9]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Plot #2.5:
-d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[0.0 0.0]_τE=[0.0 0.0]_A=10.0_α=0.7_β=0.3_η=0.5_σ=0.4.jld")
+d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-3.0 -3.0]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
 H_grid = d["H_grid"]
 a_grid = d["a_grid"]
+gm = d["gm"]
 a_T_thresh = d["a_T_thresh"]
 a_O_thresh = d["a_O_thresh"]
 β = d["β"]
@@ -238,11 +257,12 @@ N=d["N"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
 
-plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+# plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
+plt2 = plot!(plt2,a_grid,N[:,1,1],grid=:none,title="Class Size",xlabel=latexstring("a^T"),ylabel=latexstring("N(a^T)"),label=latexstring("τ_w="*string(τ_w)*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 fracteach[10]=sum(mass_T[:])/(sum(mass_T[:])+sum(mass_O[:]))
 
 # Save plots:
 # savefig(plt1,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_α="*string(round(α,digits=2))*"_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"_τ_w="*string(τ_w)*"-Panel-1.eps")
 # savefig(plt2,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_α="*string(round(α,digits=2))*"_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"_τ_w="*string(τ_w)*"-Panel-2.eps")
-savefig(plt1,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"_τ_w="*string(τ_w)*"-Panel-1.eps")
-savefig(plt2,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_α="*string(round(α,digits=2))*"_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"_τ_w="*string(τ_w)*"-Panel-2.eps")
+savefig(plt1,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"_σ="*string(round(σ,digits=2))*"-Panel-1.eps")
+savefig(plt2,"/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/N_α="*string(round(α,digits=2))*"_β="*string(round(β,digits=2))*"_η="*string(round(η,digits=2))*"_σ="*string(round(σ,digits=2))*"-Panel-2.eps")
