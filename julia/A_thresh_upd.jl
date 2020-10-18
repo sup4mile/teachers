@@ -169,6 +169,7 @@ for iG in 1:n_g
     end
 end
 # CONVERT TO 'WHILE' LOOP FOR CONTRACTION OVER H_T AND HH_T
+
 for iH in 1:length(H_grid)
     println("H: gridpoint ", iH," of ", length(H_grid)," (H = ", H_grid[iH],")")
     println("")
