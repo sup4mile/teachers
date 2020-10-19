@@ -31,9 +31,10 @@ A=10 # productivity in 'Other'
 θ=3
 
 quantile_top = .999
-#H_grid=collect(range(.05,stop=1.4,length=17))
-# H_grid=collect(range(.0005,stop=1.0,length=20))
+# Set up the grid for aggregate human capital in teaching:
 H_grid_length = 21
+# Set the percentage range above / below fixed point:
+H_grid_range = 0.2
 # a_grid=quantile.(Frechet(θ),.005:.015:1)
 mean_a=0
 std_a=1
@@ -236,7 +237,7 @@ while gapHH > tolHH
 end
 println("Found fixed point for human capital in teaching!")
 # Update H_grid:
-H_grid = collect(range(0.8*HH_fp,stop=1.2*HH_fp,length=H_grid_length))
+H_grid = collect(range((1-H_grid_range)*HH_fp,stop=(1+H_grid_range)*HH_fp,length=H_grid_length))
 for iH in 1:H_grid_length
     println("H: gridpoint ", iH," of ", H_grid_length," (H = ", H_grid[iH],")")
     println("")
