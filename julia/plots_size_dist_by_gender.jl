@@ -28,8 +28,10 @@ mass_O = d["mass_O"]
 mass_T = d["mass_T"]
 f_1 = d["f_1"]
 N=d["N"]
+EN=d["EN"]
 EN_agg=d["EN_agg"]
 cvN=d["cvN"]
+cvN_agg=d["cvN_agg"]
 # plt1 = plot(plt1,a_grid,N[:,1,1],grid=:none,label=latexstring("\\alpha = "*string(round(α,digits=2))*", \\beta = "*string(round(β,digits=2))*", \\eta = "*string(round(η,digits=2))*", \\sigma = "*string(round(σ,digits=2))*", E(N) = "*string(round(EN_agg,digits=2))*", c.v. = "*string(round(cvN,digits=2))*", \\%T = "*string(round((gm./(sum(gm))*mass_T)[1],digits=2))*",S/T = "*string(round(M*((gm./(sum(gm))*mass_T)[1])^(-1),digits=2))))
 plt1 = plot(a_grid,N[:,1,1],grid=:none,label=latexstring("τ_w^O = "*string(τ_w[1])*", N = "*string(round(EN[1],digits=2))*", c.v. = "*string(round(cvN[1],digits=2))*", \\%T = "*string(round((mass_T)[1],digits=2))*", S/T = "*string(round(((gm'./sum(gm).*EN)./(gm'.*mass_T))[1],digits=2))))
 plt1 = plot!(plt1,a_grid,N[:,1,2],grid=:none,label=latexstring("τ_w^O = "*string(τ_w[2])*", N = "*string(round(EN[2],digits=2))*", c.v. = "*string(round(cvN[2],digits=2))*", \\%T = "*string(round((mass_T)[2],digits=2))*", S/T = "*string(round(((gm'./sum(gm).*EN)./(gm'.*mass_T))[2],digits=2))))
