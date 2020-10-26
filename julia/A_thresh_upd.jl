@@ -110,6 +110,7 @@ H_O_0 = Array{Float64,1}(undef,n_g)
 
 EN = Array{Float64,1}(undef,n_g)
 EN2 = Array{Float64,1}(undef,n_g)
+cvN = Array{Float64,1}(undef,n_g)
 mass_T = Array{Float64,1}(undef,n_g)
 mass_O = Array{Float64,1}(undef,n_g)
 f_1 = Array{Float64,2}(undef,length(a_grid),n_g)
@@ -350,15 +351,16 @@ for iG in 1:n_g
     # Second moment:
     spl_EN2 = Spline1D(a_grid,N[:,1,iG].^2)
     EN2[iG] = quadgk(aa -> spl_pdf_T(aa) * spl_EN2(aa),lowbnd,upbnd)[1]
+    cvN[iG] = (EN2[iG] - EN[iG].^2).^(.5)./EN[iG]
 end
 EN_agg = (gm./(sum(gm))*EN)[1]
 EN2_agg = (gm./(sum(gm))*EN2)[1]
-cvN = (EN2_agg - EN_agg.^2).^(.5)./EN_agg
+cvN_agg = (EN2_agg - EN_agg.^2).^(.5)./EN_agg
 #/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/
 filename1 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_τW=",τ_w,"_τE=",τ_e,"_A=",round(A,digits=2),"_α=",round(α,digits=2),"_β=",round(β,digits=2),"_η=",round(η,digits=2),"_σ=",round(σ,digits=2),".jld")
-save(filename1,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N,"EN_agg",EN_agg,"cvN",cvN,"gm",gm)
+save(filename1,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"N",N,"EN",EN,"EN_agg",EN_agg,"cvN",cvN,"cvN_agg",cvN_agg,"gm",gm)
 filename2 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
-save(filename2,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"HH_T_cf",HH_T_cf,"H_O_cf",H_O_cf, "N", N,"EN_agg",EN_agg,"cvN",cvN,"gm",gm)
+save(filename2,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"N",N,"EN",EN,"EN_agg",EN_agg,"cvN",cvN,"cvN_agg",cvN_agg,"gm",gm)
 
 # Find steady state
 # using Roots
