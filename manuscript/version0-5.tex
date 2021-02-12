@@ -1,0 +1,566 @@
+\documentclass[onehalfspacing,11pt]{article}
+\usepackage{achicago,setspace,palatino,graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{bm,bbm}
+\usepackage[bottom]{footmisc} % places footnotes @ bottom of page
+\usepackage{booktabs}
+\usepackage{enumerate}
+\usepackage[breaklinks]{hyperref} % option enables "broken" links across lines
+\usepackage{natbib}
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lscape,rotating}
+\usepackage{xfrac}
+\usepackage{dsfont}
+\newtheorem{as}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corr}{Corollary}
+\newtheorem{df}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prp}{Proposition}
+\newtheorem{clm}{Claim}
+\newtheorem{rmk}{Remark}
+\newenvironment{prf}{{\bf Proof}}{\hfill {\sc q.e.d. }}
+\newenvironment{prfLemma}{{\bf Proof of Lemma}}{\hfill {\sc q.e.d. }(Lemma)}
+\setlength{\parindent}{0em} \setlength{\parskip}{1.5ex plus0.5ex
+minus0.5ex} \textwidth15.75cm \evensidemargin5mm \oddsidemargin5mm
+\topmargin-8mm \textheight 21.7cm
+
+\newcommand{\fraction}{\int\frac{\mu_{t+1}}{\epsilon_{t+1}} }
+\newcommand{\lbar}{\int\frac{\mu_{t+1}}{\epsilon_{t+1}} }
+\parindent 0pt
+\parskip 5pt
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{titlepage}
+\title{The Allocation of Teaching Talent and Human Capital Accumulation}
+\author{Simeon D.~Alder\footnote{University of Wisconsin - Madison} \and Yulia Dudareva\footnote{University of Wisconsin - Madison} \and Ananth Seshadri\footnote{University of Wisconsin - Madison}}
+\date{\today \\ \vspace{5mm} {\sc Preliminary and Incomplete!}}
+
+\maketitle
+
+\begin{abstract}
+The educational landscape in the U.S.~has gone through major changes since the end of World War II. Real expenditure per student has risen from approximately \$2,100 to more than \$10,000 by the turn of the century and more than \$12,000 since the Great Recession. At the same time, the student-teacher ratio has fallen from a national average of almost 27 in 1955 to 16 by the 2010s. Yet despite the rise in expenditures and the reduction in class sizes, educational outcomes in the U.S.~don't compare very favorably with countries at similar income levels. One aspect of U.S.~education that has not garnered a lot of attention until fairly recently is occupational choice. We add an education sector to an otherwise standard \cite{Hsieh:2018}-style model to explore the extent to which changes in career opportunities in other occupations affect the selection of workers into teaching careers. In our model, changes in the allocation of teaching talent have implications for the evolution of class size as well as quality of instruction and hence the accumulation of human capital during the workers' formative years. This gives rise to a trade-off between static and dynamic efficiency, which we quantify by way of a structural model. In order to discipline the parameterization of the model, we compare model-generated moments to their empirical counterparts in three longitudinal surveys: Project TALENT, the NLSY79, and NLSY97. Project TALENT surveys 377,000 U.S.~high school students in 1960 and follows them for more than a decade. Together with the two NLSY's, it provides a detailed account of, among many others, the educational trajectories and career paths of young American adults over the course of more than four decades.
+\end{abstract}
+\end{titlepage}
+
+\section{Introduction}
+The educational landscape in the U.S.~has gone through major changes since the end of World War II. Real expenditure per student has risen from approximately \$2,100 to more than \$10,000 by the turn of the century and more than \$12,000 since the Great Recession. At the same time, the student-teacher ratio has fallen from a national average of almost 27 in 1955 to 16 by the 2010s. Yet despite the rise in expenditures and the reduction in class sizes, educational outcomes in the U.S.~don't compare very favorably with countries at similar income levels.
+
+One aspect of U.S.~education that has not garnered a lot of attention until fairly recently is occupational choice. We add an education sector to an otherwise standard \cite{Hsieh:2018}-style model to explore the extent to which changes in career opportunities in other occupations affect the selection of workers into teaching careers. In our model, teaching is distinct from other occupations in the economy since it produces human capital embodied in students rather than a consumption good or service. As a result, changes in the allocation of teaching talent have implications for the evolution of class size as well as quality of instruction and hence the accumulation of human capital during the workers' formative years.
+
+While the model has implications for the stationary static allocation of talent across occupations, we emphasize the dynamic effects driven by human capital accumulation in primary and secondary education in order to explore the deeper causes of America's education \textit{malaise}.
+
+Section \ref{sec:model} introduces the model. Section \ref{sec:data} reviews the data and we calibrate the model to match salient empirical moments in section \ref{sec:quant}. Section \ref{sec:conclusion} concludes.
+
+\section{Model}\label{sec:model}
+The model is populated by a constant measure $M$ of workers who are employed in one of the $N$ sectors of the economy. Each individual is born with an exogenous $N$-dimensional vector of skills $\vec{a}$, where each element characterizes her innate ability in any one of the $n \in \{1,\ldots,N\}$ occupations in the economy, each corresponding to one of the sectors or industries. This vector of abilities is drawn from a known joint distribution $F_a(\vec{a})$.
+
+Without loss of generality, occupation 1 is \textit{teaching}. In this economy, teachers are distinct from other occupations since their technology produces human capital rather than the homogenous final good in the remaining $N-1$ sectors. This kind of distinction is salient since we are assuming that the economy is populated by overlapping generations of workers who accumulate human capital when young, which then pays off when they are of working age (or ``old'').
+\subsection{Workers}
+As in \cite{Roy:1951}, workers make occupational choices based on their full range of idiosyncratic abilities $\vec{a}$ and the corresponding ``payoffs.'' To this basic mechanism we add \cite{Hsieh:2018}-style forces that distort the allocation of skill across occupations and a human capital formation technology with time, good, and teacher input.
+
+The timing convention is similar to \cite{Hsieh:2018}. In the first period, prospective workers -- or students -- make human capital investments. Since there is no uncertainty, students have perfect foresight and their investment decision will depend on their fully anticipated occupational choice in period 2. They retire at the end of their working period and are replaced by a new cohort of students with measure $\tfrac{M}{2}$. The environment is stationary in the sense that the members of each cohort draw their ability vectors from the same distribution $F_a$.
+
+The worker's utility depends on her consumption and time devoted to human capital investment:
+\begin{equation}
+\label{ }
+U_t = \max_{C_{t+!},s_t,e_t}\ln C_{t+1} + \ln\left(1-s_t\right)
+\end{equation}
+where
+\begin{align}
+\label{}
+C_{t+1} & =(1-\tau^{\omega,g})\omega_{t+1}(h_{t+1})-e_{t} \\ %, \textrm{ for } t \in \{c,c+1\}  \\
+h_{t+1}^n & =g(h_{t}^T,a^n)(s_t^n)^{\phi} (e_t^n)^{\eta}\big(N_t(h_t^T)\big)^{-\sigma} \label{eq:h}\\
+g(h_{c+1}^T,\vec{a}) & =(h_{c+1}^T)^\beta \begin{bmatrix}a_1^\alpha \ldots a_N^\alpha \end{bmatrix}.
+\end{align}
+$C_{t+1}$ is consumption of the homogeneous final good when old, $s_t$ is the time allocated to human capital formation when young, and $e_t$ are units of the final good invested in human capital formation when workers are still students. These investments are occupation-specific and indexed by the superscript $n$.\footnote{Nothing prevents students from making investments in human capital in multiple occupations. Since there is no uncertainty in future payoffs they will, however, select only one in equilibrium.} The periodic time endowment is set to unity. $1-s_t$ is leisure time when young and labor is supplied inelastically when individuals reach working age. $\tau^{\omega,g}$ encapsulates a composite of a constant marginal tax rate levied on labor income and any group-$g$-specific labor market distortion (or wedge).
+
+The joint distribution of $\vec{a}$ is a multivariate Fr\'echet with c.d.f.
+\begin{equation}
+\label{ }
+F(a_1,\ldots,a_N) = \exp \left[ -\sum_{n=1}^N a_n^{-\theta} \right],
+\end{equation}
+where the idiosyncratic draws are independent. We borrow this assumption from \cite{Eaton:2002}.
+
+The production technologies in occupations $2,\ldots,N$ are linear in efficiency units of labor $h$ with productivities $\{A_n\}_{n=2}^N$.
+
+\subsection{Occupational Choice}
+Teaching is distinct from other occupations since it ``transforms'' students with skill endowment $\vec{a}$ into workers with human capital $\vec{h}$ based on equation \eqref{eq:h}. The acquisition of human capital depends on the teacher's input $h^T$, the student's talent $\vec{a}$, the student's time and good investments $s$ and $e$, as well as class size $N(h^T)$, which we allow to vary with the teacher's $h^T$.
+
+Individuals will choose the occupation that delivers the highest lifetime utility. Since human capital takes ``time to build'', the return to educational good and time investments is zero when working.% Clearly, then, $e_{c+1} = s_{c+1} = 0$.
+
+Since we're mainly interested in the choice between a teaching career and other occupations, we will first characterize the problem in the special $N=2$ case and label the occupations with $T$ (teaching) and $O$ (other). In a second step, we can review how changes in discrimination or educational barriers in these ``other'' occupations affect the selection and human capital composition of teachers over time.
+
+Equation \eqref{eq:h} highlights the distinctive feature of teaching compared to all other occupations: the elasticity of output with respect to the teacher's human capital ($h^T$) is $\beta$ whereas production is linear in human capital in $O$, i.e. the output elasticity is $1$. Due to the complementarity between student ability and teacher type, the efficient allocation would match higher-ability students with more skilled teachers.
+\subsubsection{Teachers and Class Size}
+ This effect, however, is tempered by the teacher's span-of-control. $N(\cdot)$ denotes the class size and the coefficient $-\sigma$ captures the stylized fact that in larger classes teachers can pay less attention to individual students. Here, we allow class size to depend on $h^T$ and we are focusing on $N(h^T)$ such that -- for given $e$ -- students are indifferent between teachers with different levels of human capital, say $h^T$ and ${h^T}'$:
+ \begin{equation}
+\label{ }
+N({h^T}') = \left(\frac{{h^T}'}{{h^T}}\right)^{\frac{\beta}{\sigma}} N({h^T})
+\end{equation}
+\subsubsection{Student-Teacher Matching}
+While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This will be the case, for instance, if students make human capital investments in terms of goods as a function of (1) their own ability, (2) anticipated occupation, and (3) teacher quality. 
+
+For simplicity, we assume that students make investments as a function of $a$ and occupation, but not $h^T$. The joint assumption $e(a)$ and $N(h^T)$ implies that the student-teacher matching is random since in this specification the human capital production function is modular in $h^T$ and $a$.\footnote{The anecdotal evidence suggests that student-teacher assignments don't involve systematic sorting at the school level. There is, however, some evidence in support of sorting between families with highly educated parents and high-ability teachers into better funded schools or school districts. Identifying the empirically relevant extent of this type of sorting is working in progress and future versions of our model will allow for it, if salient.}
+
+\subsection{Values}
+The structure we impose on class size and student-teacher matching simplifies the characterization of an equilibrium considerably. While idiosyncratic heterogeneity still matters, the aggregate state can be summarized by a single moment of the distribution of human capital among current teachers (which we discuss in more detail below). Thanks to this feature, the dimensionality of the dynamic program associated with this economy is finite and we can characterize stationary equilibria as well as full transition paths sharply.
+
+The idiosyncratic state consists of the $N$-dimensional vector of abilities $\vec{a}$. For the time being, we assume $N=2$, where $n=1$ denotes teaching and $n=2$ lumps together all other occupations. Instead of 1 and 2, we'll label the occupations by $T$ (for teaching) and $O$ (for other).
+
+Students solve the following maximization problem which entails a discrete occupational choice as well as continuous human capital investments in terms of time and final goods. Formally, they solve:
+\begin{align*}
+V^g(a^T,a^O,\widetilde{H}^T) & = \max_{\{s^{O},s^{T},e^{O},e^{T}\}} \bigg\{ V^{O,g}(a^O,\widetilde{H}^T), V^{T,g}(a^T,\widetilde{H}^T) \bigg\}
+\end{align*}
+where
+\begin{align*}
+%\label{eq:vo}
+V^{O,g}(a^O,\widetilde{H}^T) & = \ln\left(1-s^O\left(a^O,\widetilde{H}^T\right)\right) \\
+& + \mu \ln \Big[ {{h'}^{O}} A^O(1-{{\tau'}^{O,g,w}}) \\
+& - e^O(a^O,\widetilde{H}^T)(1+\tau^{O,g,e}) - T \Big],  \\
+%\label{eq:vt}
+V^{T,g}(a^T,\widetilde{H}^T) & = \ln\left(1-s^T\left(a^T,\widetilde{H}^T\right)\right)  \\
+& + \mu \ln \Big[ \omega'({{h'}^{T}},{\widetilde{H'}^{T}})(1-{{\tau'}^{T,g,w}})  \\
+& - e^T(a^T,\widetilde{H}^T)(1+\tau^{T,g,e}) - T \Big] 
+\end{align*}
+
+To make further progress, we need to characterize an occupational choice threshold along which a student with abilities $(a^T,a^O)$ is indifferent between teaching and production work. More formally, the threshold is a function
+
+\begin{equation*}
+%\label{eq:ot}
+a^{T*}(a^O) = \bar{a}\big(a^{O},\widetilde{H}^T\big) %\\
+\end{equation*}
+such that
+\begin{equation}
+\label{eq:indiff}
+V^{O}(a^{O},\widetilde{H}^T) = V^{T}\left(a^{T*}(a^O),\widetilde{H}^T\right) \textrm{{\sf , for all} } a^O \in (0,\infty)
+\end{equation}
+
+Unless it's necessary, we will omit the aggregate state argument $\widetilde{H}^T$ from $\bar{a}$ in order to keep the notation clean and tidy.
+
+The optimization problem is subject to the following constraints and laws of motion:
+\begin{align}
+%H^{T} & = \int_{0}^{\infty} \left(h^{T}(a)\right)^{\frac{\beta}{\sigma}} f^{T}(a) da \\
+\label{eq:bc}
+T & = \int_0^\infty \omega\left(h^{T'}(a)\right) {f'}^T(a) da \\%\frac{2}{M} \int_0^\infty \omega\left(h^{T'}(a)\right) {f'}^T(a) da \nonumber\\
+\label{eq:densT}
+f^T(a) & = \int_0^{\bar{a}^{-1}\left(a\right)} f\big(a,b \big) db \\
+\label{eq:densO}
+f^O(b) & = \int_0^{\bar{a}\left(b\right)} f\big(a,b \big) da 
+%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O 
+\end{align}
+Equation \eqref{eq:bc} is the government's balanced budget requirement, which is a salient feature in the U.S.~context. Equations \eqref{eq:densT} and \eqref{eq:densO} are the marginal densities of teachers and production workers after taking into account the endogenous occupational choice in \eqref{eq:indiff}.
+
+The aggregate laws of motion for human capital in teaching ($\widetilde{H}^T$) and ``other'' (${H}^O$) are:
+\begin{align}
+\label{eq:lomO}
+{H'}^{O} & = \int_0^\infty \left(\tfrac{2 \widetilde{H}^T}{M}\right)^\sigma a^\alpha s^O\left(a,\widetilde{H}^T\right)^\phi e^O(a,\widetilde{H}^T)^\eta  f^O(a) da \\
+\label{eq:lomT}
+\widetilde{H'}^{T} & = \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}^T}{M}\right)^\sigma a^\alpha s^T\left(a,\widetilde{H}^T\right)^\phi e^T(a,\widetilde{H}^T)^\eta \right)^{\frac{\beta}{\sigma}} f^T(a) da 
+\end{align}
+
+Equation \eqref{eq:lomO} is the aggregation over $h^O$ of the current cohort of students while equation \eqref{eq:lomT} is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of $h^T$ of the current cohort of students.
+
+For the time being, the only restriction on the teachers' wage profile is that it's proportional to her class size. We will revisit this aspect in section \ref{sec:firstbest} where we will impose some additional structure on this profile. While $\omega$ is linear in class size, it is non-linear in the teacher's human capital and this will turn out to be important when we analyze the effects associated with changes in educational barriers and labor market discrimination over time.
+
+\section{Equilibrium}
+Let's first characterize the optimal human capital investment for a prospective teacher with ability $a$.\footnote{A stickler might object that it should really be $a^T$, but we're dropping the superscript to economize on notation whenever possible.}
+
+The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
+\begin{align}
+\label{eq:foc-e}
+(1-\tau^e) e^t \left( \frac{\sigma}{\beta \eta}-1 \right) - T & = \left(1-s^T\right) \mu(1-\tau^w) \frac{\partial \omega'}{\partial s^T} \\
+\label{eq:foc-s}
+(1-\tau^w) \frac{\partial \omega'}{\partial e^T} & = 1-\tau^e,
+\end{align}
+where
+\begin{align}
+%\label{}
+ \frac{\partial \omega'}{\partial s^T} & =  \frac{\beta \phi}{\sigma} \lambda' \left(\frac{M}{2 H^T}\right)^{-\beta} \frac{M}{2 {{H'}^T}} \left[ a^\alpha (s^T)^\phi (e^T)^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{s^T} \nonumber \\
+ \frac{\partial \omega'}{\partial e^T} & = \frac{\beta \eta}{\sigma} \lambda' \left(\frac{M}{2 H^T}\right)^{-\beta} \frac{M}{2 {{H'}^T}} \left[ a^\alpha (s^T)^\phi (e^T)^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{e^T} \nonumber
+\end{align}
+
+The F.O.C.s for prospective production workers are analogues of \eqref{eq:foc-e} and \eqref{eq:foc-s} with the simplification that the wage profile in production (as opposed to teaching) is linear in $h^O$.
+
+In the special case with $\beta=\sigma$, the model recovers most if not all of the standard {\it Roy} features and the wage profile is linear in human capital on {\it both} occupations.
+
+%Now that we have a characterization of class size and student-teacher matching we can think about the value of a teacher's contribution and how it shapes the workers' occupational choices. To proceed we need some additional notation.
+%
+%Let $\left(h^*(h^O),h^O\right)$ denote the human capital vector across the two occupations such that the worker is indifferent between a teaching career and the alternative. Since the ``other'' production technology is linear in labor with productivity $A^O$, the period 2 income in $O$ is $w^O h^O = A^O h^O$ and indifference implies that the marginal teacher's income is $\omega\left(h^*(h^O)\right) = w^O h^O$. Starting with the marginal teacher we can build the complete wage profile $\omega$.
+%
+%To do so we need to first characterize how much more human capital a supra-marginal teacher produces and how valuable that extra amount is in light of the students' occupation choices. At this point, we're only interested in a stationary equilibrium and our notation should be interpreted accordingly.
+%
+%To make further progress, we need to solve for the optimal human capital investment decisions in terms of time and goods. The former, as is standard in these models, doesn't depend on the student's talent or future occupation:
+%\begin{equation}
+%\label{eq:s*}
+%s=\frac{1}{1+\frac{1-\eta}{\gamma\phi}}.
+%\end{equation}
+%The latter, in contrast, depends on the student's occupational choice and the slope of the wage profile in each occupation. In $O$, the wage profile is linear and the marginal value of human capital is $w^O = A^O$. In teaching, $\omega(h^T)$ can be non-linear and the choice of $e$ depends on $\omega'(h^T)$:
+%\begin{equation}
+%\label{eq:e*}
+%e(a)=\begin{cases}
+%\left[(1-\tau)w^O {\left(a^O\right)}^{\alpha}s^\phi\eta c^{\ast}\right]^{\frac{1}{1-\eta}}, & \textrm{if} \ a^T< \frac{h^*(h^O)}{h^O} \cdot a^O\\
+%\left[(1-\tau)\frac{d\omega}{dh}|_{{h^T}'}\cdot {\left(a^T\right)}^{\alpha}s^\phi\eta c^{\ast}\right]^{\frac{1}{1-\eta}}, & \ \textrm{if} \ {a^T}\ge \frac{h^*(h^O)}{h^O} \cdot a^O
+%\end{cases}
+%\end{equation}
+%where ${h^T}'$ is the student's human capital in teaching in the second period of her life (i.e. at $c+1$) and $c^{\ast}=(h^T)^{\beta}\left(N(h^T)\right)^{-\sigma}$ is a constant. It is pinned down by the students' indifference condition as well as market clearing for students and teachers. We will return to the latter once we have all the ingredients to describe the distribution of $h^T$ among teachers.
+%
+%At this point, it is worth emphasizing that $e(a)$ depends on $a$ and the student's future occupation. However, educational investments and the teacher's input into human capital production are such that \textit{all} raw skills are ``upgraded'' proportionally and we have $\frac{{h^T}'}{{h^O}'} = \frac{a^T}{a^O}$.
+%
+%Now we have all the elements to quantify how much more human capital a teacher with $h^T > h^*(h^O)$ produces compared to the marginal teacher with $h^*(h^O)$. Holding $a$ fixed, all teachers generate the same human capital ``gain'' per student. The increased value of a better teacher comes from class size and we can compute the additional human capital by integrating over the distribution of student ability (adjusted for the size of each cohort $\sfrac{M}{2}$):
+%\begin{align}
+%\label{eq:relN}
+%\left[N(h^T) - N\left(h^*(h^O) \right)\right] \int a^\alpha s^\phi e(a)^\eta \frac{dF(a)}{\sfrac{M}{2}} \nonumber \\
+%= N\left(h^*(h^O) \right) \left[ \left(\frac{h^T}{h^*(h^O)}\right)^{\frac{\beta}{\sigma}} - 1 \right] \int a^\alpha s^\phi e(a)^\eta \frac{dF(a)}{\sfrac{M}{2}}.
+%\end{align}
+%Equation \eqref{eq:relN} describes the excess human capital production relative to a marginal teacher with human capital $h^*(h^O)$. Absolute class sizes must be such that the (inelastic) supply of students can be distributed among the endogenous supply of teachers, which is a function of the joint distribution of human capital in the two occupations and each workers occupational choice. Let $f(a^O,a^T)$ denote the joint density over the students' skills in the two occupations and $f^T(a^T) = \int_0^\infty f(a^O,a^T) \textrm{d}a^O$ is the marginal density over $a^T$. We can then take advantage of the fact that $\frac{{h^T}'}{{h^O}'} = \frac{a^T}{a^O}$ to derive the density $\hat{f}^T$ over $a^T$ among teachers only:
+%\begin{equation}
+%\label{eq:densT}
+%\hat{f}^T(a^T) = f^T(a^T) \textrm{Pr}\left[ \frac{a^T}{a^0} \geq \frac{h^{\ast}(h^O)}{h^O} \right].
+%\end{equation}
+%Given \eqref{eq:h}, \eqref{eq:s*}, and \eqref{eq:e*}, we can describe the teachers' human capital as a function of their $a^T$. To close the model, the market for students and teachers must clear, i.e.~we must find a reference class size $N\left(h^*(h^O) \right)$ for a marginal teacher with $h^T(a^T) = h^*(h^O)$:
+%\begin{equation}
+%\label{eq:marketclear}
+%N\left(h^*(h^O) \right) = \frac{\sfrac{M}{2}}{\int_0^\infty \left[ \left(\frac{h^T(a^T)}{h^*(h^O)}\right)^{\frac{\beta}{\sigma}} - 1 \right] \hat{f}^T(a^T) \textrm{d}a^T},
+%\end{equation}
+%for any $h^O$.
+\begin{prp}
+If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h^O)}{h^O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h^T}{h^O}$ for all $h^O$.
+\end{prp}
+\section{Data}\label{sec:data}
+%[Discuss Project TALENT, NLSY79, and NLSY97.]
+
+We rely on moments from three longitudinal surveys of young Americans to parameterize our structural model
+\subsection{Project TALENT}
+
+Project TALENT surveyed approximately 377,000 students enrolled in high school in 1960. The vast majority of these students were in the 14-18 year age range with a few outliers outside this bracket (on both sides). The sample of surveyed students was representative and accounted for 5 percent of the high school population that year. The project was funded by the United States Office of Education (the precursor of the Department of Education) and its goal was to collect high quality data on the achievements, aptitudes, and interests of high school students in the United States, and to examine whether, and how, these data predicted future outcomes in terms of educational attainment, career, and wellbeing.
+
+In the initial wave of surveys, students were subjected to a two-day battery of aptitude, ability, and achievement tests. In addition, students answered questions about dispositional traits, their interests (with respect to occupations and activities), as well as personal and family information. 	In total, the surveyed students answered more than 1,000 questions.
+
+Follow-up surveys were then carried out one, five, and eleven years after the students' expected high school graduation. For instance, students who were in eleventh grade in 1960 were expected to graduate in 1961 and were contacted again in 1962, 1966, and 1972. Ninth graders were contacted in 1963, 1967, and 1973. A lack of federal funding stopped the project during the planning stage for a 17-year follow-up, which never took place.
+
+51 percent of the original participants participated in the 1-year post-graduation survey. The five and eleven-year follow-ups successfully contacted 35 and 25 percent of the original participants, respectively. One concern with attrition rates of this magnitude is that the survey sample of waves two through five is subject to selection along one or several attributes. In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample clearly exhibits some anomalies. In particular, the racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies. A sizeable fraction has inconsistencies (e.g.~self-reported vs.~pollster's classification) and the sample proportion of black high school students differs from that reported in the 1960 Census.}
+\begin{table}[h!]
+  \centering 
+%  \label{tab:samplebywave}
+  \begin{tabular}{lcccc}
+\toprule
+% after \\ : \hline or \cline{col1-col2} \cline{col3-col4} ...
+   & Base Year & 1-Year Post & 5-Year Post & 11-Year Post\\
+   \midrule
+Sample Size & 368,938 & 188,138 & 128,163 & 92,962 \\
+\midrule
+Black   & 6,488 & 4,003 & 4,856 & 3,026 \\
+
+\quad (\% of sample size) & (1.8\%) & (2.1\%) & (3.8\%) & (3.3\%) \\
+%\midrule
+%White   &  &  &  &  \\
+%
+%\quad (\% of sample size) & (\%) & (\%) & (\%) & (\%) \\
+\midrule
+Other / Unknown / Conflicting & 215,786 & 73,668 & 3,739 & 3,758 \\
+\quad (\% of sample size) & (58.5\%) & (39.1\%) & (2.9\%) & (4.0\%) \\
+\midrule
+Female   & 184,912 & 98,183 & 64,841 & 47,417 \\
+\quad (\% of sample size) & (50.1\%) & (52.2\%) & (50.6\%) & (51.0\%) \\
+\midrule
+Parents: High School Degree & & & & \\
+\quad (\% of sample size) & & & & \\
+\midrule
+Parents: College Degree & & & & \\
+\quad (\% of sample size) & & & & \\
+\midrule
+Parents: High Income & & & & \\
+\quad (\% of sample size) & & & & \\
+\midrule
+\bottomrule
+\end{tabular}
+
+\caption{Project TALENT Demographic Composition}
+\label{tab:samplebywave}
+\end{table}
+
+\subsection{NLSY79 and NLSY97}
+In contrast to Project TALENT, the two NLSY initiated in 1979 and 1997 are widely used and many readers are already familiar with the data. \cite{Cooksey:2018}, among many others, provides a comprehensive overview of the two surveys. For the purposes of our paper, the {\it Armed Forces Qualification Test} (AFQT) scores are of particular interest since we need proxies to capture differences in the individuals' raw skills, which is the crucial source of exogenous variation in our model. The score consists of four sections of the {\it Armed Services Vocational Aptitude Battery} (ASVAB): arithmetic reasoning, word knowledge, paragraph comprehension, and numerical operations. The tests took place in 1980 and 1999 for NLSY79 and NLSY97 cohorts, respectively.
+
+Since the data was administered at different ages and based upon different test formats, NLS program staff re-normed the scores in 2006, in order to facilitate cross-cohort comparisons.\footnote{\cite{Altonji:2009} also propose a method to enable a comparison of AFQT scores across the two NLSY samples.} Table \ref{tab:NLSYscores} shows summary statistics for the individuals in our sample, divided into three categories: (1) teachers, (2) non-teachers/others, (3) not in labor force. Since an individual usually has multiple employment spells, she might be in all these categories over the course of the panel. We define an individual as a teacher if she has at least one spell in teaching that is longer than 9 months (one academic year). An individual is out of labor force if she reported to be out of labor force for 208 consecutive weeks for a reason {\it other} than schooling.\footnote{After four years, ``not in the labor force'' is effectively an absorbing state. The probability of returning to the labor force is less than 1\%.}
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lccc}
+			\toprule
+%			\toprule
+			\multicolumn{4}{c}{Panel A: NLSY79}\\
+			\midrule
+%			& (1) & (2) & (3)\\
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in\\
+			&  &  & Labor Force\\
+			\midrule
+			Female & 505 & 2,739 & 1,006 \\
+			\quad (\% of subsample) & (74.93\%) & (43.82\%) & (65.80\%)\\
+			\midrule
+			AFQT mean & 53,160.36 & 42,859.81 & 31,842.39 \\
+			\quad (st.dev.) & (29,157.36) & (28,518.21) & (31,842.39) \\
+			\midrule
+			Observations & 674 & 6,251 & 1,066 \\
+			\quad (\% of total sample) & (7.98\%) & (73.97\%) & (12.61\%) \\
+			\bottomrule
+%			\bottomrule
+			\\
+			\toprule
+%			\toprule
+			\multicolumn{4}{c}{Panel B: NLSY97}\\
+			\midrule
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in\\
+			&  &  & Labor Force\\
+			\midrule
+			Female & 577 & 2,580 & 331\\
+			\quad (\% of subsample) & (71.50\%) & (45.1\%) & (63.65\%)\\
+			\midrule
+			AFQT mean & 62,229.16 & 44,239.26 & 33,108.32 \\
+			\quad (st.dev.) & (26,349.47) & (28,681.16) & (27,507.65) \\
+			\midrule
+			Observations & 807 & 5,721 & 520 \\
+			\quad (\% of total sample) & (11.51\%) & (81.60\%) & (7.42\%) \\
+			\bottomrule
+%			\bottomrule			
+		\end{tabular}
+		\caption{NLSY AFQT Scores by Occupation}
+		\label{tab:NLSYscores}
+	\end{table}
+
+	Project TALENT contains a number of tests administered in 1960 when the respondents were attending high school, though in different grades.\footnote{Roughly one quarter of the sample was in each grade 9 -12 in the baseline survey.} We focus on composite scores for the various verbal and mathematics tests. The former includes literature information, vocabulary, and English. The latter contains math information, arithmetic reasoning, introductory high school math, and advanced high school math. Table \ref{tab:PTscores} shows summary statistics for the 88,330 individuals in our 11-year follow-up sample. We focus on the 11-year {\it post} survey since it contains the bulk of occupational information at a time when the respondents are approximately thirty years old.\footnote{The 5-year post-graduation survey contains occupational information. Given our criterion for the three occupational categories, we're not (yet) fully exploiting this information.}
+	
+	\begin{table}[h!]
+		\centering 
+		\begin{tabular}{lccc}
+			\toprule
+			\multicolumn{4}{c}{Panel A: 5-Year Post}\\
+			\midrule
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in \\
+			&  &  & Labor Force \\
+			\midrule
+			Female & 9,392 & 32,337 & 17,974 \\
+			\quad (\% of subsample) & (74.01\%) & (39.06\%) & (79.46\%) \\
+			\midrule
+			Math composite mean & 95.31 & 74.10 & 71.94 \\
+			\quad (st.dev.) & (31.78) & (33.43) & (33.19) \\
+			\midrule
+			Verbal composite mean & 126.26 & 109.63 & 112.67 \\
+			\quad (st.dev.) & (16.44) & (22.09) & (21.08) \\
+			\midrule
+			Observations & 12,690 & 82,798 & 22,620 \\
+			\quad (\% of total sample) & (10.74\%) & (70.10\%) & (19.15\%) \\
+			\bottomrule
+			\\
+			\toprule
+			
+			\multicolumn{4}{c}{Panel B: 11-Year Post} \\
+			\midrule
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in \\
+			&  &  & Labor Force \\
+			\midrule
+			Female & 3,747 & 19,527 & 21,983 \\
+			\quad (\% of subsample) & (74.05\%) & (38.95\%) & (79.48\%) \\
+			\midrule
+			Math composite mean & 90.72 & 75.19 & 69.85 \\
+			\quad (st.dev.) & (33.56) & (34.17) & (30.24) \\
+			\midrule
+			Verbal composite mean & 123.28 & 108.92 & 112.82 \\
+			\quad (st.dev.) & (18.19) & (22.67) & (20.36) \\
+			\midrule
+			Observations & 6,217 & 58,835 & 23,278 \\
+			\quad (\% of total sample) & (7.04\%) & (66.61\%) & (26.35\%) \\
+			\bottomrule
+		\end{tabular}
+		\caption{Project TALENT Test Scores by Occupation}
+		\label{tab:PTscores}
+	\end{table}
+	
+If the labor market discriminated more against certain groups (gender, race,\ldots) in non-teaching occupations in 1960, we expect these groups to favor teaching over other occupations or to stay out of the labor force altogether. ``Not in the labor force'' is more a reflection of the absolute level of labor market discrimination against particular group while the occupational choice between teaching or other occupations reflects differences between group-specific barriers. To the extent that occupations require specific human capital investments we allow for educational barriers to affect occupational choices separately in the model. If both of these barriers declined after 1960, we would expect a narrowing of the educational achievement gap and more talented females should move from teaching into other occupations. This reallocation would lower the average quality of teachers and, therefore, we expect to observe more significant differences in the ability distributions between teachers and other occupations in cohorts who entered the labor market in the 60s and 70s (i.e.~our Project TALENT population) compared to younger individuals (i.e.~the NLSY79 and NLSY97 respondents). 
+	
+Figure \ref{fig:talent} shows the distribution of test scores for math and verbal composite by occupations in Project TALENT. The distribution of math scores in panel \ref{fig:talentmath} is skewed to the right for ``other'' compared to the distribution of math scores among teachers. Panel \ref{fig:talentverb} shows a similar pattern in terms of relative skewness. The distribution of scores of respondents in non-teaching occupations and those who report not being in the labor force are quite similar. Overall, individuals in teaching occupations tend to have higher scores than non-teachers. One possible explanation for these differences is that individuals select into teaching along a non-skill dimension and an obvious selection candidate is gender. Approximately three quarters of all teachers are female (see the first row in the two panels of Figure \ref{tab:PTscores}). If women exhibited a distinct distribution of scores this may explain the discrepancy between teaching and other occupations. The data, however, do not suggest that women are innately more or less talented than men. Women's verbal scores slightly dominate the men's while the opposite is true for the math scores (see Figure \ref{fig:nlsy97bygender}).
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{TALENT_math_occ.pdf}
+		\caption{Math} \label{fig:talentmath}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{TALENT_verb_occ.pdf}
+		\caption{Verbal} \label{fig:talentverb}
+	\end{subfigure}
+	\caption{Distribution of Composite Scores by Occupation in Project TALENT} \label{fig:talent}
+\end{figure}
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{TALENT_math_by_gender.pdf}
+		\caption{Math composite} \label{fig:nlsy79}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{TALENT_verb_by_gender.pdf}
+		\caption{Verbal composite} \label{fig:nlsy97bygender}
+	\end{subfigure}
+	\caption{Distribution of Composite Scores by Gender in Project TALENT} \label{fig:talent_gender}
+\end{figure}
+
+The distributions of composite IQ scores for Project TALENT respondents split by gender are quite similar (see Figure \ref{fig:IQbygender}). What reconciles Figures \ref{fig:talent}-\ref{fig:IQbygender} is the selection of more talented women into teaching, which we plot in Figure \ref{fig:IQbygenderteach}. Due to the smaller numbers of individuals in Figure \ref{fig:IQbygenderteach} compared to the three previous figures (the number of men is particularly low), the plot contains more noise and one should draw any conclusion with appropriate caution. With this in mind, it does appear that teaching attracts higher-ability individuals and that the selection of women along this dimension is somewhat stronger, plausibly due to the lack of career opportunities in other occupations.
+
+If indeed labor market barriers are shrinking over time, we would expect to see some evidence of this in the occupational choice of women in more recent cohorts and hence in the NLSY79 and NLSY97.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.49\textwidth]{iq_by_gender.pdf}
+\caption{Composite IQ Scores by Gender in Project TALENT}
+\label{fig:IQbygender}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.49\textwidth]{iq_by_gen_teach.pdf}
+\caption{Composite IQ Scores by Gender in Teaching (Project TALENT)}
+\label{fig:IQbygenderteach}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:nlsy_by_occ} plots the NLSY analogues of the math and verbal scores in Project TALENT shown in Figure \ref{fig:talent}. Clearly, teaching still attracts higher-ability individuals than ``other'' occupations or those who are not in the labor force. While the ability distribution of teachers still first-order dominates the scores in ``other'' occupations in the 1979 survey, there is a remarkable shift in the talent distribution of those who are not in the labor force. It is for more right-skewed than the distribution of workers in ``other'' occupations. Unfortunately, the 1997 data is considerably more noisy mostly due to the smaller sample size and we're refraining from reading too much into any particular feature of the data. This being said, it is worth highlighting that the definition of ``not in the labor force'' is {\it not} identical in the TALENT data on the one hand and the NLSY data on the other.\footnote{The difference stems from the fact that we observe Project TALENT participants relatively infrequently and the respondents' labor market histories are less complete.} It is, however, suggestive of a trend whereby high-ability individuals are pulled into the labor force more ``aggressively'' compared to low-skill workers over time.
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY79_MK_occ.pdf}
+		\caption{Math Knowledge (NLSY79)} \label{fig:nlsy79math}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY79_WK_occ.pdf}
+		\caption{Word Knowledge (NLSY79)} \label{fig:nlsy79word}
+	\end{subfigure}
+		\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY97_MK_occ.pdf}
+		\caption{Math Knowledge (NLSY97)} \label{fig:nlsy97math}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY97_WK_occ.pdf}
+		\caption{Word Knowledge (NLSY97)} \label{fig:nlsy97wprd}
+	\end{subfigure}
+
+	\caption{Distribution of AFQT Scores by Occupations}
+	\label{fig:nlsy_by_occ}
+\end{figure}
+
+%\begin{figure}
+%	\begin{subfigure}{0.49\textwidth}
+%		\includegraphics[width=\linewidth]{NLSY79_afqt79_occ_new.pdf}
+%		\caption{NLSY79} \label{fig:nlsy79}
+%	\end{subfigure}
+%	\hspace*{\fill} % separation between the subfigures
+%	\begin{subfigure}{0.49\textwidth}
+%		\includegraphics[width=\linewidth]{NLSY97_afqt97_occ_new.pdf}
+%		\caption{NLSY97} \label{fig:nlsy97}
+%	\end{subfigure}
+%	\caption{Distribution of AFQT Scores by Occupations}
+%	\label{fig:nlsy}
+%\end{figure}
+
+Figures \ref{fig:nlsy_by_gender}-\ref{fig:nlsy_comp_by_gender} are the NLSY analogues of Figures \ref{fig:talent_gender}-\ref{fig:IQbygender}.
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY79_MK_gender.pdf}
+		\caption{Math Knowledge (NLSY79)} \label{fig:nlsy79math}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY79_WK_gender.pdf}
+		\caption{Word Knowledge (NLSY79)} \label{fig:nlsy79word}
+	\end{subfigure}
+		\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY97_MK_gender.pdf}
+		\caption{Math Knowledge (NLSY97)} \label{fig:nlsy97math}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY97_WK_gender.pdf}
+		\caption{Word Knowledge (NLSY97)} \label{fig:nlsy97wprd}
+	\end{subfigure}
+
+	\caption{Distribution of Topic Scores by Gender}
+	\label{fig:nlsy_by_gender}
+\end{figure}
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY79_afqt79_gender.pdf}
+		\caption{AFQT Composite (NLSY79)} \label{fig:nlsy79math}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{NLSY97_afqt97_gender.pdf}
+		\caption{AFQT Composite (NLSY97)} \label{fig:nlsy79word}
+	\end{subfigure}
+	\caption{Distribution of AFQT Scores by Occupations}
+	\label{fig:nlsy_comp_by_gender}
+\end{figure}
+	
+Unfortunately, the composite score distributions aren't comparable between Project TALENT and NLSY cohorts for several reasons. Although the ability tests try to capture math and verbal abilities, the tests themselves are very different. Therefore, it is impossible to compare changes in score distributions over time. Despite this limitation we can still compare the composition (by gender or occupation) {\it within} cohorts across the three surveys. In fact, the particular {\it Roy} flavor of our model suggests that this is where the interesting action is.
+
+Differences in the frequency of the surveys further complicate comparisons between Project TALENT and the NLSY's. The NLSY79 and NLSY97 survey the respondents far more frequently and this enables us to construct more detailed employment histories and occupation choices over the course of panels. While Project TALENT provides data on the respondents' {\it current} occupation in the 1, 5, and 11-year post waves, it misses some of the higher-frequency churn since it doesn't ask any retrospective career questions. Moreover, the probability of being a teacher one year after high school graduation is vanishingly small (0.08\% of the sample). In the figures and tables presented so far we report the occupations reported in the 11-year follow-up study. While certainly less complete than the NLSY data, Project TALENT still offers insights into the career decisions of young adults at a time for which there is only a very limited supply of nationally representative longitudinal survey data.\footnote{In ongoing work, we synthetically impose some of the data limitations in Project TALENT on the NLSY in order to get a better sense for underlying changes in labor market conditions and career decisions across cohorts. Evidently we're giving up some valuable details in the process for the benefit of more cross-survey comparability.}
+
+Project TALENT, NLSY79, and NLSY97 provide us with the data moments that we match to model-generated moments in order to quantify the static and dynamic effects of the implied educational barriers and labor market barriers. While the discussion so far emphasized the contrast between men and women, it is worth emphasizing that our model framework can accommodate more richness in terms of the salient groups of workers. In ongoing work we are incorporating race and ethnicity to more fully capture the salient educational and labor market frictions in the data.\footnote{Since the racial categorization is problematic in Project TALENT, this step is more challenging but we are confident that we can overcome these data limitations.}
+
+\section{First Best Allocation}\label{sec:firstbest}
+In order to highlight the mechanisms that govern the individuals' occupational choice we first solve for a decentralized equilibrium that implements the optimal allocation of adults to ``teaching'' and ``other'' in a single location. Put differently, we solve the model for a wage profile $\omega^*(h^T)$ that pays teachers with human capital $h^T$ their marginal product.\footnote{In section \ref{sec:model} we specified the model for an arbitrary profile $\omega$. Here we impose further restrictions on this function.}
+
+How can we characterize the teacher's marginal product? Recall that only workers produce the final (consumption) good using a linear production function with productivity $A^O$. Thanks to stable random matching of students to teachers the ability distribution of students is identical across class rooms and a teacher's marginal value only varies with the number of students in her class room, denoted by $N(h^t)$. Clearly, then, the wage profile is linear in $N(\cdot)$. Since $N$ is not linear in $h^T$ in general this implies that the wage profile is not linear in $h^T$ either.
+
+Since teachers are compensated for the incremental human capital in ``other'', the wage profile has the following functional form:
+\begin{align}
+\label{}
+   \omega(h^T,\widetilde{H}^T) & =  \frac{\overbrace{{H'}^O {A'}^O}^{\textrm{aggregate final output}}}{\underbrace{\int_o^\infty f^O(a) da}_{\begin{subarray}{c}\textrm{fraction of prospective} \\ \textrm{production workers in class}\end{subarray}}} \underbrace{\frac{\left( h^T \right)^{\frac{\beta}{\sigma}}}{{\widetilde{H}^T}}}_{\textrm{fraction of students taught}}
+\end{align}
+where
+\begin{align*}
+\label{}
+  \widetilde{H'}^{T} & = \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}^T}{M}\right)^\sigma a^\alpha s^T\left(a,\widetilde{H}^T\right)^\phi e^T(a,\widetilde{H}^T)^\eta \right)^{\frac{\beta}{\sigma}} f^T(a) da
+\end{align*}
+is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of human capital among current teachers.
+\section{Constrained Optimal Allocation}
+To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model in section \ref{sec:firstbest}. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
+
+The calibration in section \ref{sec:quant} will go beyond the simple comparative statics here and match moments along the secular transition from the late 1960s to the more recent past.
+
+{\sc This is work in progress!}
+\section{Model Extension with $L > 1$ Locations}
+In section \ref{sec:model} we motivated lump-sum taxation by the stylized fact that school districts are, to a considerable extent, funded by local property taxes. It is therefore natural to consider multiple locations with distinct taxes $\{T_1,\ldots,T_L\}$. In this version of the model, young agents not only decide which career path they would like to pursue, but they also choose a location for their education. % NOTE TO SELF: HOW DO WE RULE OUT THAT KIDS MOVE TO HIGH TAX AREAS FOR THEIR EDUCATION AND THEN RE-LOCATE TO LOW TAX LOCATIONS IN ADULTHOOD.
+The assumption of a single location with (stable) random matching between students and teachers had the benefit of tractability. The aggregate state of the economy could be summarized by a single scalar, $ \widetilde{H}^{T}$.
+
+Abandoning the assumption of random student assignment implies that the aggregate state is now given by an entire distribution of $\widetilde{h}^{T}$ rather than a single moment of that same distribution. This turns out be a rather challenging generalization. What appears to be more relevant empirically is the introduction of multiple locations, differentiated by local (lump sum) tax levels and possibly some (as of yet) unspecified amenity. As long as we maintain the assumption of effectively random student-teacher assignment within locations, we can rely on tools from \cite{Lucas:2014} and more recently used in \cite{Martellini:2019} to keep the state space small enough and thus the dynamic program tractable.
+
+This model extension enables us to capture the quantitative effects associated with the salient stylized fact of increasing socio-economic segregation of students -- and plausibly even teachers -- between inner cities and suburbs.
+
+{\sc This is also work in progress!}
+\section{Quantitative Analysis}\label{sec:quant}
+\subsection{Calibration Strategy}
+{\sc To Be Completed!}
+\subsection{Counterfactual Experiments}
+{\sc To Be Completed!}
+\section{Conclusion}\label{sec:conclusion}
+{\sc To Be Completed!}
+\newpage
+\bibliography{/Users/simeonalder/Dropbox/Bibliography/MasterBibliography}
+\bibliographystyle{ecta}
+\end{document}

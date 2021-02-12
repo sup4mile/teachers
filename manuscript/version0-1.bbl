@@ -1,0 +1,20 @@
+\begin{thebibliography}{3}
+\newcommand{\enquote}[1]{``#1''}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[\protect\citeauthoryear{Eaton and Kortum}{Eaton and
+  Kortum}{2002}]{Eaton:2002}
+\textsc{Eaton, J. and S.~Kortum} (2002): \enquote{Technology, Geography, and
+  Trade,} \emph{Econometrica}, 70, 1741--1779.
+
+\bibitem[\protect\citeauthoryear{Hsieh, Hurst, Jones, and Klenow}{Hsieh
+  et~al.}{2018}]{Hsieh:2018}
+\textsc{Hsieh, C.-T., E.~Hurst, C.~I. Jones, and P.~J. Klenow} (2018):
+  \enquote{{The Allocation of Talent and U.S. Economic Growth},} \emph{Working
+  Paper}, 1--72.
+
+\bibitem[\protect\citeauthoryear{Roy}{Roy}{1951}]{Roy:1951}
+\textsc{Roy, A.} (1951): \enquote{Some Thoughts on the Distribution of
+  Earnings,} \emph{Oxford Economic Papers New Series}, 3, 135--146.
+
+\end{thebibliography}
