@@ -1,5 +1,4 @@
-using Distributions, Dierckx, QuadGK, JLD, Plots, LaTeXStrings
-
+using Distributions, Dierckx, QuadGK, JLD, Plots, LaTeXStrings, CSV, DataFrames
 # Load occupational threshold from previous parameterization:
 previous = 1;
 # Parameters:
@@ -60,7 +59,7 @@ a_O_thresh = Array{Float64,2}(undef,length(a_grid),n_g)
 a_T_thresh_new = Array{Float64,2}(undef,length(a_grid),n_g)
 if previous == 1
     # d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.8 -0.8]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
-    d = load("/Users/iuliia/Desktop/res/previousParameterization.jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
     a_T_thresh=d["a_T_thresh"]
     t = d["t"]
     HH_T = d["HH_T"]
@@ -357,9 +356,9 @@ EN_agg = (gm./(sum(gm))*EN)[1]
 EN2_agg = (gm./(sum(gm))*EN2)[1]
 cvN = (EN2_agg - EN_agg.^2).^(.5)./EN_agg
 #/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/
-filename1 = string("/Users/iuliia/Desktop/res/results_",n_g,"_groups_τW=",τ_w,"_τE=",τ_e,"_A=",round(A,digits=2),"_α=",round(α,digits=2),"_β=",round(β,digits=2),"_η=",round(η,digits=2),"_σ=",round(σ,digits=2),".jld")
+filename1 = string("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_",n_g,"_groups_τW=",τ_w,"_τE=",τ_e,"_A=",round(A,digits=2),"_α=",round(α,digits=2),"_β=",round(β,digits=2),"_η=",round(η,digits=2),"_σ=",round(σ,digits=2),".jld")
 save(filename1,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"N", N,"EN_agg",EN_agg,"cvN",cvN,"gm",gm)
-filename2 = string("/Users/iuliia/Desktop/res/previousParameterization.jld")
+filename2 = string("//Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
 save(filename2,"H_grid",H_grid,"a_grid",a_grid,"τ_e",τ_e,"τ_w",τ_w,"α",α,"β",β,"σ",σ,"η",η,"A",A,"HH_T",HH_T,"H_O",H_O,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"e_T",e_T,"s_T",s_T,"e_O",e_O,"s_O",s_O,"t",t,"E_O",E_O,"E_T",E_T,"mass_O",mass_O,"mass_T",mass_T,"f_1",f_1,"f_2",f_2,"N", N,"EN_agg",EN_agg,"cvN",cvN,"gm",gm)
 
 # Find steady state
@@ -416,16 +415,18 @@ for iG in 1:n_g
     spl_e_T = Spline1D(a_grid,e_T[:,1,iG])
     av_e_O[iG]=quadgk(aa -> spl_e_O(aa)*pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1]
     av_e_T[iG]=quadgk(aa -> spl_e_T(aa)*pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa)),lowbnd,upbnd)[1]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa)),lowbnd,upbnd)[1]
+    mass_O[iG]=quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1]
+    mass_T[iG]=quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa)),lowbnd,upbnd)[1]
 end
 println(av_e_T[1])
 println(av_e_T[2])
 println(av_e_O[1])
 println(av_e_O[2])
 println(s_T/s_O)
-println(E_T[1,1]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa)),lowbnd,upbnd)[1])
-println(E_T[1,2]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa)),lowbnd,upbnd)[1])
-println(E_O[1,1]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1])
-println(E_O[1,2]/quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa)),lowbnd,upbnd)[1])
+println(E_T[1,1]/mass_T[1])
+println(E_T[1,2]/mass_T[2])
+println(E_O[1,1]/mass_O[1])
+println(E_O[1,2]/mass_O[2])
 av_a_O=zeros(n_g)
 av_a_T=zeros(n_g)
 for iG in 1:n_g
@@ -477,3 +478,5 @@ E_T_2_agg = (gm./(sum(gm))*E_T_2)[1]
 cv_E_T = (E_T_2_agg - E_T_1_agg.^2).^(.5)./E_T_1_agg
 
 println(cv_E_T)
+
+# Create array with all moments of interest:
