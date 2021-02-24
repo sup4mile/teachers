@@ -202,20 +202,20 @@ while gapHH > tolHH
             # Compute HHH_T:
             h_T[:,iH,iG] = (2*HH_fp/M).^σ .* a_grid.^α .* s_T.^ϕ .* e_T[:,iH,iG].^η
             #spl_e_T=Spline1D(a_grid,e_T[:,iH,iG],bc="extrapolate")
-            spl_O_thresh=Spline1D(a_grid, a_O_thresh[:,iG],bc="extrapolate")
+            spl_T_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_O_thresh[:,iG]).*a_grid.^(α/(σ/β-η)))
+
+            HHH_T_0[iG]= (2*HH_fp/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
             #HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
-            HHH_T_0[iG]= (2*HH_fp/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
             # Compute H_O: (note that exponent sigma/beta is absent):
             h_O[:,iH,iG] = (2*HH_fp/M).^σ .* a_grid.^α .* s_O.^ϕ .* e_O[:,iH,iG].^η
-            spl_e_O=Spline1D(a_grid,e_O[:,iH,iG],bc="extrapolate")
-            spl_T_thresh=Spline1D(a_grid, a_T_thresh[:,iG],bc="extrapolate")
-            H_O_0[iG]=(2*HH_fp/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+            spl_O_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_T_thresh[:,iG]).*a_grid.^α.*e_O[:,iH,iG].^η)
+            H_O_0[iG]=(2*HH_fp/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
 
             # Total earnings of teachers in each group:
-            E_T[iH,iG] =  H_O[iH]*A/HH_T[iH]/f1[iG]*(2*HH_fp/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+            E_T[iH,iG] = H_O[iH]*A/HH_T[iH]/f1[iG]*(2*HH_fp/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
             #H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
             # Total earnings of others in each group:
-            E_O[iH,iG] = (1-τ_w[iG])*A*(2*HH_fp/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+            E_O[iH,iG] = (1-τ_w[iG])*A*(2*HH_fp/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
         end
         HH_T[iH]=sum(HHH_T_0.*gm)
         H_O[iH]=sum(H_O_0.*gm)
@@ -258,20 +258,20 @@ for iH in 1:H_grid_length
             # Compute HHH_T:
             h_T[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_T.^ϕ .* e_T[:,iH,iG].^η
             #spl_e_T=Spline1D(a_grid,e_T[:,iH,iG],bc="extrapolate")
-            spl_O_thresh=Spline1D(a_grid, a_O_thresh[:,iG],bc="extrapolate")
+            spl_T_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_O_thresh[:,iG]).*a_grid.^(α/(σ/β-η)))
+
+            HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
             #HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
-            HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
             # Compute H_O: (note that exponent sigma/beta is absent):
             h_O[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_O.^ϕ .* e_O[:,iH,iG].^η
-            spl_e_O=Spline1D(a_grid,e_O[:,iH,iG],bc="extrapolate")
-            spl_T_thresh=Spline1D(a_grid, a_T_thresh[:,iG],bc="extrapolate")
-            H_O_0[iG]=(2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+            spl_O_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_T_thresh[:,iG]).*a_grid.^α.*e_O[:,iH,iG].^η)
+            H_O_0[iG]= (2*H/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
 
             # Total earnings of teachers in each group:
-            E_T[iH,iG] =  H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+            E_T[iH,iG] = H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
             #H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
             # Total earnings of others in each group:
-            E_O[iH,iG] = (1-τ_w[iG])*A*(2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+            E_O[iH,iG] = (1-τ_w[iG])*A*(2*H/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
         end
         HH_T[iH]=sum(HHH_T_0.*gm)
         H_O[iH]=sum(H_O_0.*gm)
@@ -299,21 +299,21 @@ for iH in 1:H_grid_length
         # Compute HHH_T:
         h_T[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_T.^ϕ .* e_T[:,iH,iG].^η
         #spl_e_T=Spline1D(a_grid,e_T[:,iH,iG],bc="extrapolate")
-        spl_O_thresh=Spline1D(a_grid, a_O_thresh[:,iG],bc="extrapolate")
-        HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+        spl_T_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_O_thresh[:,iG]).*a_grid.^(α/(σ/β-η)))
+
+        HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
         #HHH_T_0[iG]= (2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
         # Compute H_O: (note that exponent sigma/beta is absent):
         h_O[:,iH,iG] = (2*H/M).^σ .* a_grid.^α .* s_O.^ϕ .* e_O[:,iH,iG].^η
-        spl_e_O=Spline1D(a_grid,e_O[:,iH,iG],bc="extrapolate")
-        spl_T_thresh=Spline1D(a_grid, a_T_thresh[:,iG],bc="extrapolate")
+        spl_O_f=Spline1D( a_grid, pdf.(LogNormal(mean_a,std_a),a_grid).*cdf.(LogNormal(mean_a,std_a),a_T_thresh[:,iG]).*a_grid.^α.*e_O[:,iH,iG].^η)
 
-        H_O_0[iG]= (2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+        H_O_0[iG]= (2*H/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
 
         # Total earnings of teachers in each group:
-        E_T[iH,iG] = H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α/(σ/β-η)),lowbnd,upbnd)[1]
+        E_T[iH,iG] = H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*(((1-τ_w[iG])/(1+τ_e[iG]))^(η/(1-η))*((1-t[iH,1])*A*η*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))*β/σ*f3[iG]/f1[iG]/f2[iG])^(η*β/σ)*quadgk(aa -> spl_T_f(aa),lowbnd,upbnd)[1]
         #H_O[iH]*A/HH_T[iH]/f1[iG]*(2*H/M)^β*s_T^(ϕ*β/σ)*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_O_thresh(aa))*aa^(α*β/σ)*maximum([spl_e_T(aa),0.0])^(η*β/σ),lowbnd,upbnd)[1]
         # Total earnings of others in each group:
-        E_O[iH,iG] = (1-τ_w[iG])*A*(2*H/M)^σ*s_O^ϕ*quadgk(aa -> pdf(LogNormal(mean_a,std_a),aa)*cdf(LogNormal(mean_a,std_a),spl_T_thresh(aa))*aa^α*maximum([spl_e_O(aa),0.0])^η,lowbnd,upbnd)[1]
+        E_O[iH,iG] = (1-τ_w[iG])*A*(2*H/M)^σ*s_O^ϕ*quadgk(aa -> spl_O_f(aa),lowbnd,upbnd)[1]
     end
     HH_T[iH]=sum(HHH_T_0.*gm)
     H_O[iH]=sum(H_O_0.*gm)
