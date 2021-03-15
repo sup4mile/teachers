@@ -238,12 +238,10 @@ In the special case with $\beta=\sigma$, the model reverts to a standard occupat
 If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h^O)}{h^O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h^T}{h^O}$ for all $h^O$.
 \end{prp}
 
-ADD STEADY-STATE RESULT (FOR $H^T$).
-
 \section{Data}\label{sec:data}
 %[Discuss Project TALENT, NLSY79, and NLSY97.]
 
-We parameterize the model with data from longitudinal surveys that cover American youth at three different times after World War II: Project TALENT, NLSY 79, and NLSY 97. While the two NSLY surveys have been used extensively in the literature, Project TALENT is somewhat less know and we present it in some detail below.
+We parameterize the model with data from longitudinal surveys that cover American youth at three different times after World War II: Project TALENT, NLSY 79, and NLSY 97. While the two NSLY surveys have been used extensively in the literature, Project TALENT is somewhat less known and we present it in some detail below.
 \subsection{Project TALENT}
 
 Project TALENT surveyed approximately 377,000 students enrolled in high school in 1960. The vast majority of these students were in the 14-18 year age range with a few outliers outside this bracket (on both sides). The sample of surveyed students was representative and accounted for 5 percent of the high school population that year. The project was funded by the United States Office of Education (the precursor of the Department of Education) and its goal was to collect high quality data on the achievements, aptitudes, and interests of high school students in the United States, and to examine whether, and how, these data predicted future outcomes in terms of educational attainment, career, and wellbeing.
@@ -254,7 +252,7 @@ Follow-up surveys were then carried out one, five, and eleven years after the st
 
 51 percent of the original participants participated in the 1-year post-graduation surveys. The five and eleven-year follow-ups successfully contacted 35 and 25 percent of the original participants, respectively. One concern with attrition rates of this magnitude is that the survey sample of waves two through five is subject to selection along one or several attributes.
 
-In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.} WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
+In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.} % WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
 \begin{table}[h!]
   \centering 
 %  \label{tab:samplebywave}
@@ -279,13 +277,13 @@ Other / Unknown / Conflicting & 215,786 & 73,668 & 3,739 & 3,758 \\
 Female   & 184,912 & 98,183 & 64,841 & 47,417 \\
 \quad (\% of sample size) & (50.1\%) & (52.2\%) & (50.6\%) & (51.0\%) \\
 \midrule
-Parents: High School Degree & & & & \\
+Parents: High School Degree & TBC & TBC & TBC & TBC \\
 \quad (\% of sample size) & & & & \\
 \midrule
-Parents: College Degree & & & & \\
+Parents: College Degree & TBC & TBC & TBC & TBC \\
 \quad (\% of sample size) & & & & \\
 \midrule
-Parents: High Income & & & & \\
+Parents: High Income & TBC & TBC & TBC & TBC \\
 \quad (\% of sample size) & & & & \\
 \midrule
 \bottomrule
@@ -295,7 +293,7 @@ Parents: High Income & & & & \\
 \label{tab:samplebywave}
 \end{table}
 
-SHOULD WE KEEP THE LAST THREE ROWS IN THIS TABLE? DOES PROJECT TALENT EVEN HAVE INFORMATION ON PARENTAL EDUCATION AND INCOME? SHOULD WE USE OTHER VARIABLES TO DISCUSS ATTRITION OVER TIME?
+%SHOULD WE KEEP THE LAST THREE ROWS IN THIS TABLE? DOES PROJECT TALENT EVEN HAVE INFORMATION ON PARENTAL EDUCATION AND INCOME? SHOULD WE USE OTHER VARIABLES TO DISCUSS ATTRITION OVER TIME?
 
 The rationale for using panel data from Project TALENT and the two NLSYs is that all three surveys allow us to connect scores from aptitude tests to labor market outcomes. 
 Project TALENT contains a number of tests administered in 1960 when the respondents were attending high school, though in different grades.\footnote{Roughly one quarter of the sample was in each high school grade (i.e.~9 through 12) in the baseline survey.} We mainly use composite scores built from a battery of underlying tests measuring verbal and mathematical aptitude. The former includes literature information, vocabulary, and English. The latter contains math information, arithmetic reasoning, introductory high school math, and advanced high school math. Table \ref{tab:PTscores} shows summary statistics for the 88,330 individuals who participated in the 11-year follow-up survey. We focus on the 11-year {\it post} wave since it contains the bulk of occupational information at a time when the respondents are approximately thirty years old.\footnote{The 5-year post-graduation survey contains occupational information but we have not made use of it yet.}
@@ -537,7 +535,16 @@ Differences in the frequency of the surveys further complicate comparisons betwe
 
 Project TALENT, NLSY79, and NLSY97 provide us with the data moments that we match to model-generated moments in order to quantify the static and dynamic effects of the implied educational barriers and labor market barriers. While the discussion so far emphasized the contrast between men and women, it is worth emphasizing that our model framework can accommodate more richness in terms of the salient groups of workers. In ongoing work we are incorporating race and ethnicity to more fully capture the salient educational and labor market frictions in the data.\footnote{Since the racial categorization is somewhat problematic in Project TALENT, this extension poses additional challenges.}
 
-\section{First Best Allocation}\label{sec:firstbest}
+The final element in our calibration element relies on O*Net's characterization of occupation-specific skill requirements. We use a three-dimensional job characterization: mathematics, verbal, and social. We decompose the requirements of each job into an absolute and a comparative dimension in a way that aligns naturally with the notion of absolute and comparative advantage.
+
+We characterize the comparative requirements by a triple of weights based on the dimension-by-dimension skill ranking of each job. To account for the possibility that jobs with similar comparative profiles are characterized by different overall skill intensities, we also create an absolute profile based on the weighted sum of skill-specific rankings. Given the non-linearity of payoffs in our model, the distinction between comparative and absolute advantage is critical for our calibration strategy\footnote{In this respect, our model differs from a plain-vanilla occupational choice model \`a la \cite{Roy:1951}.}
+
+Last but not least, we use these skill profiles to project the survey respondents' three-dimensional abilities into an $N$-dimensional vector of job-specific abilities.
+
+{\sc This is currently work in progress!}
+
+%\section{First Best Allocation}\label{sec:firstbest}
+\section{Decentralized Competitive Equilibrium (No Frictions) }\label{sec:firstbest}
 In order to highlight the mechanisms that govern the individuals' occupational choice we first solve for a decentralized equilibrium that implements the optimal allocation of adults to ``teaching'' and ``other'' in a single location. Put differently, we solve the model for a wage profile $\omega^*(h^T)$ that pays teachers with human capital $h^T$ their marginal product.\footnote{In section \ref{sec:model} we specified the model for an arbitrary profile $\omega$. Here we impose further restrictions on this function.}
 
 How can we characterize the teacher's marginal product? Recall that only workers produce the final (consumption) good using a linear production function with productivity $A^O$. Thanks to stable random matching of students to teachers the ability distribution of students is identical across class rooms and a teacher's marginal value only varies with the number of students in her class room, denoted by $N(h^t)$. Clearly, then, the wage profile is linear in $N(\cdot)$. Since $N$ is not linear in $h^T$ in general this implies that the wage profile is not linear in $h^T$ either.
@@ -557,17 +564,28 @@ is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the dist
 
 The second term in equation \eqref{eq:omegaOpt} captures the idea that a teacher's wage depends on class size, which is a non-linear function of her human capital $h^T$. Recall from equations \eqref{eq:sT} and \eqref{eq:eT} that a prospective teacher's optimal $s^T$ and $e^T$ depends on the quality of today's teachers (i.e.~their human capital) and on the slope of the wage profile next period and hence on both today's $ \widetilde{H}^{T}$ as well as tomorrow's $\widetilde{H'}^{T}$.
 
+%\section{Constrained Optimal Allocation}
+\section{Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
+To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model in section \ref{sec:firstbest}. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
+
 We can show that this economy has a steady state in $H^T$ and we can characterize it in a single equation:
 \begin{equation}
 \label{ }
-TBC
+\textrm{To Be Inserted!}
 \end{equation}
-\section{Constrained Optimal Allocation}
-To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model in section \ref{sec:firstbest}. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
+
+Moreover, the occupational choice boundary, denoted $\bar{a}^T(a^O)$ depends on the magnitude of the educational barriers and labor market frictions, but not current or future aggregate human capital in teaching. The boundary can be characterized implicitly by the following condition:
+
+\begin{eqnarray}
+\label{eq:occChoice}
+\left(\frac{1-{\tau'}^{O,w}}{1-{\tau'}^{T,w}}\right) \left(\frac{1-\eta}{1-\tfrac{\eta\beta}{\sigma}}\right)  \left(\frac{1-s^{O}}{1-s^{T}}\right)^{\frac{1}{\mu}}  \left(\frac{(a^O)^\frac{\alpha}{1-\eta}}{\big({\bar{a}^T(a^O)}\big)^\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} \right) \nonumber \\
+= \left(\frac{\int_0^\infty a^\frac{\alpha}{1-\eta} {f^O(a)} da}{\int_0^\infty {f^O(a)} da} \right) \left(\int_0^\infty a^\frac{\alpha}{\frac{\sigma}{\beta}-\eta} {f^T(a)} da\right)^{-1} 
+\end{eqnarray}
+
 
 The calibration in section \ref{sec:quant} will go beyond the simple comparative statics here and match moments along the secular transition from the late 1960s to the more recent past.
 
-{\sc This is work in progress!}
+%{\sc This is work in progress!}
 \section{Model Extension with $L > 1$ Locations}
 In section \ref{sec:model} we motivated lump-sum taxation by the stylized fact that school districts are, to a considerable extent, funded by local property taxes. It is therefore natural to consider multiple locations with distinct taxes $\{T_1,\ldots,T_L\}$. In this version of the model, young agents not only decide which career path they would like to pursue, but they also choose a location for their education. % NOTE TO SELF: HOW DO WE RULE OUT THAT KIDS MOVE TO HIGH TAX AREAS FOR THEIR EDUCATION AND THEN RE-LOCATE TO LOW TAX LOCATIONS IN ADULTHOOD.
 The assumption of a single location with (stable) random matching between students and teachers had the benefit of tractability. The aggregate state of the economy could be summarized by a single scalar, $ \widetilde{H}^{T}$.
@@ -576,10 +594,10 @@ Abandoning the assumption of random student assignment implies that the aggregat
 
 This model extension enables us to capture the quantitative effects associated with the salient stylized fact of increasing socio-economic segregation of students -- and plausibly even teachers -- between inner cities and suburbs.
 
-{\sc This is also work in progress!}
+{\sc This is currently work in progress!}
 \section{Quantitative Analysis}\label{sec:quant}
 \subsection{Calibration Strategy}
-{\sc To Be Completed!}
+{\sc This is currently work in progress!}
 \subsection{Counterfactual Experiments}
 {\sc To Be Completed!}
 \section{Conclusion}\label{sec:conclusion}
