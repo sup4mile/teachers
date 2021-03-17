@@ -10,7 +10,7 @@ occ = ["teaching","other"]
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_w[1,1] = -4
+τ_w[1,1] = -3
 τ_w[1,2] = -4
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
 τ_e[1,1] = 0.0
@@ -22,7 +22,7 @@ end
 gm[end] = M/2 - sum(gm)
 α=.1
 η=.1
-β=.3
+β=.4
 σ=.4
 μ=1/2
 ϕ=1/3
@@ -459,7 +459,6 @@ cv_E_O = (E_O_2_agg - E_O_1_agg.^2).^(.5)./E_O_1_agg
 
 println(cv_E_O)
 
-
 E_T_1=zeros(n_g)
 E_T_2=zeros(n_g)
 for iG in 1:n_g
@@ -482,36 +481,25 @@ println(cv_E_T)
 # Create array with all moments of interest:
 # (1) Vector with 11 parameters:
 paramExp=Vector{Float64}(undef,10)
-paramExp[1]=α
-paramExp[2]=η
-paramExp[3]=β
-paramExp[4]=σ
-paramExp[5]=μ
-paramExp[6]=ϕ
-paramExp[7]=A
-paramExp[8]=θ
-paramExp[9]=τ_w[1,1]
-paramExp[10]=τ_w[1,2]
+paramExp=[α,η,β,σ,μ,ϕ,A,θ,τ_w[1,1],τ_w[1,2]]
 # (2) Vector with XX moments:
 momExp=Vector{Float64}(undef,21)
-momExp[1]=
-momExp[2]=
-momExp[3]=
-momExp[4]=
-momExp[5]=
-momExp[6]=
-momExp[7]=
-momExp[8]=
-momExp[9]=
-momExp[10]=
-momExp[11]=
-momExp[12]=
-momExp[13]=
-momExp[14]=
-momExp[15]=
-momExp[16]=
-momExp[17]=
-momExp[18]=
-momExp[19]=
-momExp[20]=
-momExp[21]=
+
+# Create DataFrame with parameters:
+calibration_params = DataFrame(Label = ["α","η","β","σ","μ","ϕ","A","θ","τ_w (female)","τ_w (male)"],Value = [α,η,β,σ,μ,ϕ,A,θ,τ_w[1,1],τ_w[1,2]])
+
+# Create DataFrame with moments:
+calibration_moms = DataFrame(Moment = ["average class size","cv of class size","share of teachers among female","share of teachers among male","share of female vs male teachers","average good investment in T female","average good investment in T male","average good investment in O female","average good investment in O male","s_T/s_O","average wage in T female","average wage in T male","average wage in O female","average wage in O male","average ability in T female","average ability in T male","average ability in O female","average ability in O male","wage dispersion in T","wage dispersion in O"],Value=[EN_agg,cvN,mass_T[1],mass_T[2],mass_T[1]*gm[1]/sum(mass_T.*vec(gm)),av_e_T[1],av_e_T[2],av_e_O[1],av_e_O[2],s_T/s_O,E_T[1,1]/mass_T[1],E_T[1,2]/mass_T[2],E_O[1,1]/mass_O[1],E_O[1,2]/mass_O[2],av_a_T[1],av_a_T[2],av_a_O[1],av_a_O[2],cv_E_T,cv_E_O])
+
+# Create DataFrame with parameters + moments (for export / write to file):
+calibration_df = DataFrame(Label = ["α","η","β","σ","μ","ϕ","A","θ","τ_w (female)","τ_w (male)","average class size","cv of class size","share of teachers among female","share of teachers among male","share of female vs male teachers","average good investment in T female","average good investment in T male","average good investment in O female","average good investment in O male","s_T/s_O","average wage in T female","average wage in T male","average wage in O female","average wage in O male","average ability in T female","average ability in T male","average ability in O female","average ability in O male","wage dispersion in T","wage dispersion in O"],Value = [α,η,β,σ,μ,ϕ,A,θ,τ_w[1,1],τ_w[1,2],EN_agg,cvN,mass_T[1],mass_T[2],mass_T[1]*gm[1]/sum(mass_T.*vec(gm)),av_e_T[1],av_e_T[2],av_e_O[1],av_e_O[2],s_T/s_O,E_T[1,1]/mass_T[1],E_T[1,2]/mass_T[2],E_O[1,1]/mass_O[1],E_O[1,2]/mass_O[2],av_a_T[1],av_a_T[2],av_a_O[1],av_a_O[2],cv_E_T,cv_E_O])
+# CSV.write(fullpath_results,calibration_df)
+calibration_csv = permutedims(Matrix(calibration_df))
+
+fullpath_results = pwd()*"/parameterizations/calibration.csv"
+# For new CSV file:
+# writedlm(fullpath_results,  calibration_csv, ',')
+# To append to existing CSV file (ignoring header row):
+io = open(fullpath_results,"a")
+writedlm(io,  calibration_csv[2:end,:], ','; header=true)
+close(io)
