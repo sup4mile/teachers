@@ -107,9 +107,17 @@ So how can we assign occupation-specific abilities to each individual with the t
 Without loss of generality (at least I think so), the mathematical skill and requirement pair is the reference dimension in our measure of distance between individual $i$'s skills and occupation $j$'s requirements.
 \begin{equation}
 \label{ }
-\overline{a}_i^j = \ln\left( \frac{a_{i,m}}{b_{j,m}} \right) - \abs{ \ln \left( \frac{\nicefrac{a_{i,w}}{b_{j,w}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) } - \abs{ \ln \left( \frac{\nicefrac{a_{i,s}}{b_{j,s}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) }
+\hat{a}_i^j = \ln\left( \frac{a_{i,m}}{b_{j,m}} \right) - \abs{ \ln \left( \frac{\nicefrac{a_{i,w}}{b_{j,w}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) } - \abs{ \ln \left( \frac{\nicefrac{a_{i,s}}{b_{j,s}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) }
 \end{equation}
 This measures the distance between an individual's skill set relative to the requirements of a particular occupation. The support of this measure is the real line.
 
-For the purposes of our quantitative exercise, we need to normalize this measure such that the support is $\mathbb{R^{+}}$. I'm not sure what the best way to do this is.
+For the purposes of our quantitative exercise, we need to transform this measure such that the support is $\mathbb{R}^{+} \cup \{ 0 \}$ by subtracting the minimum of all $\hat{a}_i^j $. In addition, we divide it by the standard deviation of $\hat{a}_i^j $ in order to standardize it.
+
+\begin{equation}
+\label{ }
+\overline{a}_i^j = \frac{\hat{a}_i^j - \min\{\hat{a}_i^j\}_{i,j} }{\sigma(\hat{a}_i^j)}
+\end{equation}
+Each individual in this economy now is endowed with a vector of occupation-specific abilities $\overline a_i = \{ \overline a_i^j \}_{j \in J}$, where $J$ is the number of different occupations in the economy.
+
+In the non-linear occupational choice environment of our model, both absolute and comparative advantage matter, which is why $\overline a_i$ takes into account both aspects.
 \end{document}
