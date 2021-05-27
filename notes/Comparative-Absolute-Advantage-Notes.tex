@@ -15,7 +15,7 @@
 \usepackage{nicefrac}
 \usepackage{dsfont}
 \usepackage{mathtools}
-
+\usepackage{multirow}
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 
@@ -82,23 +82,38 @@ Ability in the Data and in the Model}
 %\textit{Keywords:}
 %\end{singlespacing}
 %\end{titlepage}
-In Project TALENT and in the two iterations of the NLSY, each survey respondent takes a battery of cognitive tests and we have test scores for three types of tests:
-\begin{enumerate}
-  \item mathematics,
-  \item verbal (word knowledge and comprehension), and
-  \item social.
-\end{enumerate}
-O*NET has skill requirements for each occupation and we are focusing on the skills corresponding most closely to the cognitive test scores, namely:
-\begin{enumerate}
-  \item mathematics,
-  \item writing, and
-  \item social skills.
-\end{enumerate}
-We'll label the three components $m$, $w$, and $s$, respectively.
+In Project TALENT and in the two NLSY cohorts, each survey respondent takes a battery of cognitive test and attitudinal scales that measure a respondent's non-cognitive abilities. Table \ref{tab:ability} presents test components that we use to construct math, verbal, and social abilities that can be linked to skill counterparts. For each survey, we reduce the components into three composite dimensions using principal component analysis. Then, these composites are converted into percentile ranks among individuals.
 
-Each individual is characterized by a triple $(a_m,a_w,a_s)$ based on her test scores, which are normalized to the unit interval $[0,1]$ to facilitate comparisons across cohorts in different surveys. Effectively, the triple keeps track of an individual's rank in each individual component.
+\begin{table}[ht!]
+	\begin{center}
+{\footnotesize	\begin{tabular}{|| c | c | c | c |} 
+			\hline
+			 & Project TALENT & NLSY79 & NLSY97\\ [0.5ex] 
+			\hline\hline
+			\multirow{2}{2cm}{\centering Math ability} & \multirow{2}{3.7cm}{\centering Mathematics composite} & Arithmetic reasoning & Arithmetic reasoning \\ 
+			 & & Mathematics knowledge & Mathematics knowledge \\ 
+			 \hline
+			\multirow{2}{2cm}{\centering Verbal ability} & \multirow{2}{3.7cm}{\centering Verbal composite} & Word knowledge & Word knowledge \\ 
+			 &  & Paragraph comprehension & Paragraph comprehension \\ 
+			 \hline
+			\multirow{3}{2cm}{\centering Social ability} & \multirow{2}{3.7cm}{\centering Impulsiveness, calmness, self-confidence, mature personality} & Rotter locus of control scale & \multirow{3}{4.5cm}{\centering Organized, conscientious, dependable, thorough, trusting, disciplined, careful} \\ 
+			 & & Rosenberg self-esteem scale &   \\
+			 &  &  &  \\
+			\hline
+		\end{tabular}}
+		    \caption{Ability measures}\label{tab:ability}
+	\end{center}
+\end{table}
 
-Similarly, each occupation $j$ is characterized by a vector of skill requirements $(b_m,b_w,b_s)$ based on the O*NET descriptors.
+O*NET contains information on ability, knowledge, and skills that characterize at total of 974 different occupations. Each of these occupations has scores for the importance of 277 descriptors. We are focusing on the occupational skill requirements corresponding to math, verbal, and social abilities.
+
+Following Guvenen et al. (2020), we use 32 descriptors that are most closely related to our ability measures. First, we convert 26 O*NET skills into {\it Arithmetic Reasoning}, {\it Mathematics Knowledge}, {\it Word Knowledge}, and {\it Paragraph Comprehension} from ASVAB using the crosswalk created by the Defense Manpower Data Center. Then, we normalize the four components and reduce them into math and verbal skill requirements using principal component analysis. Next, we reduce six O*NET descriptors into a single social skill requirement using principal component analysis. Finally, these three composites are converted into percentile ranks among occupations.
+
+We label the three dimensions of job requirements and worker skill with subscripts $m$ (math), $v$ (verbal), and $s$ (social), respectively.
+
+Each individual is characterized by a triple $(a_m,a_v,a_s)$.% Effectively, the triple keeps track of an individual's rank in each individual component.
+
+Similarly, each occupation $j$ is characterized by a vector of skill requirements $(b_m,b_v,b_s)$ based on the O*NET descriptors and the Guvenen et al. (2020) procedure above.
 
 Jobs are differentiated vertically as well as horizontally. For instance, some occupations have higher requirements in all three dimensions compared to other jobs. They require more skill in an {\it absolute} sense. Other jobs have a different mix of requirements. For instance, one occupation may have low requirements for mathematics and high requirements for writing / communication while another job may have a ``reverse'' profile. This differentiation is mostly horizontal and hence the requirements vary in a {\it comparative} sense.
 
@@ -107,17 +122,17 @@ So how can we assign occupation-specific abilities to each individual with the t
 Without loss of generality (at least I think so), the mathematical skill and requirement pair is the reference dimension in our measure of distance between individual $i$'s skills and occupation $j$'s requirements.
 \begin{equation}
 \label{ }
-\hat{a}_i^j = \ln\left( \frac{a_{i,m}}{b_{j,m}} \right) - \abs{ \ln \left( \frac{\nicefrac{a_{i,w}}{b_{j,w}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) } - \abs{ \ln \left( \frac{\nicefrac{a_{i,s}}{b_{j,s}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) }
+\hat{a}_i^j = \ln\left( \frac{a_{i,m}}{b_{j,m}} \right) - \abs{ \ln \left( \frac{\nicefrac{a_{i,v}}{b_{j,v}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) } - \abs{ \ln \left( \frac{\nicefrac{a_{i,s}}{b_{j,s}}}{\nicefrac{a_{i,m}}{b_{j,m}}}  \right) }
 \end{equation}
 This measures the distance between an individual's skill set relative to the requirements of a particular occupation. The support of this measure is the real line.
 
-For the purposes of our quantitative exercise, we need to transform this measure such that the support is $\mathbb{R}^{+} \cup \{ 0 \}$ by subtracting the minimum of all $\hat{a}_i^j $. In addition, we divide it by the standard deviation of $\hat{a}_i^j $ in order to standardize it.
+For the purposes of our quantitative exercise, we need to transform this measure such that the support is $\mathbb{R}^{+} \cup \{ 0 \}$ by subtracting the minimum of all $\hat{a}_i^j $. In addition, we divide it by the standard deviation of $\hat{a}_i^j $ in order to normalize it.
 
 \begin{equation}
 \label{ }
 \overline{a}_i^j = \frac{\hat{a}_i^j - \min\{\hat{a}_i^j\}_{i,j} }{\sigma(\hat{a}_i^j)}
 \end{equation}
-Each individual in this economy now is endowed with a vector of occupation-specific abilities $\overline a_i = \{ \overline a_i^j \}_{j \in J}$, where $J$ is the number of different occupations in the economy.
+Each individual $i$ in this economy now is endowed with a vector of occupation-specific abilities $\overline a_i = \{ \overline a_i^j \}_{j \in J}$, where $J$ is the number of different occupations in the economy.
 
 In the non-linear occupational choice environment of our model, both absolute and comparative advantage matter, which is why $\overline a_i$ takes into account both aspects.
 \end{document}
