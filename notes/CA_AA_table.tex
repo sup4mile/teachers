@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{caption}
+\geometry{letterpaper, portrait, margin=1in}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\newcommand{\source}[1]{\caption*{Source: {#1}} }
+\renewcommand{\baselinestretch}{1.5}
+\usepackage[english]{babel}
+\usepackage[options]{authblk}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{natbib}
+\usepackage{apalike}
+\usepackage{titling}
+
+
+\begin{document}
+
+In Project TALENT and in the two NLSY cohorts, each survey respondent takes a battery of cognitive test and attitudinal scales that measure a respondent's non-cognitive abilities. Table \ref{tab:ability} presents test components that we use to construct math, verbal, and social abilities that can be linked to skill counterparts. For each survey, we reduce the components into three composite dimensions using principal component analysis. Then, these composites are converted into percentile ranks among individuals.
+
+\begin{table}[ht!]
+	\begin{center}
+		\begin{tabular}{|| c | c | c | c |} 
+			\hline
+			 & Project TALENT & NLSY79 & NLSY97\\ [0.5ex] 
+			\hline\hline
+			\multirow{2}{2.1cm}{\centering Math ability} & \multirow{2}{3.9cm}{\centering Mathematics composite} & Arithmetic reasoning & Arithmetic reasoning \\ 
+			 & & Mathematics knowledge & Mathematics knowledge \\ 
+			 \hline
+			\multirow{2}{2.1cm}{\centering Verbal ability} & \multirow{2}{3.9cm}{\centering Verbal composite} & Word knowledge & Word knowledge \\ 
+			 &  & Paragraph comprehension & Paragraph comprehension \\ 
+			 \hline
+			\multirow{3}{2.1cm}{\centering Social ability} & \multirow{2}{3.9cm}{\centering Impulsiveness, calmness, self-confidence, mature personality} & Rotter locus of control scale & \multirow{3}{5cm}{\centering Organized, conscientious, dependable, thorough, trusting, disciplined, careful} \\ 
+			 & & Rosenberg self-esteem scale &   \\
+			 &  &  &  \\
+			\hline
+		\end{tabular}
+		    \caption{Ability measures}\label{tab:ability}
+	\end{center}
+\end{table}
+
+O*NET contains information of ability, knowledge, and skills that characterize each occupation. The data includes information on 974 occupations. Each of these occupations has scores for the importance of 277 descriptors. We are focusing on the occupational skill requirements corresponding to math, verbal, and social abilities. Following Guvenen et al. (2020), we use 32 descriptors that are most closely related to our ability measures. First, we convert 26 O*NET skills into Arithmetic reasoning, Mathematics knowledge, Word knowledge, and Paragraph comprehension from ASVAB using the crosswalk created by the Defense Manpower Data Center. Then, we normalize four components and reduce them into math and verbal skill requirements using principal component analysis. Next, we reduce six O*NET descriptors into social skill requirement using principal component analysis. Finally, these composites are converted into percentile ranks among occupations.
+
+\end{document}
