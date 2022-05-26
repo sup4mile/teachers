@@ -1,0 +1,41 @@
+\begin{thebibliography}{7}
+\newcommand{\enquote}[1]{``#1''}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[\protect\citeauthoryear{Altonji, Bharadwaj, and Lange}{Altonji
+  et~al.}{2009}]{Altonji:2009}
+\textsc{Altonji, J., P.~Bharadwaj, and F.~Lange} (2009): \enquote{Constructing
+  AFQT Scores that are Comparable Across the NLSY79 and the NLSY97,} Data Note.
+
+\bibitem[\protect\citeauthoryear{Cooksey}{Cooksey}{2018}]{Cooksey:2018}
+\textsc{Cooksey, E.~C.} (2018): \enquote{Using the National Longitudinal
+  Surveys of Youth (NLSY) to Conduct Life Course Analyses,} in \emph{Handbook
+  of Life Course Health Development}, ed. by N.~Halfon, C.~B. Forrest, R.~M.
+  Lerner, and E.~M. Faustman, Cham: Springer International Publishing,
+  561--577.
+
+\bibitem[\protect\citeauthoryear{Eaton and Kortum}{Eaton and
+  Kortum}{2002}]{Eaton:2002}
+\textsc{Eaton, J. and S.~Kortum} (2002): \enquote{Technology, Geography, and
+  Trade,} \emph{Econometrica}, 70, 1741--1779.
+
+\bibitem[\protect\citeauthoryear{Hsieh, Hurst, Jones, and Klenow}{Hsieh
+  et~al.}{2018}]{Hsieh:2018}
+\textsc{Hsieh, C.-T., E.~Hurst, C.~I. Jones, and P.~J. Klenow} (2018):
+  \enquote{{The Allocation of Talent and U.S. Economic Growth},} \emph{Working
+  Paper}, 1--72.
+
+\bibitem[\protect\citeauthoryear{Lucas and Moll}{Lucas and
+  Moll}{2014}]{Lucas:2014}
+\textsc{Lucas, R.~E. and B.~Moll} (2014): \enquote{Knowledge Growth and the
+  Allocation of Time,} \emph{Journal of Political Economy}, 122, 1--51.
+
+\bibitem[\protect\citeauthoryear{Martellini}{Martellini}{2019}]{Martellini:2019}
+\textsc{Martellini, P.} (2019): \enquote{{The City-Size Wage Premium: Origins
+  and Aggregate Implications},} \emph{Working Paper}, 1--76.
+
+\bibitem[\protect\citeauthoryear{Roy}{Roy}{1951}]{Roy:1951}
+\textsc{Roy, A.} (1951): \enquote{Some Thoughts on the Distribution of
+  Earnings,} \emph{Oxford Economic Papers New Series}, 3, 135--146.
+
+\end{thebibliography}
