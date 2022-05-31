@@ -1,58 +1,46 @@
-This is BibTeX, Version 0.99d
-Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+This is BibTeX, Version 0.99d (TeX Live 2019)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: version0_12.aux
-Reallocating 'name_of_file' (item size: 1) to 59 items.
-I couldn't open database file /Users/simeonalder/Dropbox/Bibliography/MasterBibliography.bib
----line 136 of file version0_12.aux
- : \bibdata{/Users/simeonalder/Dropbox/Bibliography/MasterBibliography
- :                                                                    }
-I'm skipping whatever remains of this command
-Reallocating 'name_of_file' (item size: 1) to 5 items.
 The style file: ecta.bst
-I found no database files---while reading file version0_12.aux
-Warning--I didn't find a database entry for "Hsieh:2018"
-Warning--I didn't find a database entry for "Roy:1951"
-Warning--I didn't find a database entry for "Cooksey:2018"
-Warning--I didn't find a database entry for "Altonji:2009"
-You've used 0 entries,
+Database file #1: /Users/simeonalder/Dropbox/Bibliography/MasterBibliography.bib
+You've used 4 entries,
             2849 wiz_defined-function locations,
-            604 strings with 4769 characters,
-and the built_in function-call counts, 25 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 8
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
+            627 strings with 5457 characters,
+and the built_in function-call counts, 2604 in all, are:
+= -- 217
+> -- 110
+< -- 4
++ -- 35
+- -- 31
+* -- 209
+:= -- 402
+add.period$ -- 8
+call.type$ -- 4
+change.case$ -- 26
+chr.to.int$ -- 4
+cite$ -- 4
+duplicate$ -- 195
+empty$ -- 193
+format.name$ -- 44
+if$ -- 526
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 0
-newline$ -- 5
-num.names$ -- 0
-pop$ -- 0
+missing$ -- 34
+newline$ -- 17
+num.names$ -- 21
+pop$ -- 64
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 25
 quote$ -- 0
-skip$ -- 1
+skip$ -- 80
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
+substring$ -- 126
+swap$ -- 101
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
+type$ -- 48
 warning$ -- 0
-while$ -- 0
+while$ -- 21
 width$ -- 0
-write$ -- 4
-(There were 2 error messages)
+write$ -- 52
