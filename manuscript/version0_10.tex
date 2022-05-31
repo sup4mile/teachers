@@ -55,17 +55,25 @@ The educational landscape in the U.S.~has gone through major changes since the e
 \section{Introduction}
 The educational landscape in the U.S.~has gone through major changes since the end of World War II. Real expenditure per student has risen from approximately \$2,100 to more than \$10,000 by the turn of the century and more than \$12,000 since the Great Recession. At the same time, the student-teacher ratio has fallen from a national average of almost 27 in 1955 to 16 by the 2010s. Yet despite the rise in expenditures and the reduction in class sizes, educational outcomes in the U.S.~don't compare very favorably with countries at similar income levels.
 
-One aspect of U.S.~education that has not garnered a lot of attention until fairly recently is occupational choice. We add an education sector to an otherwise standard \cite{Hsieh:2018}-style model to explore the extent to which changes in career opportunities in other occupations affect the selection of workers into teaching careers. In our model, teaching is distinct from other occupations in the economy since it produces human capital embodied in students rather than a consumption good or service. As a result, changes in the allocation of teaching talent have implications for the evolution of class size as well as quality of instruction and hence the accumulation of human capital during the workers' formative years.
+In this paper, we develop a novel unified theory of occupational choice and human capital formation with the aim of reconciling several salient stylized facts. In addition to the change in the student-teacher ratios and per-student-expenditures mentioned above, they are: (1) the increase in the share of women in teaching jobs from 4.6 percent in 1970 to 6.7 percent in 2010; (2) the drop in the share of men who are teachers from 2.9 percent to 2.1 percent during that same time; (3) the sharp rise in the female labor force participation rate; (4) the slight decline in the male labor force participation rate; and (5) the evolution of the skill composition by gender and occupation between 1970 and 2010.\footnote{The secular rise in educational achievement as well and gender- and occupation-specific variations in this trend are additional salient aspects that merit further attention. As will become apparent in chapters \ref{sec:model} and \ref{sec:equilibrium}, the current version of our model is not particularly well-equipped to address this stylized fact. This is an area for future work.}
 
-While the model has implications for the stationary static allocation of talent across occupations, we emphasize the dynamic effects driven by human capital accumulation in primary and secondary education in order to explore the deeper causes of America's education \textit{malaise}.
+In order to account for these stylized facts, we add an education sector to an otherwise standard \cite{Hsieh:2018}-style model to explore the extent to which changes in career opportunities in other occupations -- including home production -- affect the selection of workers into teaching careers. In our model, teaching is distinct from other occupations in the economy. The teacher's human capital is one of several inputs into an education technology through which students of different abilities accumulate human capital. Human capital, in turn, is the key input for the production of final goods and services. In other words, workers in non-teaching occupations produces final output while teachers contribute to the production of human capital in today's students who, in turn, will either produce units of final output next period or train the next generation of students.% As a result, changes in the allocation of teaching talent have implications for the evolution of class size as well as quality of instruction and hence the accumulation of human capital during the workers' formative years.
 
-Section \ref{sec:model} introduces the model. Section \ref{sec:data} reviews the data, and we calibrate the model to match salient empirical moments in section \ref{sec:quant}. Section \ref{sec:conclusion} concludes.
+In contrast to a standard \cite{Roy:1951}-type model, we allow for the possibility that occupational choice is shaped by comparative as well as absolute advantage. The elasticity of income with respect to the worker's human capital can be different from unity and this implies that two workers with identical {\it comparative} advantages but different {\it absolute} advantage may select distinct occupations. This variation gives us additional flexility to account for the evolution of employment shares across occupations separately from changes in the distribution of skills or human capital across jobs.
+
+The question of whether low or high-skill workers are more like to enter (or exit, for that matter) the teaching profession is critical for understanding whether static efficiency gains associated with the elimination of labor market discrimination and educational barriers in non-teaching occupations are muted or amplified by dynamic effects that operate through our model's human capital accumulation channel. The previous literature has explored the static gains and losses extensively in the context of linear models. The key contribution of our paper is {\it (a)} the introduction of non-linear wage functions that emphasize the role of absolute advantage in addition to the prior focus on comparative advantage and {\it (b)} the intergenerational dynamics of human capital accumulation that mainly operate through the distinct education sector in our model.
+
+In addition to our theoretical contribution, our paper revives and older, but rarely used longitudinal dataset. {\it Project TALENT} surveyed a representative sample of approximately 377 thousand U.S.~high school students in 1959. These same students were interviewed again one, five, and eleven year after they graduated from high school. This dataset was digitized somewhat recently and we use it in combination with the NLSY79 and NLSY97 for our quantitative work. Together, the three surveys paint a rich and detailed picture of American youth spanning more than four decades. Importantly, respondents in all three surveys take aptitude tests that allow us to construct ability profiles, which play a central role in our quantitative work.
+
+%While the model has implications for the stationary static allocation of talent across occupations, we emphasize the dynamic effects driven by human capital accumulation in primary and secondary education in order to explore the deeper causes of America's education \textit{malaise}.
+
+The remainder of the paper is organized as follows. Section \ref{sec:model} introduces the model. Section \ref{sec:data} reviews the data and we calibrate the model to match salient empirical moments in section \ref{sec:quant}. Section \ref{sec:conclusion} concludes.
 
 \section{Model}\label{sec:model}
 The model is populated by a constant measure $M$ of workers who are employed in one of the $I$ sectors of the economy. Each individual is born with an exogenous $I$-dimensional vector of skills $\vec{a}$, where each element characterizes her innate ability in any one of the $i \in \{1,\ldots,I\}$ occupations in the economy, each corresponding to one of the sectors or industries. This vector of abilities is drawn from a known joint distribution $F_a(\vec{a})$. Moreover, the measure of workers is partitioned into $G$ different groups, which are indexed by $g \in \{1,\dots,G \}$. Workers are born into one of these groups and membership is permanent. Moreover, we assume that the distribution of abilities is identical across groups, i.e., $F_a^g(\vec{a}) = F_a^{g'}(\vec{a}) = F_a(\vec{a})$.
 
 Without loss of generality, occupation 1 is \textit{teaching}. In this economy, teachers are distinct from other occupations since their technology produces human capital rather than the homogenous final good in the remaining $I-1$ sectors. This kind of distinction is salient since we are assuming that the economy is populated by overlapping generations of workers who accumulate human capital when young, which then pays off when they are of working age (or ``old'').
-\subsection{Workers}\label{sec:workers}
+\subsection{Preferences and Technologies}\label{sec:workers}
 As in \cite{Roy:1951}, workers make occupational choices based on their full range of idiosyncratic abilities $\vec{a}$ and the corresponding ``payoffs.'' To this basic mechanism we add \cite{Hsieh:2018}-style forces that distort the allocation of skill across occupations and a human capital formation technology with time, good, and teacher inputs.
 
 The timing convention is similar to \cite{Hsieh:2018}. In the first period, prospective workers -- or students -- make human capital investments. Since there is no uncertainty, students have perfect foresight and their investment decision will depend on their fully anticipated occupational choice in period 2. They retire at the end of their working period and are replaced by a new cohort of students with measure $\tfrac{M}{2}$. The environment is stationary in the sense that the members of each cohort draw their ability vectors from the same distribution $F_a$.
@@ -73,16 +81,16 @@ The timing convention is similar to \cite{Hsieh:2018}. In the first period, pros
 The worker's utility depends on her consumption and time devoted to human capital investment:
 \begin{equation}
 %\label{ }
-U = \max_{C'_{i,g},s_{i,g},e_{i,g}} \left\{\ln C'_{i,g} + \mu\ln\left(1-s_{i,g} \right) \label{eq:util} \right\}_{i=1}^I
+U = \max_{C'_{g},\{s_{i,g},e_{i,g}\}_{i=1}^I} \left\{\mu \ln C'_{g} + \ln\left(1-s_{i,g} \right) \label{eq:util} \right\}_{i=1}^I
 \end{equation}
 where
 \begin{align}
 \label{}
-C'_{i,g} & =(1-t')(1-\tau^\omega_{i,g}')\omega_{i,g}'(h_{i,g})- \sum_{i=1}^I(1+\tau^e_{i,g})e_{i,g} \label{eq:bc}\\ %, \textrm{ for } t \in \{c,c+1\}  \\
+C'_{g} & =(1-t')(1-\tau^\omega_{i,g}')\omega_{i,g}'(h_{i,g})- \sum_{i=1}^I(1+\tau^e_{i,g})e_{i,g} \label{eq:bc}\\ %, \textrm{ for } t \in \{c,c+1\}  \\
 h_{i,g} & =\kappa(h_{T,g},a_i)(s_{i,g})^{\phi} (e_{i,g})^{\eta}\big(N(h_{T,g})\big)^{-\sigma} \label{eq:h}\\
 \kappa(h_{T,g},a_i) & =(h_{T,g})^\beta \left(a_i \right)^\alpha. \label{eq:g(h,a)}
 \end{align}
-$C_{i,g}$ is consumption of the homogeneous final good when old, $s_{i,g}$ is the time allocated to occupation-specific human capital formation when young, and $e_{i,g}$ are units of the final good invested in occupation-specific human capital formation when workers are still students. These investments and the corresponding consumption in the following period are occupation-specific and indexed by the superscript $i$.\footnote{Nothing prevents students from making investments in human capital in multiple occupations. Since there is no uncertainty in future payoffs, they will, however, select only one in equilibrium.} The periodic time endowment is set to unity. $1-s_{i,g}$ is leisure time when young, and labor is supplied inelastically when individuals reach working age.
+$C'_{g}$ is consumption of the homogeneous final good when old, $s_{i,g}$ is the time allocated to occupation-specific human capital formation when young, and $e_{i,g}$ are units of the final good invested in occupation-specific human capital formation when workers are still students. These investments and the corresponding consumption in the following period are occupation-specific and indexed by the superscript $i$.\footnote{Nothing prevents students from making investments in human capital in multiple occupations. Since there is no uncertainty in future payoffs, they will, however, select only one in equilibrium.} The periodic time endowment is set to unity. $1-s_{i,g}$ is leisure time when young, and labor is supplied inelastically when individuals reach working age.
 
 Labor income is taxed at a constant marginal rate $t \in [0,1)$ and $\tau^\omega_{i,g} < 1$ is a group-$g$-and-occupation-$i$-specific labor market distortion. We allow for the possibility of {\it negative} distortions. Finally, $\tau^e_{i,g}$ is a group and occupation-specific educational barrier that raises the cost of good investments in human capital.
 
@@ -93,7 +101,7 @@ Labor income is taxed at a constant marginal rate $t \in [0,1)$ and $\tau^\omega
 %\end{equation}
 %where the idiosyncratic draws are independent. We borrow this assumption from \cite{Eaton:2002}.
 
-The c.d.f.~of the joint distribution of $\vec{a}$ is denoted $F \left( \vec{a} \right)$. We assume that the draws from this distribution are i.i.d.~across agents but we allow for the possibility that draws are not independent across occupations.
+We assume that the draws from $F_a \left( \cdot \right)$ are i.i.d.~across agents but we allow for the possibility that draws are not independent across occupations.
 
 The production technologies in occupations $2,\ldots,I$ are linear in efficiency units of labor $h_{i,g}$ with productivities $\{A_i\}_{i=2}^I$:
 \begin{equation}
@@ -114,7 +122,7 @@ Teaching is distinct from other occupations since it ``transforms'' students wit
 
 Individuals will choose the occupation that delivers the highest lifetime utility. The workers' choice between non-teaching occupations is typical in the sense that it is based on a conventional \cite{Roy:1951}-type model. Teaching, on the other hand, is modeled in a way that deviates from the standard assumptions in two key respects: (1) the teachers' human capital is an input into the {\it students'} human capital production function rather than the production function for final goods and (2) the teacher's wage $\omega_{T,g}\left( h_{T,g} \right)$ need not be linear in $h_{T,g}$. This implies that the choice of becoming a teacher doesn't just depend on a worker's comparative advantage, it also depends on her {\it absolute} advantage.
 
-Due to the special nature of teaching, we will discuss the key characteristics based on a version of the model with $I=2$ case. This allows us to highlight the novel elements of the model more effectively. In this version, we label the two occupations with $T$ (for {\it teaching}) and $O$ (for {\it other}). Later, and especially when we parameterize the model to match moments in U.S.~data, we will re-introduce the standard {\it Roy} features.
+Due to the special nature of teaching, we will discuss the key characteristics based on a version of the model with $I=2$. This allows us to highlight the novel elements of the model more effectively. In this version, we label the two occupations with $T$ (for {\it teaching}) and $O$ (for {\it other}). Later, and especially when we parameterize the model to match moments in U.S.~data, we will re-introduce the standard {\it Roy} features.
 
 %Equation \eqref{eq:h} highlights the distinctive feature of teaching compared to all other occupations: the elasticity of output with respect to the teacher's human capital ($h^T$) is $\beta$ whereas production is linear in human capital in $O$, i.e. the output elasticity is $1$.
 
@@ -124,8 +132,23 @@ In equations \eqref{eq:h} and \eqref{eq:g(h,a)}, the student's ability $a_i$ and
 \label{ }
 N({h_{T,g}}') = \left(\frac{{h_{T,g}}'}{{h_{T,g}}}\right)^{\frac{\beta}{\sigma}} N({h_{T,g}}).
 \end{equation}
+
+All $\frac{M}{2}$ students in the economy attend school. Therefore, the following resource constraint must be satisfied:
+\begin{align}
+\label{resource}
+\frac{M}{2}=\int_0^\infty N(h_{T,g})dF(h_{T,g}) 
+\end{align}
+where $F(\cdot)$ is the c.d.f. of human capital in teaching.
+
+Then, the resource constraint (\ref{resource}) anchors the class size distribution.
+\begin{prp}[Class size distribution] For a given teacher with human capital $h_{T,g}$, the her class size is characterized by:
+\begin{align}
+  \left(\frac{2\widetilde{H_T}}{M}\right)^\sigma=h_{T,g}^\beta N(h_{T,g})^{-\sigma}
+\end{align}
+\end{prp}
+
 \subsubsection{Student-Teacher Matching}
-While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This can be the case, for instance, if students make human capital investments in terms of goods as a function of the teacher's human capital $h_{T,g}$. 
+While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This can happen, for instance, if students make human capital investments in terms of goods as a function of the teacher's human capital $h_{T,g}$. 
 
 For simplicity, we assume that students make investments as a function of $a$ and occupation $i$, but not $h_{T,g}$. The joint assumption that $e_{i,g}(a_i)$ is a function of $a$ (but not $h_{T,g}$) and that $N(h_{T,g})$ is a function of $h_{T,g}$ (but not $a_i$) implies that the student-teacher matching is random, i.e.~the human capital production function is modular in $h_{T,g}$ and $a_i$.\footnote{The anecdotal evidence suggests that student-teacher assignments don't involve systematic sorting at the school level. There is, however, some evidence in support of sorting between families with highly educated parents and high-ability teachers into better funded schools or school districts. Identifying the empirically relevant extent of this type of sorting is working in progress and future versions of our model may eventually allow for it.}
 
@@ -136,17 +159,18 @@ The idiosyncratic state consists of the $I$-dimensional vector of abilities $\ve
 
 A student in group $g$ solves a maximization problem which entails a discrete occupational choice as well as continuous human capital investments in terms of time and final goods. Formally, she solves:
 \begin{align}
+\label{}
 V_g(a_T,a_O,\widetilde{H}_T) & = \max_{\{s_{O,g},s_{T,g},e_{O,g},e_{T,g}\}} \bigg\{ V_{O,g}(a_O,\widetilde{H}_T), V_{T,g}(a_T,\widetilde{H}_T) \bigg\} \label{eq:V}
 \end{align}
 where
 \begin{align}
 %\label{eq:vo}
-V_{O,g}(a_O,\widetilde{H}_T) & = \mu \ln\left(1-s_{O,g}\left(a_O,\widetilde{H}_T\right)\right) \nonumber \\
-& + \ln \Big[ {{h'}_{O,g}} A_O'(1-t')(1-\tau^\omega_{O,g}') \nonumber \\
+V_{O,g}(a_O,\widetilde{H}_T) & = \ln\left(1-s_{O,g}\left(a_O,\widetilde{H}_T\right)\right) \nonumber \\
+& + \mu \ln \Big[ {{h'}_{O,g}} A_O'(1-t')(1-\tau^\omega_{O,g}') \nonumber \\
 & - e_{O,g}(a_O,\widetilde{H}_T)(1+\tau^e_{O,g}) \Big], \label{eq:VO} \\
 %\label{eq:vt}
-V_{T,g}(a_T,\widetilde{H}_T) & = \mu \ln\left(1-s_{T,g}\left(a_T,\widetilde{H}_T\right)\right) \nonumber \\
-& + \ln \Big[ \omega'({h_{T,g}'},{\widetilde{H}_{T}'})(1-t')(1-\tau^\omega_{T,g}') \nonumber \\
+V_{T,g}(a_T,\widetilde{H}_T) & = \ln\left(1-s_{T,g}\left(a_T,\widetilde{H}_T\right)\right) \nonumber \\
+& + \mu \ln \Big[ \omega'({h_{T,g}'},{\widetilde{H}_{T}'})(1-t')(1-\tau^\omega_{T,g}') \nonumber \\
 & - e_{T,g}(a_T,\widetilde{H}_T)(1+\tau^e_{T,g}') \Big] \label{eq:VT}
 \end{align}
 
@@ -154,15 +178,15 @@ To make further progress, we need to characterize an occupational choice thresho
 
 \begin{equation*}
 %\label{eq:ot}
-a_{T^*,g}(a_O) = \bar{a}_g\big(a_{O},\widetilde{H}_T\big) %\\
+a^*_{T,g}(a_O) = \bar{a}_g\big(a_{O},\widetilde{H}_T\big) %\\
 \end{equation*}
 such that
 \begin{equation}
 \label{eq:indiff}
-V_{O,g}(a_{O},\widetilde{H}_T) = V_{T,g}\left(a_{T^*,g}(a_O),\widetilde{H}_T\right) \textrm{{\sf , for all} } a_O \in (0,\infty)
+V_{O,g}(a_{O},\widetilde{H}_T) = V_{T,g}\left(a^*_{T,g}(a_O),\widetilde{H}_T\right) \textrm{{\sf , for all} } a_O \in (0,\infty)
 \end{equation}
 
-Unless it's necessary, we will omit the aggregate state argument $\widetilde{H}_T$ from $\bar{a}_g(\cdot)$ in order to keep the notation clean and tidy.\footnote{We will show later that the occupational threshold is indeed independent from $\widetilde{H}^T$. At this point, this result is not (yet) obvious.}
+Unless it's necessary, we will omit the aggregate state argument $\widetilde{H}_T$ from $\bar{a}_g(\cdot)$ in order to keep the notation clean and tidy.\footnote{We will show later that the occupational threshold is indeed independent from $\widetilde{H}_T$. At this point, this result is not (yet) obvious.}
 
 The optimization problem is subject to the following constraints:
 \begin{align}
@@ -191,67 +215,63 @@ The aggregate laws of motion for human capital in teaching ($\widetilde{H}_T$) a
 \widetilde{H}_{T}' & = \sum_{g=1}^G \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{T,g}\left(a,\widetilde{H}_T\right)^\phi e_{T,g}(a,\widetilde{H}_T)^\eta \right)^{\frac{\beta}{\sigma}} f_{T,g}(a) da 
 \end{align}
  
-Teachers are public sector employees and their compensation is funded by tax revenues. Equation \eqref{eq:bc} is the government's balanced budget requirement, which is a salient feature in the U.S.~context. Equations \eqref{eq:densTN2} and \eqref{eq:densON2} are the marginal densities of teachers and production workers after taking into account the endogenous occupational choice in \eqref{eq:indiff}.
+Teachers are public sector employees and their compensation is funded by tax revenues. Equation \eqref{eq:bc} is the government's balanced budget requirement, which is a salient feature in the U.S.~context. 
 
-Equation \eqref{eq:lomO} is the aggregation over $h^O$ of the current cohort of students while equation \eqref{eq:lomT} is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of $h^T$ of the current cohort of students.
+Equation \eqref{eq:lomO} is the aggregation over $h^O$ of the current cohort of students, while equation \eqref{eq:lomT} is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of $h^T$ of the current cohort of students.
 
-The only restriction on the teacher's wage profile is that it is proportional to her class size. We revisit this aspect in section \ref{sec:firstbest} where we impose some additional structure on this profile. While $\omega$ is linear in class size, it is non-linear in the teacher's human capital and this will turn out to be important when we analyze the effects associated with changes in educational barriers and labor market discrimination over time.\footnote{The key implication is that, in contrast to a standard Roy model, occupational choice depends on an agent's comparative as well as absolute advantage.}
+The only restriction on the teacher's wage profile is that it is proportional to her class size. While $\omega$ is linear in class size, it is non-linear in the teacher's human capital and this will turn out to be important when we analyze the effects associated with changes in educational barriers and labor market discrimination over time.\footnote{The key implication is that, in contrast to a standard Roy model, occupational choice depends on an agent's comparative as well as absolute advantage.}
 
 \section{Equilibrium}
-\begin{df}[COMPLETE?]
-The equilibrium consists of individual choices $\{C, e, s\}$, occupational choice boundary and the corresponding densities $f^T$ and $f^O$, aggregate human capital in each occupation $\widetilde{H}^{T}$ and ${H}^{O}$, and an efficiency wage in each occupation such that:
+\begin{df}
+Given occupational choices of today's old and aggregate human capital $\widetilde{H}_{T}$ and ${H}_{O}$, the equilibrium consists of individual choices of young $\{e_{T,g}, s_{T,g}, e_{O,g}, s_{O,g}\}$, the occupational choice boundary $a^*_{T,g}(a_O)$, the corresponding densities $f_{T,g}$ and $f_{O,g}$, and occupation- and group-specific wage profiles $\{\omega_{T,g}, \omega_{O,g}\}$ such that:
 \begin{enumerate}
-  \item Given an occupational choice and the occupational wage, each individual chooses consumption $C$, goods investment $e$, and time investment $s$ to maximize utility given by (\ref{eq:util}) subject to the constraints given by (\ref{eq:bc})-\eqref{eq:fON2}.
-  \item Each individual chooses the occupation that maximizes utility [COMPLETE!].
+  \item Given the wage profiles, each individual's choice of goods investment $\{e_{T,g}, e_{O,g}\}$ and time investment $\{s_{T,g}, s_{O,g}\}$ maximizes utility given by (\ref{eq:V}) subject to the constraints given by (\ref{eq:fTN2})-\eqref{eq:fON2}.
   \item The aggregate human capital follows the laws of motion given by (\ref{eq:lomO}) and (\ref{eq:lomT}).
+  \item Government budget constraint (\ref{eq:bc}) is satisfied.
 \end{enumerate}
 \end{df}
 
 \subsection{Human Capital Investment}
 Let's first characterize the optimal human capital investment for a prospective teacher with ability $a$ from group $g$.%\footnote{A stickler might object that it should really be $a^T$, but we're dropping the superscript to economize on notation whenever possible.}
 
-The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
+The F.O.C.s for $s_{T,g}$ and $e_{T,g}$, respectively, after a few steps of algebra are:
 \begin{align}
 \label{eq:foc-e}
-(1-\tau^{e,g,T}) e^t \left( \frac{\sigma}{\beta \eta}-1 \right) & = \left(1-s^T\right) \mu(1-t)(1-\tau^{\omega,g,T}) \frac{\partial \omega'}{\partial s^T} \\
+(1+\tau^e_{T,g}) e_{T,g} \left( \frac{\sigma}{\eta\beta }-1 \right) & = \left(1-s_{T,g}\right) \mu(1-t')(1-\tau^\omega_{T,g}') \frac{\partial \omega'}{\partial s_{T,g}} \\
 \label{eq:foc-s}
-(1-t)(1-\tau^{\omega,g,T}) \frac{\partial \omega'}{\partial e^T} & = 1-\tau^{e,g,T},
+(1-t')(1-\tau^\omega_{T,g}') \frac{\partial \omega'}{\partial e_{T,g}} & = 1+\tau^e_{T,g}',
 \end{align}
 where
 \begin{align}
 %\label{}
- \frac{\partial \omega'}{\partial s^T} & =  \frac{\beta \phi}{\sigma} \lambda' \left(\frac{M}{2 H^T}\right)^{-\beta} \frac{M}{2 {{H'}^T}} \left[ a^\alpha (s^T)^\phi (e^T)^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{s^T} \label{eq:sT} \\
- \frac{\partial \omega'}{\partial e^T} & = \frac{\beta \eta}{\sigma} \lambda' \left(\frac{M}{2 H^T}\right)^{-\beta} \frac{M}{2 {{H'}^T}} \left[ a^\alpha (s^T)^\phi (e^T)^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{e^T} \label{eq:eT}
+ \frac{\partial \omega'}{\partial s_{T,g}} & =  \frac{\phi\beta }{\sigma} \lambda' \left(\frac{M}{2 \widetilde{H}_T}\right)^{-\beta} \frac{M}{2 {\widetilde{H}'_T}} \left[ a^\alpha (s_{T,g})^\phi (e_{T,g})^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{s_{T,g}} \label{eq:sT} \\
+ \frac{\partial \omega'}{\partial e_{T,g}} & = \frac{\eta\beta }{\sigma} \lambda' \left(\frac{M}{2 \widetilde{H}_T}\right)^{-\beta} \frac{M}{2 {\widetilde{H}'_T}} \left[ a^\alpha (s_{T,g})^\phi (e_{T,g})^\eta \right]^{\frac{\beta}{\sigma}} \frac{1}{e_{T,g}} \label{eq:eT}
 \end{align}
-Let $\tau^{g,T} \equiv \frac{\left( 1-t' \right) \left( 1-{\tau'}^{\omega,g,T} \right)}{1+\tau^{e,g,T}}$ be a composite wedge that takes into account the rate at which income is taxed, the extent of labor market discrimination, and educational barriers. Note that $\tau^{g,T}=1$ when $t' = \tau^{\omega,g,T} = \tau^{e,g,T} = 0$.
+Let $\tau_{T,g} \equiv \frac{\left( 1-t' \right) \left( 1-\tau^\omega_{T,g}' \right)}{1+\tau^e_{T,g}}$ be a composite wedge that takes into account the rate at which income is taxed, the extent of labor market discrimination, and educational barriers. Note that $\tau_{T,g}=1$ when $t' = \tau^\omega_{T,g}' = \tau^e_{T,g} = 0$.
 
 The amount of time and goods this individual invests in human capital is then given by:
-
 \begin{align}
 %\label{eq:s_T}
-s^{T} & = \frac{\mu \phi}{\mu \phi+\tfrac{\beta}{\sigma}-\eta} \\
+s_{T,g} & = \frac{\mu \phi}{\mu \phi+\tfrac{\beta}{\sigma}-\eta} \\
 %\label{eq:e_T}
-e^{T} & = \tau^{g,T}\cdot\tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^{\frac{\sigma}{1-\eta}} \nonumber\\
-%&  \textrm{\sc This needs to be fixed to reflect that there is only one non-teaching occupation.} \nonumber \\
-& \times \frac{{\tau^{g,O}}^{\frac{\eta}{1-\eta}} \cdot {A^{O'}}^{\frac{1}{1-\eta}} \cdot {s^O}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{g,O}(a)da }{\int_0^\infty f^{g,O}(a)da}  \frac{a_T^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}}}{\int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{g,T}(a)da}
+e_{T,g} & = \tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \frac{\sum_{g=1}^G {A_O'}^\frac{1}{1-\eta}\cdot\tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da}{\sum_{g=1}^G f_{O,g}(a)da} \nonumber\\
+& \times \frac{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta}}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}
 \end{align}
-Note that a prospective teacher's optimal investment of resources depends on the total human capital investment of prospective {\it production} workers. Clearly, it depends explicitly on $s^O$, but it also depends on $e^O$ in equation \eqref{eq:e_O} below, albeit less obviously so. This captures the fact that teachers are compensated for their contribution to the accumulation of human capital that can be used for the production of the consumable final good.\footnote{When the economy has $N>2$ occupations, the prospective teacher's optimal investment of resources is characterized by:
-\begin{align*}
-%\label{ }
-e^{T} & = \tau^{g,T}\cdot\tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^{\frac{\sigma}{1-\eta}} \nonumber\\
-& \times \frac{\sum_n {\tau^{g,n}}^{\frac{\eta}{1-\eta}} \cdot {A'_i}^{\frac{1}{1-\eta}} \cdot s_i^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da }{\sum_i \int_0^\infty f^{i,g}(a)da} \nonumber\\
-& \times \frac{a_T^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}}}{\int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{T,g}(a)da}
-\end{align*}.
-}
 
-The F.O.C.s for prospective production workers (i.e., those labeled ``other'') are analogues of \eqref{eq:foc-e} and \eqref{eq:foc-s} with the simplification that the wage profile in production (as opposed to teaching) is linear in $h^O$ and the optimal amount of time and resources invested in human capital is given by:
+Note that a prospective teacher's optimal investment of resources depends on the total human capital investment of prospective {\it production} workers. Clearly, it depends explicitly on $s_{O,g}$, but it also depends on $e_{O,g}$ in equation \eqref{eq:e_O} below, albeit less obviously so. This captures the fact that teachers are compensated for their contribution to the accumulation of human capital that can be used for the production of the consumable final good.\footnote{When the economy has $I>2$ occupations, the prospective teacher's optimal investment of resources is characterized by:
+\begin{align*}
+e_{T,g} & = \tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \nonumber\\
+& \times \frac{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta }}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}.
+\end{align*}
+}
+The F.O.C.s for prospective production workers (i.e., those labeled ``other'') are analogues of \eqref{eq:foc-e} and \eqref{eq:foc-s} with the simplification that the wage profile in production (as opposed to teaching) is linear in $h_{O,g}$ and the optimal amount of time and resources invested in human capital is given by:
 \begin{align}
 %\label{eq:s_O}
-s^{O} & = \frac{\mu \phi}{\mu \phi+1-\eta} \\
+s_{O,g} & = \frac{\mu \phi}{\mu \phi+1-\eta} \\
 \label{eq:e_O}
-e^{O} & = \left( \tau^{g,O} \cdot \eta \cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^\sigma\cdot {A^{O'}}^\eta \cdot s_T^\phi \cdot a_O^\alpha \right)^{\frac{1}{1-\eta}}
+e_{O,g} & = \left( \tau_{O,g} \cdot \eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\sigma\cdot {A'_{O}}^\eta \cdot s_{O,g}^\phi \cdot a_O^\alpha \right)^{\frac{1}{1-\eta}}
 \end{align}
-where, analogously to the problem of a prospective teacher, we define $\tau_{i,g} =\frac{(1-t')(1-{\tau'}_{i,g}^w)}{(1+\tau_{i,g}^e)}$.
+where, analogously to the problem of a prospective teacher, we define $\tau_{O,g} \equiv \frac{\left( 1-t' \right) \left( 1-\tau^\omega_{O,g}' \right)}{1+\tau^e_{O,g}}$.
 %\begin{align}
 %\tau_{T,g} &=\frac{(1-t)(1-{\tau'}_{T,g}^w)}{(1+\tau_{T,g}^e)} \nonumber\\
 %\tau_{i,g} &=\frac{(1-t)(1-{\tau'}_{i,g}^w)}{(1+\tau_{i,g}^e)} \nonumber
@@ -300,80 +320,86 @@ In the special case with $\beta=\sigma$, the model reverts to a standard occupat
 %\end{equation}
 %for any $h^O$.
 \begin{prp}
-If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h^O)}{h^O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h^T}{h^O}$ for all $h^O$.
+If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h_O)}{h_O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h_T}{h_O}$ for all $h_O$.
 \end{prp}
 
 \subsection{The Aggregate Laws of Motion}
+The economy is characterized by the following laws of motions: \footnote{When the economy has $I>2$ occupations, the law of motion for the aggregate human capital in teaching is characterized by:
+\begin{align*}
+\widetilde{H}'_{T} & = \Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \Bigg( \frac{\sum_{g=1}^G {A_O'}^\frac{1}{1-\eta}\cdot\tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da}{\sum_{g=1}^G f_{O,g}(a)da} \Bigg)^\eta \nonumber\\
+& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^\frac{\beta}{\sigma}
+\end{align*}.
+}
 %\begin{prp}
 \begin{align}
 %\label{eq:lomT}
-\widetilde{H'}^{T} & = \sum_g \Bigg[ \tau_{T,g}^\eta \cdot \left(\tfrac{\beta}{\sigma}\right)^\eta  \cdot \eta^{\frac{\eta}{1-\eta}} \cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot s_T^\phi \nonumber\\
-& \times \left(\frac{\sum_i {\tau_{i,g}}^{\frac{\eta}{1-\eta}} \cdot {A'}_i^{\frac{1}{1-\eta}} \cdot s_i^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da }{\sum_i \int_0^\infty f^{i,g}(a)da}\right)^\eta \nonumber\\
-& \times \left(\int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{T,g}(a)da\right)^{\frac{\sigma}{\beta}-\eta} \Bigg]^{\frac{\beta}{\sigma}}\\
-{H'}^{i} & = \sum_g \left( \tau_{i,g}^\eta \cdot \eta^\eta \cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^\frac{\sigma}{1-\eta}\cdot {A'}_i^\eta \cdot s_T^\phi \right)^\frac{1}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da
-\end{align}
-where
-\begin{align}
-\tau_{T,g} & =\frac{(1-t)(1-{\tau'}_{T,g}^w)}{(1+\tau_{T,g}^e)} \nonumber\\
-\tau_{i,g} & =\frac{(1-t)(1-{\tau'}_{i,g}^w)}{(1+\tau_{i,g}^e)} \nonumber
+\widetilde{H}'_{T} & = \Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \Bigg( \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \Bigg)^\eta \nonumber\\
+& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^\frac{\beta}{\sigma}\\
+{H}'_{O} & = \sum_{g=1}^G \left( \tau_{O,g}^\eta \cdot \eta^\eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot {A}'_O^\eta \cdot s_{T,g}^\phi \right)^\frac{1}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da
 \end{align}
 %\end{prp}
 
-\subsection{Occupational Wages in Decentralized Competitive Equilibrium (No Frictions)}
-In order to highlight the mechanisms that govern the individuals' occupational choice we first solve for a decentralized equilibrium that implements the optimal allocation of adults to ``teaching'' and ``other'' in a single location. Put differently, we solve the model for a wage profile $\omega^*(h^T)$ that pays teachers with human capital $h^T$ their marginal product.\footnote{In section \ref{sec:model} we specified the model for an arbitrary profile $\omega$. Here we impose further restrictions on this function.}
+\subsection{Occupational Wages in Decentralized Competitive Equilibrium}
+In order to highlight the mechanisms that govern the individuals' occupational choice, we first solve for a decentralized equilibrium that implements the optimal allocation of adults to ``teaching'' and ``other''. Put differently, we solve the model for a wage profile $\omega^*(h_{T,g})$ that pays teachers with human capital $h_{T,g}$ their marginal product.\footnote{In section \ref{sec:model} we specified the model for an arbitrary profile $\omega$. Here we impose further restrictions on this function.}
 
-How can we characterize the teacher's marginal product? Recall that only workers produce the final (consumption) good using a linear production function with productivity $A^O$. Thanks to stable random matching of students to teachers the ability distribution of students is identical across class rooms and a teacher's marginal value only varies with the number of students in her class room, denoted by $N(h^t)$. Clearly, then, the wage profile is linear in $N(\cdot)$. Since $N$ is not linear in $h^T$ in general this implies that the wage profile is not linear in $h^T$ either.
+How can we characterize the teacher's marginal product? Recall that only workers produce the final (consumption) good using a linear production function with productivity $A_O$. Thanks to stable random matching of students to teachers, the ability distribution of students is identical across class rooms and a teacher's marginal value only varies with the number of students in her class room, denoted by $N(h_{T,g})$. Clearly, then, the wage profile is linear in $N(\cdot)$. Since $N$ is not linear in $h_{T,g}$ in general this implies that the wage profile is not linear in $h_{T,g}$ either.
 
-Since teachers are compensated for the incremental human capital in ``other'', we could characterize the teacher's wage profile.
-\begin{prp}[Teacher's wage profile] For a given teacher with human capital $h^T$ and aggregate human capital in teaching $\widetilde{H}^T$, the wage in teaching is proportional to the \textit{number of students} in the teacher's class and is characterized by
+Since teachers are compensated for the incremental human capital in ``other'', we can characterize the teacher's wage profile.
+\begin{prp}[Teacher's wage profile] For a given teacher with human capital $h_{T,g}$ and aggregate human capital in teaching $\widetilde{H}_T$, the wage in teaching is proportional to the \textit{number of students} in the teacher's class and is characterized by:
 \begin{align}
 \label{eq:omegaOpt}
-   \omega(h^T,\widetilde{H}^T) & =  \frac{\overbrace{{H'}^O {A'}^O}^{\textrm{total output (next period)}}}{\underbrace{\int_0^\infty f^O(a) da}_{\begin{subarray}{c}\textrm{fraction of prospective} \\ \textrm{production workers in class}\end{subarray}}} \underbrace{\frac{\left( h^T \right)^{\frac{\beta}{\sigma}}}{{\widetilde{H}^T}}}_{\textrm{fraction of students taught}}
+   \omega(h_{T,g},\widetilde{H}_T) & =  \frac{\overbrace{{H}'_O {A}'_O}^{\textrm{total output (next period)}}}{\underbrace{\int_0^\infty f_{O,g}(a) da}_{\begin{subarray}{c}\textrm{fraction of prospective} \\ \textrm{production workers in class}\end{subarray}}} \underbrace{\frac{\left( h_{T,g} \right)^{\frac{\beta}{\sigma}}}{{\widetilde{H}_T}}}_{\textrm{fraction of students taught}}
 \end{align}
 where
 \begin{align*}
 \label{}
 %  \widetilde{H'}^{T} & = \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}^T}{M}\right)^\sigma a^\alpha s^T\left(a,\widetilde{H}^T\right)^\phi e^T(a,\widetilde{H}^T)^\eta \right)^{\frac{\beta}{\sigma}} f^T(a) da
-  \widetilde{H'}^{T} & = \int_0^\infty {h^T}^{\frac{\beta}{\sigma}} f^T(a) da
+  \widetilde{H}'_{T} & = \sum_{g=1}^G\int_0^\infty {h_{T,g}}^{\frac{\beta}{\sigma}} f_{T,g}(a) da
 \end{align*}
 is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of human capital among current teachers.
 \end{prp}
 
-The second term in equation \eqref{eq:omegaOpt} captures the idea that a teacher's wage depends on class size, which is a non-linear function of her human capital $h^T$. Recall from equations \eqref{eq:sT} and \eqref{eq:eT} that a prospective teacher's optimal $s^T$ and $e^T$ depends on the quality of today's teachers (i.e.~their human capital) and on the slope of the wage profile next period and hence on both today's $ \widetilde{H}^{T}$ as well as tomorrow's $\widetilde{H'}^{T}$.
-
+The second term in equation \eqref{eq:omegaOpt} captures the idea that a teacher's wage depends on class size, which is a non-linear function of her human capital $h_{T,g}$. Recall from equations \eqref{eq:sT} and \eqref{eq:eT} that a prospective teacher's optimal $s_{T,g}$ and $e_{T,g}$ depends on the quality of today's teachers (i.e.~their human capital) and on the slope of the wage profile next period and hence on both today's $ \widetilde{H}_{T}$ as well as tomorrow's $\widetilde{H}'_{T}$. \footnote{When the economy has $I>2$ occupations, the teachers' wage profile is characterized by:
+\begin{align*}
+\omega & = \eta^{\frac{\eta}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \frac{\sum_{i=2}^I\sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I\sum_{g=1}^G f_{i,g}(a)da} \nonumber\\
+& \times \frac{\tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta}}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}
+\end{align*}
+}
 \begin{align}
-\omega_g & = \eta^{\frac{\eta}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}^T}{M}\right)^{\frac{\sigma}{1-\eta}} \nonumber\\
-& \times \frac{\sum_i {\tau_{i,g}}^{\frac{\eta}{1-\eta}} \cdot {A'}_i^{\frac{1}{1-\eta}} \cdot s_i^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da }{\sum_i \int_0^\infty f^{i,g}(a)da} \nonumber\\
-& \times \frac{a_T^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}}}{\int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{T,g}(a)da}
+\omega & = \eta^{\frac{\eta}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \frac{\sum_{g=1}^G {A_O'}^\frac{1}{1-\eta}\cdot\tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da}{\sum_{g=1}^G f_{O,g}(a)da} \nonumber\\
+& \times \frac{\tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta}}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}
 \end{align}
 
 \subsection{Occupational Choice in Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
-To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model in section \ref{sec:firstbest}. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
+To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
 
-We can show that this economy has a steady state in $H^T$ and we can characterize it in a single equation:
+We can show that this economy has a steady state in $H_T$ and we can characterize it in a single equation:\footnote{When the economy has $I>2$ occupations, the steady state $H_T$ is characterized by:
+\begin{align*}
+%\label{eq:lomT}
+\widetilde{H}_{T} & = \Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \Bigg( \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \Bigg)^\eta \nonumber\\
+& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^{\frac{\beta}{\sigma}\cdot\frac{1-\eta}{1-\eta-\beta}}
+\end{align*}
+}
 \begin{align}
-%\label{eq:ss}
-\widetilde{H}^{T} & = \Bigg\{\sum_g \Bigg[ \tau_{T,g}^\eta \cdot \left(\tfrac{\beta}{\sigma}\right)^\eta  \cdot \eta^{\frac{\eta}{1-\eta}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot s_T^\phi \nonumber\\
-& \times \left(\frac{\sum_i {\tau_{i,g}}^{\frac{\eta}{1-\eta}} \cdot {A'}_i^{\frac{1}{1-\eta}} \cdot s_i^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da }{\sum_i \int_0^\infty f^{i,g}(a)da}\right)^\eta \nonumber\\
-& \times \left(\int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{T,g}(a)da\right)^{\frac{\sigma}{\beta}-\eta} \Bigg]^{\frac{\beta}{\sigma}} \Bigg\}^{\frac{1-\eta}{1-\eta-\beta}}\\
-{H}^{i} & = 
+%\label{eq:lomT}
+\widetilde{H}_{T} & = \Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \Bigg( \frac{\sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da}{\sum_{g=1}^G f_{O,g}(a)da} \Bigg)^\eta \nonumber\\
+& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^{\frac{\beta}{\sigma}\cdot\frac{1-\eta}{1-\eta-\beta}}
 \end{align}
-where
-\begin{align}
-\tau_{T,g} & =\frac{(1-t)(1-{\tau'}_{T,g}^w)}{(1+\tau_{T,g}^e)} \nonumber\\
-\tau_{i,g} & =\frac{(1-t)(1-{\tau'}_{i,g}^w)}{(1+\tau_{i,g}^e)} \nonumber
-\end{align}
-
-\begin{prp} The occupational choice boundary, denoted $\bar{a}^T(a^O)$, depends on the magnitude of the educational barriers and labor market frictions, but does not depend on neither current or future aggregate human capital in teaching $\widetilde{H^T}$. It is characterized by
+\begin{prp}[Occupational choice boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and labor market frictions, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H_T}$. It is characterized by:\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
+\begin{align*}
+\label{eq:occChoice}
+\frac{a_i^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{i,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{i,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{i,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{i_g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\
+= \frac{\sum_{i=2}^I \sum_{g=1}^G {A}'_i^\frac{1}{1-\eta} \cdot \tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da }{{A}'_i^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{i=2}^I \sum_{g=1}^G \int_0^\infty f_{i,g}(a)da  } 
+\end{align*}
+}
 \begin{align}
 \label{eq:occChoice}
-\frac{a_i^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}}} \cdot \frac{\tau_{i,g}^\frac{1}{1-\eta}}{\tau_{T,g}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{i,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_i}{1-s_T}\right)^\frac{1}{\mu} \nonumber\\
-= \frac{\sum_i {\tau_{i,g}}^{\frac{\eta}{1-\eta}} \cdot {A'}_i^{\frac{1}{1-\eta}} \cdot s_i^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f^{i,g}(a)da }{{A'}_i^\frac{1}{1-\eta} \cdot s_i^\frac{\phi}{1-\eta} \cdot \sum_i \int_0^\infty f^{i,g}(a)da \cdot \int_0^\infty a^{\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} f^{T,g}(a)da } 
+\frac{a_O^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{O,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{O,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{O,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{O,g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\
+= \frac{\sum_{g=1}^G {A}'_O^{\frac{1}{1-\eta}} \cdot \tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da }{{A}'_O^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{g=1}^G \int_0^\infty f_{O,g}(a)da  } 
 \end{align}
 \end{prp}
 
 The calibration in section \ref{sec:quant} will go beyond the simple comparative statics here and match moments along the secular transition from the late 1960s to the more recent past.
-
 
 \section{Data}\label{sec:data}
 %[Discuss Project TALENT, NLSY79, and NLSY97.]
@@ -414,14 +440,14 @@ Other / Unknown / Conflicting & 215,786 & 73,668 & 3,739 & 3,758 \\
 Female   & 184,912 & 98,183 & 64,841 & 47,417 \\
 \quad (\% of sample size) & (50.1\%) & (52.2\%) & (50.6\%) & (51.0\%) \\
 \midrule
-Parents: High School Degree & TBC & TBC & TBC & TBC \\
-\quad (\% of sample size) & & & & \\
+Parents: High School Degree & 155,128 & 85,804 & 60,142 & 43,204 \\
+\quad (\% of sample size) & (42.05\%) & (45.61\%) & (46.93\%) & (46.47\%)\\
 \midrule
-Parents: College Degree & TBC & TBC & TBC & TBC \\
-\quad (\% of sample size) & & & & \\
+Parents: College Degree & 58.959 & 35,065 & 25,193 & 17,361 \\
+\quad (\% of sample size) & (15.98\%) & (18.64\%) & (19.66\%) & (18.68\%)\\
 \midrule
-Parents: High Income & TBC & TBC & TBC & TBC \\
-\quad (\% of sample size) & & & & \\
+Parents: High Income & 116,628 & 65,691 & 46,499 & 33,097 \\
+\quad (\% of sample size) & (33.42\%) & (36.70\%) & (38.10\%) & (37.43\%) \\
 \midrule
 \bottomrule
 \end{tabular}
@@ -435,46 +461,52 @@ Parents: High Income & TBC & TBC & TBC & TBC \\
 The rationale for using panel data from Project TALENT and the two NLSYs is that all three surveys allow us to connect scores from aptitude tests to labor market outcomes. 
 Project TALENT contains a number of tests administered in 1960 when the respondents were attending high school, though in different grades.\footnote{Roughly one quarter of the sample was in each high school grade (i.e.~9 through 12) in the baseline survey.} We mainly use composite scores built from a battery of underlying tests measuring verbal and mathematical aptitude. The former includes literature information, vocabulary, and English. The latter contains math information, arithmetic reasoning, introductory high school math, and advanced high school math. Table \ref{tab:PTscores} shows summary statistics for the 88,330 individuals who participated in the 11-year follow-up survey. We focus on the 11-year {\it post} wave since it contains the bulk of occupational information at a time when the respondents are approximately thirty years old.\footnote{The 5-year post-graduation survey contains occupational information but we have not made use of it yet.}
 	
-	\begin{table}[h!]
+\begin{table}[h!]
 		\centering 
-		\begin{tabular}{lccc}
+		\begin{tabular}{lccccc}
 			\toprule
-			\multicolumn{4}{c}{Panel A: 5-Year Post}\\
+			%\multicolumn{6}{c}{Panel A: 5-Year Post}\\
+			%\midrule
+			% & \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other}& \multirow{2}{*}{Unemployed} & Not in \\
+			% &  & & & Labor Force & \multirow{2}{*}{Total}\\
+			%\midrule
+			%Female & 9,392 & 32,337 & 17,974 & &\\
+			%\quad (\% of subsample) & (74.01\%) & (39.06\%) & (79.46\%) & &\\
+			%\midrule
+			%Math composite mean & 95.31 & 74.10 & 71.94 & &\\
+			%\quad (st.dev.) & (31.78) & (33.43) & (33.19) & &\\
+			%\midrule
+			%Verbal composite mean & 126.26 & 109.63 & 112.67 & &\\
+			%\quad (st.dev.) & (16.44) & (22.09) & (21.08) & &\\
+			%\midrule
+			%Observations & 12,690 & 82,798 & 22,620 & &\\
+			%\quad (\% of total sample) & (10.74\%) & (70.10\%) & (19.15\%) & &\\
+			%\bottomrule
+			%\\
+			%\toprule
+			%\multicolumn{6}{c}{Panel B: 11-Year Post} \\
+			\multicolumn{6}{c}{11-Year Post} \\
 			\midrule
-			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in \\
-			&  &  & Labor Force \\
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & \multirow{2}{*}{Unemployed}& Not in \\
+			&  &  & & Labor Force & \multirow{2}{*}{Total}\\
 			\midrule
-			Female & 9,392 & 32,337 & 17,974 \\
-			\quad (\% of subsample) & (74.01\%) & (39.06\%) & (79.46\%) \\
+			Female & 3,641 & 16,063 & 1,154 & 23,001 & 43,859\\
+			\quad (\% of subsample) & (60.36\%) & (30.47\%) & (61.84\%) & (92.84\%) &(51.36\%)\\
 			\midrule
-			Math composite mean & 95.31 & 74.10 & 71.94 \\
-			\quad (st.dev.) & (31.78) & (33.43) & (33.19) \\
+			Math composite mean & 2.964 & 2.704 & 2.573 & 2.477 & 2.654\\
+			\quad (st.dev.) & (0.888) & (1.023) & (1.052) & (0.939) & (1.0) \\
 			\midrule
-			Verbal composite mean & 126.26 & 109.63 & 112.67 \\
-			\quad (st.dev.) & (16.44) & (22.09) & (21.08) \\
+			Verbal composite mean & 6.370 & 5.900 & 5.909 & 6.091 & 5.989\\
+			\quad (st.dev.) & (0.809) & (1.031) & (1.145) & (0.929) & (1.0)\\
 			\midrule
-			Observations & 12,690 & 82,798 & 22,620 \\
-			\quad (\% of total sample) & (10.74\%) & (70.10\%) & (19.15\%) \\
-			\bottomrule
-			\\
-			\toprule
-			
-			\multicolumn{4}{c}{Panel B: 11-Year Post} \\
+			Social composite mean & 2.915 & 2.660 & 2.563 & 2.753 & 2.703\\
+			\quad (st.dev.) & (0.988) & (1.000) & (0.985) & (0.996) & (1.0)\\
 			\midrule
-			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in \\
-			&  &  & Labor Force \\
+			IQ composite mean & 4.330 & 3.964 & 3.887 & 3.978 & 3.992\\
+			\quad (st.dev.) & (0.822) & (1.027) & (1.128) & (0.955) & (1.0)\\
 			\midrule
-			Female & 3,747 & 19,527 & 21,983 \\
-			\quad (\% of subsample) & (74.05\%) & (38.95\%) & (79.48\%) \\
-			\midrule
-			Math composite mean & 90.72 & 75.19 & 69.85 \\
-			\quad (st.dev.) & (33.56) & (34.17) & (30.24) \\
-			\midrule
-			Verbal composite mean & 123.28 & 108.92 & 112.82 \\
-			\quad (st.dev.) & (18.19) & (22.67) & (20.36) \\
-			\midrule
-			Observations & 6,217 & 58,835 & 23,278 \\
-			\quad (\% of total sample) & (7.04\%) & (66.61\%) & (26.35\%) \\
+			Observations & 6,032 & 52,726 & 1,866 & 24,775 & 85,399\\
+			\quad (\% of total sample) & (7.06\%) & (61.74\%) & (2.19\%) & (29.01\%) &(100.0\%)\\
 			\bottomrule
 		\end{tabular}
 		\caption{Project TALENT Test Scores by Occupation}
@@ -540,45 +572,63 @@ Since the tests were administered at different ages (and times) and used differe
 
 	\begin{table}[h!]
 		\centering
-		\begin{tabular}{lccc}
+		\begin{tabular}{lccccc}
 			\toprule
 %			\toprule
-			\multicolumn{4}{c}{Panel A: NLSY79}\\
+			\multicolumn{6}{c}{Panel A: NLSY79}\\
 			\midrule
 %			& (1) & (2) & (3)\\
-			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in\\
-			&  &  & Labor Force\\
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & \multirow{2}{*}{Unemployed} & Not in & \multirow{2}{*}{Total}\\
+			& &  &  & Labor Force & \\
 			\midrule
-			Female & 505 & 2,739 & 1,006 \\
-			\quad (\% of subsample) & (74.93\%) & (43.82\%) & (65.80\%)\\
+			Female & 999 & 2,933 & 221 & 1,568 & 5,721\\
+			\quad (\% of subsample) & (43.19\%) & (44.85\%) & (41.39\%) & (76.34\%) & (50.01\%)\\
 			\midrule
-			AFQT mean & 53,160.36 & 42,859.81 & 31,842.39 \\
-			\quad (st.dev.) & (29,157.36) & (28,518.21) & (31,842.39) \\
+			Math ability & 2.450 & 2.443 & 1.919 & 1.962 & 2.334\\
+			\quad (st.dev.) & (0.932) & (1.018) & (0.935) & (0.912) & (1)\\
 			\midrule
-			Observations & 674 & 6,251 & 1,066 \\
-			\quad (\% of total sample) & (7.98\%) & (73.97\%) & (12.61\%) \\
+			Verbal ability & 3.614 & 3.509 & 2.920 & 3.057 &  3.422\\
+			\quad (st.dev.) & (0.864) & (0.971) & (1.088) & (1.074) & (1)\\
+			\midrule
+			Social ability & 3.891 & 3.824 & 3.566 & 3.552 & 3.777\\
+			\quad (st.dev.) & (1.016) & (0.980) & (0.969) & (1.011) & (1)\\
+			\midrule
+			AFQT & 1.780 &  1.741 & 1.184 & 1.270 & 1.638\\
+			\quad (st.dev.) & (0.928) & (1.004) & (0.950) & (0.956) & (1)\\
+			\midrule
+			Observations &  2,313 & 6,539 &  534 & 2,054 & 11,440\\
+			\quad (\% of total sample) & (20.22\%) & (57.16\%) & (4.67\%) & (17.95\%) & (100.00\%)\\
 			\bottomrule
 %			\bottomrule
 			\\
 			\toprule
 %			\toprule
-			\multicolumn{4}{c}{Panel B: NLSY97}\\
+			\multicolumn{6}{c}{Panel B: NLSY97}\\
 			\midrule
-			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & Not in\\
-			&  &  & Labor Force\\
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & \multirow{2}{*}{Unemployed} & Not in & \multirow{2}{*}{Total}\\
+			& &  &  & Labor Force & \\
 			\midrule
-			Female & 577 & 2,580 & 331\\
-			\quad (\% of subsample) & (71.50\%) & (45.1\%) & (63.65\%)\\
+			Female & 478 & 2,184 & 171 & 605 & 3,438\\
+			\quad (\% of subsample) & (48.53\%) & (46.60\%) & (48.03\%) & (64.71\%) & (49.38\%)\\
 			\midrule
-			AFQT mean & 62,229.16 & 44,239.26 & 33,108.32 \\
-			\quad (st.dev.) & (26,349.47) & (28,681.16) & (27,507.65) \\
+			Math ability & 1.309 & 1.422 & 1.710 & 1.780 & 1.469\\
+			\quad (st.dev.) & (0.885) & (0.959) & (1.148) & (1.164) & (1)\\
 			\midrule
-			Observations & 807 & 5,721 & 520 \\
-			\quad (\% of total sample) & (11.51\%) & (81.60\%) & (7.42\%) \\
+			Verbal ability & 1.475 & 1.590 & 1.985 & 2.001 &  1.649\\
+			\quad (st.dev.) & (0.879) & (0.957) & (1.144) & (1.154) & (1)\\
+			\midrule
+			Social ability & 5.684 & 5.645 & 5.478 & 5.460 & 5.614\\
+			\quad (st.dev.) & (0.904) & (0.967) & (1.108) & (1.158) & (1)\\
+			\midrule
+			AFQT & 1.776 & 1.665 & 1.045 & 1.185 & 1.585\\
+			\quad (st.dev.) & (0.943) & (0.998) & (0.808) & (0.961) & (1)\\
+			\midrule
+			Observations &  985 & 4,687 &  356 & 935 & 6,963\\
+			\quad (\% of total sample) & (14.15\%) & (67.31\%) & (5.11\%) & (13.43\%) & (100.00\%)\\
 			\bottomrule
 %			\bottomrule			
 		\end{tabular}
-		\caption{NLSY AFQT Scores by Occupation}
+		\caption{NLSY Scores by Occupation}
 		\label{tab:NLSYscores}
 	\end{table}
 	
@@ -676,9 +726,9 @@ The final element in our calibration element relies on O*Net's characterization 
 
 We characterize the comparative requirements by a triple of weights based on the dimension-by-dimension skill ranking of each job. To account for the possibility that jobs with similar comparative profiles are characterized by different overall skill intensities, we also create an absolute profile based on the weighted sum of skill-specific rankings. Given the non-linearity of payoffs in our model, the distinction between comparative and absolute advantage is critical for our calibration strategy\footnote{In this respect, our model differs from a plain-vanilla occupational choice model \`a la \cite{Roy:1951}.}
 
-Last but not least, we use these skill profiles to project the survey respondents' three-dimensional abilities into an $N$-dimensional vector of job-specific abilities.
+Last but not least, we use these skill profiles to project the survey respondents' three-dimensional abilities into an $I$-dimensional vector of job-specific abilities.
 
-{\sc This is currently work in progress!}
+%{\sc This is currently work in progress!}
 
 %\section{First Best Allocation}\label{sec:firstbest}
 % \section{Decentralized Competitive Equilibrium (No Frictions) }\label{sec:firstbest}
@@ -736,11 +786,12 @@ Last but not least, we use these skill profiles to project the survey respondent
 %{\sc This is currently work in progress!}
 \section{Quantitative Analysis}\label{sec:quant}
 \subsection{Calibration Strategy}
-The aim of the calibration is to parametrize the economy to match aggregate and micro moments that characterize the US economy to their model counterparts. We assume that the idiosyncratic occupation-specific abilities are distributed log-Normal. We assume that relative innate talent levels are the same across all groups.
+The model allows analyzing the effects of changes in the labor market barriers. The aim of the calibration is to parametrize the economy to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. Individuals from Project TALENT, NLSY79, and NLSY97 are around 29 years old during the corresponding years. Combining these three surveys allows us to characterize and compare three steady-states, as well as analyze transitional dynamics.
 
-Table \ref{tab:assump} summarizes the assumptions and normalization for our base parameterization of the model. We assume that there are no labor and human capital barriers for men in all occupations. We also assume that labor and human capital barriers in home production are zero for all groups.
+We assume that the idiosyncratic occupation-specific abilities are distributed log-normal. We assume that relative innate talent levels are the same across all groups. Tables (\ref{tab:assump})-(\ref{tab:assump}) present sample parameterization. Table \ref{tab:assump} summarizes the assumptions and normalization for our base parameterization of the model. We assume that there are no labor and human capital barriers for men in all occupations. We also assume that labor and human capital barriers in home production are zero for all groups.
 
-Table \ref{tab:param} summarizes the key parameters. The table \ref{tab:calibr} presents the endogenous variables and their targeted empirical counterparts. Table \ref{tab:mom} compares the data and the model's predictions.
+Table \ref{tab:param} summarizes the key parameters. The table \ref{tab:assump} presents the endogenous variables and their targeted empirical counterparts. Parameter value for $\frac{\beta}{\sigma}$ is a crucial parameter that governs how skill distribution changes with respect to the changes in the barriers. Identification of this parameter allows calibrating the model to the data and conduct quantitative and counterfactual analysis. Another parameter that governs how selection into teaching career responds to the changes in the barriers is $\eta$. If $\eta<1$, a decrease in barriers in other occupations leads to the higher occupational threshold, making teaching career more selective. If $\eta>1$, a decrease in barriers in other occupations results in the lower occupational threshold.
+%Table \ref{tab:mom} compares the data and the model's predictions.
 
 	\begin{table}[h!]
 		\centering
@@ -749,12 +800,12 @@ Table \ref{tab:param} summarizes the key parameters. The table \ref{tab:calibr} 
 			\toprule
 			Parameter & Definition & Determination & Value\\
 			\midrule
-			$\tau^{i,w,men}_t$ & Labor market barriers for men & Assumption & 0\\
-			$\tau^{i,e,men}_t$ & Human capital barriers for men & Assumption & 0\\
-			$\tau^{T,w,g}_t$ & Labor market barriers for all groups & Assumption & 0\\
-			$\tau^{T,e,g}_t$ & Human capital barriers for all groups & Assumption & 0\\
-			$tau^{i,e,g}_t$ & Human capital barriers for other groups & Normalization & 0\\
-			$A^{T}_t$ & Teachers productivity & Normalization & 1\\
+			$\tau^{w}_{i,men}$ & Labor market barriers for men & Assumption & 0\\
+			$\tau^{e}_{i,men}$ & Human capital barriers for men & Assumption & 0\\
+			$\tau^{w}_{T,g}$ & Labor market barriers for all groups & Assumption & 0\\
+			$\tau^{e}_{T,g}$ & Human capital barriers for all groups & Assumption & 0\\
+			$\tau^{e}_{i,g}$ & Human capital barriers for other groups & Normalization & 0\\
+			$A_{T}$ & Teachers productivity & Normalization & 1\\
 			$\mu_a$ & Mean ability distribution & Normalization & 0\\
 			$\sigma_a$ & St.dev. ability distribution & Normalization & 1\\
 			\bottomrule
@@ -766,16 +817,16 @@ Table \ref{tab:param} summarizes the key parameters. The table \ref{tab:calibr} 
 	
 	\begin{table}[h!]
 		\centering
-		\begin{tabular}{lccc}
+		\begin{tabular}{lcc}
 			\toprule
 			\toprule
-			Parameter & Definition & Determination & Value\\
+			Parameter & Definition & Determination\\
 			\midrule
-			$\alpha$ & Ability elasticity of human capital & Wage dispersion &\\
-			$\eta$ & Goods elasticity of human capital & Aggregate education spending share & \\
+			$\alpha$ & Ability elasticity of human capital & Wage dispersion \\
+			$\eta$ & Goods elasticity of human capital & Aggregate education spending share  \\
 			$\phi$ & Time elasticity of human capital & Mincerian return to education for other \\
-			$A^{i}_t$ & Occupation-specific productivity & Labor market shares for men\\
-			$tau^{i,w,g}_t$ & Labor market barriers for other groups & Group gap by occupation\\
+			$A_{i}$ & Occupation-specific productivity & Labor market shares for men\\
+			$\tau^{w}_{i,g}$ & Labor market barriers for other groups & Group gap by occupation\\
 			% s_T/s_O, where  s_i=years of school/25 years
 			\bottomrule
 %			\bottomrule
@@ -804,40 +855,48 @@ Table \ref{tab:param} summarizes the key parameters. The table \ref{tab:calibr} 
 		\label{tab:calibr}
 	\end{table}
 	
-	\begin{table}[h!]
-		\centering
-		\begin{tabular}{lcc}
-			\toprule
-			\toprule
-			Moments & Model & Data \\
-			\midrule
-			& & \\
-			& & \\
-			\bottomrule
-%			\bottomrule
-		\end{tabular}
-		\caption{Model and Data Moments}
-		\label{tab:mom}
-	\end{table}
+% 	\begin{table}[h!]
+% 		\centering
+% 		\begin{tabular}{lcc}
+% 			\toprule
+% 			\toprule
+% 			Moments & Model & Data \\
+% 			\midrule
+% 			& & \\
+% 			& & \\
+% 			\bottomrule
+% %			\bottomrule
+% 		\end{tabular}
+% 		\caption{Model and Data Moments}
+% 		\label{tab:mom}
+% 	\end{table}
 	
 %$\frac{s_O}{s_T}=\frac{\mu \phi+\frac{\beta}{\sigma}-\eta}{\mu \phi+1-\eta}=1-\frac{1-\frac{\beta}{\sigma}}{\mu \phi+1-\eta}$
 
 
-\subsection{Counterfactual Experiments}
-{\sc To Be Completed!}
+%\subsection{Counterfactual Experiments}
+%{\sc To Be Completed!}
 \section{Conclusion}\label{sec:conclusion}
-{\sc To Be Completed!}
+\begin{enumerate}
+    \item Reported some data patterns;
+    \item Developed a theoretical model;
+    \item Outlined calibration strategy which we leave for further analysis;
+    \item Next step is to use the model to characterize the US economy in 1970, 1990, and 2010, as well as transition dynamics between these years.
+\end{enumerate}
+
+
+
 \newpage
 \bibliography{/Users/simeonalder/Dropbox/Bibliography/MasterBibliography}
 \bibliographystyle{ecta}
 
 
 
-\newpage
-\begin{align}
-\beta < 1-\eta \textit{\,to guarantee existence of stable\,} \widetilde{H^T} = \widetilde{H^T}' > 0 \nonumber\\
-\tfrac{\sigma}{\beta} > \eta \textit{\,and\,} \mu \phi > 0 \textit{\,for\,} s^{T*} \in (0,1) \nonumber\\
-1 > \eta \textit{\,and\,} \mu \phi > 0 \textit{\,for\,} s^{O*} \in (0,1) \nonumber
-\end{align}
+% \newpage
+% \begin{align}
+% \beta < 1-\eta \textit{\,to guarantee existence of stable\,} \widetilde{H^T} = \widetilde{H^T}' > 0 \nonumber\\
+% \tfrac{\sigma}{\beta} > \eta \textit{\,and\,} \mu \phi > 0 \textit{\,for\,} s^{T*} \in (0,1) \nonumber\\
+% 1 > \eta \textit{\,and\,} \mu \phi > 0 \textit{\,for\,} s^{O*} \in (0,1) \nonumber
+% \end{align}
 
 \end{document}
