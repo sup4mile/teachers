@@ -136,7 +136,7 @@ N({h_{T,g}}') = \left(\frac{{h_{T,g}}'}{{h_{T,g}}}\right)^{\frac{\beta}{\sigma}}
 All $\frac{M}{2}$ students in the economy attend school. Therefore, the following resource constraint must be satisfied:
 \begin{align}
 \label{resource}
-\frac{M}{2}=\int_0^\infty N(h_{T,g})dF(h_{T,g}) 
+\frac{M}{2}=\int_0^\infty N(h_{T,g})dF(h_{T,g})
 \end{align}
 where $F(\cdot)$ is the c.d.f. of human capital in teaching.
 
@@ -148,7 +148,7 @@ Then, the resource constraint (\ref{resource}) anchors the class size distributi
 \end{prp}
 
 \subsubsection{Student-Teacher Matching}
-While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This can happen, for instance, if students make human capital investments in terms of goods as a function of the teacher's human capital $h_{T,g}$. 
+While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This can happen, for instance, if students make human capital investments in terms of goods as a function of the teacher's human capital $h_{T,g}$.
 
 For simplicity, we assume that students make investments as a function of $a$ and occupation $i$, but not $h_{T,g}$. The joint assumption that $e_{i,g}(a_i)$ is a function of $a$ (but not $h_{T,g}$) and that $N(h_{T,g})$ is a function of $h_{T,g}$ (but not $a_i$) implies that the student-teacher matching is random, i.e.~the human capital production function is modular in $h_{T,g}$ and $a_i$.\footnote{The anecdotal evidence suggests that student-teacher assignments don't involve systematic sorting at the school level. There is, however, some evidence in support of sorting between families with highly educated parents and high-ability teachers into better funded schools or school districts. Identifying the empirically relevant extent of this type of sorting is working in progress and future versions of our model may eventually allow for it.}
 
@@ -195,7 +195,7 @@ t\left[ \sum_{g=1}^G \int_0^\infty \omega_T\left(h_{T,g}(a)\right) f_{T,g}(a) da
 &= \sum_{g=1}^G\int_0^\infty \omega_T\left(h_{T,g}(a)\right) f_{T,g}(a) da \label{eq:bc} \\%\frac{2}{M} \int_0^\infty \omega\left(h^{T'}(a)\right) {f'}^T(a) da \nonumber\\
 f_{T,g}(a) & = \int_0^{\bar{a}_g^{-1}\left(a\right)} f\big(a,b \big) db \label{eq:fTN2}\\
 f_{O,g}(b) & = \int_0^{\bar{a}_g\left(b\right)} f\big(a,b \big) da, \label{eq:fON2}
-%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O 
+%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O
 \end{align}
 where $f(a,b)$ is the p.d.f.~associated with the c.d.f.~$F(\cdot)$ from section \ref{sec:workers} in the special case with $I=2$, $f_{T,g}(a)$ describes today's distribution of teachers, and $f_{O,g}(a)$ characterizes the distribution of other workers. Workers have perfect foresight and correctly anticipate next period's tax rate $t'$ and future labor market distortions $\left\{ \tau^{\omega '}_{O,g}, \tau^{\omega '}_{T,g} \right\}_{g =1}^G$ that satisfy \eqref{eq:bc}-\eqref{eq:fON2} one period from today.\footnote{In the more general case with $I>2$, the measures of teachers and other workers from equations \eqref{eq:fTN2} and \eqref{eq:fON2} are given by:
 \begin{align*}
@@ -203,19 +203,19 @@ where $f(a,b)$ is the p.d.f.~associated with the c.d.f.~$F(\cdot)$ from section 
 f_{T,g}(a_T) & = \sum_{i=2}^I \int_0^{\bar{a}_{i,g}^{-1}\left(a_T\right)} \Pi_{j\neq i} F\left(\Bigg[\frac{A_i}{A_j}\cdot\frac{1-\tau^{\omega '}_{i,g}}{1-\tau^{\omega '}_{j,g}} \cdot \left(\frac{1+\tau^e_{i,g}}{1+\tau^e_{j,g}} \right)^{-\eta}\Bigg]^\frac{1}{\alpha}\cdot a_i\right)f_{i,g}(a)da \\
 %\label{eq:densO}
 f_{i,g}(a_i) & = F(\bar{a}_{i,g}(a_i)) \Pi_{j\neq i} F\left(\Bigg[\frac{A_i}{A_j}\cdot\frac{1-\tau^{\omega '}_{i,g}}{1-\tau^{\omega '}_{j,g}} \cdot \left(\frac{1+\tau^e_{i,g}}{1+\tau^e_{j,g}} \right)^{-\eta}\Bigg]^\frac{1}{\alpha} \cdot a_i\right)
-%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O 
+%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O
 \end{align*}
 }
- 
+
 The aggregate laws of motion for human capital in teaching ($\widetilde{H}_T$) and ``other'' (${H}_O$) are:
 \begin{align}
 \label{eq:lomO}
 {H}_{O}' & = \sum_{g=1}^G \int_0^\infty \left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{O,g}\left(a,\widetilde{H}_T\right)^\phi e_{O,g}(a,\widetilde{H}_T)^\eta  f_{O,g}(a) da \\
 \label{eq:lomT}
-\widetilde{H}_{T}' & = \sum_{g=1}^G \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{T,g}\left(a,\widetilde{H}_T\right)^\phi e_{T,g}(a,\widetilde{H}_T)^\eta \right)^{\frac{\beta}{\sigma}} f_{T,g}(a) da 
+\widetilde{H}_{T}' & = \sum_{g=1}^G \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{T,g}\left(a,\widetilde{H}_T\right)^\phi e_{T,g}(a,\widetilde{H}_T)^\eta \right)^{\frac{\beta}{\sigma}} f_{T,g}(a) da
 \end{align}
- 
-Teachers are public sector employees and their compensation is funded by tax revenues. Equation \eqref{eq:bc} is the government's balanced budget requirement, which is a salient feature in the U.S.~context. 
+
+Teachers are public sector employees and their compensation is funded by tax revenues. Equation \eqref{eq:bc} is the government's balanced budget requirement, which is a salient feature in the U.S.~context.
 
 Equation \eqref{eq:lomO} is the aggregation over $h^O$ of the current cohort of students, while equation \eqref{eq:lomT} is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of $h^T$ of the current cohort of students.
 
@@ -389,13 +389,13 @@ We can show that this economy has a steady state in $H_T$ and we can characteriz
 \begin{align*}
 %\label{eq:occChoiceFN}
 \frac{a_i^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{i,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{i,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{i,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{i_g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\
-= \frac{\sum_{i=2}^I \sum_{g=1}^G {A'}_i^\frac{1}{1-\eta} \cdot \tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da }{{A'}_i^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{i=2}^I \sum_{g=1}^G \int_0^\infty f_{i,g}(a)da  } 
+= \frac{\sum_{i=2}^I \sum_{g=1}^G {A'}_i^\frac{1}{1-\eta} \cdot \tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da }{{A'}_i^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{i=2}^I \sum_{g=1}^G \int_0^\infty f_{i,g}(a)da  }
 \end{align*}
 }
 \begin{align}
 \label{eq:occChoice}
 \frac{a_O^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{O,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{O,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{O,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{O,g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\
-= \frac{\sum_{g=1}^G {A'}_O^{\frac{1}{1-\eta}} \cdot \tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da }{{A'}_O^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{g=1}^G \int_0^\infty f_{O,g}(a)da  } 
+= \frac{\sum_{g=1}^G {A'}_O^{\frac{1}{1-\eta}} \cdot \tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da }{{A'}_O^\frac{1}{1-\eta} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} f_{T,g}(a)da \cdot \sum_{g=1}^G \int_0^\infty f_{O,g}(a)da  }
 \end{align}
 \end{prp}
 
@@ -417,7 +417,7 @@ Follow-up surveys were then carried out one, five, and eleven years after the st
 
 In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.} % WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
 \begin{table}[h!]
-  \centering 
+  \centering
 %  \label{tab:samplebywave}
   \begin{tabular}{lcccc}
 \toprule
@@ -458,11 +458,11 @@ Parents: High Income & 116,628 & 65,691 & 46,499 & 33,097 \\
 
 %SHOULD WE KEEP THE LAST THREE ROWS IN THIS TABLE? DOES PROJECT TALENT EVEN HAVE INFORMATION ON PARENTAL EDUCATION AND INCOME? SHOULD WE USE OTHER VARIABLES TO DISCUSS ATTRITION OVER TIME?
 
-The rationale for using panel data from Project TALENT and the two NLSYs is that all three surveys allow us to connect scores from aptitude tests to labor market outcomes. 
+The rationale for using panel data from Project TALENT and the two NLSYs is that all three surveys allow us to connect scores from aptitude tests to labor market outcomes.
 Project TALENT contains a number of tests administered in 1960 when the respondents were attending high school, though in different grades.\footnote{Roughly one quarter of the sample was in each high school grade (i.e.~9 through 12) in the baseline survey.} We mainly use composite scores built from a battery of underlying tests measuring verbal and mathematical aptitude. The former includes literature information, vocabulary, and English. The latter contains math information, arithmetic reasoning, introductory high school math, and advanced high school math. Table \ref{tab:PTscores} shows summary statistics for the 88,330 individuals who participated in the 11-year follow-up survey. We focus on the 11-year {\it post} wave since it contains the bulk of occupational information at a time when the respondents are approximately thirty years old.\footnote{The 5-year post-graduation survey contains occupational information but we have not made use of it yet.}
-	
+
 \begin{table}[h!]
-		\centering 
+		\centering
 		\begin{tabular}{lccccc}
 			\toprule
 			%\multicolumn{6}{c}{Panel A: 5-Year Post}\\
@@ -512,9 +512,9 @@ Project TALENT contains a number of tests administered in 1960 when the responde
 		\caption{Project TALENT Test Scores by Occupation}
 		\label{tab:PTscores}
 	\end{table}
-	
+
 Approximately three quarters of teachers in the sample are female, in the 5-year post as well as the 11-year post surveys. In non-teaching occupations the share of women is 39 percent and women account for 80 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics and verbal test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
-	
+
 If the labor market discriminated more against certain groups (gender, race,\ldots) in non-teaching occupations in 1960, we expect these groups to favor teaching over other occupations or to stay out of the labor force altogether. ``Not in the labor force'' is more a reflection of the absolute level of labor market discrimination against particular group while the occupational choice between teaching or other occupations reflects differences between group-specific barriers. To the extent that occupations require specific human capital investments we allow for educational barriers to affect occupational choices separately in the model. If both of these barriers declined after 1960, we would expect a narrowing of the educational achievement gap and more talented females should move from teaching into other occupations. This reallocation would lower the average quality of teachers and, therefore, we expect to observe more significant differences in the ability distributions between teachers and other occupations in cohorts who entered the labor market in the 60s and 70s (i.e.~our Project TALENT population) compared to younger individuals (i.e.~the NLSY79 and NLSY97 respondents).
 
 Figure \ref{fig:talent} shows the distribution of test scores for math and verbal composite by occupations in Project TALENT. The distribution of math scores in panel \ref{fig:talentmath} is skewed to the right for ``other'' compared to the distribution of math scores among teachers. Panel \ref{fig:talentverb} shows a similar pattern in terms of relative skewness. The distribution of scores of respondents in non-teaching occupations and those who report not being in the labor force are quite similar. Overall, individuals in teaching occupations tend to have higher scores than non-teachers. One possible explanation for these differences is that individuals select into teaching along a non-skill dimension and an obvious selection candidate is gender. Approximately three quarters of all teachers are female (see the first row in the two panels of Figure \ref{tab:PTscores}). If women exhibited a distinct distribution of scores this may explain the discrepancy between teaching and other occupations. The data, however, do not suggest that women are innately more or less talented than men. Women's verbal scores slightly dominate the men's while the opposite is true for the math scores (see Figure \ref{fig:nlsy97bygender}).
@@ -552,7 +552,7 @@ The distributions of composite IQ scores for Project TALENT respondents split by
 	\includegraphics[width=\linewidth]{iq_by_gender.pdf}
 	\caption{All Occupations}
 	\label{fig:IQbygenderall}
-	\end{subfigure}	
+	\end{subfigure}
 	\hspace*{\fill} % separation between the subfigures
 	\begin{subfigure}{0.49\textwidth}
 	\includegraphics[width=\linewidth]{iq_by_gen_teach.pdf}
@@ -626,15 +626,15 @@ Since the tests were administered at different ages (and times) and used differe
 			Observations &  985 & 4,687 &  356 & 935 & 6,963\\
 			\quad (\% of total sample) & (14.15\%) & (67.31\%) & (5.11\%) & (13.43\%) & (100.00\%)\\
 			\bottomrule
-%			\bottomrule			
+%			\bottomrule
 		\end{tabular}
 		\caption{NLSY Scores by Occupation}
 		\label{tab:NLSYscores}
 	\end{table}
-	
+
 If indeed labor market barriers are shrinking over time, we would expect to see some evidence of this in the occupational choice of women in more recent cohorts and hence in the NLSY79 and NLSY97. In these younger cohorts, the share of women among teachers continues to be high. The gender composition of teachers in NLSY 79 is comparable to the one we observe in Project TALENT. In the more recent NLSY 97, the share is a few percentage points lower. In contrast, the share of female workers in other occupations is rising, from approximately 39 percent in Project TALENT to 44 percent in NLSY79, and 45 percent in NLSY97. The gender composition of those who are out of the labor force is heading in the opposite direction. It dropped to 66 percent among NLSY79 respondents and 64 percent among NLSY97 respondents, compared to almost 80 percent in the 11-year post graduation survey from Project TALENT.
 
-One significant difference between the Project TALENT and NLSY respondents are the aptitude scores for those who are not in the labor force. While their average score was {\it higher} than the average score of those in {\it Other} in Project TALENT, the ranking is reversed in the two NLSYs. This suggests that the exit rate from ``not in the labor force'' is correlated with the respondents' ability. High and low ability individuals appear to respond differentially to changes in labor market discrimination and this is further corroborated in a set of plots we present below. 
+One significant difference between the Project TALENT and NLSY respondents are the aptitude scores for those who are not in the labor force. While their average score was {\it higher} than the average score of those in {\it Other} in Project TALENT, the ranking is reversed in the two NLSYs. This suggests that the exit rate from ``not in the labor force'' is correlated with the respondents' ability. High and low ability individuals appear to respond differentially to changes in labor market discrimination and this is further corroborated in a set of plots we present below.
 
 Figure \ref{fig:nlsy_by_occ} plots the NLSY analogues of the math and verbal scores in Project TALENT shown in Figure \ref{fig:talent}. Clearly, teaching still attracts higher-ability individuals than ``other'' occupations or those who are not in the labor force. While the ability distribution of teachers still first-order dominates the scores in ``other'' occupations in the 1979 survey, there is a remarkable shift in the talent distribution of those who are not in the labor force. It is for more right-skewed than the distribution of workers in ``other'' occupations. Unfortunately, the 1997 data is considerably more noisy mostly due to the smaller sample size and we're refraining from reading too much into any particular feature of the data. This being said, it is worth highlighting that the definition of ``not in the labor force'' is {\it not} identical in the TALENT data on the one hand and the NLSY data on the other.\footnote{The difference stems from the fact that we observe Project TALENT participants relatively infrequently and the respondents' labor market histories are less complete.} It is, however, suggestive of a trend whereby high-ability individuals are pulled into the labor force more ``aggressively'' compared to low-skill workers over time.
 
@@ -715,7 +715,7 @@ Figures \ref{fig:nlsy_by_gender}-\ref{fig:nlsy_comp_by_gender} are the NLSY anal
 	\caption{AFQT Scores by Gender}
 	\label{fig:nlsy_comp_by_gender}
 \end{figure}
-	
+
 Unfortunately, the composite score distributions aren't comparable between Project TALENT and NLSY cohorts for several reasons. Although the ability tests try to capture math and verbal abilities, the tests themselves are very different. Therefore, it is impossible to compare changes in score distributions over time. Despite this limitation we can still compare the composition (by gender or occupation) {\it within} cohorts across the three surveys. In fact, the particular {\it Roy} flavor of our model suggests that this is where the interesting action is.
 
 Differences in the frequency of the surveys further complicate comparisons between Project TALENT and the NLSY's. The NLSY79 and NLSY97 survey the respondents far more frequently and this enables us to construct more detailed employment histories and occupation choices over the course of panels. While Project TALENT provides data on the respondents' {\it current} occupation in the 1, 5, and 11-year post waves, it misses some of the higher-frequency churn since it doesn't ask any retrospective career questions. Moreover, the probability of being a teacher one year after high school graduation is vanishingly small (0.08\% of the sample). In the figures and tables presented so far we report the occupations reported in the 11-year follow-up study. While certainly less complete than the NLSY data, Project TALENT still offers insights into the career decisions of young adults at a time for which there is only a very limited supply of nationally representative longitudinal survey data.\footnote{In ongoing work, we synthetically impose some of the data limitations in Project TALENT on the NLSY in order to get a better sense for underlying changes in labor market conditions and career decisions across cohorts. Evidently we're giving up some valuable details in the process for the benefit of more cross-survey comparability.}
@@ -768,7 +768,7 @@ Last but not least, we use these skill profiles to project the survey respondent
 % \begin{eqnarray}
 % \label{eq:occChoice}
 % \left(\frac{1-{\tau'}^{O,w}}{1-{\tau'}^{T,w}}\right) \left(\frac{1-\eta}{1-\tfrac{\eta\beta}{\sigma}}\right)  \left(\frac{1-s^{O}}{1-s^{T}}\right)^{\frac{1}{\mu}}  \left(\frac{(a^O)^\frac{\alpha}{1-\eta}}{\big({\bar{a}^T(a^O)}\big)^\frac{\alpha}{\frac{\sigma}{\beta}-\eta}} \right) \nonumber \\
-% = \left(\frac{\int_0^\infty a^\frac{\alpha}{1-\eta} {f^O(a)} da}{\int_0^\infty {f^O(a)} da} \right) \left(\int_0^\infty a^\frac{\alpha}{\frac{\sigma}{\beta}-\eta} {f^T(a)} da\right)^{-1} 
+% = \left(\frac{\int_0^\infty a^\frac{\alpha}{1-\eta} {f^O(a)} da}{\int_0^\infty {f^O(a)} da} \right) \left(\int_0^\infty a^\frac{\alpha}{\frac{\sigma}{\beta}-\eta} {f^T(a)} da\right)^{-1}
 % \end{eqnarray}
 
 
@@ -814,7 +814,7 @@ Table \ref{tab:param} summarizes the key parameters. Table \ref{tab:calibr} pres
 		\caption{Assumptions and Normalization}
 		\label{tab:assump}
 	\end{table}
-	
+
 	\begin{table}[h!]
 		\centering
 		\begin{tabular}{lcc}
@@ -834,7 +834,7 @@ Table \ref{tab:param} summarizes the key parameters. Table \ref{tab:calibr} pres
 		\caption{Baseline Parameter Values}
 		\label{tab:param}
 	\end{table}
-	
+
 		\begin{table}[h!]
 		\centering
 		\begin{tabular}{lcc}
@@ -854,7 +854,7 @@ Table \ref{tab:param} summarizes the key parameters. Table \ref{tab:calibr} pres
 		\caption{Benchmark Calibration}
 		\label{tab:calibr}
 	\end{table}
-	
+
 % 	\begin{table}[h!]
 % 		\centering
 % 		\begin{tabular}{lcc}
@@ -870,7 +870,7 @@ Table \ref{tab:param} summarizes the key parameters. Table \ref{tab:calibr} pres
 % 		\caption{Model and Data Moments}
 % 		\label{tab:mom}
 % 	\end{table}
-	
+
 %$\frac{s_O}{s_T}=\frac{\mu \phi+\frac{\beta}{\sigma}-\eta}{\mu \phi+1-\eta}=1-\frac{1-\frac{\beta}{\sigma}}{\mu \phi+1-\eta}$
 
 
