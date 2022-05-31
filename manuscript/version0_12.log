@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  31 MAY 2022 11:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  31 MAY 2022 11:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1097,11 +1097,11 @@ Package rerunfilecheck Info: File `version0_12.out' has not changed.
 (rerunfilecheck)             Checksum: DA3E34B66C94BE224F8FFCCD7C0E2DFE;3291.
  ) 
 Here is how much of TeX's memory you used:
- 20710 strings out of 478582
- 364607 string characters out of 2844344
+ 20706 strings out of 478582
+ 364569 string characters out of 2844344
  658665 words of memory out of 3000000
- 38382 multiletter control sequences out of 15000+600000
- 505114 words of font info for 123 fonts, out of 8000000 for 9000
+ 38380 multiletter control sequences out of 15000+600000
+ 503982 words of font info for 121 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,18n,117p,1787b,559s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}<C:
@@ -1131,7 +1131,7 @@ r8a.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/palatino/
 uplb8a.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/palati
 no/uplr8a.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/pal
 atino/uplri8a.pfb>
-Output written on version0_12.pdf (29 pages, 1495939 bytes).
+Output written on version0_12.pdf (29 pages, 1495657 bytes).
 PDF statistics:
  2583 PDF objects out of 2984 (max. 8388607)
  121 named destinations out of 1000 (max. 500000)
