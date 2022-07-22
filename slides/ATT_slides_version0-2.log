@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  2 JUN 2022 15:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  3 JUN 2022 09:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1155,137 +1155,132 @@ File: ts1cmss.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 
 ] [8
 
+] [9
+
 ]
 
 pdfTeX warning: pdflatex.exe (file ./plots/TALENT_math_occ_no_norm_female_no_lf
 .pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowe
 d
-<plots/TALENT_math_occ_no_norm_female_no_lf.pdf, id=224, 397.485pt x 289.08pt>
+<plots/TALENT_math_occ_no_norm_female_no_lf.pdf, id=249, 397.485pt x 289.08pt>
 File: plots/TALENT_math_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/TALENT_math_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/TALENT_math_occ_no_norm_female_no_lf.pdf  used o
-n input line 199.
+n input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
 
 
 pdfTeX warning: pdflatex.exe (file ./plots/nlsy79_mk_occ_no_norm_female_no_lf.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf, id=225, 397.485pt x 289.08pt>
+<plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf, id=250, 397.485pt x 289.08pt>
 File: plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf  used on 
-input line 199.
+input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
 
 
 pdfTeX warning: pdflatex.exe (file ./plots/nlsy97_mk_occ_no_norm_female_no_lf.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf, id=226, 397.485pt x 289.08pt>
+<plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf, id=251, 397.485pt x 289.08pt>
 File: plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf  used on 
-input line 199.
+input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
 
 
 pdfTeX warning: pdflatex.exe (file ./plots/TALENT_verbal_occ_no_norm_female_no_
 lf.pdf): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allo
 wed
-<plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf, id=227, 397.485pt x 289.08pt
+<plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf, id=252, 397.485pt x 289.08pt
 >
 File: plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf  used
- on input line 199.
+ on input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
 
 
 pdfTeX warning: pdflatex.exe (file ./plots/nlsy79_wk_occ_no_norm_female_no_lf.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf, id=228, 397.485pt x 289.08pt>
+<plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf, id=253, 397.485pt x 289.08pt>
 File: plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf  used on 
-input line 199.
+input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
 
 
 pdfTeX warning: pdflatex.exe (file ./plots/nlsy97_wk_occ_no_norm_female_no_lf.p
 df): PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf, id=229, 397.485pt x 289.08pt>
+<plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf, id=254, 397.485pt x 289.08pt>
 File: plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf Graphic file (type pdf)
 <use plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf>
 Package pdftex.def Info: plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf  used on 
-input line 199.
+input line 210.
 (pdftex.def)             Requested size: 82.96957pt x 60.34247pt.
-[9
+[10
 
  <./plots/TALENT_math_occ_no_norm_female_no_lf.pdf> <./plots/nlsy79_mk_occ_no_n
 orm_female_no_lf.pdf> <./plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf> <./plots
 /TALENT_verbal_occ_no_norm_female_no_lf.pdf> <./plots/nlsy79_wk_occ_no_norm_fem
-ale_no_lf.pdf> <./plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf>] [10
+ale_no_lf.pdf> <./plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf>] [11
 
 ]
-[11
-
-]
-
-Package hyperref Warning: Ignoring empty anchor on input line 248.
-
-
-Overfull \hbox (8.1465pt too wide) detected at line 248
-[]
- []
-
-
-Package hyperref Warning: Ignoring empty anchor on input line 248.
-
-
-Overfull \vbox (2.091pt too high) detected at line 248
- []
-
 [12
 
 ]
 
-Package hyperref Warning: Ignoring empty anchor on input line 269.
+Package hyperref Warning: Ignoring empty anchor on input line 259.
 
 
-Overfull \hbox (3.56995pt too wide) detected at line 269
+Overfull \hbox (8.1465pt too wide) detected at line 259
 []
+ []
+
+
+Package hyperref Warning: Ignoring empty anchor on input line 259.
+
+
+Overfull \vbox (2.091pt too high) detected at line 259
  []
 
 [13
 
 ]
-Overfull \vbox (2.20695pt too high) detected at line 288
+
+Package hyperref Warning: Ignoring empty anchor on input line 280.
+
+
+Overfull \hbox (3.56995pt too wide) detected at line 280
+[]
  []
 
 [14
 
-] [15
-
 ]
-Overfull \vbox (4.9553pt too high) detected at line 330
+Overfull \vbox (2.20695pt too high) detected at line 299
  []
 
-[16
+[15
 
-] [17
+] [16
 
 ]
-Overfull \hbox (17.9806pt too wide) detected at line 352
-[]
+Overfull \vbox (4.9553pt too high) detected at line 341
  []
 
-[18
+[17
+
+] [18
 
 ] [19
 
 ] [20
 
 ]
-Overfull \hbox (11.35103pt too wide) detected at line 405
+Overfull \hbox (11.35103pt too wide) detected at line 408
 []
  []
 
@@ -1304,13 +1299,20 @@ Overfull \hbox (11.35103pt too wide) detected at line 405
 ] [27
 
 ]
-Overfull \hbox (17.07262pt too wide) detected at line 573
+Overfull \hbox (17.07262pt too wide) detected at line 575
 []
  []
 
 [28
 
-] [29
+]
+Overfull \hbox (17.9806pt too wide) detected at line 586
+[]
+ []
+
+[29
+
+] [30
 
 ]
 \tf@nav=\write6
@@ -1327,10 +1329,10 @@ Package rerunfilecheck Info: File `ATT_slides_version0-2.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 24506 strings out of 478582
- 488218 string characters out of 2844344
- 739881 words of memory out of 3000000
- 42090 multiletter control sequences out of 15000+600000
+ 24512 strings out of 478582
+ 488263 string characters out of 2844344
+ 739924 words of memory out of 3000000
+ 42093 multiletter control sequences out of 15000+600000
  481669 words of font info for 79 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,24n,122p,543b,562s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -1367,9 +1369,9 @@ lia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/
 Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.
 pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/s
 ymbols/msam10.pfb>
-Output written on ATT_slides_version0-2.pdf (29 pages, 886164 bytes).
+Output written on ATT_slides_version0-2.pdf (30 pages, 892312 bytes).
 PDF statistics:
- 1418 PDF objects out of 1440 (max. 8388607)
- 69 named destinations out of 1000 (max. 500000)
+ 1446 PDF objects out of 1728 (max. 8388607)
+ 72 named destinations out of 1000 (max. 500000)
  73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
