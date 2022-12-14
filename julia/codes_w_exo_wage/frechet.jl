@@ -10,9 +10,10 @@ g = ["female","male"] # no discrimination / no barrier group last
 #occ = ["other1", "other2", "teaching"]
 #occ = ["other1", "other2", "other3", "other4", "teaching"]
 import XLSX
-cd("C:/Users/julia/Desktop/Research/Teachers")
-#cd("C:\\Users\\julia\\Box\\Teachers\\New Yulia's Folder\\LaborMarketData")
-xf = XLSX.readxlsx("Occupation_shares_v3.xlsx")
+# cd("C:/Users/julia/Desktop/Research/Teachers")
+# cd("C:\\Users\\julia\\Box\\Teachers\\New Yulia's Folder\\LaborMarketData")
+cd("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage")
+xf = XLSX.readxlsx("/Users/simeonalder/Library/CloudStorage/Box-Box/Teachers/New Yulia's Folder/LaborMarketData/Occupation_shares_v3.xlsx")
 sh = xf["mom"]
 # labels for occuptions
 occ = sh["A3:A23"]
@@ -58,7 +59,8 @@ gm[end] = M/2 - sum(gm)
 
 # guess for initial relative A for men (levels will be adjusted later)
 if previous == 1
-    d = load("C:/Users/julia/Desktop/teacher/previousParameterization_.jld")#2010.jld")
+    # d = load("C:/Users/julia/Desktop/teacher/previousParameterization_.jld")#2010.jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
     Agrid_initial=d["Agrid"]
 else
     # productivity in 'Other' occupations
@@ -217,8 +219,8 @@ a_T_thresh = Array{Float64,3}(undef,length(a_grid),n_g,n_occ-1)
 a_O_thresh = Array{Float64,3}(undef,length(a_grid),n_g,n_occ-1)
 if previous == 1
     # d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.8 -0.8]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
-    # d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/previousParameterization.jld")
-    d = load("C:/Users/iuliia/Desktop/teachers/julia/results_new/previousParameterization.jld")
+    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
+    # d = load("C:/Users/iuliia/Desktop/teachers/julia/results_new/previousParameterization.jld")
     a_T_thresh=d["a_T_thresh"]
     t = d["t"]
     HH_T = d["HH_T"]
@@ -230,7 +232,7 @@ else
         end
     end
     t[:,1] = zeros(H_grid_length)
-    t[:,1]=t1[:,1]
+    # t[:,1]=t1[:,1]
     HH_T = H_grid
     H_O = H_grid
 end
@@ -319,7 +321,7 @@ end
 # Set the array index to the midpoint of H_grid:
 iH = convert(Int,ceil(H_grid_length/2))
 if previous == 0
-    HH_fp =HH_fp1# 1
+    HH_fp = 1 # HH_fp1
 else
     HH_fp = HH_T[iH]
 end
