@@ -13,7 +13,7 @@ import XLSX
 # cd("C:/Users/julia/Desktop/Research/Teachers")
 # cd("C:\\Users\\julia\\Box\\Teachers\\New Yulia's Folder\\LaborMarketData")
 cd("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage")
-xf = XLSX.readxlsx("/Users/simeonalder/Library/CloudStorage/Box-Box/Teachers/New Yulia's Folder/LaborMarketData/Occupation_shares_v3.xlsx")
+xf = XLSX.readxlsx("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/data/LaborMarketData/Occupation_shares_v3.xlsx")
 sh = xf["mom"]
 # labels for occuptions
 occ = sh["A3:A23"]
@@ -300,7 +300,7 @@ end
 
 # EXOGENOUS WAGE PROFILE
 ω_tmp = Array{Float64,3}(undef,n_h_T_tmp,H_grid_length,n_g)
-ω_tmp =0.2*h_T_tmp.+0.8.*h_T_tmp.^0.8
+ω_tmp = 0.8.*h_T_tmp.^0.8
 spl_ω = Array{Spline1D,1}(undef,n_g)
 for iH in 1:H_grid_length
     for iG in 1:n_g
