@@ -223,6 +223,8 @@ Teachers are public sector employees and their compensation is funded by tax rev
 
 Equation \eqref{eq:lomO} is the aggregation over $h_O$ of the current cohort of students, while equation \eqref{eq:lomT} is the ${\left( \tfrac{\beta}{\sigma} \right)}^{\textrm{th}}$ moment of the distribution of $h_T$ of the current cohort of students.
 
+Note that ${H}_{O}'$ depends on $\widetilde{H}_{T}' $ but not on ${H}_{O}$. This reflects the assumption that the acquisition of human capital by today's students -- regardless of the occupational choice -- depends on the quality of today's teachers but not on the human capital of today's production workers.
+
 The teachers' wage profile $\omega_T$ is exogenous. We assume that $\omega_T$ is strictly increasing in the teacher's human capital $h_T$ and continuously differentiable. We allow, in particular, for the possibility that $\omega_T$ is not linear in $h_T$.%\footnote{The key implication is that, in contrast to a ``standard'' Roy model, an agent's occupational choice depends on their comparative as well as absolute advantage.}
 
 \section{Equilibrium}\label{sec:equilibrium}
@@ -317,12 +319,14 @@ where, analogously to the problem of a prospective teacher, we define $\tau_{O,g
 %N\left(h^*(h^O) \right) = \frac{\sfrac{M}{2}}{\int_0^\infty \left[ \left(\frac{h^T(a^T)}{h^*(h^O)}\right)^{\frac{\beta}{\sigma}} - 1 \right] \hat{f}^T(a^T) \textrm{d}a^T},
 %\end{equation}
 %for any $h^O$.
-\begin{prp}
-If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h_O)}{h_O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h_T}{h_O}$ for all $h_O$.
-\end{prp}
+
+% FORMER PROPOSITION 2:
+%\begin{prp}
+%If $\beta = \sigma$, then $\frac{d\omega}{dh}$ and $\frac{h^*(h_O)}{h_O}$ are constant, i.e.~the occupational cutoff satisfies $h^* = \frac{h_T}{h_O}$ for all $h_O$.
+%\end{prp}
 
 \subsection{The Aggregate Laws of Motion}
-The economy is characterized by the following laws of motions:%\footnote{When the economy has $I>2$ occupations, the law of motion for the aggregate human capital in teaching is characterized by:
+After substituting \eqref{eq:s_T}-\eqref{eq:e_O} into \eqref{eq:lomO} and \eqref{eq:lomT} we can characterize the equilibrium laws of motion for $\widetilde{H}_{T}$ and ${H}_{O}$ by:%\footnote{When the economy has $I>2$ occupations, the law of motion for the aggregate human capital in teaching is characterized by:
 %\begin{align*}
 %\widetilde{H}'_{T} & = 
 %\end{align*}.
@@ -331,14 +335,11 @@ The economy is characterized by the following laws of motions:%\footnote{When th
 \begin{align}
 %\label{eq:lomT}
 \widetilde{H}'_{T} & =\eta^{\frac{\beta\eta}{\sigma(1-\eta)}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\beta}{1-\eta}} \cdot \sum_{g=1}^G \tau_{T,g}^\frac{\beta\eta}{\sigma(1-\eta)} \cdot \int_0^\infty \left( \tfrac{\partial \omega'_{T,g}}{\partial h'_{T,g}} \right)^\frac{\beta\eta}{\sigma(1-\eta)} \cdot s_{T,g}^\frac{\beta\phi}{\sigma(1-\eta)} \cdot a^\frac{\beta\alpha}{\sigma(1-\eta)}  f_{T,g}(a)da\\
-{H}'_{O} & = \eta^\frac{\eta}{1-\eta} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot \sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot \int_0^\infty {A'}_O^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta} \cdot a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da
+\textrm{and} \nonumber\\
+{H}'_{O} & = \eta^\frac{\eta}{1-\eta} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot \sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot \int_0^\infty {A'}_O^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta} \cdot a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da.
 \end{align}
 %\end{prp}
-
-\subsection{Occupational Choice in Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
-To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
-
-We can show that this economy has a steady state in $\widetilde{H}_T$ and we can characterize it in a single equation:%\footnote{When the economy has $I>2$ occupations, the steady state $H_T$ is characterized by:
+We can show that this economy has a steady state in $\widetilde{H}_T$ and we can characterize it implicitly in a single equation:%\footnote{When the economy has $I>2$ occupations, the steady state $H_T$ is characterized by:
 %\begin{align*}
 %\label{eq:lomT}
 %\widetilde{H}_{T} & = 
@@ -346,9 +347,17 @@ We can show that this economy has a steady state in $\widetilde{H}_T$ and we can
 %}
 \begin{align}
 %\label{eq:lomT}
-\widetilde{H}_{T} & = \eta^{\frac{\beta\eta}{\sigma(1-\eta-\beta)}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\beta}{1-\eta-\beta}} \cdot \Bigg[ \sum_{g=1}^G \tau_{T,g}^\frac{\beta\eta}{\sigma(1-\eta)} \cdot \int_0^\infty \left( \tfrac{\partial \omega'_{T,g}}{\partial h'_{T,g}} \right)^\frac{\beta\eta}{\sigma(1-\eta)} \cdot s_{T,g}^\frac{\beta\phi}{\sigma(1-\eta)} \cdot a^\frac{\beta\alpha}{\sigma(1-\eta)}  f_{T,g}(a)da \Bigg]^\frac{1-\eta}{1-\eta-\beta}
+\widetilde{H}_{T} & = \eta^{\frac{\beta\eta}{\sigma(1-\eta-\beta)}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\beta}{1-\eta-\beta}} \cdot \Bigg[ \sum_{g=1}^G \tau_{T,g}^\frac{\beta\eta}{\sigma(1-\eta)} \cdot \int_0^\infty \left( \tfrac{\partial \omega_{T,g}}{\partial h_{T,g}} \right)^\frac{\beta\eta}{\sigma(1-\eta)} \cdot s_{T,g}^\frac{\beta\phi}{\sigma(1-\eta)} \cdot a^\frac{\beta\alpha}{\sigma(1-\eta)}  f_{T,g}(a)da \Bigg]^\frac{1-\eta}{1-\eta-\beta}
 \end{align}
-\begin{prp}[Occupational choice boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and labor market frictions, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H_T}$. It is characterized by:%\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
+
+\subsection{Occupational Choice}% in Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
+
+%To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
+
+% OLD VERSION OF OCCUPATIONAL CHOICE BOUNDARY:
+\begin{prp}[Occupational Choice Boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and the labor market frictions, the student's teaching-specific human capital $h'_{T,g}$, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H}_T$. It is characterized by:
+
+%\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
 %\begin{align*}
 %\label{eq:occChoiceFN}
 %
@@ -356,16 +365,14 @@ We can show that this economy has a steady state in $\widetilde{H}_T$ and we can
 %}
 \begin{align}
 \label{eq:occChoice}
-\left(\frac{a_T}{a_O}\right)^\alpha \cdot \frac{\tau_{T,g}}{\tau_{O,g}} \cdot \left(\frac{1+\tau^e_{T,g}}{1+\tau^e_{O,g}}\right)^{1-\eta}  \cdot \left(\frac{1-s_{T,g}}{1-s_{O,g}}\right)^\frac{1-\eta}{\mu} \cdot \left(\frac{s_{T,g}}{s_{O,g}}\right)^\phi \cdot \frac{\frac{\partial \omega'_{T,g}}{\partial h'_{T,g}}}{A'_O} \cdot \left(\frac{ \frac{\omega'_{T,g}}{\frac{\partial \omega'_{T,g}}{\partial h'_{T,g}} \cdot h'_{T,g}}-\eta}{1-\eta}\right)^{1-\eta}=1
+\left(\frac{a_T}{a_O}\right)^\alpha \cdot \frac{\tau_{T,g}}{\tau_{O,g}} \cdot \left(\frac{1+\tau^e_{T,g}}{1+\tau^e_{O,g}}\right)^{1-\eta}  \cdot \left(\frac{1-s_{T,g}}{1-s_{O,g}}\right)^\frac{1-\eta}{\mu} \cdot \left(\frac{s_{T,g}}{s_{O,g}}\right)^\phi \cdot \frac{\frac{\partial \omega'_{T,g}}{\partial h'_{T,g}}}{A'_O} \cdot \left(\frac{ \frac{\omega'_{T,g}}{\frac{\partial \omega'_{T,g}}{\partial h'_{T,g}} \cdot h'_{T,g}}-\eta}{1-\eta}\right)^{1-\eta}=1.
 \end{align}
 \end{prp}
 
-The calibration in section \ref{sec:quant} will go beyond the simple comparative statics here and match moments along the secular transition from the late 1960s to the more recent past.
+%The calibration in section \ref{sec:quant} will go beyond the simple comparative statics here and match moments along the secular transition from the late 1960s to the more recent past.
 
 \section{Data}\label{sec:data}
 %[Discuss Project TALENT, NLSY79, and NLSY97.]
-
-{\sc Add discussion of construction of occupation-specific abilities based on procedure in Guvenen at al.}
 
 We parameterize the model with data from longitudinal surveys that cover American youth at three different times after World War II: Project TALENT, NLSY 79, and NLSY 97. While the two NSLY surveys have been used extensively in the literature, Project TALENT is somewhat less known and we present it in some detail below.
 \subsection{Project TALENT}
@@ -378,7 +385,10 @@ Follow-up surveys were then carried out one, five, and eleven years after the st
 
 51 percent of the original participants participated in the 1-year post-graduation surveys. The five and eleven-year follow-ups successfully contacted 35 and 25 percent of the original participants, respectively. One concern with attrition rates of this magnitude is that the survey sample of waves two through five is subject to selection along one or several attributes.
 
-In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.} % WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
+In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.}
+
+Although the high attrition rate from the original sample size of almost 370,000 is a concern, Table \ref{tab:samplebywave} suggests that selection along the respondents' gender and their parents' educational attainment and income is not a major issue. The 11-year post survey appears to be roughly representative of the high school population in 1960.
+% WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
 \begin{table}[h!]
   \centering 
 %  \label{tab:samplebywave}
@@ -450,8 +460,8 @@ Project TALENT contains a number of tests administered in 1960 when the responde
 			%\multicolumn{6}{c}{Panel B: 11-Year Post} \\
 			\multicolumn{6}{c}{11-Year Post} \\
 			\midrule
-			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & \multirow{2}{*}{Unemployed}& Not in \\
-			&  &  & & Labor Force & \multirow{2}{*}{Total}\\
+			& \multirow{2}{*}{Teachers} & \multirow{2}{*}{Other} & \multirow{2}{*}{Unemployed}& Not in & \multirow{2}{*}{Total}\\
+			&  &  & & Labor Force &  \\
 			\midrule
 			Female & 3,641 & 16,063 & 1,154 & 23,001 & 43,859\\
 			\quad (\% of subsample) & (60.36\%) & (30.47\%) & (61.84\%) & (92.84\%) &(51.36\%)\\
@@ -476,17 +486,19 @@ Project TALENT contains a number of tests administered in 1960 when the responde
 		\label{tab:PTscores}
 	\end{table}
 	
-ARE WE USING THE PARENTS' EDUCATIONAL ATTAINMENT OR INCOME FOR ANYTHING? IF IT'S IN THE TABLE, WE SHOULD DISCUSS IT SOMEWHERE.
+%We are mainly interested in the respondents' occupational choice and labor market status eleven years after their presumed high school graduation. In Table \ref{tab:PTscores} we report gender and composite aptitude scores for mathematics, verbal and social skills. 
 
-THIS TRANSITION IS ABRUPT. WE START THE DISCUSSION OF TEACHERS IMMEDIATELY AFTER DESCRIBING THE APTITUDE TESTS.
+% 5-YEAR POST:
+%Approximately three quarters of teachers in the sample are female, in the 5-year post as well as the 11-year post surveys. In non-teaching occupations the share of women is 39 percent and women account for 80 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics and verbal test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
 
-Approximately three quarters of teachers in the sample are female, in the 5-year post as well as the 11-year post surveys. In non-teaching occupations the share of women is 39 percent and women account for 80 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics and verbal test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
+% 11-YEAR POST:
+Approximately 60 percent of teachers in the sample are female eleven years after their presumed high school graduation. In non-teaching occupations the share of women is 30 percent and women account for more than 90 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics, verbal, and social test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
 	
-If the labor market discriminated more against certain groups (gender, race,\ldots) in non-teaching occupations in 1960, we expect these groups to favor teaching over other occupations or to stay out of the labor force altogether. ``Not in the labor force'' is more a reflection of the absolute level of labor market discrimination against a particular group while the occupational choice between teaching or other occupations reflects differences between group-specific barriers. To the extent that occupations require specific human capital investments we allow for educational barriers to affect occupational choices separately in the model. If both of these barriers declined after 1960, we would expect a narrowing of the educational achievement gap and more talented females should move from teaching into other occupations. This reallocation would lower the average quality of teachers and, therefore, we expect to observe more significant differences in the ability distributions between teachers and other occupations in cohorts who entered the labor market in the 60s and 70s (i.e.~our Project TALENT population) compared to younger individuals (i.e.~the NLSY79 and NLSY97 respondents).
+If the labor market discriminated more against certain groups (gender, race,\ldots) in non-teaching occupations in 1960, we expect these groups to favor teaching over other occupations or to stay out of the labor force altogether. ``Not in the labor force'' is more a reflection of the absolute level of labor market discrimination against a particular group while the occupational choice between teaching or other occupations reflects differences between group-specific barriers. To the extent that occupations require specific human capital investments we allow for educational barriers to affect occupational choices separately in the model. If both of these barriers declined after 1960, we would expect a narrowing of the educational achievement gap and more talented females should move from teaching into other occupations. This reallocation would lower the average quality of teachers and, therefore, we expect to observe more significant differences in the ability distributions between teachers and other occupations in cohorts who entered the labor market in the 60s and 70s (i.e., our Project TALENT population) compared to younger individuals (i.e., the NLSY79 and NLSY97 respondents).
 
-We focus on the verbal composite score and math composite score provided by Project TALENT. In addition, we construct noncognitive ability which we call social ability hereafter by combining scores on impulsiveness, calmness, self-confidence, mature personality applying principal component analysis (PCA). Finally, we convert these scores into percentile ranks among individuals (NOT IN THE TABLE). 
+We focus on the verbal and math composite scores provided by Project TALENT. In addition, we construct a measure of non-cognitive ability, which we call social ability, by combining scores on impulsiveness, calmness, self-confidence, and personality maturity by way of a principal component analysis (PCA). Finally, we convert these scores into percentile ranks among individuals. The conversion to percentiles enables us to connect the cognitive assessments in Project TALENT to the ASVAB and AFQT tests in the two NLSYs.\footnote{The percentiles are not reported here. They are available by request.} 
 
-Figure \ref{fig:talent} shows the distribution of test scores for math and verbal composite by occupations in Project TALENT. The distribution of math scores in panel \ref{fig:talentmath} is skewed to the right for ``other'' compared to the distribution of math scores among teachers. Panel \ref{fig:talentverb} shows a similar pattern in terms of relative skewness. The distribution of scores of respondents in non-teaching occupations and those who report not being in the labor force are quite similar. Overall, individuals in teaching occupations tend to have higher scores than non-teachers. One possible explanation for these differences is that individuals select into teaching along a non-skill dimension and an obvious selection candidate is gender. Approximately three quarters of all teachers are female (see the first row in the two panels of Figure \ref{tab:PTscores} IS THIS THE CORRECT TABLE/FIGURE REFERENCE?). If women exhibited a distinct distribution of scores this may explain the discrepancy between teaching and other occupations. The data, however, do not suggest that women are innately more or less talented than men. Women's verbal scores slightly dominate the men's while the opposite is true for the math scores (see Figure \ref{fig:nlsy97bygender}).
+Figure \ref{fig:talent} shows the distribution of math and verbal composite scores by occupations in Project TALENT. The distribution of math scores in panel \ref{fig:talentmath} is skewed to the right for ``other'' compared to the distribution of math scores among teachers. Panel \ref{fig:talentverb} shows a similar pattern in terms of relative skewness. The distribution of scores of respondents in non-teaching occupations and those who report not being in the labor force are quite similar. Overall, individuals in teaching occupations tend to have higher scores than non-teachers. One possible explanation for these differences is that individuals select into teaching along a non-skill dimension and an obvious selection candidate is gender. If women indeed exhibited a distinct distribution of aptitude scores, this may explain the discrepancy between teaching and other occupations. The data, however, do not suggest that women are innately more or less talented than men. Women's verbal scores slightly dominate the men's while the opposite is true for the math scores (see Figures \ref{fig:nlsy79} and \ref{fig:nlsy97bygender}).
 
 \begin{figure}
 	\begin{subfigure}{0.49\textwidth}
@@ -514,7 +526,7 @@ Figure \ref{fig:talent} shows the distribution of test scores for math and verba
 	\caption{Composite Scores by Gender in Project TALENT} \label{fig:talent_gender}
 \end{figure}
 
-The distributions of composite IQ scores for Project TALENT respondents split by gender are quite similar (see Figure \ref{fig:IQbygender}). What reconciles Figures \ref{fig:talent}-\ref{fig:IQbygender} is the selection of more talented women into teaching, which we plot in Figure \ref{fig:IQbygenderteach}. Due to the smaller numbers of individuals in Figure \ref{fig:IQbygenderteach} compared to the three previous figures (the number of men is particularly low), the plot contains more noise and one should draw any conclusion with appropriate caution. With this in mind, it does appear that teaching attracts higher-ability individuals and that the selection of women along this dimension is somewhat stronger, plausibly due to the lack of career opportunities in other occupations.
+The distributions of composite IQ scores for Project TALENT respondents split by gender are quite similar (see Figure \ref{fig:IQbygender}). Figures \ref{fig:talent}-\ref{fig:IQbygender} suggest that high-ability women gravitate toward teaching, which is illustrated by the distribution of IQ scores in Figure \ref{fig:IQbygenderteach}. Due to the smaller numbers of individuals in that figure compared to the three previous figures (the number of men is particularly low), the plot contains more noise and one should draw any conclusion with appropriate caution. With this in mind, it does appear that teaching attracts higher-ability individuals and that the selection of women along this dimension is somewhat stronger, plausibly due to the lack of career opportunities in other occupations.
 
 \begin{figure}
 	\begin{subfigure}{0.49\textwidth}
@@ -532,11 +544,11 @@ The distributions of composite IQ scores for Project TALENT respondents split by
 	\label{fig:IQbygender}
 \end{figure}
 
-The 11-year follow-up survey provides a snapshot of young workers' occupational choices together with the pre-labor market aptitude profile in the early 1970s. For later years, we use data from the two NLSYs and we will give a brief overview in the next section.
+%The 11-year follow-up survey provides a snapshot of young workers' occupational choices together with the pre-labor market aptitude profile in the early 1970s. For later years, we use data from the two NLSYs and we will give a brief overview in the next section.
 
 \subsection{NLSY79 and NLSY97}
-In contrast to Project TALENT, the two NLSYs initiated in 1979 and 1997 are widely used and many readers are already familiar with the data. \cite{Cooksey:2018}, among many others, provides a comprehensive overview of the two surveys. For the purposes of our paper, the {\it Armed Forces Qualification Test} (AFQT) scores are of particular interest since we need proxies to capture differences in the individuals' raw skills, which is the crucial source of exogenous variation in our model. The score consists of four sections of the {\it Armed Services Vocational Aptitude Battery} (ASVAB): arithmetic reasoning, word knowledge, paragraph comprehension, and numerical operations. The tests took place in 1980 and 1999 for NLSY79 and NLSY97 cohorts, respectively. Since the tests were administered at different ages (and times) and used different formats, NLS program staff re-normed the scores in 2006, in order to facilitate cross-cohort comparisons.\footnote{\cite{Altonji:2009} also propose a method to enable a comparison of ASVAB scores across the two NLSY samples. Note that we cannot construct equivalence scores that would allow as to compare results from aptitude tests in Project TALENT with those from the two NLSYs.} We reduce four ASVAB categories into two composite dimensions, verbal and math, by applying principal component analysis (PCA). The verbal score is the first principal component of word knowledge and paragraph comprehension, and the math score is that of math knowledge and arithmetic reasoning. 
-Next, we combine the Rotter Locus of Control Scale and Rosenberg Self-Esteem Scale from NLSY79 to construct a noncognitive ability (\cite{Heckman:2006} and \cite{Bowles:2001} which we call social ability hereafter. Likewise, we combine the Big 5 personality factor conscientiousness traits to construct a comparable social ability measure for NLSY97 (\cite{Deming:2017}). Finally, we convert these scores into percentile ranks among individuals (NOT IN THE TABLE). 
+In contrast to Project TALENT, the two NLSYs initiated in 1979 and 1997 are widely used and many readers are already familiar with the data. \cite{Cooksey:2018}, among many others, provides a comprehensive overview of the two surveys. For the purposes of our paper, the {\it Armed Forces Qualification Test} (AFQT) scores are of particular interest since we need proxies to capture differences in the individuals' raw skills, which is the crucial source of exogenous variation in our model. The score consists of four sections of the {\it Armed Services Vocational Aptitude Battery} (ASVAB): arithmetic reasoning, word knowledge, paragraph comprehension, and numerical operations. The tests took place in 1980 and 1999 for NLSY79 and NLSY97 cohorts, respectively. Since the tests were administered at different ages (and times) and used different formats, NLS program staff re-normed the scores in 2006, in order to facilitate cross-cohort comparisons.\footnote{\cite{Altonji:2009} also propose a method to enable a comparison of ASVAB scores across the two NLSY samples. Note that we cannot construct equivalence scores that would allow as to compare results from aptitude tests in Project TALENT with those from the two NLSYs.} We reduce four ASVAB categories into two composite dimensions, verbal and math, by applying a principal component analysis (PCA). The verbal score is the first principal component of word knowledge and paragraph comprehension, and the math score is that of math knowledge and arithmetic reasoning. 
+Next, we combine the {\it Rotter Locus of Control Scale} and {\it Rosenberg Self-Esteem Scale} from NLSY79 to construct a measure of non-cognitive ability (\cite{Heckman:2006} and \cite{Bowles:2001}), which we will call social ability hereafter. Likewise, we combine the Big 5 personality factor conscientiousness traits to construct a comparable social ability measure for NLSY97 (\cite{Deming:2017}). Finally, we convert these scores into percentile ranks among individuals.\footnote{Not reported in the current version of the manuscript}. 
 
 Table \ref{tab:NLSYscores} shows summary statistics for the individuals in our sample, divided into three categories: (1) teachers, (2) non-teachers/others, (3) not in labor force. Since an individual usually has multiple employment spells, she might be in all these categories over the course of the panel. We define an individual as a teacher if she has at least one spell in teaching that is longer than 9 months (one academic year). An individual is out of labor force if she reported to be out of labor force for 208 consecutive weeks for a reason other than schooling.\footnote{After four years, ``not in the labor force'' is effectively an absorbing state. The probability of returning to the labor force is less than 1\%.}
 
@@ -646,7 +658,7 @@ Figure \ref{fig:nlsy_by_occ} plots the NLSY analogues of the math and verbal sco
 %	\label{fig:nlsy}
 %\end{figure}
 
-Figures \ref{fig:nlsy_by_gender}-\ref{fig:nlsy_comp_by_gender} are the NLSY analogues of Figures \ref{fig:talent_gender}-\ref{fig:IQbygender}. WE NEED TO SAY A FEW MORE THINGS ABOUT THIS. IT'S AN ISOLATED STATEMENT RIGHT NOW.
+Figures \ref{fig:nlsy_by_gender} and \ref{fig:nlsy_comp_by_gender} are the NLSY analogues of the math and verbal composite scores in Figures \ref{fig:talent_gender} and \ref{fig:IQbygender}.
 
 \begin{figure}
 	\begin{subfigure}{0.49\textwidth}
@@ -688,14 +700,14 @@ Figures \ref{fig:nlsy_by_gender}-\ref{fig:nlsy_comp_by_gender} are the NLSY anal
 	
 Unfortunately, the composite score distributions aren't comparable between Project TALENT and NLSY cohorts for several reasons. Although the ability tests try to capture math and verbal abilities, the tests themselves are very different. Therefore, it is impossible to compare changes in score distributions over time. Despite this limitation we can still compare the composition (by gender or occupation) {\it within} cohorts across the three surveys. In fact, the particular {\it Roy} flavor of our model suggests that this is where the interesting action is.
 
-THIS IS A ROUGH TRANSITION. WE JUMP FROM ABILITY TESTS TO EMPLOYMENT AND OCCUPATIONAL HISTORIES SUDDENLY.
-
-Differences in the frequency of the surveys further complicate comparisons between Project TALENT and the NLSY's. The NLSY79 and NLSY97 survey the respondents far more frequently and this enables us to construct more detailed employment histories and occupation choices over the course of panels. While Project TALENT provides data on the respondents' {\it current} occupation in the 1, 5, and 11-year post waves, it misses some of the higher-frequency churn since it doesn't ask any retrospective career questions. Moreover, the probability of being a teacher one year after high school graduation is vanishingly small (0.08\% of the sample). In the figures and tables presented so far we report the occupations reported in the 11-year follow-up study. While certainly less complete than the NLSY data, Project TALENT still offers insights into the career decisions of young adults at a time for which there is only a very limited supply of nationally representative longitudinal survey data.\footnote{In ongoing work, we synthetically impose some of the data limitations in Project TALENT on the NLSY in order to get a better sense for underlying changes in labor market conditions and career decisions across cohorts. Evidently we're giving up some valuable details in the process for the benefit of more cross-survey comparability. IS THIS REFERRING TO THE RESTRICTION TO 29-YEAR OLDS IN THE NLSY? IF YES, WE NEED TO BE MORE EXPLICIT IN THE MAIN TEXT.}
+%THIS IS A ROUGH TRANSITION. WE JUMP FROM ABILITY TESTS TO EMPLOYMENT AND OCCUPATIONAL HISTORIES SUDDENLY.
+%
+Differences in the frequency of the surveys further complicate comparisons between Project TALENT and the NLSY's. The NLSY79 and NLSY97 survey the respondents far more frequently and this enables us to construct more detailed employment histories and occupation choices over the course of panels. While Project TALENT provides data on the respondents' {\it current} occupation in the 1, 5, and 11-year post waves, it misses some of the higher-frequency churn since it doesn't ask any retrospective career questions. Moreover, the probability of being a teacher one year after high school graduation is vanishingly small (0.08\% of the sample). In the figures and tables presented so far we report the occupations reported in the 11-year follow-up study. While certainly less complete than the NLSY data, Project TALENT still offers insights into the career decisions of young adults at a time for which there is only a very limited supply of nationally representative longitudinal survey data.\footnote{In the work we have done so far, we impose some of the data limitations in Project TALENT on the NLSY in order to get a better sense for underlying changes in labor market conditions and career decisions across cohorts. In particular, we are only using the occupational choice of 29-year olds in all three surveys even though the NLSYs allow us to construct far more detailed occupational histories. Evidently we're giving up some valuable details in the process for the benefit of more cross-survey comparability.}
 
 Project TALENT, NLSY79, and NLSY97 provide us with the data moments that we match to model-generated moments in order to quantify the static and dynamic effects of the implied educational barriers and labor market barriers. While the discussion so far emphasized the contrast between men and women, it is worth emphasizing that our model framework can accommodate more richness in terms of the salient groups of workers. In ongoing work we are incorporating race and ethnicity to more fully capture the salient educational and labor market frictions in the data.\footnote{Since the racial categorization is somewhat problematic in Project TALENT, this extension poses additional challenges.}
 
 \subsection{O*NET}
-The final element in our calibration element relies on the U.S. Department of Labor’s O*NET's characterization of occupation-specific skill requirements. The data provides the descriptors that characterize the mix of knowledge, skills, and abilities used to perform the tasks that make up an occupation. To convert these descriptors to a three-dimensional job characterization: mathematics, verbal, and social, we follow \cite{Guvenen:2020}. First, we use 26 of these descriptors that are most related to the ASVAB component tests and another 6 descriptors related to the social skills and convert them into four ASVAB test categories. Second, we normalize each dimension’s standard deviation to be one and reduce these 4 ASVAB categories into 2 composite dimensions, verbal and math, by applying principal component analysis (PCA). The verbal score is the first principal component of word knowledge and paragraph comprehension, and the math score is that of math knowledge and arithmetic reasoning. All four scores were converted into percentile ranks among occupations. Likewise, we create an index of social ability using the first principal component using the O*NET descriptors related to the social skills. Lastly, we grouped O*NET occupations into 20 occupation groups. We also include the home sector as an additional occupation, 21st occupation group. We find an average skill requirement percentile rank within each occupation group. 
+The final element in our calibration element relies on the U.S. Department of Labor’s characterization of occupation-specific skill requirements in O*NET. The data contain the mix of knowledge, skills, and abilities used to perform the tasks that characterize an occupation. For our purposes, we need to convert these descriptors into a three-dimensional job characterization consisting of mathematics, verbal, and social skills. This procedure largely follows \cite{Guvenen:2020}. First, we use 26 of these descriptors that are most related to the ASVAB component tests and another 6 descriptors related to the social skills and convert them into four ASVAB test categories. Second, we normalize each dimension’s standard deviation to be one and reduce these 4 ASVAB categories into 2 composite dimensions, verbal and math, by applying principal component analysis (PCA). The verbal score is the first principal component of word knowledge and paragraph comprehension, and the math score is that of math knowledge and arithmetic reasoning. All four scores were converted into percentile ranks among occupations. Likewise, we create an index of social ability using the first principal component using the O*NET descriptors related to the social skills. Lastly, we grouped O*NET occupations into 20 occupation groups. We also include the home sector as an additional occupation, 21st occupation group. We find an average skill requirement percentile rank within each occupation group. 
 
 Last but not least, we use these skill profiles to project the survey respondents' three-dimensional abilities into an $I$-dimensional vector of job-specific abilities. We decompose the job-specific ability into an absolute and a comparative dimension in a way that aligns naturally with the notion of absolute and comparative advantage. We characterize the comparative dimension for each worker $j$ with a vector of abilities $(a^j_v, a^j_m, a^j_s)$ in each occupation group $i$ with skill requirement $(s^i_v, s^i_m, s^i_s)$:
 \[CA_{i,j}=\frac{a^j_v}{s^i_v} \cdot \left|\frac{a^j_v}{a^j_v+a^j_m+a^j_s}-\frac{s^i_v}{s^i_v+s^i_m+s^i_s}\right|+\]
@@ -767,10 +779,10 @@ Finally, combining absolute and comparative dimensions, we construct a job-speci
 %{\sc This is currently work in progress!}
 \section{Quantitative Analysis}\label{sec:quant}
 \subsection{Calibration Strategy}\label{sec:calstrat}
-{\sc Need to update this section to reflect the discussion from the previous meeting!.}
+%{\sc Need to update this section to reflect the discussion from the previous meeting!.}
 
 %The model allows analyzing the effects of changes in the labor market barriers.
-The aim of the calibration is to parametrize the economy to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. We select these years since the respondents from Project TALENT, NLSY79, and NLSY97 are, on average, 29 years old. The parameterization will treat these three target years as steady states of the model.
+In the calibration exercise we parametrize the economy in order to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. We select these years since the respondents from Project TALENT, NLSY79, and NLSY97 are, on average, 29 years old at these three dates. The parameterization treats these three target years as steady states of the model.
 
 We assume that the idiosyncratic occupation-specific abilities are drawn from a Fr\'echet distribution and the relative innate talent levels are identical across all groups. Tables \ref{tab:assump}-\ref{tab:calibr} summarize the elements of a sample parameterization. Table \ref{tab:assump} summarizes the assumptions and normalization for our base parameterization of the model. We assume that there are no labor and human capital barriers for men in all occupations. We also assume that labor and human capital barriers in home production are zero for all groups.
 
@@ -881,11 +893,13 @@ The somewhat loose discussion of our calibration strategy in section \ref{sec:ca
 \bibliography{/Users/simeonalder/Dropbox/Bibliography/MasterBibliography}
 \bibliographystyle{ecta}
 
-
+\newpage
 \appendix
 %\section{Equilibrium for special case: Teachers are paid marginal product}\label{sec:equilibrium}
-\section{Special Case: Teacher's Are Paid their Marginal Product}\label{app:equilibrium}
-The model in section \ref{sec:model} assumes that teachers are paid according to an exogenous schedule $\omega_T$ and each teacher's level of pay is a function of her human capital $h_T$. Here we consider a special case wher
+\section{Special Case: Teacher's Are Paid Their Marginal Product}\label{app:equilibrium}
+The model in section \ref{sec:model} assumes that teachers are paid according to an exogenous schedule $\omega_T$ and each teacher's level of pay is a function of her human capital $h_T$. Here we consider a special case where teachers are paid according to their contribution to the human capital acquisition of the students in their classroom. Since the assignment of students to teachers is random and equally-abled students acquire the same amount of human capital across classrooms ``run'' by different teachers, better teachers are compensated for the additional human capital they contribute to by virtue of differences in class size.
+
+In a nutshell, this implies that teachers are paid according to the wage profile in Proposition \ref{prp:omega}.
 \subsection{Human Capital Investment}
 Let's first characterize the optimal human capital investment for a prospective teacher with ability $a$ from group $g$.%\footnote{A stickler might object that it should really be $a^T$, but we're dropping the superscript to economize on notation whenever possible.}
 
@@ -913,7 +927,7 @@ e_{T,g} & = \tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{
 & \times \frac{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta}}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}
 \end{align}
 
-Note that a prospective teacher's optimal investment of resources depends on the total human capital investment of prospective {\it production} workers. Clearly, it depends explicitly on $s_{O,g}$, but it also depends on $e_{O,g}$ in equation \eqref{eq:e_O} below, albeit less obviously so. This captures the fact that teachers are compensated for their contribution to the accumulation of human capital that can be used for the production of the consumable final good.\footnote{When the economy has $I>2$ occupations, the prospective teacher's optimal investment of resources is characterized by:
+Note that a prospective teacher's optimal investment of resources depends on the total human capital investment of prospective {\it production} workers. Clearly, it depends explicitly on $s_{O,g}$, but it also depends on $e_{O,g}$ in equation \eqref{eq:e_O_app} below, albeit less obviously so. This captures the fact that teachers are compensated for their contribution to the accumulation of human capital that can be used for the production of the consumable final good.\footnote{When the economy has $I>2$ occupations, the prospective teacher's optimal investment of resources is characterized by:
 \begin{align*}
 e_{T,g} & = \tfrac{\beta}{\sigma}\cdot\eta^{\frac{1}{1-\eta}}\cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \nonumber\\
 & \times \frac{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta }}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}.
@@ -924,7 +938,7 @@ The F.O.C.s for prospective production workers (i.e., those labeled ``other'') a
 \begin{align}
 %\label{eq:s_O}
 s_{O,g} & = \frac{\mu \phi}{\mu \phi+1-\eta} \\
-\label{eq:e_O}
+\label{eq:e_O_app}
 e_{O,g} & = \left( \tau_{O,g} \cdot \eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\sigma\cdot {A'_{O}}^\eta \cdot s_{O,g}^\phi \cdot a_O^\alpha \right)^{\frac{1}{1-\eta}}
 \end{align}
 where, analogously to the problem of a prospective teacher, we define $\tau_{O,g} \equiv \frac{\left( 1-t' \right) \left( 1-\tau^{\omega '}_{O,g} \right)}{1+\tau^e_{O,g}}$.
@@ -1001,7 +1015,7 @@ In order to highlight the mechanisms that govern the individuals' occupational c
 How can we characterize the teacher's marginal product? Recall that only workers produce the final (consumption) good using a linear production function with productivity $A_O$. Thanks to stable random matching of students to teachers, the ability distribution of students is identical across class rooms and a teacher's marginal value only varies with the number of students in her class room, denoted by $N(h_{T,g})$. Clearly, then, the wage profile is linear in $N(\cdot)$. Since $N$ is not linear in $h_{T,g}$ in general this implies that the wage profile is not linear in $h_{T,g}$ either.
 
 Since teachers are compensated for the incremental human capital in ``other'', we can characterize the teacher's wage profile.
-\begin{prp}[Teacher's wage profile] For a given teacher with human capital $h_{T,g}$ and aggregate human capital in teaching $\widetilde{H}_T$, the wage in teaching is proportional to the \textit{number of students} in the teacher's class and is characterized by:
+\begin{prp}[Teacher's Wage Profile]\label{prp:omega} For a given teacher with human capital $h_{T,g}$ and aggregate human capital in teaching $\widetilde{H}_T$, the wage in teaching is proportional to the \textit{number of students} in the teacher's class and is characterized by:
 \begin{align}
 \label{eq:omegaOpt}
    \omega(h_{T,g},\widetilde{H}_T) & =  \frac{\overbrace{{H}'_O {A}'_O}^{\textrm{total output (next period)}}}{\underbrace{\int_0^\infty f_{O,g}(a) da}_{\begin{subarray}{c}\textrm{fraction of prospective} \\ \textrm{production workers in class}\end{subarray}}} \underbrace{\frac{\left( h_{T,g} \right)^{\frac{\beta}{\sigma}}}{{\widetilde{H}_T}}}_{\textrm{fraction of students taught}}
@@ -1026,7 +1040,7 @@ The second term in equation \eqref{eq:omegaOpt} captures the idea that a teacher
 & \times \frac{\tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot a_T^\frac{\alpha\beta }{\sigma-\eta\beta}}{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da}
 \end{align}
 
-\subsection{Occupational Choice in Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
+\subsection{Occupational Choice}% in Decentralized Competitive Equilibrium with Educational Barriers and Labor Market Discrimination}
 To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
 
 We can show that this economy has a steady state in $H_T$ and we can characterize it in a single equation:\footnote{When the economy has $I>2$ occupations, the steady state $H_T$ is characterized by:
@@ -1041,7 +1055,7 @@ We can show that this economy has a steady state in $H_T$ and we can characteriz
 \widetilde{H}_{T} & = \Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2}{M}\right)^{\frac{\sigma}{1-\eta}} \cdot \Bigg( \frac{\sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da}{\sum_{g=1}^G f_{O,g}(a)da} \Bigg)^\eta \nonumber\\
 & \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^{\frac{\beta}{\sigma}\cdot\frac{1-\eta}{1-\eta-\beta}}
 \end{align}
-\begin{prp}[Occupational choice boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and labor market frictions, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H_T}$. It is characterized by:\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
+\begin{prp}[Occupational Choice Boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and labor market frictions, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H_T}$. It is characterized by:\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
 \begin{align*}
 %\label{eq:occChoiceFN}
 \frac{a_i^{\frac{\alpha}{1-\eta}}}{a_T^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{i,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{i,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{i,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{i_g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\

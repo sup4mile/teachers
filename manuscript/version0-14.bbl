@@ -1,4 +1,4 @@
-\begin{thebibliography}{4}
+\begin{thebibliography}{8}
 \newcommand{\enquote}[1]{``#1''}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
@@ -7,12 +7,35 @@
 \textsc{Altonji, J., P.~Bharadwaj, and F.~Lange} (2009): \enquote{Constructing
   AFQT Scores that are Comparable Across the NLSY79 and the NLSY97,} Data Note.
 
+\bibitem[\protect\citeauthoryear{Bowles, Gintis, and Osborne}{Bowles
+  et~al.}{2001}]{Bowles:2001}
+\textsc{Bowles, S., H.~Gintis, and M.~Osborne} (2001): \enquote{{The
+  Determinants of Earnings: A Behavioral Approach},} \emph{Journal of Economic
+  Literature}, 39, 1137--1176.
+
 \bibitem[\protect\citeauthoryear{Cooksey}{Cooksey}{2018}]{Cooksey:2018}
 \textsc{Cooksey, E.~C.} (2018): \enquote{Using the National Longitudinal
   Surveys of Youth (NLSY) to Conduct Life Course Analyses,} in \emph{Handbook
   of Life Course Health Development}, ed. by N.~Halfon, C.~B. Forrest, R.~M.
   Lerner, and E.~M. Faustman, Cham: Springer International Publishing,
   561--577.
+
+\bibitem[\protect\citeauthoryear{Deming}{Deming}{2017}]{Deming:2017}
+\textsc{Deming, D.~J.} (2017): \enquote{{The Growing Importance of Social
+  Skills in the Labor Market*},} \emph{The Quarterly Journal of Economics},
+  132, 1593--1640.
+
+\bibitem[\protect\citeauthoryear{Guvenen, Kuruscu, Tanaka, and Wiczer}{Guvenen
+  et~al.}{2020}]{Guvenen:2020}
+\textsc{Guvenen, F., B.~Kuruscu, S.~Tanaka, and D.~Wiczer} (2020):
+  \enquote{Multidimensional Skill Mismatch,} \emph{American Economic Journal:
+  Macroeconomics}, 12, 210--44.
+
+\bibitem[\protect\citeauthoryear{Heckman, Stixrud, and Urzua}{Heckman
+  et~al.}{2006}]{Heckman:2006}
+\textsc{Heckman, J.~J., J.~Stixrud, and S.~Urzua} (2006): \enquote{{The Effects
+  of Cognitive and Noncognitive Abilities on Labor Market Outcomes and Social
+  Behavior},} \emph{Journal of Labor Economics}, 24, 411--482.
 
 \bibitem[\protect\citeauthoryear{Hsieh, Hurst, Jones, and Klenow}{Hsieh
   et~al.}{2019}]{Hsieh:2019}
