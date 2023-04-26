@@ -3,7 +3,7 @@ using Distributions, Dierckx, QuadGK, JLD, Plots, LaTeXStrings, CSV, DataFrames,
 using PyCall#, SciPy
 
 # Load occupational threshold from previous parameterization:
-previous = 0;
+previous = 1;
 # Parameters:
 M=1.0 # population measure
 g = ["female","male"] # no discrimination / no barrier group last
@@ -11,9 +11,9 @@ g = ["female","male"] # no discrimination / no barrier group last
 #occ = ["other1", "other2", "other3", "other4", "teaching"]
 import XLSX
 # cd("C:/Users/julia/Desktop/Research/Teachers")
-# cd("C:\\Users\\julia\\Box\\Teachers\\New Yulia's Folder\\LaborMarketData")
-cd("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage")
-xf = XLSX.readxlsx("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/data/LaborMarketData/Occupation_shares_v3.xlsx")
+ cd("C:\\Users\\julia\\Desktop\\Box\\Teachers\\New Yulia's Folder\\LaborMarketData")
+#cd("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage")
+xf = XLSX.readxlsx("C:/Users/julia/Desktop/BOX/Teachers/New Yulia's Folder/LaborMarketData/Occupation_shares_v3.xlsx")
 sh = xf["mom"]
 # labels for occuptions
 occ = sh["A3:A23"]
@@ -56,11 +56,13 @@ gm[end] = M/2 - sum(gm)
 μ=.714
 ϕ=0.999
 #θ=3
+γ=0.99
+κ=1.1
 
 # guess for initial relative A for men (levels will be adjusted later)
 if previous == 1
-    # d = load("C:/Users/julia/Desktop/teacher/previousParameterization_.jld")#2010.jld")
-    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
+     d = load("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")#2010.jld")
+    #d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
     Agrid_initial=d["Agrid"]
 else
     # productivity in 'Other' occupations
@@ -102,7 +104,7 @@ end
 
 # guess for initial relative τ_w for women (levels will be adjusted later)
 if previous == 1
-    d = load("C:/Users/julia/Desktop/teacher/previousParameterization_.jld")#2010.jld")
+    d = load("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")#2010.jld")
     τ_w_initial=d["τ_w_opt"][:,1]
 #    τ_e_initial=d["τ_e"][:,1]
 else
@@ -219,8 +221,8 @@ a_T_thresh = Array{Float64,3}(undef,length(a_grid),n_g,n_occ-1)
 a_O_thresh = Array{Float64,3}(undef,length(a_grid),n_g,n_occ-1)
 if previous == 1
     # d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results_new/results_2_groups_τW=[-0.8 -0.8]_τE=[0.0 0.0]_A=10.0_α=0.1_β=0.3_η=0.1_σ=0.4.jld")
-    d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
-    # d = load("C:/Users/iuliia/Desktop/teachers/julia/results_new/previousParameterization.jld")
+    #d = load("/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/results/previousParameterization.jld")
+     d = load("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")
     a_T_thresh=d["a_T_thresh"]
     t = d["t"]
     HH_T = d["HH_T"]
@@ -244,6 +246,7 @@ s_T = Array{Float64,3}(undef,length(a_grid),H_grid_length,n_g)
 h_T = Array{Float64,3}(undef,length(a_grid),H_grid_length,n_g)
 h_O = Array{Float64,4}(undef,length(a_grid),H_grid_length,n_g,n_occ-1)
 ω = Array{Float64,3}(undef,length(a_grid),H_grid_length,n_g)
+der_ω = Array{Float64,3}(undef,length(a_grid),H_grid_length,n_g)
 
 spl_T = Array{Spline1D,1}(undef,n_g)
 spl_O = Array{Spline1D,1}(undef,n_g)
@@ -298,24 +301,24 @@ for iH in 1:H_grid_length
     end
 end
 
-# EXOGENOUS WAGE PROFILE
-ω_tmp = Array{Float64,3}(undef,n_h_T_tmp,H_grid_length,n_g)
-ω_tmp = 0.8.*h_T_tmp.^0.8
-spl_ω = Array{Spline1D,1}(undef,n_g)
+########### EXOGENOUS WAGE PROFILE
+ω_fn(h_T) = κ*h_T^γ
+# derivative of wage profile
+der_ω_fn(h_T) = κ*γ*h_T^(γ-1)
+
+#=spl_ω = Array{Spline1D,1}(undef,n_g)
 for iH in 1:H_grid_length
     for iG in 1:n_g
         spl_ω[iG] = Spline1D(h_T_tmp[:,iH,iG], ω_tmp[:,iH,iG],k=1, bc="extrapolate")
     end
 end
-
-# derivative of wage profile
 spl_der_ω = Array{Spline1D,1}(undef,n_g)
 der_ω(k,iG)=Dierckx.derivative(spl_ω[iG],k)
 for iH in 1:H_grid_length
     for iG in 1:n_g
         spl_der_ω[iG]=Spline1D(h_T_tmp[:,iH,iG],der_ω.(h_T_tmp[:,iH,iG],iG),k=1, bc="extrapolate")
     end
-end
+end=#
 
 # Initial guess for fixed point of HH_T:
 # Set the array index to the midpoint of H_grid:
@@ -344,25 +347,22 @@ while gapHH > tolHH
         for iG in 1:n_g
             for ia in 1:length(a_grid)
                 a=a_grid[ia]
-                dw_dh(k)=spl_der_ω[iG](k)
-                w_h(k)=spl_ω[iG](k)
-                fn_s_T(k)=μ*ϕ*dw_dh(k)*k/((μ*ϕ-η)*dw_dh(k)*k+w_h(k))
-                fn_h_T(k)=(η^η*(1-t[iH,1])^η*dw_dh(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
+                fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
+                fn_h_T(k)=(η^η*(1-t[iH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
                 #(2*H_grid[iH]/M)^σ*a_grid[ia]^α*fn_s_T(k)^ϕ*fn_e_T(k)^η-k
                 hh_T=find_zero(fn_h_T,(minimum(h_T_tmp[:,iH,iG]),maximum(h_T_tmp[:,iH,iG])))
                 h_T[ia,iH,iG]=hh_T
                 s_T[ia,iH,iG]=fn_s_T(hh_T)
-                e_T[ia,iH,iG]=η*(1-t[iH,1])*dw_dh(hh_T)*hh_T
-                ω[ia,iH,iG]=w_h(hh_T)
-
+                e_T[ia,iH,iG]=η*(1-t[iH,1])*der_ω_fn(hh_T)*hh_T
+                ω[ia,iH,iG]=ω_fn(hh_T)
+                der_ω[ia,iH,iG]=der_ω_fn(hh_T)
                 for i_occ in 1:n_occ-1
-                    a_O_thresh[ia,iG,i_occ]=((1+τ_e[i_occ,iG])*((1-s_O)/(1-s_T[ia,iH,iG]))^μ*(((1-t[iH,1])*ω[ia,iH,iG]-e_T[ia,iH,iG])/ ((1-η)*(η^η*(1-t[iH,1])*(1-τ_w[i_occ,iG])/(1+τ_e[i_occ,iG])*Agrid[i_occ]*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))) ))^((1-η)/α)
-                    # ((1+τ_e[i_occ,iG])*((1-s_O)/(1-s_T[ia,iH,iG]))^μ*((ω[ia,iH,iG]-e_T[ia,iH,iG])/ ((1-η)*(η^η*τ_w[i_occ,iG]*Agrid[i_occ]*s_O*(2*H_grid[iH]/M)^σ)^(1/(1-η))) ))^((1-η)/α)
-                    h_O[ia,iH,iG,i_occ]=(η^η*(1-t[iH,1])^η*(1-τ_w[iH,1])^η/(1+τ_e[iH,1])^η*Agrid[i_occ]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
+                    a_O_thresh[ia,iG,i_occ]=((1+τ_e[i_occ,iG])/(1-τ_w[i_occ,iG])*(1+τ_e[i_occ,iG])^(-(1-η))*((1-s_T[ia,iH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iH,iG]/s_O)^ϕ*(der_ω[ia,iH,iG]/Agrid[i_occ])*((ω[ia,iH,iG]/(der_ω[ia,iH,iG]*h_T[ia,iH,iG])-η)/(1-η))^(1-η))^(1/α)*a
+                    h_O[ia,iH,iG,i_occ]=(η^η*(1-t[iH,1])^η*(1-τ_w[i_occ,iG])^η/(1+τ_e[i_occ,iG])^η*Agrid[i_occ]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
                 end
             end
             spl_s=Spline1D(a_grid, s_T[:,iH,iG])
-            spl_dw=Spline1D(a_grid, spl_der_ω[iG].(h_T[:,iH,iG]), bc="extrapolate")
+            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]), bc="extrapolate")
 
             for i_occ in 1:n_occ-1
                 spl_marg=Spline1D(a_grid, marginal[:,i_occ,iG], bc="extrapolate")
@@ -395,6 +395,8 @@ while gapHH > tolHH
             f2[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
             f4[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*spl_wa(aa),lowbnd,upbnd)[1]
 
+            mass_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa),lowbnd,upbnd)[1]
+
             # Compute HHH_T:
             HHH_T_0[iG]= ( (1-t[iH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iG]
             #*s_T^ϕ*(β/σ)^η*(sum( Agrid.^(1/(1-η)).*((1-t[iH,1]).*(ones(n_occ-1).-τ_w[:,iG])./(ones(n_occ-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
@@ -404,6 +406,7 @@ while gapHH > tolHH
             Y_T[iH,iG] = sum(H_O_0[:,iG].*Agrid)
             #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( Agrid.^(1/(1-η)).*((1-t[iH,1]).*(ones(n_occ-1).-τ_w[:,iG])./(ones(n_occ-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
         end
+        
         HH_T[iH]=sum(HHH_T_0.*gm)
         for i_occ in 1:n_occ-1
             H_O[i_occ,iH]=sum(H_O_0[i_occ,:].*gm)
@@ -429,7 +432,6 @@ while gapHH > tolHH
 end
 println("Found fixed point for human capital in teaching!")
 
-
 # Update H_grid:
 H_grid = HH_fp#collect(range((1-H_grid_range)*HH_fp,stop=(1+H_grid_range)*HH_fp,length=H_grid_length))
 H_grid_length=1
@@ -448,25 +450,22 @@ for iH in 1:H_grid_length
         for iG in 1:n_g
             for ia in 1:length(a_grid)
                 a=a_grid[ia]
-                dw_dh(k)=spl_der_ω[iG](k)
-                w_h(k)=spl_ω[iG](k)
-                fn_s_T(k)=μ*ϕ*dw_dh(k)*k/((μ*ϕ-η)*dw_dh(k)*k+w_h(k))
-                fn_h_T(k)=(η^η*(1-t[iH,1])^η*dw_dh(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
+                fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
+                fn_h_T(k)=(η^η*(1-t[iH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
                 #(2*H_grid[iH]/M)^σ*a_grid[ia]^α*fn_s_T(k)^ϕ*fn_e_T(k)^η-k
                 hh_T=find_zero(fn_h_T,(minimum(h_T_tmp[:,iH,iG]),maximum(h_T_tmp[:,iH,iG])))
                 h_T[ia,iH,iG]=hh_T
                 s_T[ia,iH,iG]=fn_s_T(hh_T)
-                e_T[ia,iH,iG]=η*(1-t[iH,1])*dw_dh(hh_T)*hh_T
-                ω[ia,iH,iG]=w_h(hh_T)
-
+                e_T[ia,iH,iG]=η*(1-t[iH,1])*der_ω_fn(hh_T)*hh_T
+                ω[ia,iH,iG]=ω_fn(hh_T)
+                der_ω[ia,iH,iG]=der_ω_fn(hh_T)
                 for i_occ in 1:n_occ-1
-                    a_O_thresh[ia,iG,i_occ]=((1+τ_e[i_occ,iG])*((1-s_O)/(1-s_T[ia,iH,iG]))^μ*(((1-t[iH,1])*ω[ia,iH,iG]-e_T[ia,iH,iG])/ ((1-η)*(η^η*(1-t[iH,1])*(1-τ_w[i_occ,iG])/(1+τ_e[i_occ,iG])*Agrid[i_occ]*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))) ))^((1-η)/α)
-                    # ((1+τ_e[i_occ,iG])*((1-s_O)/(1-s_T[ia,iH,iG]))^μ*((ω[ia,iH,iG]-e_T[ia,iH,iG])/ ((1-η)*(η^η*τ_w[i_occ,iG]*Agrid[i_occ]*s_O*(2*H_grid[iH]/M)^σ)^(1/(1-η))) ))^((1-η)/α)
-                    h_O[ia,iH,iG,i_occ]=(η^η*(1-t[iH,1])^η*(1-τ_w[iH,1])^η/(1+τ_e[iH,1])^η*Agrid[i_occ]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
+                    a_O_thresh[ia,iG,i_occ]=((1+τ_e[i_occ,iG])/(1-τ_w[i_occ,iG])*(1+τ_e[i_occ,iG])^(-(1-η))*((1-s_T[ia,iH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iH,iG]/s_O)^ϕ*(der_ω[ia,iH,iG]/Agrid[i_occ])*((ω[ia,iH,iG]/(der_ω[ia,iH,iG]*h_T[ia,iH,iG])-η)/(1-η))^(1-η))^(1/α)*a
+                    h_O[ia,iH,iG,i_occ]=(η^η*(1-t[iH,1])^η*(1-τ_w[i_occ,iG])^η/(1+τ_e[i_occ,iG])^η*Agrid[i_occ]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
                 end
             end
             spl_s=Spline1D(a_grid, s_T[:,iH,iG])
-            spl_dw=Spline1D(a_grid, spl_der_ω[iG].(h_T[:,iH,iG]), bc="extrapolate")
+            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]), bc="extrapolate")
 
             for i_occ in 1:n_occ-1
                 spl_marg=Spline1D(a_grid, marginal[:,i_occ,iG], bc="extrapolate")
@@ -498,6 +497,7 @@ for iH in 1:H_grid_length
 
             f2[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
             f4[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*spl_wa(aa),lowbnd,upbnd)[1]
+
             mass_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa),lowbnd,upbnd)[1]
 
             # Compute HHH_T:
@@ -528,6 +528,46 @@ for iH in 1:H_grid_length
         iterT = iterT+1
     end
 end
+
+#filename1 = string("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")
+#save(filename1,"τ_w_opt",τ_w_opt,"Agrid",Agrid,"a_T_thresh",a_T_thresh,"t",t,"HH_T",HH_T,"H_O",H_O)
+
+#=
+## reduced form HHH_T
+HHH_T_0_tmp=Array{Float64,1}(undef,n_g)
+for iG in 1:n_g
+    for ia in 1:length(a_grid)
+        a=a_grid[ia]
+        fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
+        fn_h_T(k)=(η^η*(1-t[iH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
+        #(2*H_grid[iH]/M)^σ*a_grid[ia]^α*fn_s_T(k)^ϕ*fn_e_T(k)^η-k
+        hh_T=find_zero(fn_h_T,(minimum(h_T_tmp[:,iH,iG]),maximum(h_T_tmp[:,iH,iG])))
+        h_T[ia,iH,iG]=hh_T
+        s_T[ia,iH,iG]=fn_s_T(hh_T)
+    end
+    spl_s=Spline1D(a_grid, s_T[:,iH,iG])
+    spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]), bc="extrapolate")
+
+    for i_occ in 1:n_occ-1
+        spl_marg=Spline1D(a_grid, marginal[:,i_occ,iG], bc="extrapolate")
+        for ia in 1:length(a_grid)
+            a = a_grid[ia]
+            # fract of teach occ by occ, given a_T
+            f_1_T_tmp[ia,i_occ,iG]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iG,i_occ])[1],0.0])
+        end
+    end
+
+    for ia in 1:length(a_grid)
+        f_1_T[ia,iG]= sum(f_1_T_tmp[ia,:,iG]) # Fraction of teachers given a_T
+    end
+    spl_f_1_T=Spline1D(a_grid, f_1_T[:,iG])
+    
+    f2[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
+    HHH_T_0_tmp[iG]=(1-t[iH,1])^(β*η/σ/(1-η))*f2[iG]
+end
+HH_T_tmp=η^(β*η/σ/(1-η-β))*(2/M)^(β/(1-η-β))*sum(HHH_T_0_tmp.*gm)^((1-η)/(1-η-β))
+=#
+
 
 N=zeros(length(a_grid),H_grid_length,n_g)
 H_grid_length=1
