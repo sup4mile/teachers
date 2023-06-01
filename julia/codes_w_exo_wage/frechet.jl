@@ -664,3 +664,7 @@ println(" ")
 println("tax rate= ",t[1,1])
 println("output= ",sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm))
 println("HH_fp= ",HH_fp)
+
+# Save results (for possible use as initial guess in subsequent parameterization):
+# fname = string(TBC)
+# save(fname,"a",a)
