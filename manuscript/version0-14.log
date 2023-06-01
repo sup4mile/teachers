@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2022.3.29)  23 MAR 2023 12:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2022.3.29)  24 MAY 2023 20:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -801,8 +801,8 @@ arning (ext4): destination with the same identifier (name{page.1}) has been alr
 eady used, duplicate ignored
 <to be read again> 
                    \relax 
-l.65 
-      [1] [2]
+l.65 	
+       [1] [2]
 Overfull \hbox (5.13835pt too wide) in paragraph at lines 92--94
 \OT1/ppl/m/n/10.95 These in-vest-ments and the cor-re-spond-ing con-sump-tion i
 n the fol-low-ing pe-riod are occupation-
@@ -827,7 +827,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./TALENT_math_occ.pdf): PDF 
 inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<TALENT_math_occ.pdf, id=286, 397.485pt x 289.08pt>
+<TALENT_math_occ.pdf, id=283, 397.485pt x 289.08pt>
 File: TALENT_math_occ.pdf Graphic file (type pdf)
 <use TALENT_math_occ.pdf>
 Package pdftex.def Info: TALENT_math_occ.pdf  used on input line 505.
@@ -836,7 +836,7 @@ Package pdftex.def Info: TALENT_math_occ.pdf  used on input line 505.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./TALENT_verb_occ.pdf): PDF 
 inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<TALENT_verb_occ.pdf, id=287, 397.485pt x 289.08pt>
+<TALENT_verb_occ.pdf, id=284, 397.485pt x 289.08pt>
 File: TALENT_verb_occ.pdf Graphic file (type pdf)
 <use TALENT_verb_occ.pdf>
 Package pdftex.def Info: TALENT_verb_occ.pdf  used on input line 510.
@@ -845,7 +845,7 @@ Package pdftex.def Info: TALENT_verb_occ.pdf  used on input line 510.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./TALENT_math_by_gender.pdf)
 : PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<TALENT_math_by_gender.pdf, id=288, 397.485pt x 289.08pt>
+<TALENT_math_by_gender.pdf, id=285, 397.485pt x 289.08pt>
 File: TALENT_math_by_gender.pdf Graphic file (type pdf)
 <use TALENT_math_by_gender.pdf>
 Package pdftex.def Info: TALENT_math_by_gender.pdf  used on input line 518.
@@ -854,7 +854,7 @@ Package pdftex.def Info: TALENT_math_by_gender.pdf  used on input line 518.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./TALENT_verb_by_gender.pdf)
 : PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<TALENT_verb_by_gender.pdf, id=289, 397.485pt x 289.08pt>
+<TALENT_verb_by_gender.pdf, id=286, 397.485pt x 289.08pt>
 File: TALENT_verb_by_gender.pdf Graphic file (type pdf)
 <use TALENT_verb_by_gender.pdf>
 Package pdftex.def Info: TALENT_verb_by_gender.pdf  used on input line 523.
@@ -863,7 +863,7 @@ Package pdftex.def Info: TALENT_verb_by_gender.pdf  used on input line 523.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./iq_by_gender.pdf): PDF inc
 lusion: found PDF version <1.6>, but at most version <1.5> allowed
-<iq_by_gender.pdf, id=294, 397.485pt x 289.08pt>
+<iq_by_gender.pdf, id=291, 397.485pt x 289.08pt>
 File: iq_by_gender.pdf Graphic file (type pdf)
 <use iq_by_gender.pdf>
 Package pdftex.def Info: iq_by_gender.pdf  used on input line 533.
@@ -872,7 +872,7 @@ Package pdftex.def Info: iq_by_gender.pdf  used on input line 533.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./iq_by_gen_teach.pdf): PDF 
 inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<iq_by_gen_teach.pdf, id=295, 397.485pt x 289.08pt>
+<iq_by_gen_teach.pdf, id=292, 397.485pt x 289.08pt>
 File: iq_by_gen_teach.pdf Graphic file (type pdf)
 <use iq_by_gen_teach.pdf>
 Package pdftex.def Info: iq_by_gen_teach.pdf  used on input line 539.
@@ -887,7 +887,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY79_MK_occ.pdf): PDF in
 clusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY79_MK_occ.pdf, id=1227, 397.485pt x 289.08pt>
+<NLSY79_MK_occ.pdf, id=1225, 397.485pt x 289.08pt>
 File: NLSY79_MK_occ.pdf Graphic file (type pdf)
 <use NLSY79_MK_occ.pdf>
 Package pdftex.def Info: NLSY79_MK_occ.pdf  used on input line 625.
@@ -896,7 +896,7 @@ Package pdftex.def Info: NLSY79_MK_occ.pdf  used on input line 625.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY79_WK_occ.pdf): PDF in
 clusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY79_WK_occ.pdf, id=1228, 397.485pt x 289.08pt>
+<NLSY79_WK_occ.pdf, id=1226, 397.485pt x 289.08pt>
 File: NLSY79_WK_occ.pdf Graphic file (type pdf)
 <use NLSY79_WK_occ.pdf>
 Package pdftex.def Info: NLSY79_WK_occ.pdf  used on input line 630.
@@ -905,7 +905,7 @@ Package pdftex.def Info: NLSY79_WK_occ.pdf  used on input line 630.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY97_MK_occ.pdf): PDF in
 clusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY97_MK_occ.pdf, id=1229, 397.485pt x 289.08pt>
+<NLSY97_MK_occ.pdf, id=1227, 397.485pt x 289.08pt>
 File: NLSY97_MK_occ.pdf Graphic file (type pdf)
 <use NLSY97_MK_occ.pdf>
 Package pdftex.def Info: NLSY97_MK_occ.pdf  used on input line 634.
@@ -914,7 +914,7 @@ Package pdftex.def Info: NLSY97_MK_occ.pdf  used on input line 634.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY97_WK_occ.pdf): PDF in
 clusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY97_WK_occ.pdf, id=1230, 397.485pt x 289.08pt>
+<NLSY97_WK_occ.pdf, id=1228, 397.485pt x 289.08pt>
 File: NLSY97_WK_occ.pdf Graphic file (type pdf)
 <use NLSY97_WK_occ.pdf>
 Package pdftex.def Info: NLSY97_WK_occ.pdf  used on input line 639.
@@ -923,7 +923,7 @@ Package pdftex.def Info: NLSY97_WK_occ.pdf  used on input line 639.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY79_MK_gender.pdf): PDF
  inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY79_MK_gender.pdf, id=1235, 397.485pt x 289.08pt>
+<NLSY79_MK_gender.pdf, id=1233, 397.485pt x 289.08pt>
 File: NLSY79_MK_gender.pdf Graphic file (type pdf)
 <use NLSY79_MK_gender.pdf>
 Package pdftex.def Info: NLSY79_MK_gender.pdf  used on input line 665.
@@ -932,7 +932,7 @@ Package pdftex.def Info: NLSY79_MK_gender.pdf  used on input line 665.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY79_WK_gender.pdf): PDF
  inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY79_WK_gender.pdf, id=1236, 397.485pt x 289.08pt>
+<NLSY79_WK_gender.pdf, id=1234, 397.485pt x 289.08pt>
 File: NLSY79_WK_gender.pdf Graphic file (type pdf)
 <use NLSY79_WK_gender.pdf>
 Package pdftex.def Info: NLSY79_WK_gender.pdf  used on input line 670.
@@ -941,7 +941,7 @@ Package pdftex.def Info: NLSY79_WK_gender.pdf  used on input line 670.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY97_MK_gender.pdf): PDF
  inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY97_MK_gender.pdf, id=1237, 397.485pt x 289.08pt>
+<NLSY97_MK_gender.pdf, id=1235, 397.485pt x 289.08pt>
 File: NLSY97_MK_gender.pdf Graphic file (type pdf)
 <use NLSY97_MK_gender.pdf>
 Package pdftex.def Info: NLSY97_MK_gender.pdf  used on input line 674.
@@ -950,7 +950,7 @@ Package pdftex.def Info: NLSY97_MK_gender.pdf  used on input line 674.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY97_WK_gender.pdf): PDF
  inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY97_WK_gender.pdf, id=1238, 397.485pt x 289.08pt>
+<NLSY97_WK_gender.pdf, id=1236, 397.485pt x 289.08pt>
 File: NLSY97_WK_gender.pdf Graphic file (type pdf)
 <use NLSY97_WK_gender.pdf>
 Package pdftex.def Info: NLSY97_WK_gender.pdf  used on input line 679.
@@ -959,7 +959,7 @@ Package pdftex.def Info: NLSY97_WK_gender.pdf  used on input line 679.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY79_afqt79_gender.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY79_afqt79_gender.pdf, id=1239, 397.485pt x 289.08pt>
+<NLSY79_afqt79_gender.pdf, id=1237, 397.485pt x 289.08pt>
 File: NLSY79_afqt79_gender.pdf Graphic file (type pdf)
 <use NLSY79_afqt79_gender.pdf>
 Package pdftex.def Info: NLSY79_afqt79_gender.pdf  used on input line 689.
@@ -968,7 +968,7 @@ Package pdftex.def Info: NLSY79_afqt79_gender.pdf  used on input line 689.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./NLSY97_afqt97_gender.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.5> allowed
-<NLSY97_afqt97_gender.pdf, id=1240, 397.485pt x 289.08pt>
+<NLSY97_afqt97_gender.pdf, id=1238, 397.485pt x 289.08pt>
 File: NLSY97_afqt97_gender.pdf Graphic file (type pdf)
 <use NLSY97_afqt97_gender.pdf>
 Package pdftex.def Info: NLSY97_afqt97_gender.pdf  used on input line 694.
@@ -976,13 +976,13 @@ Package pdftex.def Info: NLSY97_afqt97_gender.pdf  used on input line 694.
 [18] [19 <./NLSY79_MK_occ.pdf> <./NLSY79_WK_occ.pdf> <./NLSY97_MK_occ.pdf> <./N
 LSY97_WK_occ.pdf>] [20 <./NLSY79_MK_gender.pdf> <./NLSY79_WK_gender.pdf> <./NLS
 Y97_MK_gender.pdf> <./NLSY97_WK_gender.pdf> <./NLSY79_afqt79_gender.pdf> <./NLS
-Y97_afqt97_gender.pdf>] [21]
+Y97_afqt97_gender.pdf>]
 Overfull \hbox (12.60599pt too wide) in paragraph at lines 712--713
 []\OT1/ppl/m/n/10.95 Last but not least, we use these skill pro-files to projec
 t the sur-vey re-spon-dents' three-dimensional
  []
 
-[22]
+[21] [22]
 Overfull \hbox (15.72383pt too wide) in paragraph at lines 816--830
  [][] 
  []
@@ -1015,7 +1015,7 @@ Here is how much of TeX's memory you used:
  36607 multiletter control sequences out of 15000+600000
  439885 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,18n,117p,1774b,536s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,18n,117p,1777b,536s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/te
 xlive/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></usr/local
@@ -1041,10 +1041,10 @@ pe1/urw/palatino/uplb8a.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/urw
 /palatino/uplr8a.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/urw/palati
 no/uplr8a.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/urw/palatino/uplr
 i8a.pfb>
-Output written on version0-14.pdf (32 pages, 1170332 bytes).
+Output written on version0-14.pdf (32 pages, 1169818 bytes).
 PDF statistics:
- 2683 PDF objects out of 2984 (max. 8388607)
- 2535 compressed objects within 26 object streams
+ 2681 PDF objects out of 2984 (max. 8388607)
+ 2533 compressed objects within 26 object streams
  148 named destinations out of 1000 (max. 500000)
  265 words of extra memory for PDF output out of 10000 (max. 10000000)
 

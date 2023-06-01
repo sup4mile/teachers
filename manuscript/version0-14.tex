@@ -151,7 +151,7 @@
 	\subsubsection{Student-Teacher Matching}
 	While this guarantees that students are indifferent between different teachers, it may be the case that better teachers prefer to work with higher ability students. This can happen, for instance, if students make human capital investments in terms of goods as a function of the teacher's human capital $h_{T,g}$. 
 	
-	For simplicity, we assume that students make investments as a function of $a$ and occupation $i$, but not $h_{T,g}$. The joint assumption that $e_{i,g}(a_i)$ is a function of $a$ (but not $h_{T,g}$) and that $N(h_{T,g})$ is a function of $h_{T,g}$ (but not $a_i$) implies that the student-teacher matching is random, i.e.~the human capital production function is modular in $h_{T,g}$ and $a_i$.\footnote{The anecdotal evidence suggests that student-teacher assignments don't involve systematic sorting at the school level. There is, however, evidence in support of sorting between families with highly educated parents and high-ability teachers into better funded schools or school districts. Identifying the empirically relevant extent of this type of sorting is work in progress. Future versions of our model may eventually incorporate it.}
+	For simplicity, we assume that students make investments as a function of $a$ and occupation $i$, but not $h_{T,g}$. The joint assumption that $e_{i,g}(a_i)$ is a function of $a$ (but not $h_{T,g}$) and that $N(h_{T,g})$ is a function of $h_{T,g}$ (but not $a_i$) implies that the student-teacher matching is random, i.e.,~the human capital production function is modular in $h_{T,g}$ and $a_i$.\footnote{The anecdotal evidence suggests that student-teacher assignments don't involve systematic sorting at the school level. There is, however, evidence in support of sorting between families with highly educated parents and high-ability teachers into better funded schools or school districts. Identifying the empirically relevant extent of this type of sorting is work in progress. Future versions of our model may eventually incorporate it.}
 	
 	\subsection{Values}
 	The structure we impose on class size and student-teacher matching simplifies the characterization of an equilibrium considerably. While idiosyncratic heterogeneity still matters, the aggregate state can be summarized by a single moment of the distribution of human capital among current teachers (which we discuss in more detail below) rather than the entire distribution. Thanks to this feature we can characterize stationary equilibria as well as full transition paths sharply.
@@ -231,8 +231,8 @@
 	\begin{df}
 		Given next period's tax rate $t'$, the labor market distortions and educational barriers $\left\{ \left\{ \tau_{i,g}^e,\tau_{i,g}^{\omega '} \right\}_{i=1}^I \right\}_{g=1}^G$, the occupational choices of today's old agents and aggregate human capital $\widetilde{H}_{T}$ and ${H}_{O}$, the equilibrium consists of the individual investment decisions of young agents, $\{e_{T,g}, s_{T,g}, e_{O,g}, s_{O,g}\}$, the occupational choice boundary $a^*_{T,g}(a_O)$, the corresponding densities $f_{T,g}\left(\cdot\right)$ and $f_{O,g}\left(\cdot\right)$, and occupation- and group-specific wage profiles $\{\omega_{T,g}, \omega_{O,g}\}$ such that:
 		\begin{enumerate}
-			\item Given the wage profiles, each individual's choice of goods investment $\{e_{T,g}, e_{O,g}\}$ and time investment $\{s_{T,g}, s_{O,g}\}$ maximizes utility given by (\ref{eq:V}) subject to the constraints given by (\ref{eq:fTN2})-\eqref{eq:fON2}.
-			\item The aggregate human capital stocks follow the laws of motion given by (\ref{eq:lomO}) and (\ref{eq:lomT}).
+			\item Given the wage profiles, each individual's choice of goods investment $\{e_{T,g}, e_{O,g}\}$ and time investment $\{s_{T,g}, s_{O,g}\}$ maximizes \eqref{eq:V}.
+			\item The aggregate human capital stocks follow the laws of motion given by \eqref{eq:lomO} and \eqref{eq:lomT}.
 			\item The government's budget constraint (\ref{eq:bc}) is satisfied.
 		\end{enumerate}
 	\end{df}
@@ -248,7 +248,7 @@
 		1+\tau^e_{T,g} & = (1-t')(1-\tau^{\omega '}_{T,g})\cdot \tfrac{\partial \omega'_{T,g}}{\partial h'_{T,g}}\cdot \tfrac{\partial h'_{T,g}}{\partial e_{T,g}},
 	\end{align}
 	
-	Let $\tau_{T,g} \equiv \frac{\left( 1-t' \right) \left( 1-\tau^{\omega '}_{T,g} \right)}{1+\tau^e_{T,g}}$ be a composite wedge that takes into account the rate at which income is taxed, the extent of labor market discrimination, and educational barriers. Note that $\tau_{T,g}=1$ when $t' = \tau^{\omega '}_{T,g} = \tau^e_{T,g} = 0$.
+	Let $\tau_{T,g} \equiv \frac{\left( 1-t' \right) \left( 1-\tau^{\omega '}_{T,g} \right)}{1+\tau^e_{T,g}}$ be a composite wedge that takes into account the rate at which future income is taxed ($t'$), the extent of labor market discrimination ($\tau^{\omega '}_{T,g}$), and educational barriers ($\tau^e_{T,g}$). Note that $\tau_{T,g}=1$ when $t' = \tau^{\omega '}_{T,g} = \tau^e_{T,g} = 0$.
 	
 	The amount of time and goods this individual invests in human capital is then given by:
 	\begin{align}
@@ -355,7 +355,7 @@
 	%To highlight the effect of educational barriers and labor market discrimination we add group- and occupation-specific distortions to the model. This is mostly a heuristic exercise since parsimony of our state space enables us to characterize the full transition path from one set of distortions to another. We highlight this feature of the model here since there have arguably been secular changes in educational barriers and labor market distortions for groups other than white males. To fix ideas, however, we simply compare steady states associated with particular wedges $\tau$ indexed by $\omega$ (for labor market discrimination), $e$ (for educational barriers), and $g$ for groups (race, gender,\ldots).
 	
 	% OLD VERSION OF OCCUPATIONAL CHOICE BOUNDARY:
-	\begin{prp}[Occupational Choice Boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers and the labor market frictions, the student's teaching-specific human capital $h'_{T,g}$, but does not depend on either current or future aggregate human capital in teaching $\widetilde{H}_T$. It is characterized by:
+	\begin{prp}[Occupational Choice Boundary] The occupational choice boundary, denoted $\bar{a}_{T,g}(a_O)$, depends on the magnitude of the educational barriers, the labor market frictions, and the student's teaching-specific human capital $h'_{T,g}$. It does not, however, depend on either current or future aggregate human capital in teaching $\widetilde{H}_T$. It is characterized by:
 		
 		%\footnote{When the economy has $I>2$ occupations, the occupational choice boundary is characterized by:
 			%\begin{align*}
@@ -374,7 +374,7 @@
 	\section{Data}\label{sec:data}
 	%[Discuss Project TALENT, NLSY79, and NLSY97.]
 	
-	We parameterize the model with data from longitudinal surveys that cover American youth at three different times after World War II: Project TALENT, NLSY 79, and NLSY 97. While the two NSLY surveys have been used extensively in the literature, Project TALENT is somewhat less known and we present it in some detail below.
+	We parameterize the model with data from longitudinal surveys that cover American youth at three different times after World War II: Project TALENT, NLSY 79, and NLSY 97. While the two NSLY surveys have been used extensively in the literature, Project TALENT is somewhat less known and we describe it in some detail below.
 	\subsection{Project TALENT}
 	
 	Project TALENT surveyed approximately 377,000 students enrolled in high school in 1960. The vast majority of these students were in the 14-18 year age range with a few outliers outside this bracket (on both sides). The sample of surveyed students was representative and accounted for 5 percent of the high school population that year. The project was funded by the United States Office of Education (the precursor of the Department of Education) and its goal was to collect high quality data on the achievements, aptitudes, and interests of high school students in the United States, and to examine whether, and how, these data predicted future outcomes in terms of educational attainment, career, and wellbeing.
@@ -387,7 +387,7 @@
 	
 	In Table \ref{tab:samplebywave} we summarize the descriptive statistics by gender, race, parental education, and parental economic status (all in 1960). The racial composition of the sample exhibits some anomalies. The racial classification in the 1960 base year is problematic since almost 60 percent of the sample are in the ``other'', ``unknown'', or ``conflicting'' category. One conceivable explanation for this unusual pattern as well as the {\it rise} of black respondents when the sample size is {\it shrinking} is a retroactive racial re-classification of all the participants in the 5-year post survey.\footnote{The classification of respondents into race categories in the base year suffers from inconsistencies (e.g.~self-reported vs.~pollster's classification). Moreover, the sample proportion of black high school students differs from that reported in the 1960 Census.}
 	
-	Although the high attrition rate from the original sample size of almost 370,000 is a concern, Table \ref{tab:samplebywave} suggests that selection along the respondents' gender and their parents' educational attainment and income is not a major issue. The 11-year post survey appears to be roughly representative of the high school population in 1960.
+	Although the high attrition rate from the original sample size of almost 370,000 is a concern, Table \ref{tab:samplebywave} suggests that selection along the respondents' gender and their parents' educational attainment and income is not a major issue. The 11-year post survey appears to be roughly representative of the high school population in 1960. On average, the respondents had slightly more educated parents and higher household in 1960.
 	% WE NEED TO REVIEW THIS PARAGRAPH. I DON'T QUITE REMEMBER WHAT THE ISSUE WITH RACE WAS. SHOULD WE BE CONCERNED THAT THE NUMBER OF BLACK RESPONDENTS IS HIGHER 5-YEAR POST COMPARED TO 1-YEAR POST?
 	\begin{table}[h!]
 		\centering 
@@ -492,6 +492,8 @@
 	%Approximately three quarters of teachers in the sample are female, in the 5-year post as well as the 11-year post surveys. In non-teaching occupations the share of women is 39 percent and women account for 80 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics and verbal test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
 	
 	% 11-YEAR POST:
+	While we are i
+	
 	Approximately 60 percent of teachers in the sample are female eleven years after their presumed high school graduation. In non-teaching occupations the share of women is 30 percent and women account for more than 90 percent of respondents who report that they are not in the labor force. On average, teachers have higher mathematics, verbal, and social test scores than respondents in other occupations and those who are not in the labor force. Together, these stylized facts are consistent with the hypothesis that high-ability women are disproportionately choosing teaching jobs and careers and we will return to this point below.
 	
 	If the labor market discriminated more against certain groups (gender, race,\ldots) in non-teaching occupations in 1960, we expect these groups to favor teaching over other occupations or to stay out of the labor force altogether. ``Not in the labor force'' is more a reflection of the absolute level of labor market discrimination against a particular group while the occupational choice between teaching or other occupations reflects differences between group-specific barriers. To the extent that occupations require specific human capital investments we allow for educational barriers to affect occupational choices separately in the model. If both of these barriers declined after 1960, we would expect a narrowing of the educational achievement gap and more talented females should move from teaching into other occupations. This reallocation would lower the average quality of teachers and, therefore, we expect to observe more significant differences in the ability distributions between teachers and other occupations in cohorts who entered the labor market in the 60s and 70s (i.e., our Project TALENT population) compared to younger individuals (i.e., the NLSY79 and NLSY97 respondents).
