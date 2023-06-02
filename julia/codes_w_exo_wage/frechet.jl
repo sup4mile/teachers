@@ -75,9 +75,12 @@ if previous == 1
     ϕ = d["ϕ"]
     γ = d["γ"]
     κ = d["κ"]
+    λf = d["λf"]
+    λm = d["λm"]
+    iHH = d["iHH"]
     cd("..")
 else
-    # productivity in 'Other' occupations
+    # productivity in 'Other' occupations:
     Agrid_initial=Array{Float64,1}(undef,n_occ-1)
     #Agrid=fill!(Agrid, 1)
     Agrid_initial=collect(range(1,1.1,length=n_occ-1))
@@ -94,8 +97,8 @@ end
 
 # Update model parameters, if required:
 γ = .9
-λf = 1.6
-λm = 1.7
+λf = .9
+κ = .5
 
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
