@@ -43,9 +43,9 @@ else
     println("No Agrid for the selected year")
 end
 
-# step for the update
-ν = 0.1
-ν2 = 0.2
+# Innovation step size for updates:
+ν = 0.9 # for tax rate that balances government's budget
+ν2 = 0.8 # for fixed point of aggregate human capital in teaching
 
 n_g=length(g) # number of "groups"
 n_occ=length(occ) # number of occupations
@@ -93,8 +93,9 @@ else
 end
 
 # Update model parameters, if required:
-γ = .925
-λf = 2
+γ = .9
+λf = 1.6
+λm = 1.7
 
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
@@ -112,14 +113,14 @@ end
 #    d = load("C:/Users/julia/Desktop/teacher/previousParameterization.jld")
 #    λm=d["λm"]
 #else
-    λm=1. # to match mass of men in Teaching
+    # λm=1. # to match mass of men in Teaching
 #end
 # scale of τ_w
 #if previous == 1
 #    d = load("C:/Users/julia/Desktop/teacher/previousParameterization.jld")
 #    λf=d["λf"]
 #else
-    λf=1.1# to match mass of women in Teaching
+    # λf=1.1# to match mass of women in Teaching
 #end
 
 τ_w[:,2]=ones(n_occ-1).-λm*(ones(n_occ-1).-τ_w[:,2])
@@ -355,12 +356,12 @@ if previous == 0
     # else
     # HH_fp = HH_T[iH]
 end
-gapHH = 1
+convHH = 1
 tolHH = .0025
 println("t[1,1] = ",t[1,1])
-while gapHH > tolHH
+while convHH > tolHH
     global HH_fp
-    global gapHH
+    global convHH
     global tolHH
     global HH_T
     println("HH_fp = ", HH_fp)
@@ -450,14 +451,14 @@ while gapHH > tolHH
          println("convT=",round(convT,digits=3))
          println("t[1,:]=",round.(t[1,:],digits=3))
         # println("HH_T[iHH]=",round(HH_T[iHH],digits=3))
-        t[1,1] =  ν*t[1,1]+(1-ν)*t[1,2]# min(t[1,2],1-1e-3)
+        t[1,1] =  (1-ν)*t[1,1] + ν*t[1,2]# min(t[1,2],1-1e-3)
 
         iterT = iterT+1
     end
-    gapHH = abs(log(HH_T[iHH]/HH_fp))
-    println(gapHH)
+    convHH = abs(log(HH_T[iHH]/HH_fp))
+    println(convHH)
     println(HH_T[iHH])
-    HH_fp = ν2*HH_T[iHH] + (1-ν2)*HH_fp
+    HH_fp = (1-ν2)*HH_fp + ν2*HH_T[iHH]
 end
 println("Found fixed point for human capital in teaching!")
 
@@ -552,7 +553,7 @@ for iH in 1:H_grid_length
          println("convT=",round(convT,digits=3))
          println("t[1,:]=",round.(t[1,:],digits=3))
         # println("HH_T[iH]=",round(HH_T[iH],digits=3))
-        t[1,1] =  ν*t[1,1]+(1-ν)*t[1,2]# min(t[1,2],1-1e-3)
+        t[1,1] =  (1-ν)*t[1,1] + ν*t[1,2]# min(t[1,2],1-1e-3)
 
         iterT = iterT+1
     end
@@ -638,33 +639,29 @@ println("____________")
 println("share of teachers among women= ",mass_T[1])
 println("share of teachers among men= ",mass_T[2])
 println("average class size= ",sum(av_N.*gm))
-println(" ")
-println("average a_rank_T_female= ",av_a_rank_T[1])
-println("average a_rank_T_male= ",av_a_rank_T[2])
-println("average e_T_female= ",av_e_T[1])
-println("average e_T_male= ",av_e_T[2])
-println("average s_T_female= ",av_s_T[1])
-println("average s_T_male= ",av_s_T[2])
-println("average w_T_female= ",E_T[1,1]/mass_T[1])
-println("average w_T_male= ",E_T[1,2]/mass_T[2])
-println("dispersion w_T_female= ")
-println("dispersion w_T_male= ")
-println(" ")
-#println("average a_rank_O_female= ",)
-#println("average a_rank_O_male= ",)
-#println("average e_O_female= ",)
-#println("average e_O_male= ",)
-println("average s_O_female= ",s_O)
-println("average s_O_male= ",s_O)
-#println("average w_O_female= ",)
-#println("average w_O_male= ",)
-#println("dispersion w_O_female= ",)
-#println("dispersion w_O_male= ",)
+# println(" ")
+# println("average a_rank_T_female= ",av_a_rank_T[1])
+# println("average a_rank_T_male= ",av_a_rank_T[2])
+# println("average e_T_female= ",av_e_T[1])
+# println("average e_T_male= ",av_e_T[2])
+# println("average s_T_female= ",av_s_T[1])
+# println("average s_T_male= ",av_s_T[2])
+# println("average w_T_female= ",E_T[1,1]/mass_T[1])
+# println("average w_T_male= ",E_T[1,2]/mass_T[2])
+# println("dispersion w_T_female= ")
+# println("dispersion w_T_male= ")
+# println(" ")
+# println("average a_rank_O_female= ",)
+# println("average a_rank_O_male= ",)
+# println("average e_O_female= ",)
+# println("average e_O_male= ",)
+# println("average s_O_female= ",s_O)
+# println("average s_O_male= ",s_O)
+# println("average w_O_female= ",)
+# println("average w_O_male= ",)
+# println("dispersion w_O_female= ",)
+# println("dispersion w_O_male= ",)
 println(" ")
 println("tax rate= ",t[1,1])
 println("output= ",sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm))
 println("HH_fp= ",HH_fp)
-
-# Save results (for possible use as initial guess in subsequent parameterization):
-# fname = string(TBC)
-# save(fname,"a",a)
