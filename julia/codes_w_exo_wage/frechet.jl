@@ -97,8 +97,8 @@ end
 
 # Update model parameters, if required:
 γ = .9
-λf = .9
-κ = .5
+λf = .9285
+κ = .623
 
 τ_w=zeros(n_occ-1,n_g) # n_g-element vector of labor market discrimination in 'O' (relative to 'T')
 τ_e=zeros(n_occ-1,n_g) # n_g-element vector of education barriers in 'O' (relative to 'T')
@@ -668,3 +668,17 @@ println(" ")
 println("tax rate= ",t[1,1])
 println("output= ",sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm))
 println("HH_fp= ",HH_fp)
+
+# Write parameter values and moments to CSV file.
+# Start with λf / κ (parameters) and male / female teachers' share (moments).
+df = DataFrame(λf = round(λf;digits=4),κ = round(κ;digits=4),share_teachers_female = round(mass_T[1];digits=4),share_teachers_male = round(mass_T[2];digits=4))
+# Load previous parameterization (in CSV format) and convert to DataFrame:
+moments = DataFrame(CSV.File("./results/moments.csv"))
+if (@isdefined moments) == true
+    append!(moments,df)
+else
+    moments = DataFrame(λf = [],κ = [],share_teachers_female = [],share_teachers_male = [])
+    append!(moments,df)
+end
+# Write DataFrame to CSV file:
+CSV.write("./results/moments.csv",moments)
