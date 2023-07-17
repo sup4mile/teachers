@@ -114,7 +114,7 @@ else
 end
 
 # Update model parameters, if required:
-γ = .865
+γ = .855
 λf = .895
 κ = .23
 theta = 1.18
@@ -788,5 +788,6 @@ else
     moments = df
 end
 show(moments)
+
 # Write DataFrame to CSV file:
 CSV.write("./results/moments.csv",moments)
