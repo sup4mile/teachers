@@ -74,8 +74,8 @@ if previous == 1
     τ_w_initial = d["τ_w_opt"]
     τ_e_initial = d["τ_e"]
     a_T_thresh = d["a_T_thresh"]
-    t = transpose(d["t"])
-    HH_T = d["HH_T"]
+    t = (d["t"])
+    H_grid = d["H_grid"]
     H_O = d["H_O"]
     HH_fp = d["HH_fp"]
     α = d["α"]
@@ -93,13 +93,17 @@ if previous == 1
     a_grid = d["a_grid"]
     a_O_10p = d["a_O_10p"]
     a_O_90p = d["a_O_90p"]
-    h_T_init = d["h_T"]
+    a_T_10p = d["a_T_10p"]
+    a_T_90p = d["a_T_90p"]
+    h_T_initial = d["h_T"]
     cd("..")
 else
     # productivity in 'Other' occupations:
     a_by_occ_initial=Array{Float64,1}(undef,n_O-1)
     #a_by_occ=fill!(a_by_occ, 1)
     a_by_occ_initial=collect(range(1,1.1,length=n_O-1))
+    a_T_10p = Array{Float64,2}(undef,n_H,n_G+1)
+    a_T_90p = Array{Float64,2}(undef,n_H,n_G+1)
     a_O_10p = Array{Float64,3}(undef,n_H,n_G,n_O)
     a_O_90p = Array{Float64,3}(undef,n_H,n_G,n_O)
     α=.089
@@ -114,82 +118,78 @@ else
 end
 
 # Update model parameters, if required:
-γ = .855
-λf = .895
-κ = .23
-theta = 1.18
-η = .32
+γ = .82
+# λf = .895
+κ = .22
+theta = 1.1
+# η = .32
 
 # Distribution of abilities:
 dist=Frechet(theta,1)
 
-τ_w=zeros(n_O-1,n_G) # n_G-element vector of labor market discrimination in 'O' (relative to 'T')
-τ_e=zeros(n_O-1,n_G) # n_G-element vector of education barriers in 'O' (relative to 'T')
+ # Vector of labor market discrimination in each occupation (relative to 'T')
+τ_w=zeros(n_O-1,n_G)
+# Vector of education barriers in each occupation (relative to 'T')
+τ_e=zeros(n_O-1,n_G)
 
 # to match shares for Other for women
 τ_w_opt=zeros(n_O-1,n_G) # n_G-element vector of labor market discrimination in 'O' (relative to 'T')
 
-#τ_w[:,1]=fill!(τ_w[:,1],-3)
-#τ_w[1,1] = -3+3*.1
-
 τ_w[:,2]=fill!(τ_w[:,2],0)
-# scale of τ_w
-# guess for initial relative τ_w for women (levels will be adjusted later)
-#if previous == 1
-#    d = load("C:/Users/julia/Desktop/teacher/previousParameterization.jld")
-#    λm=d["λm"]
-#else
-    # λm=1. # to match mass of men in Teaching
-#end
-# scale of τ_w
-#if previous == 1
-#    d = load("C:/Users/julia/Desktop/teacher/previousParameterization.jld")
-#    λf=d["λf"]
-#else
-    # λf=1.1# to match mass of women in Teaching
-#end
-
 τ_w[:,2]=ones(n_O-1).-λm*(ones(n_O-1).-τ_w[:,2])
-
-#τ_w[1,2] = -4
 τ_e=fill!(τ_e,0.0)
 
-# guess for initial relative τ_w for women (levels will be adjusted later)
-# if previous == 1
-#     d = load("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")#2010.jld")
-#     τ_w_initial=d["τ_w_opt"][:,1]
-#    τ_e_initial=d["τ_e"][:,1]
-# else
 if previous == 0
     τ_w_initial=fill!(τ_w[:,1],0.0)
-    #τ_w[1,1] = -3+3*.1
-
     τ_e_initial=fill!(τ_e,0.0)
 end
 
-quantile_top = .999
-quantile_bottom=.001
+quantile_top = 1 - 1e-4
+quantile_bottom = 1e-3
 
+# Reset grid length for individual abilities (if necessary):
+n_a = 100
 # Set up the grid for aggregate human capital in teaching:
 n_H = 11
 # Set the percentage range above / below fixed point:
 range_H = 0.25
 # Update the grid for abilities (if necessary):
 if previous == 0
-    a_grid = quantile.(dist,log10.(range(1000^(quantile_bottom),1000^(quantile_top),length(a_grid)))./3)
+    a_grid = quantile.(dist,log10.(range(1e4^(quantile_bottom),1e4^(quantile_top),n_a))./4)
 else
-    # b_grid = quantile.(dist,log10.(range(1000^(quantile_bottom),1000^(quantile_top),length(a_grid)))./3)
-    # a_grid = 1 .* b_grid + 0 .* a_grid
+    i_grid = log10.(range(1e4^(quantile_bottom),1e4^(quantile_top),n_a))./4
+    b_grid = quantile.(dist,i_grid)
+    spl_a_grid = Spline1D(range(1,length(a_grid),length(a_grid)),a_grid)
+    a_grid_upd = spl_a_grid.(range(1,length(a_grid),n_a))
+    c_grid = 1 .* b_grid + 0 .* a_grid_upd
+    # Update size of loaded arrays, if necessary:
+    if n_a != length(a_grid)
+        h_T_initial_upd = Array{Float64,3}(undef,n_a,n_H,n_G)
+        a_T_thresh_upd = Array{Float64,4}(undef,n_a,n_H,n_G,n_O)
+        for iH = 1:n_H
+            for iG = 1:n_G
+                spl_h_T = Spline1D(a_grid,h_T_initial[:,iH,iG])
+                h_T_initial_upd[:,iH,iG] = spl_h_T.(c_grid)
+                for iO = 1:n_O-1
+                    spl_a_T_thresh = Spline1D(a_grid,a_T_thresh[:,iH,iG,iO])
+                    a_T_thresh_upd[:,iH,iG,iO] = spl_a_T_thresh.(c_grid)
+                end
+            end
+        end
+        h_T_initial = h_T_initial_upd
+        a_T_thresh = a_T_thresh_upd
+    end
+    a_grid = c_grid
 end
 
-# Integral bounds
-lowbnd=quantile.(dist,quantile_bottom) # set to smallest element in 'a_grid'
-upbnd=quantile.(dist,quantile_top) # set to largest element in 'a_grid'
+# Integral bounds:
+lowbnd = a_grid[1] # set to smallest element in 'a_grid'
+upbnd = a_grid[end] # set to largest element in 'a_grid'
 
 # Given a productivity vector 'a_by_occ' with productivities in non-teaching occupations, the function 'share()' calculates share of people choosing occupation 'occ_id':
-marg=Array{Float64,3}(undef,length(a_grid),n_O-1,n_G)
+marg=Array{Float64,3}(undef,n_a,n_O-1,n_G)
 function share(occ_id,iG,a_by_occ,τ_w,τ_e)
-    for ia in 1:length(a_grid)
+    for ia in 1:n_a
         A_tmp=(( ((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id])).^(1/α))
         marg[ia,occ_id,iG]=prod(cdf.(dist,A_tmp.*a_grid[ia]))
     end
@@ -198,10 +198,9 @@ function share(occ_id,iG,a_by_occ,τ_w,τ_e)
     return quadgk(aa -> spl_marg(aa)*pdf(dist,aa),lowbnd,upbnd)[1], marg[:,occ_id,iG]
 end
 
-# Calibrate a_by_occ to match labor market shares for men in non-teaching occupations:
+# Calibrate 'a_by_occ' to match labor market shares for men in non-teaching occupations:
 function calibrate_A(x)
-    # share of individuals employed in occ i among all non-teaching individuals among this group
-    # then all share_occ will add up to 1*n_G
+    # Share of individuals employed in occupation 'iO' among all non-teaching individuals (the elements of share_occ_model will add up to 1):
     share_occ_model = Array{Float64,1}(undef,n_O-1)
     for iO = 1:(n_O-1)
         share_occ_model[iO]=share(iO,2,x,τ_w[:,2],τ_e[:,2])[1]
@@ -211,81 +210,59 @@ function calibrate_A(x)
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,2])./share_occ_data[1:end-1,2]))
 end
 
-# x0=1.0.*a_by_occ_initial
+# Compute occupation-specific productivies to match employment shares of men (group 2):
 res=optimize(calibrate_A,a_by_occ_initial, show_trace=false)
 a_by_occ=Optim.minimizer(res)
-println("sum of absolute distances between a_by_occ_initial and a_by_occ for men is ",sum(abs.(a_by_occ- a_by_occ_initial)))
+println("Sum of absolute distances between a_by_occ_initial and a_by_occ for men is ",sum(abs.(a_by_occ- a_by_occ_initial)))
 
-# Calibrate τ_w/τ_w to match labor marker shares for women in non-teaching occupations:
+# Calibrate 'τ_w' to match labor marker shares for women in non-teaching occupations:
 function calibrate_τ(x)
-    # share of individuals employed in occ i among all non-teaching individuals among this group
-    # then all share_occ will add up to 1*n_G
+    # Share of individuals employed in occupation 'iO' among all non-teaching individuals (the elements of share_occ_model will add up to 1):
     share_occ_model = Array{Float64,1}(undef,n_O-1)
     for iO = 1:(n_O-1)
         share_occ_model[iO]=share(iO,1,a_by_occ,x,τ_e[:,1])[1]
     end
     share_occ_model=share_occ_model./sum(share_occ_model)
-    # obj fn is a gap in labor market shares for non-teaching male between model and data
+    # Objective function is the difference in labor market shares for non-teaching females between model and data:
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]))
 end
-
-x0=1.0.*τ_w_initial[:,1]
-res=optimize(calibrate_τ,x0, show_trace=false)
-τ_w_opt[:,1]=Optim.minimizer(res)
-println("sum of absolute distances between τ_w_initial and τ_w_opt for women is ",sum(abs.(τ_w_opt-τ_w_initial)))
-
-# scale of τ_w
-#if previous == 1
-#    d = load("C:/Users/julia/Desktop/teacher/previousParameterization.jld")
-#    λf=d["λf"]
-#else
-#    λf=160 # to match mass of women in Teaching
-#end
+# Compute labor market barriers for women (group 1):
+res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false)
+τ_w_opt[:,1] = Optim.minimizer(res)
+println("Sum of absolute distances between τ_w_initial and τ_w_opt for women is ",sum(abs.(τ_w_opt-τ_w_initial)))
 τ_w[:,1]=ones(n_O-1).-λf*(ones(n_O-1).-τ_w_opt[:,1])
-#ones(n_O-1).-λf/λm*(ones(n_O-1).-τ_w_opt[:,1])
 
 # Compute the share of individuals employed in non-teaching occupations in each group (indexed by 'iG'):
 share_occ = Array{Float64,2}(undef,n_O-1,n_G)
-marginal=Array{Float64,3}(undef,length(a_grid),n_O-1,n_G)
+marginal=Array{Float64,3}(undef,n_a,n_O-1,n_G)
 for iG in 1:n_G
     for iO = 1:(n_O-1)
         share_occ[iO,iG]=share(iO,iG,a_by_occ,τ_w[:,iG],τ_e[:,iG])[1]
         # Note: the sum of 'share_occ' will add up to 1*n_G.
-        # Fraction of workers with abilities 'a' in (non-teaching) occupation 'iO' who actually work in that occupation:
+        # Fraction of workers with abilities 'a' in (non-teaching) occupation 'iO' who actually work in occupation 'iO':
         marginal[:,iO,iG]=share(iO,iG,a_by_occ,τ_w[:,iG],τ_e[:,iG])[2]
     end
     share_occ[:,iG]=share_occ[:,iG]./sum(share_occ[:,iG])
 end
 
-a_T_thresh = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
-a_O_thresh = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
+a_T_thresh = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
+a_O_thresh = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 
-if previous == 0
-    for ia in 1:n_O-1
-        for iG in 1:n_G
-            a_T_thresh[:,iG,ia]=a_grid.^0.7
-        end
-    end
-    t[:,1] = zeros(n_H)
-    HH_T = H_grid
-    H_O = H_grid
-end
+e_T = Array{Float64,3}(undef,n_a,n_H,n_G)
+e_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 
-e_T = Array{Float64,3}(undef,length(a_grid),n_H,n_G)
-e_O = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
+s_T = Array{Float64,3}(undef,n_a,n_H,n_G)
 
-s_T = Array{Float64,3}(undef,length(a_grid),n_H,n_G)
-
-h_T = Array{Float64,3}(undef,length(a_grid),n_H,n_G)
-h_O = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
-ω = Array{Float64,3}(undef,length(a_grid),n_H,n_G)
-w = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
+h_T = Array{Float64,3}(undef,n_a,n_H,n_G)
+h_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
+ω = Array{Float64,3}(undef,n_a,n_H,n_G)
+w = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 ω_90_10 = Array{Float64,2}(undef,n_H,n_G+1)
 w_90_10 = Array{Float64,3}(undef,n_H,n_G+1,n_O)
-der_ω = Array{Float64,3}(undef,length(a_grid),n_H,n_G)
+der_ω = Array{Float64,3}(undef,n_a,n_H,n_G)
 
-a_T_10p = Array{Float64,1}(undef,n_G+1)
-a_T_90p = Array{Float64,1}(undef,n_G+1)
+# a_T_10p = Array{Float64,2}(undef,n_H,n_G+1)
+# a_T_90p = Array{Float64,2}(undef,n_H,n_G+1)
 # a_O_10p = Array{Float64,3}(undef,n_H,n_G,n_O)
 # a_O_90p = Array{Float64,3}(undef,n_H,n_G,n_O)
 a_T_90_10 = Array{Float64,2}(undef,n_H,n_G)
@@ -308,15 +285,16 @@ Y_O = Array{Float64,3}(undef,n_O-1,n_H,n_G)
 sum_E_O = Array{Float64,2}(undef,n_H,n_G)
 sum_Y_O = Array{Float64,2}(undef,n_H,n_G)
 
-HHH_T_0 = Array{Float64,1}(undef,n_G)
+HH_T_0 = Array{Float64,1}(undef,n_G)
+HH_T = Array{Float64,1}(undef,n_H)
 H_O_0 = Array{Float64,3}(undef,n_O-1,n_G,n_H)
 H_O = Array{Float64,2}(undef,n_O-1,n_H)
 
 EN = Array{Float64,1}(undef,n_G)
 EN2 = Array{Float64,1}(undef,n_G)
 
-f_2 = Array{Float64,2}(undef,length(a_grid),n_G)
-f_O = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
+f_2 = Array{Float64,2}(undef,n_a,n_G)
+f_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 
 spl_T_thresh=Array{Spline1D,1}(undef,1)
 # spl_marg = Array{Spline1D,1}(undef,1)
@@ -324,52 +302,31 @@ spl_T_thresh=Array{Spline1D,1}(undef,1)
 f1 = Array{Float64,2}(undef,n_O-1,n_G)
 mass_O = Array{Float64,3}(undef,n_H,n_G,n_O-1)
 f3 = Array{Float64,2}(undef,n_O-1,n_G)
-f_1_T = Array{Float64,2}(undef,length(a_grid),n_G)
-f_1_O = Array{Float64,4}(undef,length(a_grid),n_H,n_G,n_O-1)
+f_1_T = Array{Float64,2}(undef,n_a,n_G)
+f_1_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 spl_f_1_T = Array{Spline1D,2}(undef,n_H,n_G)
 spl_f_1_O = Array{Spline1D,3}(undef,n_H,n_G,n_O-1)
-f_T = Array{Float64,2}(undef,length(a_grid),n_G)
+f_T = Array{Float64,2}(undef,n_a,n_G)
 spl_f_T = Array{Spline1D,1}(undef,n_G)
 spl_f_O = Array{Spline1D,3}(undef,n_H,n_G,n_O)
 mass_T = Array{Float64,2}(undef,n_H,n_G)
 f2 = Array{Float64,2}(undef,n_H,n_G)
 f4 = Array{Float64,2}(undef,n_H,n_G)
 ratio = Array{Float64,1}(undef,n_G)
-f_1_T_tmp=Array{Float64,3}(undef,length(a_grid),n_G,n_O-1)
+f_1_T_tmp=Array{Float64,3}(undef,n_a,n_G,n_O-1)
 
-n_h_T_tmp=10000
-h_T_tmp = Array{Float64,3}(undef,n_h_T_tmp,n_H,n_G)
-for iH in 1:n_H
-    for iG in 1:n_G
-        h_T_tmp[:,iH,iG]=collect(range(1e-5,5,length=n_h_T_tmp)) #(η^η.*a_grid.^α.*s_O^ϕ.*(2*H_grid[1]/M)^σ).^(1/(1-η))
-    end
-end
-
-########### EXOGENOUS WAGE PROFILE
+#######################################
+# Exogenous wage profile for teachers #
+#######################################
 ω_fn(h_T) = κ.*h_T.^γ
-# derivative of wage profile
+# Derivative of wage profile:
 der_ω_fn(h_T) = κ.*γ.*h_T.^(γ-1)
 
-#=spl_ω = Array{Spline1D,1}(undef,n_G)
-for iH in 1:n_H
-    for iG in 1:n_G
-        spl_ω[iG] = Spline1D(h_T_tmp[:,iH,iG], ω_tmp[:,iH,iG],k=1, bc="extrapolate")
-    end
-end
-spl_der_ω = Array{Spline1D,1}(undef,n_G)
-der_ω(k,iG)=Dierckx.derivative(spl_ω[iG],k)
-for iH in 1:n_H
-    for iG in 1:n_G
-        spl_der_ω[iG]=Spline1D(h_T_tmp[:,iH,iG],der_ω.(h_T_tmp[:,iH,iG],iG),k=1, bc="extrapolate")
-    end
-end=#
 
 #######################
 # Steady-state of H_T #
 #######################
 
-# Initial guess for fixed point of HH_T:
-# TBC!
 # Set the array index to the midpoint of H_grid:
 iHH = convert(Int,ceil(n_H/2))
 # Iteration and tolerance settings for fixed-point problems:
@@ -380,7 +337,6 @@ tolHH = .0025
 tolT= 2.5e-4
 maxiterT = 100
 
-println("t[1,1] = ",t[1,1])
 # Time investment doesn't depend on any endogenous variables, only on parameters:
 s_O = μ*ϕ / (μ*ϕ + 1 - η)
 # Initiate 'while' loop (not indexed) over aggregate human capital in teaching:
@@ -389,55 +345,50 @@ while convHH > tolHH
     global HH_fp
     global convHH
     global tolHH
-    global HH_T
+    global H_grid
     println("HH_fp = ", HH_fp)
-    println("t[1,1] = ",t[1,1])
+    println("t[iHH,1] = ",t[iHH,1])
     println("")
-    HH_T[iHH] = HH_fp
+    H_grid[iHH] = HH_fp
     # Initiate 'while' loop ('not indexed') over the tax rate:
     convT = 1; iterT = 1
     while convT > tolT && iterT < maxiterT
-        # println("    T: iteration ",iterT)
-        # println("HH_T[iHH]=",round(HH_T[iHH],digits=3))
-        # println("t[1,:]=",round.(t[1,:],digits=3))
         for iG in 1:n_G
-            for ia in 1:length(a_grid)
+            for ia in 1:n_a
                 a=a_grid[ia]
                 fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
-                fn_h_T(k)=(η^η*(1-t[1,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
-                #(2*H_grid[iHH]/M)^σ*a_grid[ia]^α*fn_s_T(k)^ϕ*fn_e_T(k)^η-k
-                # hh_T=find_zero(fn_h_T,(minimum(h_T_tmp[:,iHH,iG]),maximum(h_T_tmp[:,iHH,iG])))
-                hh_T = find_zero(fn_h_T,h_T_init[ia,iHH,iG])
+                fn_h_T(k)=(η^η*(1-t[iHH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
+                hh_T = find_zero(fn_h_T,h_T_initial[ia,iHH,iG])
                 h_T[ia,iHH,iG]=hh_T
                 s_T[ia,iHH,iG]=fn_s_T(hh_T)
-                e_T[ia,iHH,iG]=η*(1-t[1,1])*der_ω_fn(hh_T)*hh_T
+                e_T[ia,iHH,iG]=η*(1-t[iHH,1])*der_ω_fn(hh_T)*hh_T
                 ω[ia,iHH,iG]=ω_fn(hh_T)
                 der_ω[ia,iHH,iG]=der_ω_fn(hh_T)
                 for iO in 1:n_O-1
                     # Occupational choice threshold (workers with 'a' in occupation 'iO' become teachers if 'a' < 'a_O_thresh[.,.,.]' for given teaching ability a_T = a[ia]):
                     a_O_thresh[ia,iHH,iG,iO] = ((1+τ_e[iO,iG])/(1-τ_w[iO,iG])*(1+τ_e[iO,iG])^(-(1-η))*((1-s_T[ia,iHH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iHH,iG]/s_O)^ϕ*(der_ω[ia,iHH,iG]/a_by_occ[iO])*((ω[ia,iHH,iG]/(der_ω[ia,iHH,iG]*h_T[ia,iHH,iG])-η)/(1-η))^(1-η))^(1/α)*a
-                    h_O[ia,iHH,iG,iO] = (η^η*(1-t[1,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
-                    e_O[ia,iHH,iG,iO] = η * (1-t[1,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
+                    h_O[ia,iHH,iG,iO] = (η^η*(1-t[iHH,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
+                    e_O[ia,iHH,iG,iO] = η * (1-t[iHH,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
                 end
             end
             spl_s=Spline1D(a_grid, s_T[:,iHH,iG])
-            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iHH,iG]), bc="extrapolate")
+            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iHH,iG]))
 
             for iO in 1:n_O-1
-                spl_marg = Spline1D(a_grid, marginal[:,iO,iG], bc="extrapolate")
+                spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
                 # Inverse occupational threshold 
-                spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid, bc="extrapolate")
+                spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid)
                 f3[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*aa^(α/(1-η)),lowbnd,upbnd)[1]
 
                 f1[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
                 # Compute H_O:
-                H_O_0[iO,iG,iHH]=(((1-t[1,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*HH_fp/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
+                H_O_0[iO,iG,iHH]=(((1-t[iHH,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*HH_fp/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
                 # Total earnings of others in each group:
                 E_O[iO,iHH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iHH]
                 # Total output of others in each group:
                 Y_O[iO,iHH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iHH]
 
-                for ia in 1:length(a_grid)
+                for ia in 1:n_a
                     a = a_grid[ia]
                     # Fraction of teachers occupation-by-occupation, given 'a' in teaching (see integration in equation 17 of manuscript for details):
                     f_1_T_tmp[ia,iG,iO]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iHH,iG,iO])[1],0.0])
@@ -445,7 +396,7 @@ while convHH > tolHH
                 end
             end
 
-            for ia in 1:length(a_grid)
+            for ia in 1:n_a
                 # Fraction of teachers given a_T (across all occupations):
                 f_1_T[ia,iG]= sum(f_1_T_tmp[ia,iG,:])
             end
@@ -457,8 +408,8 @@ while convHH > tolHH
 
             mass_T[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa),lowbnd,upbnd)[1]
 
-            # Compute HHH_T:
-            HHH_T_0[iG]= ( (1-t[1,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
+            # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
+            HH_T_0[iG]= ( (1-t[iHH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
             #*s_T^ϕ*(β/σ)^η*(sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
             # Total earnings of teachers in each group:
             E_T[iHH,iG]=f4[iHH,iG]
@@ -467,7 +418,7 @@ while convHH > tolHH
             #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
         end
         
-        HH_T[iHH]=sum(HHH_T_0.*gm)
+        H_grid[iHH]=sum(HH_T_0.*gm)
         for iO in 1:n_O-1
             H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
         end
@@ -475,20 +426,19 @@ while convHH > tolHH
             sum_E_O[iHH,iG]=sum(E_O[:,iHH,iG])
             sum_Y_O[iHH,iG]=sum(Y_O[:,iHH,iG])
         end
-        t[1,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
+        t[iHH,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
         #Y=sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm)
-        convT = abs(t[1,2]-t[1,1])
+        convT = abs(t[iHH,2]-t[iHH,1])
          println("convT=",round(convT,digits=3))
-         println("t[1,:]=",round.(t[1,:],digits=3))
-        # println("HH_T[iHH]=",round(HH_T[iHH],digits=3))
-        t[1,1] =  (1-ν)*t[1,1] + ν*t[1,2]# min(t[1,2],1-1e-3)
+         println("t[iHH,:]=",round.(t[iHH,:],digits=3))
+        t[iHH,1] =  (1-ν)*t[iHH,1] + ν*t[iHH,2]
 
         iterT = iterT+1
     end
-    convHH = abs(log(HH_T[iHH]/HH_fp))
+    convHH = abs(log(H_grid[iHH]/HH_fp))
     println(convHH)
-    println(HH_T[iHH])
-    HH_fp = (1-ν2)*HH_fp + ν2*HH_T[iHH]
+    println(H_grid[iHH])
+    HH_fp = (1-ν2)*HH_fp + ν2*H_grid[iHH]
 end
 println("Found fixed point for human capital in teaching!")
 
@@ -499,64 +449,60 @@ println("Found fixed point for human capital in teaching!")
 # Construct grid for H_T (aggregate human capital in in teaching) around fixed point:
 H_grid = HH_fp .* exp.(range(-range_H,range_H,n_H))
 for iH in 1:n_H
-    println("H: gridpoint ", iH," of ", n_H," (H = ", round(H_grid[iH];digits=6),")")
+    println("Transition dynamics for H: ", iH," of ", n_H," (H = ", round(H_grid[iH];digits=6),")")
     println("")
     # Today's aggregate human capital in teaching:
     H = H_grid[iH]
     # Initiate 'while' loop ('not indexed') over the tax rate:
     convT = 1; iterT = 1
     while convT > tolT && iterT < maxiterT
-        # println("    T: iteration ",iterT)
-        # println("HH_T[iH]=",round(HH_T[iH],digits=3))
-        # println("t[1,:]=",round.(t[1,:],digits=3))
         for iG in 1:n_G
-            for ia in 1:length(a_grid)
+            for ia in 1:n_a
                 a=a_grid[ia]
                 # Human capital investments and wages in teaching:
                 fn_s_T(k) = μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
-                fn_h_T(k) = (η^η*(1-t[1,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*H/M)^σ)^(1/(1-η))-k
-                # hh_T = find_zero(fn_h_T,(minimum(h_T_tmp[:,iH,iG]),maximum(h_T_tmp[:,iH,iG])))
-                hh_T = find_zero(fn_h_T,h_T_init[ia,iH,iG])
+                fn_h_T(k) = (η^η*(1-t[iH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*H/M)^σ)^(1/(1-η))-k
+                hh_T = find_zero(fn_h_T,h_T_initial[ia,iH,iG])
                 h_T[ia,iH,iG] = hh_T
                 s_T[ia,iH,iG] = fn_s_T(hh_T)
-                e_T[ia,iH,iG] = η*(1-t[1,1])*der_ω_fn(hh_T)*hh_T
+                e_T[ia,iH,iG] = η*(1-t[iH,1])*der_ω_fn(hh_T)*hh_T
                 ω[ia,iH,iG] = ω_fn(hh_T)
                 der_ω[ia,iH,iG] = der_ω_fn(hh_T)
                 # Human capital investments and wages in other occupations:
                 for iO in 1:n_O-1
                     # Occupational threshold ():
                     a_O_thresh[ia,iH,iG,iO] = ((1+τ_e[iO,iG])/(1-τ_w[iO,iG])*(1+τ_e[iO,iG])^(-(1-η))*((1-s_T[ia,iH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iH,iG]/s_O)^ϕ*(der_ω[ia,iH,iG]/a_by_occ[iO])*((ω[ia,iH,iG]/(der_ω[ia,iH,iG]*h_T[ia,iH,iG])-η)/(1-η))^(1-η))^(1/α)*a
-                    h_O[ia,iH,iG,iO] = (η^η*(1-t[1,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))
-                    e_O[ia,iH,iG,iO] = η * (1-t[1,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
+                    h_O[ia,iH,iG,iO] = (η^η*(1-t[iH,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*H/M)^σ)^(1/(1-η))
+                    e_O[ia,iH,iG,iO] = η * (1-t[iH,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
                     w[ia,iH,iG,iO] = a_by_occ[iO] * (1-τ_w[iO,iG]) * h_O[ia,iH,iG,iO]
                 end
             end
             spl_s=Spline1D(a_grid, s_T[:,iH,iG])
-            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]), bc="extrapolate")
+            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]))
 
             for iO in 1:n_O-1
                 # Spline for fraction of workers in occupation 'iO':
-                spl_marg = Spline1D(a_grid, marginal[:,iO,iG], bc="extrapolate")
+                spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
                 # Inverse occupational threshold between occupation 'iO' and teaching: 
-                spl_inv = Spline1D(a_O_thresh[:,iH,iG,iO],a_grid, bc="extrapolate")
+                spl_inv = Spline1D(a_O_thresh[:,iH,iG,iO],a_grid)
                 f3[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*aa^(α/(1-η)),lowbnd,upbnd)[1]
 
                 f1[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
                 # Compute H_O:
-                H_O_0[iO,iG,iH]=(((1-t[1,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*H/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
+                H_O_0[iO,iG,iH]=(((1-t[iH,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*H/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
                 # Total earnings of others in each group:
                 E_O[iO,iH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iH]
                 # Total output of others in each group:
                 Y_O[iO,iH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iH]
 
-                for ia in 1:length(a_grid)
+                for ia in 1:n_a
                     a = a_grid[ia]
                     # fract of teach occ by occ, given a_T
                     f_1_T_tmp[ia,iG,iO]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iH,iG,iO])[1],0.0])
                     #quadgk(aa ->maximum([spl_marg(aa),lowbnd])*pdf(LogNormal(mean_a,std_a),aa),lowbnd,a_O_thresh[ia,iH,iG,iO])[1]
                 end
             end
-            for ia in 1:length(a_grid)
+            for ia in 1:n_a
                 # Fraction of teachers given a_T (across all occupations):
                 f_1_T[ia,iG]= sum(f_1_T_tmp[ia,iG,:])
             end
@@ -574,38 +520,38 @@ for iH in 1:n_H
                 .1 - quadgk(aa -> spl_f_T[iG](aa),lowbnd,x)[1]
             end
             # Find ability of teacher at 10th percentile of the distribution:
-            a_T_10p[iG] = find_zero(fn_F_T_10p,a_grid[round(Int,length(a_grid)/2)])
+            a_T_10p[iH,iG] = find_zero(fn_F_T_10p,a_T_10p[iH,iG])
+            # a_T_10p[iH,iG] = find_zero(fn_F_T_10p,a_grid[round(Int,n_a/2)])
             function fn_F_T_90p(x)
                 .9 - quadgk(aa -> spl_f_T[iG](aa),lowbnd,x)[1]
             end
             # Find ability of teacher at 90th percentile of the distribution:
-            a_T_90p[iG] = find_zero(fn_F_T_90p,a_grid[round(Int,length(a_grid)/2)])
+            a_T_90p[iH,iG] = find_zero(fn_F_T_90p,a_T_90p[iH,iG])
+            # a_T_90p[iH,iG] = find_zero(fn_F_T_90p,a_grid[round(Int,n_a/2)])
             # (a.3) Compute wages at 10th and 90th percentile of distribution for each group:
             spl_ω[iH] = Spline1D(a_grid,ω[:,iH,iG])
-            ω_90_10[iH,iG] = spl_ω[iH](a_T_90p[iG])/spl_ω[iH](a_T_10p[iG])
-            a_T_90_10[iH,iG] = a_T_90p[iG]/a_T_10p[iG]
+            ω_90_10[iH,iG] = spl_ω[iH](a_T_90p[iH,iG])/spl_ω[iH](a_T_10p[iH,iG])
+            a_T_90_10[iH,iG] = a_T_90p[iH,iG]/a_T_10p[iH,iG]
             
             spl_wa=Spline1D(a_grid, ω[:,iH,iG])
 
             f2[iH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
             f4[iH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_wa(aa),lowbnd,upbnd)[1]
             
-            # Compute HHH_T:
-            HHH_T_0[iG]= ( (1-t[1,1])^η*η^η*(2*H/M)^σ)^(β/σ/(1-η))*f2[iH,iG]
-            #*s_T^ϕ*(β/σ)^η*(sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
+            # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
+            HH_T_0[iG]= ( (1-t[iH,1])^η*η^η*(2*H/M)^σ)^(β/σ/(1-η))*f2[iH,iG]
             # Total earnings of teachers in each group:
             E_T[iH,iG]=f4[iH,iG]
             # Total output of teachers in each group:
             Y_T[iH,iG] = sum(H_O_0[:,iG,iH].*a_by_occ)
-            #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
 
             # (b) All other occupations:
             for iO = 1:n_O-1
                 # Inverse occupational threshold between occupation 'iO' and teaching: 
-                spl_inv = Spline1D(a_O_thresh[:,iH,iG,iO],a_grid, bc="extrapolate")
+                spl_inv = Spline1D(a_O_thresh[:,iH,iG,iO],a_grid)
                 f_1_O[:,iH,iG,iO] = marginal[:,iO,iG] .* cdf.(dist,spl_inv(a_grid))
                 # (b.1) Compute p.d.f.:
-                spl_f_1_O[iH,iG,iO]=Spline1D(a_grid, f_1_O[:,iH,iG,iO], bc="extrapolate")
+                spl_f_1_O[iH,iG,iO]=Spline1D(a_grid, f_1_O[:,iH,iG,iO])
                 mass_O[iH,iG,iO]=quadgk(aa -> pdf(dist,aa)*spl_f_1_O[iH,iG,iO](aa),lowbnd,upbnd)[1]
                 f_O[:,iH,iG,iO] = f_1_O[:,iH,iG,iO].*pdf.(dist,a_grid)./mass_O[iH,iG,iO]
                 # (b.2) Compute ability at 10th and 90th percentile for each group and occupation using c.d.f.:
@@ -614,16 +560,14 @@ for iH in 1:n_H
                     # .1 - quadgk(aa -> spl_f_O[iH,iG,iO](aa),lowbnd,x)[1]
                     .1 - quadgk(aa -> pdf(dist,aa)*spl_f_1_O[iH,iG,iO](aa)/mass_O[iH,iG,iO],lowbnd,x)[1]
                 end
-                println("iH = ",iH,", iG = ",iG," , iO = ",iO)
+                println("iH = ",iH,", iG = ",iG,", iO = ",iO)
                 # Find ability of worker at 10th percentile of the distribution in each group and occupation:
-                # a_O_10p[iH,iG,iO] = find_zero(fn_F_O_10p,a_grid[findmax(f_O[:,iH,iG,iO])[2]])
                 a_O_10p[iH,iG,iO] = find_zero(fn_F_O_10p,a_O_10p[iH,iG,iO])
                 function fn_F_O_90p(x)
                     # .9 - quadgk(aa -> spl_f_O[iH,iG,iO](aa),lowbnd,x)[1]
                     .9 - quadgk(aa -> pdf(dist,aa)*spl_f_1_O[iH,iG,iO](aa)/mass_O[iH,iG,iO],lowbnd,x)[1]
                 end
                 # Find ability of worker at 90th percentile of the distribution:
-                # a_O_90p[iH,iG,iO] = find_zero(fn_F_O_90p,a_grid[findmax(f_O[:,iH,iG,iO])[2]])
                 a_O_90p[iH,iG,iO] = find_zero(fn_F_O_90p,a_O_90p[iH,iG,iO])
                 # (a.3) Compute ratio of wages at 10th and 90th percentile of distribution for each group and occupation:
                 spl_h = Spline1D(a_grid,h_O[:,iH,iG,iO])
@@ -648,11 +592,11 @@ for iH in 1:n_H
         function fn_F_T_90p_all_g(x)
             .9 - quadgk(aa -> fn_f_T_all_g(aa),lowbnd,x)[1]
         end
-        a_T_10p[n_G+1] = find_zero(fn_F_T_10p_all_g,a_grid[round(Int,length(a_grid)/2)])
-        a_T_90p[n_G+1] = find_zero(fn_F_T_90p_all_g,a_grid[round(Int,length(a_grid)/2)])
-        ω_90_10[iH,n_G+1] = spl_ω[iH](a_T_90p[n_G+1])/spl_ω[iH](a_T_10p[n_G+1])
-    
-        HH_T[iH]=sum(HHH_T_0.*gm)
+        a_T_10p[iH,n_G+1] = find_zero(fn_F_T_10p_all_g,a_T_10p[iH,n_G+1])
+        a_T_90p[iH,n_G+1] = find_zero(fn_F_T_90p_all_g,a_T_90p[iH,n_G+1])
+        ω_90_10[iH,n_G+1] = spl_ω[iH](a_T_90p[iH,n_G+1])/spl_ω[iH](a_T_10p[iH,n_G+1])
+        # Law of motion for aggregate human in teaching: 
+        H_grid[iH]=sum(HH_T_0.*gm)
         for iO in 1:n_O-1
             H_O[iO,iH]=sum(H_O_0[iO,:,iH].*gm)
         end
@@ -660,61 +604,21 @@ for iH in 1:n_H
             sum_E_O[iH,iG]=sum(E_O[:,iH,iG])
             sum_Y_O[iH,iG]=sum(Y_O[:,iH,iG])
         end
-        t[1,2]=sum(E_T[iH,:].*gm)/(sum(E_T[iH,:].*gm)+sum(sum_E_O[iH,:].*gm))
-        #Y=sum(Y_T[iH,:].*gm)+sum(sum_Y_O[iH,:].*gm)
-        convT = abs(t[1,2]-t[1,1])
+        t[iH,2]=sum(E_T[iH,:].*gm)/(sum(E_T[iH,:].*gm)+sum(sum_E_O[iH,:].*gm))
+        convT = abs(t[iH,2]-t[iH,1])
          println("convT=",round(convT,digits=3))
-         println("t[1,:]=",round.(t[1,:],digits=3))
-        # println("HH_T[iH]=",round(HH_T[iH],digits=3))
-        t[1,1] =  (1-ν)*t[1,1] + ν*t[1,2]# min(t[1,2],1-1e-3)
+         println("t[iH,:]=",round.(t[iH,:],digits=3))
+        t[iH,1] =  (1-ν)*t[iH,1] + ν*t[iH,2]# min(t[1,2],1-1e-3)
 
         iterT = iterT+1
     end
 end
 
-#filename1 = string("C:/Users/julia/Documents/GitHub/teachers/julia/codes_w_exo_wage/parameterization/previousParameterization.jld")
-#save(filename1,"τ_w_opt",τ_w_opt,"a_by_occ",a_by_occ,"a_T_thresh",a_T_thresh,"t",t,"HH_T",HH_T,"H_O",H_O)
-
-#=
-## reduced form HHH_T
-HHH_T_0_tmp=Array{Float64,1}(undef,n_G)
-for iG in 1:n_G
-    for ia in 1:length(a_grid)
-        a=a_grid[ia]
-        fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
-        fn_h_T(k)=(η^η*(1-t[1,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
-        #(2*H_grid[iHH]/M)^σ*a_grid[ia]^α*fn_s_T(k)^ϕ*fn_e_T(k)^η-k
-        hh_T=find_zero(fn_h_T,(minimum(h_T_tmp[:,iHH,iG]),maximum(h_T_tmp[:,iHH,iG])))
-        h_T[ia,iHH,iG]=hh_T
-        s_T[ia,iHH,iG]=fn_s_T(hh_T)
-    end
-    spl_s=Spline1D(a_grid, s_T[:,iHH,iG])
-    spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iHH,iG]), bc="extrapolate")
-
-    for iO in 1:n_O-1
-        spl_marg = Spline1D(a_grid, marginal[:,iO,iG], bc="extrapolate")
-        for ia in 1:length(a_grid)
-            a = a_grid[ia]
-            # fract of teach occ by occ, given a_T
-            f_1_T_tmp[ia,iO,iG]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iG,iO])[1],0.0])
-        end
-    end
-
-    for ia in 1:length(a_grid)
-        f_1_T[ia,iG]= sum(f_1_T_tmp[ia,:,iG]) # Fraction of teachers given a_T
-    end
-    spl_f_1_T=Spline1D(a_grid, f_1_T[:,iG])
-    
-    f2[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T(aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
-    HHH_T_0_tmp[iG]=(1-t[1,1])^(β*η/σ/(1-η))*f2[iG]
-end
-HH_T_tmp=η^(β*η/σ/(1-η-β))*(2/M)^(β/(1-η-β))*sum(HHH_T_0_tmp.*gm)^((1-η)/(1-η-β))
-=#
-
-N=zeros(length(a_grid),n_H,n_G)
+# What is 'N' used for?
+N=zeros(n_a,n_H,n_G)
 for iH in 1:n_H
     for iG in 1:n_G
-        for ia in 1:length(a_grid)
+        for ia in 1:n_a
             N[ia,iH,iG]=(M/2)/H_grid[iH]*(h_T[ia,iH,iG])^(β/σ)
         end
     end
@@ -741,12 +645,12 @@ for iH in 1:n_H
 end
 # Save parameterization in JLD file:
 cd("./parameterization")
-save("previousParameterization.jld","a_by_occ",a_by_occ,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t[1,:],"HH_T",HH_T,"H_O",H_O,"HH_fp",HH_fp,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_10p,"h_T",h_T)
+save("previousParameterization.jld","a_by_occ",a_by_occ,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T)
 cd("..")
 
 println("____________")
-println("share of teachers among women= ",mass_T[1])
-println("share of teachers among men= ",mass_T[2])
+println("share of teachers among women= ",mass_T[iHH,1])
+println("share of teachers among men= ",mass_T[iHH,2])
 println("average class size= ",sum(av_N.*gm))
 # println(" ")
 # println("average a_rank_T_female= ",av_a_rank_T[1])
@@ -775,10 +679,10 @@ println("tax rate= ",t[1,1])
 println("output= ",sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm))
 println("HH_fp= ",HH_fp)
 
-# Write parameter values and moments to CSV file.
+# Write parameter values and moments to CSV file using DataFrame:
 
-# Start with λf / κ (parameters) and male / female teachers' share (moments).
 df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=2) )
+# df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = NaN, θ = round(theta;digits=4),p90_p10_w_other = NaN, η = round(η;digits=2))
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
 if isfile("./results/moments.csv") == true
     moments = DataFrame(CSV.File("./results/moments.csv"))
@@ -790,4 +694,4 @@ end
 show(moments)
 
 # Write DataFrame to CSV file:
-CSV.write("./results/moments.csv",moments)
+CSV.write("./results/moments.csv",moments);
