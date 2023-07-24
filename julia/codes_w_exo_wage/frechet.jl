@@ -209,7 +209,6 @@ function calibrate_A(x)
     share_occ_model=share_occ_model./sum(share_occ_model)
     # obj fn is a gap in labor market shares for non-teaching male between model and data
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,2])./share_occ_data[1:end-1,2]))
-    # return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]).^2)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
@@ -227,7 +226,6 @@ function calibrate_τ(x)
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Objective function is the difference in labor market shares for non-teaching females between model and data:
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]))
-    # return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]).^2)
 end
 # Compute labor market barriers for women (group 1):
 res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=true, iterations=10000)
