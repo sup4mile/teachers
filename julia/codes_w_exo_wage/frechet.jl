@@ -54,7 +54,7 @@ else
 end
 
 # Innovation step size for updates:
-ν = 0.9 # for tax rate that balances government's budget
+ν = 0.8 # for tax rate that balances government's budget
 ν2 = 0.8 # for fixed point of aggregate human capital in teaching
 
 n_G=length(g) # number of "groups"
@@ -119,10 +119,11 @@ end
 
 # Update model parameters, if required:
 γ = .82
-# λf = .895
-κ = .22
-theta = 1.1
-# η = .32
+λf = .75
+κ = .7
+theta = 1.5
+η = .103
+α = .54
 
 # Distribution of abilities:
 dist=Frechet(theta,1)
@@ -148,7 +149,7 @@ quantile_top = 1 - 1e-4
 quantile_bottom = 1e-3
 
 # Reset grid length for individual abilities (if necessary):
-n_a = 100
+n_a = 120
 # Set up the grid for aggregate human capital in teaching:
 n_H = 11
 # Set the percentage range above / below fixed point:
@@ -208,10 +209,11 @@ function calibrate_A(x)
     share_occ_model=share_occ_model./sum(share_occ_model)
     # obj fn is a gap in labor market shares for non-teaching male between model and data
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,2])./share_occ_data[1:end-1,2]))
+    # return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]).^2)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res=optimize(calibrate_A,a_by_occ_initial, show_trace=false)
+res=optimize(calibrate_A,a_by_occ_initial, show_trace=true, iterations=10000)
 a_by_occ=Optim.minimizer(res)
 println("Sum of absolute distances between a_by_occ_initial and a_by_occ for men is ",sum(abs.(a_by_occ- a_by_occ_initial)))
 
@@ -225,16 +227,17 @@ function calibrate_τ(x)
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Objective function is the difference in labor market shares for non-teaching females between model and data:
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]))
+    # return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]).^2)
 end
 # Compute labor market barriers for women (group 1):
-res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false)
+res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=true, iterations=10000)
 τ_w_opt[:,1] = Optim.minimizer(res)
 println("Sum of absolute distances between τ_w_initial and τ_w_opt for women is ",sum(abs.(τ_w_opt-τ_w_initial)))
 τ_w[:,1]=ones(n_O-1).-λf*(ones(n_O-1).-τ_w_opt[:,1])
 
 # Compute the share of individuals employed in non-teaching occupations in each group (indexed by 'iG'):
 share_occ = Array{Float64,2}(undef,n_O-1,n_G)
-marginal=Array{Float64,3}(undef,n_a,n_O-1,n_G)
+marginal = Array{Float64,3}(undef,n_a,n_O-1,n_G)
 for iG in 1:n_G
     for iO = 1:(n_O-1)
         share_occ[iO,iG]=share(iO,iG,a_by_occ,τ_w[:,iG],τ_e[:,iG])[1]
@@ -681,7 +684,7 @@ println("HH_fp= ",HH_fp)
 
 # Write parameter values and moments to CSV file using DataFrame:
 
-df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=2) )
+df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=2), α = round(α;digits=2) )
 # df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = NaN, θ = round(theta;digits=4),p90_p10_w_other = NaN, η = round(η;digits=2))
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
 if isfile("./results/moments.csv") == true
