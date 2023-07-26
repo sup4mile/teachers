@@ -8,33 +8,42 @@ previous = 1;
 M=1.0
 # Groups (no discrimination / no barrier group is last element)
 g = ["female","male"]
-
-
 # Import moments for calibration:
 import XLSX
 # Employment shares by occupation:
 cd("..")
 cd("..")
 cd("./data/LaborMarketData")
-xs1 = XLSX.readxlsx("Occupation_shares_v3.xlsx")
-tab1 = xs1["mom"]
+# Old version:
+xs1a = XLSX.readxlsx("Occupation_shares_v3.xlsx")
+tab1a = xs1a["mom"]
 # Wage dispersion by occupation:
-xs2 = XLSX.readxlsx("wages_occ_shares.xlsx")
-tab2 = xs2["90_10_hr_wages_weighted"]
+xs2a = XLSX.readxlsx("wages_occ_shares.xlsx")
+tab2a = xs2a["90_10_hr_wages_weighted"]
+# New version
+xs1b = XLSX.readxlsx("wages_occ_shares_v2.xlsx")
+tab1b = xs1b["moments_shares"]
+# Wage dispersion by occupation:
+xs2b = XLSX.readxlsx("wages_occ_shares_v2.xlsx")
+tab2b = xs2b["90_10_hr_wages_weighted"]
 
 # Reset working directory to folder with Julia script:
 cd("..")
 cd("..")
 cd("./julia/codes_w_exo_wage")
 # Labels for occupations:
+# UPDATE LABELS ONCE TRANSITION TO NEW VERSION IS COMPLETE!
 occ = tab1["A3:A23"]
 
 share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
-#year=1970
-#year=1990
-year=2010
-if year==1970
+
+# Select calendar your for calibration (1970, 1990, or 2010)
+year = 2010
+# Weight for convex combination between old and new version of data:
+mu = .9
+# Load data for selected year:
+if year == 1970
     share_occ_data[:,1] = tab1["H3:H22"] # Census 1970 for Project TALENT (women)
     share_occ_data[:,2] = tab1["B3:B22"] # Census 1970 for Project TALENT (men)
     w_90_10_data[1] = tab2["C103"] # Dispersion in non-teaching occupations
@@ -45,10 +54,10 @@ elseif year==1990
     w_90_10_data[1] = tab2["E103"] # Dispersion in non-teaching occupations
     w_90_10_data[1] = tab2["E104"] # Dispersion in teaching
 elseif year==2010
-    share_occ_data[:,1] = tab1["J3:J22"] # Census 1990 for NLSY97 (women)
-    share_occ_data[:,2] = tab1["D3:D22"] # Census 1990 for NLSY97 (men)
-    w_90_10_data[1] = tab2["G103"] # Dispersion in non-teaching occupations
-    w_90_10_data[1] = tab2["G104"] # Dispersion in teaching
+    share_occ_data[:,1] = mu .* tab1a["J3:J22"] + (1-mu) .* tab1b["O30:O49"] # Census 1990 for NLSY97 (women)
+    share_occ_data[:,2] = mu .* tab1a["D3:D22"] + (1-mu) .* tab1b["G30:G49"] # Census 1990 for NLSY97 (men)
+    w_90_10_data[1] = mu .* tab2a["G103"] + (1-mu) .* tab2b["G50"] # Dispersion in non-teaching occupations
+    w_90_10_data[1] = mu .* tab2a["G104"] + (1-mu) .* tab2b["G51"] # Dispersion in teaching
 else
     println("No a_by_occ for the selected year")
 end
@@ -68,7 +77,9 @@ gm[end] = M/2 - sum(gm)
 
 if previous == 1
     cd("./parameterization")
-    d = load("previousParameterization.jld")
+    fyear = string(year)
+    fnameJLD = string("previousParameterization",fyear,".jld")
+    d = load(fnameJLD)
     a_by_occ_initial = d["a_by_occ"]
     # a_by_occ = d["a_by_occ"]
     τ_w_initial = d["τ_w_opt"]
@@ -118,15 +129,15 @@ else
 end
 
 # Update model parameters, if required:
-γ = .82
-λf = .75
-κ = .7
-theta = 1.5
-η = .103
-α = .54
+γ = .83 # curvature of teachers' wage profile
+λf = .423 # composite barrier for women in non-teaching occupations
+κ = 1.69# scale parameter of teachers' wage profile
+theta = 1.476 # shape parameter of Fréchet distribution
+η = .103 # elasticity of human capital with respect to resource investment
+α = 1 # elasticity of human capital with respect to idiosyncratic ability
 
 # Distribution of abilities:
-dist=Frechet(theta,1)
+dist = Frechet(theta,1)
 
  # Vector of labor market discrimination in each occupation (relative to 'T')
 τ_w=zeros(n_O-1,n_G)
@@ -190,13 +201,29 @@ upbnd = a_grid[end] # set to largest element in 'a_grid'
 # Given a productivity vector 'a_by_occ' with productivities in non-teaching occupations, the function 'share()' calculates share of people choosing occupation 'occ_id':
 marg=Array{Float64,3}(undef,n_a,n_O-1,n_G)
 function share(occ_id,iG,a_by_occ,τ_w,τ_e)
+    # if iG == 1
+    # println("iO = ",occ_id,", τ_w = ",τ_w)
+    # end
     for ia in 1:n_a
-        A_tmp=(( ((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id])).^(1/α))
-        marg[ia,occ_id,iG]=prod(cdf.(dist,A_tmp.*a_grid[ia]))
+        B_tmp = (((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id]))
+        # if minimum(B_tmp) <= 0
+        #     println("Negative base!")
+        # end
+        A_tmp = B_tmp.^(1/α)
+        # A_tmp = (( ((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id])).^(1/α))
+        marg[ia,occ_id,iG] = prod(cdf.(dist,A_tmp.*a_grid[ia]))
     end
+    # if iG == 1
+    # println("iO = ",occ_id,", τ_w = ",τ_w[occ_id])
+    # end
     spl_marg = Spline1D(a_grid, marg[:,occ_id,iG])
-    # Function returns two arguments:
-    return quadgk(aa -> spl_marg(aa)*pdf(dist,aa),lowbnd,upbnd)[1], marg[:,occ_id,iG]
+    # Function returns two output arguments:
+    out1 = quadgk(aa -> spl_marg(aa)*pdf(dist,aa),lowbnd,upbnd)[1]
+    # if iG == 1
+    # println("out1 = ",out1)
+    # end
+    out2 = marg[:,occ_id,iG]
+    return out1, out2 
 end
 
 # Calibrate 'a_by_occ' to match labor market shares for men in non-teaching occupations:
@@ -227,7 +254,10 @@ function calibrate_τ(x)
     # Objective function is the difference in labor market shares for non-teaching females between model and data:
     return sum(abs.((share_occ_model[1:end-1].-share_occ_data[1:end-1,1])./share_occ_data[1:end-1,1]))
 end
-# Compute labor market barriers for women (group 1):
+# Compute labor market barriers for women (group 1) with a box constraint for τ_w (which has to be smaller than 1 for all occupations):
+lower = -Inf*ones(size(τ_w_initial[:,1]))
+upper = ones(size(τ_w_initial[:,1]))
+# res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
 res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=true, iterations=10000)
 τ_w_opt[:,1] = Optim.minimizer(res)
 println("Sum of absolute distances between τ_w_initial and τ_w_opt for women is ",sum(abs.(τ_w_opt-τ_w_initial)))
@@ -393,7 +423,6 @@ while convHH > tolHH
                     a = a_grid[ia]
                     # Fraction of teachers occupation-by-occupation, given 'a' in teaching (see integration in equation 17 of manuscript for details):
                     f_1_T_tmp[ia,iG,iO]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iHH,iG,iO])[1],0.0])
-                    #quadgk(aa ->maximum([spl_marg(aa),lowbnd])*pdf(LogNormal(mean_a,std_a),aa),lowbnd,a_O_thresh[ia,iHH,iG,iO])[1]
                 end
             end
 
@@ -561,7 +590,7 @@ for iH in 1:n_H
                     # .1 - quadgk(aa -> spl_f_O[iH,iG,iO](aa),lowbnd,x)[1]
                     .1 - quadgk(aa -> pdf(dist,aa)*spl_f_1_O[iH,iG,iO](aa)/mass_O[iH,iG,iO],lowbnd,x)[1]
                 end
-                println("iH = ",iH,", iG = ",iG,", iO = ",iO)
+                # println("iH = ",iH,", iG = ",iG,", iO = ",iO)
                 # Find ability of worker at 10th percentile of the distribution in each group and occupation:
                 a_O_10p[iH,iG,iO] = find_zero(fn_F_O_10p,a_O_10p[iH,iG,iO])
                 function fn_F_O_90p(x)
@@ -646,7 +675,7 @@ for iH in 1:n_H
 end
 # Save parameterization in JLD file:
 cd("./parameterization")
-save("previousParameterization.jld","a_by_occ",a_by_occ,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T)
+save(fnameJLD,"a_by_occ",a_by_occ,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T)
 cd("..")
 
 println("____________")
@@ -682,11 +711,11 @@ println("HH_fp= ",HH_fp)
 
 # Write parameter values and moments to CSV file using DataFrame:
 
-df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=2), α = round(α;digits=2) )
-# df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = NaN, θ = round(theta;digits=4),p90_p10_w_other = NaN, η = round(η;digits=2))
+df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=4), α = round(α;digits=2) )
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
-if isfile("./results/moments.csv") == true
-    moments = DataFrame(CSV.File("./results/moments.csv"))
+fnameCSV = string("./results/moments",fyear,".csv")
+if isfile(fnameCSV) == true
+    moments = DataFrame(CSV.File(fnameCSV))
     append!(moments,df)
 else
     # If the CSV file doesn't exist, create a new DataFrame named "moments":
@@ -695,4 +724,4 @@ end
 show(moments)
 
 # Write DataFrame to CSV file:
-CSV.write("./results/moments.csv",moments);
+CSV.write(fnameCSV,moments);
