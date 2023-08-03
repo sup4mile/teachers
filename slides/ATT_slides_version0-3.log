@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  3 AUG 2023 13:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.24)  3 AUG 2023 16:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1276,7 +1276,7 @@ Overfull \hbox (3.56995pt too wide) detected at line 280
 [14
 
 ]
-Overfull \vbox (2.20695pt too high) detected at line 299
+Overfull \vbox (10.83968pt too high) detected at line 300
  []
 
 [15
@@ -1291,14 +1291,14 @@ Overfull \vbox (2.20695pt too high) detected at line 299
 ! Double superscript.
 <argument> A'_O^
                 \frac {1}{1-\eta }
-l.380 \end{frame}
+l.385 \end{frame}
                  
 I treat `x^1^2' essentially like `x^1{}^2'.
 
 ! Double superscript.
 <argument> A'_O^
                 \frac {1}{1-\eta }
-l.380 \end{frame}
+l.385 \end{frame}
                  
 I treat `x^1^2' essentially like `x^1{}^2'.
 
@@ -1307,7 +1307,7 @@ I treat `x^1^2' essentially like `x^1{}^2'.
 ] [20
 
 ]
-Overfull \hbox (17.43431pt too wide) detected at line 416
+Overfull \hbox (17.43431pt too wide) detected at line 421
 []
  []
 
@@ -1315,7 +1315,12 @@ Overfull \hbox (17.43431pt too wide) detected at line 416
 
 ] [22
 
-] [23
+]
+Overfull \hbox (23.26555pt too wide) in paragraph at lines 516--516
+ [] 
+ []
+
+[23
 
 ] [24
 
@@ -1338,13 +1343,16 @@ Overfull \hbox (17.43431pt too wide) detected at line 416
 \openout8 = `ATT_slides_version0-3.snm'.
 
  (ATT_slides_version0-3.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `ATT_slides_version0-3.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
  24502 strings out of 478582
  489006 string characters out of 2844344
- 737852 words of memory out of 3000000
+ 738852 words of memory out of 3000000
  42089 multiletter control sequences out of 15000+600000
  480713 words of font info for 76 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1367,22 +1375,24 @@ ype1/public/amsfonts/cm/cmr10.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX
 /MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/julia/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/julia/AppData/
 Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/julia/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/User
-s/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb
-><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
-mss8.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
-nts/cm/cmss9.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmssi10.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/julia/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/julia/AppData/Local/Progr
-ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/julia/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/julia/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/j
-ulia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.p
-fb>
-Output written on ATT_slides_version0-3.pdf (28 pages, 846372 bytes).
+ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/
+julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><
+C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cms
+s12.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
+ts/cm/cmss8.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmss9.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/amsfonts/cm/cmssi10.pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/julia/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/julia/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/julia/AppD
+ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/ju
+lia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/
+Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.
+pfb><C:/Users/julia/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/s
+ymbols/msam10.pfb>
+Output written on ATT_slides_version0-3.pdf (28 pages, 872029 bytes).
 PDF statistics:
- 1379 PDF objects out of 1440 (max. 8388607)
+ 1389 PDF objects out of 1440 (max. 8388607)
  66 named destinations out of 1000 (max. 500000)
  73 words of extra memory for PDF output out of 10000 (max. 10000000)
 

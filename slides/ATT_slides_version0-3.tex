@@ -282,11 +282,12 @@
 	\begin{frame}
 		\frametitle{Model}
 		\framesubtitle{Constraints, Laws of Motion}
-		\small
+		\footnotesize
 		\begin{align*}
 			%H^{T} & = \int_{0}^{\infty} \left(h^{T}(a)\right)^{\frac{\beta}{\sigma}} f^{T}(a) da \\
-			\alert{t}\left[ \sum_{g=1}^G \int_0^\infty \omega_{T,g}\left(h_{T,g}(a)\right) f_{T,g}(a) da  +  \sum_{g=1}^G \int_0^\infty A_O h_{O,g}(a) f_{O,g}(a) da \right]  \\
-			= \sum_{g=1}^G \int_0^\infty\omega_{T,g}\left(h_{T,g}(a)\right) f_{T,g}(a) da \\
+			\alert{t}\Bigg[ \sum_{g=1}^G \int_0^\infty (1-\tau^{\omega}_{T,g})\omega_{T,g}\left(h_{T,g}(a)\right) f_{T,g}(a) da  \\
+			+ \sum_{g=1}^G \int_0^\infty (1-\tau^{\omega}_{O,g})A_O h_{O,g}(a) f_{O,g}(a) da \Bigg]\\
+			= \sum_{g=1}^G \int_0^\infty (1-\tau^{\omega}_{T,g})\omega_{T,g}\left(h_{T,g}(a)\right) f_{T,g}(a) da \\
 			f_{T,g}(a)  = \int_0^{\bar{a}_g^{-1}\left(a\right)} f\big(a,b \big) db \\
 			f_{O,g}(b)  = \int_0^{\bar{a}_g\left(b\right)} f\big(a,b \big) da 
 			%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O 
@@ -377,6 +378,10 @@ Given occupational choices of today's ``old'' and aggregate human capital $\wide
 	%\frac{a_O^{\frac{\alpha}{1-\eta}}}{\textcolor{red}{\bar{a}_T(a_O)}^{\frac{\alpha\beta}{\sigma-\eta\beta}}} \cdot \frac{\tau_{O,g}^\frac{1}{1-\eta}}{\tau_{T,g}^\frac{\sigma}{\sigma-\eta\beta}} \cdot \frac{1-\eta}{1-\tfrac{\beta \eta}{\sigma}} \cdot \frac{1+\tau^e_{O,g}}{1+\tau^e_{T,g}} \cdot \left(\frac{1-s_{O,g}}{1-s_{T,g}}\right)^\frac{1}{\mu} \cdot \frac{s_{O,g}^\frac{\phi}{1-\eta}}{s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta}} \nonumber\\
 	%= \frac{\sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot s_{O,g}^{\frac{\phi}{1-\eta}} \cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} \textcolor{red}{f_{O,g}(a)}da }{\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta}{\sigma-\eta\beta} \cdot s_{T,g}^\frac{\phi\beta}{\sigma-\eta\beta} \cdot \int_0^\infty a^{\frac{\alpha\beta}{\sigma-\eta\beta}} \textcolor{red}{f_{T,g}(a)}da \cdot \sum_{g=1}^G \int_0^\infty \textcolor{red}{f_{O,g}(a)}da  } \nonumber
 \end{align*}
+where
+\begin{align}
+	\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
+\end{align}
 \end{frame}
 
 \begin{frame}
@@ -475,32 +480,32 @@ Given occupational choices of today's ``old'' and aggregate human capital $\wide
 	\tiny
 	\begin{table}[h!]
 		\centering
-		\begin{tabular}{lcc}
+		\begin{tabular}{lccc}
 			\toprule
 			%					\toprule
-			Param. & Definition & Determination\\
+			Parameter & Definition & Determination & Value\\
 			\midrule
-			$\theta$ & shape parameter of Fr\'echet-distributed & wage dispersion in non-teaching occupations\\
-			& idiosyncratic abilities & (indirect inference)\\
+			$\theta$ & shape parameter of Fr\'echet-distributed & wage dispersion in non-teaching occupations & 1.476\\
+			& idiosyncratic abilities & (indirect inference) &\\
 			%					\midrule
-			$\eta$ & goods elasticity of human capital & aggregate education spending share  \\
-			& & (indirect inference) \\
+			$\eta$ & goods elasticity of human capital & aggregate education spending share  & 0.103\\
+			& & (indirect inference) &\\
 			%					\midrule
-			$\phi$ & time elasticity of human capital & Mincer returns to education (non-teaching) \\
-			& & (indirect inference) \\
+			$\phi$ & time elasticity of human capital & Mincer returns to education (non-teaching) & 0.999\\
+			& & (indirect inference) &\\
 			%					\midrule
-			$\gamma$ & curvature of wage function in teaching & wage dispersion in teaching \\
-			&& (indirect inference) \\
+			$\gamma$ & curvature of wage function in teaching & wage dispersion in teaching & 0.83\\
+			&& (indirect inference) &\\
 			\midrule
-			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men\\
+			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men & \\
 			%					\midrule
-			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women\\
-			& faced by women & \\
+			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women &\\
+			& faced by women & &\\
 			%					\midrule
-			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers \\
+			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers &\\
 			%					\midrule
-			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers \\
-			& in non-teaching occupations & \\
+			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers &\\
+			& in non-teaching occupations & &\\
 			% s_T/s_O, where  s_i=years of school/25 years
 			\bottomrule
 			%			\bottomrule
@@ -587,6 +592,10 @@ Given occupational choices of today's ``old'' and aggregate human capital $\wide
 		%\label{eq:e_T}
 		e_{O,g} & = \left( {A'_{O}} \cdot \eta \cdot\tau_{O,g} \cdot a_O^\alpha \cdot s_{O,g}^\phi \cdot  \left(\tfrac{2\widetilde{H}_T}{M}\right)^\sigma \right)^{\frac{1}{1-\eta}} \nonumber
 	\end{align}
+	where
+	\begin{align}
+		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
+	\end{align}
 	\hyperlink{eqm}{\beamergotobutton{Back}}
 \end{frame}
 
@@ -604,6 +613,10 @@ Given occupational choices of today's ``old'' and aggregate human capital $\wide
 		%& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^\frac{\beta}{\sigma} \nonumber\\
 		{H}'_{O} & = \left({A'}_O \cdot \eta\right)^\frac{\eta}{1-\eta} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta} \cdot  \sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot \int_0^\infty s_{O,g}^\frac{\phi}{1-\eta} \cdot a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
 		%\sum_{g=1}^G \left( \tau_{O,g}^\eta \cdot \eta^\eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot {A'}_O^\eta \cdot s_{T,g}^\phi \right)^\frac{1}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
+	\end{align}
+	where
+	\begin{align}
+		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
 	\end{align}
 	\hyperlink{eqm}{\beamergotobutton{Back}}
 \end{frame}
