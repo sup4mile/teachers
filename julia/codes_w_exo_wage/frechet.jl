@@ -326,9 +326,9 @@ iHH = convert(Int,ceil(n_H/2))
 # Iteration and tolerance settings for fixed-point problems:
 # (a) Aggregate human capital:
 convHH = 1
-tolHH = 1e-5
+tolHH = .0025
 # (b) Income tax rate:
-tolT= 1e-5
+tolT= 2.5e-4
 maxiterT = 100
 
 # Time investment doesn't depend on any endogenous variables, only on parameters:
