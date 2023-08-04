@@ -1,0 +1,52 @@
+# Generate plots for presentation slides:
+
+# Select backend:
+pyplot()
+# (1) 'year' = 1970
+# (1.a) Distribution of teachers' abilities (steady-state)
+plt1 = plot(a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
+plt2 = plot(a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (1.b) Scatter plot of labor market barriers:
+plt3 = scatter(τ_w[:,1],label=string(year),markershape=:circle)
+# (1.b.i) Create plot for 1970 only:
+
+# (1.c) Distribution of 'e_T'
+plt4 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
+plt5 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+
+# (2) 'year' = 1990
+# (2.a) 
+plot!(plt1,a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2,a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (2.b) 
+scatter!(plt3,τ_w[:,1],label=string(year),markershape=:diamond)
+# (2.c)
+plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
+plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+
+# (3) 'year' = 2010
+# (3.a)
+plot!(plt1,a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2,a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (3.b) 
+scatter!(plt3,τ_w[:,1],label=string(year),markershape=:xcross)
+# (3.c)
+plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
+plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+
+# (4) Add axis labels and titles:
+# (4.a)
+plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",legend=:right,title="Distribution of Female Teachers' Abilities",subplot=1)
+plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",legend=:right,title="Distribution of Male Teachers' Abilities",subplot=1)
+# (4.b)
+plot!(plt3,ylabel=L"τ_w",title="Labor Market Barriers Against Women",legend=:right,subplot=1)
+# (4.c)
+plot!(plt4,xlabel="Idiosyncratic Ability",ylabel=L"e_T",title="Female Teachers' Human Capital Investment",legend=:left,subplot=1)
+plot!(plt5,xlabel="Idiosyncratic Ability",ylabel=L"e_T",title="Male Teachers' Human Capital Investment",legend=:left,subplot=1)
+
+# (5) Save figures in EPS file format:
+savefig(plt1,"./plots/fT_women_steadystate.eps")
+savefig(plt2,"./plots/fT_men_steadystate.eps")
+savefig(plt3,"./plots/tau_w_women.eps")
+savefig(plt4,"./plots/eT_women_steadystate.eps")
+savefig(plt5,"./plots/eT_men_steadystate.eps")

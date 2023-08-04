@@ -1,4 +1,5 @@
-using Distributions, Dierckx, QuadGK, JLD, Plots, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random
+using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
+
 # Change directory, if necessary:
 # cd("./GitHub/teachers/julia/codes_w_exo_wage")
 
@@ -10,6 +11,8 @@ g = ["female","male"]
 # Import moments for calibration:
 import XLSX
 # Employment shares by occupation:
+cd("..")
+cd("..")
 cd("./data/LaborMarketData")
 # Employment shares:
 xs1 = XLSX.readxlsx("wages_occ_shares_v2.xlsx")
@@ -19,6 +22,8 @@ xs2 = XLSX.readxlsx("wages_occ_shares_v2.xlsx")
 tab2 = xs2["90_10_hr_wages_weighted"]
 
 # Reset working directory to folder with Julia script:
+cd("..")
+cd("..")
 cd("./julia/codes_w_exo_wage")
 # Labels for occupations:
 occ_O = tab1["A30:A49"]
@@ -95,10 +100,11 @@ gm=gm'
     a_T_10p = d["a_T_10p"]
     a_T_90p = d["a_T_90p"]
     h_T_initial = d["h_T"]
+    cd("..")
 
 # Update model parameters, if required:
-λf = .537 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-κ = 1.538 # scale parameter of teachers' wage profile
+# λf = .537 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+# κ = 1.538 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -244,6 +250,7 @@ e_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 s_T = Array{Float64,3}(undef,n_a,n_H,n_G)
 
 h_T = Array{Float64,3}(undef,n_a,n_H,n_G)
+h_T_avg = Array{Float64,1}(undef,n_H)
 h_O = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 ω = Array{Float64,3}(undef,n_a,n_H,n_G)
 w = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
@@ -403,7 +410,7 @@ while convHH > tolHH
             # Total earnings of teachers in each group:
             E_T[iHH,iG]=f4[iHH,iG]
             # Total output of teachers in each group:
-            Y_T[iHH,iG] = sum(H_O_0[:,iG,iHH].*a_by_occ)
+            Y_T[iHH,iG] = sum(H_O_0[1:n_O-2,iG,iHH].*a_by_occ[1:n_O-2])
             #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
         end
         
@@ -412,8 +419,8 @@ while convHH > tolHH
             H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
         end
         for iG in 1:n_G
-            sum_E_O[iHH,iG]=sum(E_O[:,iHH,iG])
-            sum_Y_O[iHH,iG]=sum(Y_O[:,iHH,iG])
+            sum_E_O[iHH,iG]=sum(E_O[1:n_O-2,iHH,iG])
+            sum_Y_O[iHH,iG]=sum(Y_O[1:n_O-2,iHH,iG])
         end
         t[iHH,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
         #Y=sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm)
@@ -642,7 +649,7 @@ for iH in 1:n_H
             # Total earnings of teachers in each group:
             E_T[iH,iG]=f4[iH,iG]
             # Total output of teachers in each group:
-            Y_T[iH,iG] = sum(H_O_0[:,iG,iH].*a_by_occ)
+            Y_T[iH,iG] = sum(H_O_0[1:n_O-2,iG,iH].*a_by_occ[1:n_O-2])
 
             # (b) All other occupations:
             for iO = 1:n_O-1
@@ -700,8 +707,8 @@ for iH in 1:n_H
             H_O[iO,iH]=sum(H_O_0[iO,:,iH].*gm)
         end
         for iG in 1:n_G
-            sum_E_O[iH,iG]=sum(E_O[:,iH,iG])
-            sum_Y_O[iH,iG]=sum(Y_O[:,iH,iG])
+            sum_E_O[iH,iG]=sum(E_O[1:n_O-2,iH,iG])
+            sum_Y_O[iH,iG]=sum(Y_O[1:n_O-2,iH,iG])
         end
         t[iH,2]=sum(E_T[iH,:].*gm)/(sum(E_T[iH,:].*gm)+sum(sum_E_O[iH,:].*gm))
         convT = abs(t[iH,2]-t[iH,1])
@@ -711,6 +718,9 @@ for iH in 1:n_H
 
         iterT = iterT+1
     end
+    # Compute teachers' average human capital (since men and women make identical investments, there is no need to differentiate by group):
+    spl_h_T = Spline1D(a_grid,h_T[:,iH,1])
+    h_T_avg[iH] = quadgk(aa -> spl_h_T(aa)*pdf(dist,aa)*spl_f_1_T[iH,iG](aa),lowbnd,upbnd)[1] / mass_T[iH,iG]
 end
 
 # What is 'N' used for?
@@ -744,7 +754,8 @@ for iH in 1:n_H
 end
 # Save parameterization in JLD file:
 cd("./parameterization")
-save(fnameJLD,"a_by_occ",a_by_occ,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O)
+save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg)
+cd("..")
 
 println("____________")
 println("share of teachers among women= ",mass_T[iHH,1])
