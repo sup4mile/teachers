@@ -103,8 +103,8 @@ gm=gm'
     cd("..")
 
 # Update model parameters, if required:
-# λf = .537 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = 1.538 # scale parameter of teachers' wage profile
+ λf = .537 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+ κ = 1.538 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -165,6 +165,7 @@ function share(occ_id,iG,a_by_occ,τ_w,τ_e)
     # if iG == 1
     # println("iO = ",occ_id,", τ_w = ",τ_w)
     # end
+    a_by_occ=a_by_occ./a_by_occ[end]
     for ia in 1:n_a
         B_tmp = (((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id]))
         # if minimum(B_tmp) <= 0
@@ -196,13 +197,13 @@ function calibrate_A(x)
     end
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Sum of squared differences (in relative terms) between data and model:
-    return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,2])./share_occ_data[1:end-1,2]).^2)
+    return sum(((share_occ_model[1:end].-share_occ_data[1:end,2])./share_occ_data[1:end,2]).^2)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res=optimize(calibrate_A,a_by_occ_initial, show_trace=false, iterations=10000)
+res=optimize(calibrate_A,a_by_occ_initial./a_by_occ_initial[end], show_trace=false, iterations=10000)
 a_by_occ=Optim.minimizer(res)
-println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ",sum(abs.(a_by_occ- a_by_occ_initial)))
+println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ",Optim.minimum(res))
 
 # Calibrate 'τ_w' to match labor marker shares for women in non-teaching occupations:
 function calibrate_τ(x)
@@ -213,7 +214,7 @@ function calibrate_τ(x)
     end
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Sum of squared differences (in relative terms) between data and model:
-    return sum(((share_occ_model[1:end-1].-share_occ_data[1:end-1,2])./share_occ_data[1:end-1,2]).^2)
+    return sum(((share_occ_model[1:end].-share_occ_data[1:end,1])./share_occ_data[1:end,1]).^2)
 end
 # Compute labor market barriers for women (group 1) with a box constraint for τ_w (which has to be smaller than 1 for all occupations):
 
@@ -225,7 +226,7 @@ end
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
 res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
 τ_w_opt[:,1] = Optim.minimizer(res)
-println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",sum(abs.(τ_w_opt-τ_w_initial)))
+println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",Optim.minimum(res))
 τ_w[:,1]=ones(n_O-1).-λf*(ones(n_O-1).-τ_w_opt[:,1])
 
 # Compute the share of individuals employed in non-teaching occupations in each group (indexed by 'iG'):
@@ -410,7 +411,7 @@ while convHH > tolHH
             # Total earnings of teachers in each group:
             E_T[iHH,iG]=f4[iHH,iG]
             # Total output of teachers in each group:
-            Y_T[iHH,iG] = sum(H_O_0[1:n_O-2,iG,iHH].*a_by_occ[1:n_O-2])
+            Y_T[iHH,iG] = sum(H_O_0[:,iG,iHH].*a_by_occ)#sum(H_O_0[1:n_O-2,iG,iHH].*a_by_occ[1:n_O-2])
             #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
         end
         
@@ -419,8 +420,8 @@ while convHH > tolHH
             H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
         end
         for iG in 1:n_G
-            sum_E_O[iHH,iG]=sum(E_O[1:n_O-2,iHH,iG])
-            sum_Y_O[iHH,iG]=sum(Y_O[1:n_O-2,iHH,iG])
+            sum_E_O[iHH,iG]=sum(E_O[:,iHH,iG])#sum(E_O[1:n_O-2,iHH,iG])
+            sum_Y_O[iHH,iG]=sum(Y_O[:,iHH,iG])#sum(Y_O[1:n_O-2,iHH,iG])
         end
         t[iHH,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
         #Y=sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm)
@@ -437,7 +438,7 @@ while convHH > tolHH
     HH_fp = (1-ν2)*HH_fp + ν2*H_grid[iHH]
 end
 println("Found fixed point for human capital in teaching!")
-
+#=
 ###########################################################
 ##################  PARAMETERIZATION  #####################
 ###########################################################
@@ -546,7 +547,7 @@ println("total e_O_female= ",sum(av_e_O[1,:].*share_occ[:,1])*gm[1])
 println("total e_O_male= ",sum(av_e_O[2,:].*share_occ[:,2])*gm[2])
 println("total h_O_female= ",sum(av_h_O[1,:].*share_occ[:,1])*gm[1])
 println("total h_O_male= ",sum(av_h_O[2,:].*share_occ[:,2])*gm[2])
-
+=#
 
 ##############################
 # Transition dynamics of H_T #
@@ -649,7 +650,7 @@ for iH in 1:n_H
             # Total earnings of teachers in each group:
             E_T[iH,iG]=f4[iH,iG]
             # Total output of teachers in each group:
-            Y_T[iH,iG] = sum(H_O_0[1:n_O-2,iG,iH].*a_by_occ[1:n_O-2])
+            Y_T[iH,iG] = sum(H_O_0[:,iG,iH].*a_by_occ)#sum(H_O_0[1:n_O-2,iG,iH].*a_by_occ[1:n_O-2])
 
             # (b) All other occupations:
             for iO = 1:n_O-1
@@ -707,8 +708,8 @@ for iH in 1:n_H
             H_O[iO,iH]=sum(H_O_0[iO,:,iH].*gm)
         end
         for iG in 1:n_G
-            sum_E_O[iH,iG]=sum(E_O[1:n_O-2,iH,iG])
-            sum_Y_O[iH,iG]=sum(Y_O[1:n_O-2,iH,iG])
+            sum_E_O[iH,iG]=sum(E_O[:,iH,iG])#sum(E_O[1:n_O-2,iH,iG])
+            sum_Y_O[iH,iG]=sum(Y_O[:,iH,iG])#sum(Y_O[1:n_O-2,iH,iG])
         end
         t[iH,2]=sum(E_T[iH,:].*gm)/(sum(E_T[iH,:].*gm)+sum(sum_E_O[iH,:].*gm))
         convT = abs(t[iH,2]-t[iH,1])
