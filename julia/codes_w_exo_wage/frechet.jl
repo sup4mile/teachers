@@ -34,7 +34,7 @@ share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 2010
+year = 1990
 # Load data for selected year:
 if year == 1970
     share_occ_data[:,1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -74,7 +74,6 @@ gm=gm'
     fnameJLD = string("previousParameterization",fyear,".jld")
     d = load(fnameJLD)
     a_by_occ_initial = d["a_by_occ"]
-    # a_by_occ = d["a_by_occ"]
     τ_w_initial = d["τ_w_opt"]
     τ_e_initial = d["τ_e"]
     a_T_thresh = d["a_T_thresh"]
@@ -103,8 +102,8 @@ gm=gm'
     cd("..")
 
 # Update model parameters, if required:
- λf = .537 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
- κ = 1.538 # scale parameter of teachers' wage profile
+# λf = .879 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+# κ = .2895 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -131,11 +130,12 @@ n_H = 11
 # Set the percentage range above / below fixed point:
 range_H = 0.25
 # Update the grid for abilities (if necessary):
-    i_grid = log10.(range(1e4^(quantile_bottom),1e4^(quantile_top),n_a))./4
+    i_grid = log10.(range(1e3^(quantile_bottom),1e3^(quantile_top),n_a))./3
     b_grid = quantile.(dist,i_grid)
     spl_a_grid = Spline1D(range(1,length(a_grid),length(a_grid)),a_grid)
     a_grid_upd = spl_a_grid.(range(1,length(a_grid),n_a))
-    c_grid = 1 .* b_grid + 0 .* a_grid_upd
+    cc = 1
+    a_grid = cc .* b_grid + (1-cc) .* a_grid_upd
     # Update size of loaded arrays, if necessary:
     if n_a != length(a_grid)
         h_T_initial_upd = Array{Float64,3}(undef,n_a,n_H,n_G)
@@ -330,9 +330,9 @@ iHH = convert(Int,ceil(n_H/2))
 # Iteration and tolerance settings for fixed-point problems:
 # (a) Aggregate human capital:
 convHH = 1
-tolHH = 1e-5
+tolHH = 1e-4
 # (b) Income tax rate:
-tolT= 1e-5
+tolT= 1e-4
 maxiterT = 100
 
 # Time investment doesn't depend on any endogenous variables, only on parameters:

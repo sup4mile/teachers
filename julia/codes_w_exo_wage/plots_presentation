@@ -3,9 +3,15 @@
 # Select backend:
 pyplot()
 # (1) 'year' = 1970
-# (1.a) Distribution of teachers' abilities (steady-state)
+# (1.a.0) Distribution of teachers' abilities (steady-state)
 plt1 = plot(a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
 plt2 = plot(a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (1.a.1) Teachers' human capital (steady-state)
+plt1_1 = plot(a_grid[2:end-2],h_T[2:end-2,iHH,1],label=string(year))
+plt2_1 = plot(a_grid[2:end-2],h_T[2:end-2,iHH,2],label=string(year))
+# (1.a.2) Distribution of teachers' human capital (steady-state)
+plt1_2 = plot(h_T[2:end-2,iHH,1],f_T[2:end-2,iHH,1],label=string(year))
+plt2_2 = plot(h_T[2:end-2,iHH,2],f_T[2:end-2,iHH,2],label=string(year))
 # (1.b) Scatter plot of labor market barriers:
 plt3 = scatter(τ_w[:,1],label=string(year),markershape=:circle)
 # (1.b.i) Create plot for 1970 only:
@@ -13,11 +19,20 @@ plt3 = scatter(τ_w[:,1],label=string(year),markershape=:circle)
 # (1.c) Distribution of 'e_T'
 plt4 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
 plt5 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+# (1.d) Law of motion for 'H_T'
+plt6 = plot(H_grid./H_grid[iHH],H_grid./H_grid[iHH],linewidth=.5,linestyle=:dash)
+plot!(plt6,H_grid./H_grid[iHH],HH_T./HH_T[iHH],linewidth=1,linestyle=:solid)
 
 # (2) 'year' = 1990
-# (2.a) 
+# (2.a.0) 
 plot!(plt1,a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
 plot!(plt2,a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (2.a.1)
+plot!(plt1_1,a_grid[2:end-2],h_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2_1,a_grid[2:end-2],h_T[2:end-2,iHH,2],label=string(year))
+# (2.a.2)
+plot!(plt1_2,h_T[2:end-2,iHH,1],f_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2_2,h_T[2:end-2,iHH,2],f_T[2:end-2,iHH,2],label=string(year))
 # (2.b) 
 scatter!(plt3,τ_w[:,1],label=string(year),markershape=:diamond)
 # (2.c)
@@ -25,9 +40,15 @@ plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
 plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
 
 # (3) 'year' = 2010
-# (3.a)
+# (3.a.0)
 plot!(plt1,a_grid[2:end-2],f_T[2:end-2,iHH,1],label=string(year))
 plot!(plt2,a_grid[2:end-2],f_T[2:end-2,iHH,2],label=string(year))
+# (3.a.1)
+plot!(plt1_1,a_grid[2:end-2],h_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2_1,a_grid[2:end-2],h_T[2:end-2,iHH,2],label=string(year))
+# (3.a.2)
+plot!(plt1_2,h_T[2:end-2,iHH,1],f_T[2:end-2,iHH,1],label=string(year))
+plot!(plt2_2,h_T[2:end-2,iHH,2],f_T[2:end-2,iHH,2],label=string(year))
 # (3.b) 
 scatter!(plt3,τ_w[:,1],label=string(year),markershape=:xcross)
 # (3.c)
@@ -35,14 +56,21 @@ plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
 plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
 
 # (4) Add axis labels and titles:
-# (4.a)
+# (4.a.0)
 plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",legend=:right,title="Distribution of Female Teachers' Abilities",subplot=1)
 plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",legend=:right,title="Distribution of Male Teachers' Abilities",subplot=1)
+# (4.a.1)
+plot!(plt1_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",legend=:right,title="Female Teachers' Human Capital",subplot=1)
+plot!(plt2_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",legend=:right,title="Male Teachers' Human Capital",subplot=1)
+# (4.a.2)
+plot!(plt1_2,xlabel="Human Capital",ylabel="Density",legend=:right,title="Distribution of Female Teachers' Human Capital",subplot=1)
+plot!(plt2_2,xlabel="Human Capital",ylabel="Density",legend=:right,title="Distribution of Male Teachers' Human Capital",subplot=1)
 # (4.b)
 plot!(plt3,ylabel=L"τ_w",title="Labor Market Barriers Against Women",legend=:right,subplot=1)
 # (4.c)
 plot!(plt4,xlabel="Idiosyncratic Ability",ylabel=L"e_T",title="Female Teachers' Human Capital Investment",legend=:left,subplot=1)
 plot!(plt5,xlabel="Idiosyncratic Ability",ylabel=L"e_T",title="Male Teachers' Human Capital Investment",legend=:left,subplot=1)
+plot!(plt6,xlabel=L"\widetilde{H}_T",ylabel=L"\widetilde{H}_T^'",title="Law of Motion for Teacher's Human Capital",legend=false)
 
 # (5) Save figures in EPS file format:
 savefig(plt1,"./plots/fT_women_steadystate.eps")
