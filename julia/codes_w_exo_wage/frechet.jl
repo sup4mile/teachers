@@ -34,7 +34,7 @@ share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 1990
+year = 2010
 # Load data for selected year:
 if year == 1970
     share_occ_data[:,1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
