@@ -50,8 +50,8 @@
 	%  \begin{itemize}}{\end{itemize}}
 % Separate slides by \begin{frame} and \end{frame}.
 \title{The Allocation of Teaching Talent and \\Human Capital Accumulation}
-\author[shortname]{Simeon Alder\inst{1} \and Yulia Dudareva\inst{1} \and Ananth Seshadri\inst{1}}
-\institute[shortinst]{\inst{1} University of Wisconsin--Madison}
+\author[shortname]{Simeon Alder\inst{1} \and Yulia Dudareva\inst{2} \and Ananth Seshadri\inst{1}}
+\institute[shortinst]{\inst{1} University of Wisconsin--Madison \and \inst{2} University of Stavanger Business School}
 
 \date{\today}
 \begin{document}
@@ -111,6 +111,7 @@
 			\item Combine three longitudinal surveys: 
 			\begin{itemize}
 				\item[$\circ$] Project TALENT, NLSY79, NLSY97
+				\item[$\circ$] Occupation-specific abilities
 			\end{itemize}
 		\end{itemize}
 		\vfill
@@ -121,16 +122,19 @@
 		\framesubtitle{Majority of (Public) School Teachers is Female}
 		\begin{table}[h!]
 			\centering 
-			\begin{tabular}{l c c }
+			\begin{tabular}{l l c }
 				\toprule
-				& \% Female & Time Period \\
+				Time Period & & \% Female \\
 				\midrule
 				% after \\ : \hline or \cline{col1-col2} \cline{col3-col4} ...
-				Project TALENT  &  61.1 & early 70s \\
-				NLSY79  & 77.7 & 1986-1993 \\
-				NLSY97  & 77.1 & 2009-2013 \\
+				early 70s & Project TALENT  &  61.1 \\
+				& Census 1980 &  59.8 \\
+				1986-1993 & NLSY79  & 77.7   \\
+				& Census 1990 & 74.8 \\
+				2009-2013& NLSY97  & 77.1   \\
+				& ACS 2009-2013  & 76.4  \\
 				\midrule
-				NCES (2006) & 75 & 2003-4\\
+				2003-2004 & NCES (2006) & 75\\
 				\bottomrule
 			\end{tabular}
 		\end{table}
@@ -147,10 +151,10 @@
 	
 	\begin{frame}
 		\frametitle{Stylized Fact \#3}
-		\framesubtitle{Occupational Choice}
+		\framesubtitle{Trends in Occupational Choice}
 		\begin{itemize}
-			\item Share of women in teaching: 4.6\% in 1970 to 6.7\% in 2010
-			\item Share of men in teaching: 2.9\% in 1970 to 2.1\% in 2010
+			\item Share of women choosing teaching: \\3.4\% in 1970 to 6.0\% in 2010
+			\item Share of men choosing teaching: \\2.6\% in 1970 to 1.9\% in 2010
 			\item Sharp rise in female labor force participation rate
 			\item Slight decline in male labor force participation rate
 		\end{itemize}
@@ -171,38 +175,38 @@
 	
 	\begin{frame}
 		\frametitle{Stylized Fact \#4}
-		\framesubtitle{Ability Distribution of Females by Occupation}
+		\framesubtitle{Trends in Ability Distribution of Females by Occupation}
 		\begin{adjustwidth}{2em}{2em}
 			\vfill
 			\begin{figure}[ht!]
-				\begin{subfigure}[b]{0.27\textwidth}
+				\begin{subfigure}[b]{0.29\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/TALENT_math_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/TALENT_math_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}
 				\hfill
 				\begin{subfigure}[b]{0.27\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/nlsy79_mk_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/nlsy79_mk_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}
 				\hfill
 				\begin{subfigure}[b]{0.27\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/nlsy97_mk_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/nlsy97_mk_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}	
 				\vfill	
 				\begin{subfigure}[b]{0.27\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/TALENT_verbal_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/TALENT_verbal_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}
 				\hfill
 				\begin{subfigure}[b]{0.27\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/nlsy79_wk_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/nlsy79_wk_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}
 				\hfill
 				\begin{subfigure}[b]{0.27\textwidth}
 					\centering
-%					\includegraphics[width=\textwidth]{plots_abilities/from_slides/nlsy97_wk_occ_no_norm_female_no_lf.pdf}
+					\includegraphics[width=\textwidth]{plots/nlsy97_wk_occ_no_norm_female_no_lf.pdf}
 				\end{subfigure}	
 			\end{figure}
 			\vfill
@@ -211,7 +215,7 @@
 	
 	\begin{frame}
 		\frametitle{Model}
-		\framesubtitle{Overview}
+		\framesubtitle{Three Major Building Blocks}
 		\begin{itemize}
 			\item OLG
 			\item Non-linear version of occupational choice model
@@ -226,7 +230,8 @@
 		\begin{itemize}
 			\item Each period, a measure $M$ of agents is born and lives for two periods: ``young'' and ``old''
 			\item $G$ groups of individuals
-			\item With occupation-specific abilities from $F_a(\vec{a})$
+			\item $I$ occupations indexed by $i \in \{1,\dots,I\}$
+			\item Occupational abilities $\vec{a}$ drawn from joint distribution $F(\vec{a})$
 			\item $\log$ preferences over consumption and leisure:
 			\begin{displaymath}
 				\mu \ln C'_{g} + \ln\left(1-s_{i,g} \right)
@@ -235,7 +240,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Model}
+		\frametitle{Simple Two-Sector Model}
 		\framesubtitle{Technologies}
 		\begin{itemize}
 			\item ``Young'' make occupation-specific time and goods investments
@@ -260,7 +265,7 @@
 	
 	
 	\begin{frame}
-		\frametitle{Model}
+		\frametitle{Simple Two-Sector Model}
 		\framesubtitle{Values}
 		\begin{align*}
 			\label{}
@@ -275,14 +280,13 @@
 			%\label{eq:vt}
 			V_{T,g}(a_T,\widetilde{H}_T) & = \ln\left(1-s_{T,g}\left(a_T,\widetilde{H}_T\right)\right) \nonumber \\
 			& + \mu \ln \Big[ \omega_{T,g}'({h_{T,g}'})(1-t')\alert{(1-\tau^{\omega '}_{T,g}) }\nonumber \\
-			& - e_{T,g}(a_T,\widetilde{H}_T)\alert{(1+\tau^{e '}_{T,g})} \Big] 
+			& - e_{T,g}(a_T,\widetilde{H}_T)\alert{(1+\tau^{e }_{T,g})} \Big] 
 		\end{align*}
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Model}
-		\framesubtitle{Constraints, Laws of Motion}
-		\footnotesize
+		\frametitle{Simple Two-Sector Model}
+		\framesubtitle{Constraints}
 		\begin{align*}
 			%H^{T} & = \int_{0}^{\infty} \left(h^{T}(a)\right)^{\frac{\beta}{\sigma}} f^{T}(a) da \\
 			\alert{t}\Bigg[ \sum_{g=1}^G \int_0^\infty (1-\tau^{\omega}_{T,g})\omega_{T,g}\left(h_{T,g}(a)\right) f_{T,g}(a) da  \\
@@ -291,8 +295,12 @@
 			f_{T,g}(a)  = \int_0^{\bar{a}_g^{-1}\left(a\right)} f\big(a,b \big) db \\
 			f_{O,g}(b)  = \int_0^{\bar{a}_g\left(b\right)} f\big(a,b \big) da 
 			%f^T(a) & = \int_0^{\bar{a}\big(a;H^T,{H^T}'\big)} f\big(a,a^O\big) da^O 
-		\end{align*}
-		%Aggregate laws of motion for $\widetilde{H}^T$ and ${H}^O$:
+		\end{align*}		
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Simple Two-Sector Model}
+		\framesubtitle{Laws of Motion}
 		\begin{align*}
 			{H}_{O}' & = \sum_{g=1}^G \int_0^\infty \left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{O,g}\left(a,\widetilde{H}_T\right)^\phi e_{O,g}(a,\widetilde{H}_T)^\eta  f_{O,g}(a) da \\
 			\widetilde{H}_{T}' & = \sum_{g=1}^G \int_0^\infty \left(\left(\tfrac{2 \widetilde{H}_T}{M}\right)^\sigma a^\alpha s_{T,g}\left(a,\widetilde{H}_T\right)^\phi e_{T,g}(a,\widetilde{H}_T)^\eta \right)^{\alert{\frac{\beta}{\sigma}}} f_{T,g}(a) da 
@@ -300,7 +308,7 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{Model}
+		\frametitle{Simple Two-Sector Model}
 		\framesubtitle{Occupational Threshold}
 		\begin{equation*}
 			%\label{eq:ot}
@@ -328,7 +336,7 @@
 				\item Assignment of students to teachers is random \\ $\Rightarrow$ distribution of students' skill identical across classrooms
 				\item Teachers with different $h_{T,g}$ vary with respect to class {\it size}
 				\begin{align*}
-					h_{T,g}^\beta N(h_{T,g})^{-\sigma} =\left(\frac{2\widetilde{H}_T}{M}\right)^\sigma
+					N(h_{T,g})=h_{T,g}^\frac{\beta}{\sigma} \cdot \frac{M}{2\widetilde{H}_T}
 				\end{align*}
 				\item Teacher's wage $\omega_{T,g}$ depends on teacher's human capital:
 				%\item $\omega(\cdot,\cdot)$ is proportional to the \textit{number of students} in a teacher's class:
@@ -352,7 +360,7 @@
 %\small
 Given occupational choices of today's ``old'' and aggregate human capital $\widetilde{H}_{T}$ and ${H}_{O}$, the equilibrium consists of individual choices of ``young'' $\{e_{T,g}, s_{T,g}, e_{O,g}, s_{O,g}\}$, the occupational choice boundary $a^*_{T,g}(a_O)$, the corresponding densities $f_{T,g}$ and $f_{O,g}$, and occupation- and group-specific wage profiles $\{\omega_{T,g}, \omega_{O,g}\}$ such that:
 \begin{enumerate}
-	\item Individuals solve their problem \hyperlink{time_inv}{\beamergotobutton{Time Investment}} \hyperlink{good_inv}{\beamergotobutton{Goods Investment}}
+	\item Individuals solve their investment and occupational choice problems \hyperlink{timeinv}{\beamergotobutton{Time Investment}} \hyperlink{goodinv}{\beamergotobutton{Goods Investment}}
 	\item Aggregate human capital follows the laws of motion \hyperlink{laws}{\beamergotobutton{Laws of Motion}}
 	\item Government budget constraint is satisfied
 \end{enumerate}
@@ -441,7 +449,7 @@ where
 \begin{frame}
 \frametitle{Calibration}
 \framesubtitle{Assumptions and Normalizations}
-\scriptsize
+\tiny
 %			\begin{itemize}
 	%  \item $o \in \{1,\ldots,O\}$: index for non-teaching occupations 
 	%  \item $T$: index for teaching
@@ -454,14 +462,16 @@ where
 			\toprule
 			Parameter & Definition & Determination & Value\\
 			\midrule
-			$\tau^{w}_{o,{\rm men}}$ & Labor market barriers for men & Assumption & 0 \\
-			$\tau^{e}_{o,g}$ & Human capital barriers for all groups & Assumption & 0 \\
-			$\tau^{w}_{T,g}$ & Labor market barriers in teaching  & Assumption & 0 \\
-			& (all groups)&\\
-			$\tau^{e}_{T,g}$ & Human capital barriers in teaching & Assumption & 0 \\
-			& (all groups) & \\
-			$\alpha$ & elasticity of human capital with respect to & Normalization & 1 \\
-			& idiosyncratic ability & \\
+			$\tau^{w}_{o,{\rm men}}$ & labor market barriers for men & assumption & 0 \\
+			$\tau^{e}_{o,g}$ & human capital barriers for all groups & assumption & 0 \\
+			$\tau^{w}_{T,g}$ & labor market barriers in teaching  & assumption & 0 \\
+			& (all groups)& &\\
+			$\tau^{e}_{T,g}$ & human capital barriers in teaching & assumption & 0 \\
+			& (all groups) & &\\
+			$\alpha$ & elasticity of human capital with respect to & normalization & 1 \\
+			& idiosyncratic ability & &\\
+			$\sigma$ & elasticity of human capital with respect to & normalization & 1 \\
+			& class size & &\\
 			%					$\tau^{e}_{i,g}$ & Human capital barriers for other groups & Normalization & 0 \\
 			%					$A_{T}$ & Teachers productivity & Normalization & 1 \\
 			%					$\mu_a$ & Mean ability distribution & Normalization & 0 \\
@@ -497,16 +507,10 @@ where
 			$\gamma$ & curvature of wage function in teaching & wage dispersion in teaching & 0.83\\
 			&& (indirect inference) &\\
 			\midrule
-			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men & \\
-			%					\midrule
-			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women &\\
-			& faced by women & &\\
-			%					\midrule
-			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers &\\
-			%					\midrule
-			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers &\\
-			& in non-teaching occupations & &\\
-			% s_T/s_O, where  s_i=years of school/25 years
+			$\beta$ & elasticity of human capital with respect to & skill composition by occupation and group & 0.5\\
+			& teacher's human capital & &\\
+			$\mu$ &  trade-off between consumption and & schooling of teachers relative & 0.714\\
+			& time spent accumulating human capital & to schooling of others & \\
 			\bottomrule
 			%			\bottomrule
 		\end{tabular}
@@ -517,26 +521,30 @@ where
 
 \begin{frame}
 	\frametitle{Calibration}
-	\framesubtitle{Benchmark Calibration}
+	\framesubtitle{Baseline Parameters by Year}
 	\tiny
 	\begin{table}[h!]
 		\centering
 		\begin{tabular}{lcc}
 			\toprule
-			\toprule
-			Parameter & Definition & Empirical Targets\\
-			\midrule
-			\textcolor{red}{$\beta$} & Teacher elasticity of human capital & Skill composition by occupation and group \\
-			$\sigma$ & Class size elasticity of human capital & Normalization to 1\\
-			\multirow{2}{*}{$\mu$} &  Trade-off between consumption and & Schooling of teachers relative\\
-			& time spent accumulating human capital & to schooling of others\\
-			%					$\lambda_m$ & Scale for male labor market barriers & Share of teachers among men\\
-			%					$\lambda_f$ & Scale for other group labor market barriers & Share of teachers among other group\\
+			%					\toprule
+			Parameter & Definition & Determination \\
+			\midrule			
+			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men  \\
+			%					\midrule
+			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women \\
+			& faced by women & \\
+			%					\midrule
+			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers \\
+			%					\midrule
+			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers \\
+			& in non-teaching occupations & \\
+			% s_T/s_O, where  s_i=years of school/25 years
 			\bottomrule
 			%			\bottomrule
 		\end{tabular}
-		%\caption{Benchmark Calibration}
-		\label{tab:calibr}
+		%\caption{Baseline Parameter Values}
+		\label{tab:param}
 	\end{table}
 \end{frame}
 
@@ -546,80 +554,7 @@ where
 	
 	% \end{frame}
 
-\begin{frame}
-	\frametitle{Summing up}
-	%\framesubtitle{}
-	\textcolor{tblue}{Results}
-	\begin{itemize}
-		\item Develop a novel theory of occupational choice and human capital formation: 
-		\begin{itemize}
-			\item[$\circ$] non-linear wages %$\Rightarrow$ comparative and absolute advantage
-			\item[$\circ$] intergenerational dynamics of human capital accumulation
-		\end{itemize}
-		\item Calibrate reduction in discrimination \& barriers:
-		\begin{itemize}
-			\item[$\circ$] static gains (as in Hsieh et al., 2019) vs.
-			\item[$\circ$] dynamic effects (human capital accumulation)
-		\end{itemize}
-	\end{itemize}
-	\textcolor{tblue}{Ongoing and Future Work}
-	\begin{itemize}				
-		\item Multiple locations differentiated by amenities and/or local tax rates (implicit school segregation by income)
-	\end{itemize}
-\end{frame}
 
-
-\begin{frame}
-	\frametitle{Optimal Time Investment} 
-	\label{time_inv}
-	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
-	\begin{align}
-		%\label{eq:s_T}
-		s_{T,g} & = \frac{\mu \phi}{\mu \phi+\tfrac{1}{\gamma}-\eta} \nonumber\\
-		%\label{eq:e_T}
-		s_{O,g} & = \frac{\mu \phi}{\mu \phi+1-\eta} \nonumber
-	\end{align}
-	\hyperlink{eqm}{\beamergotobutton{Back}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Optimal Goods Investment} 
-	\label{good_inv}
-	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
-	\begin{align}
-		%\label{eq:s_T}
-		e_{T,g} & = \left( \left(\kappa \cdot \gamma \cdot \eta \cdot \tau_{T,g} \right)^\frac{1}{\gamma} \cdot a_T^{\alpha} \cdot s_{T,g}^{\phi} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\sigma}\right)^{\frac{1}{\frac{1}{\gamma}-\eta}}  \nonumber\\
-		%\label{eq:e_T}
-		e_{O,g} & = \left( {{A'}_{O}} \cdot \eta \cdot\tau_{O,g} \cdot a_O^\alpha \cdot s_{O,g}^\phi \cdot  \left(\tfrac{2\widetilde{H}_T}{M}\right)^\sigma \right)^{\frac{1}{1-\eta}} \nonumber
-	\end{align}
-	where
-	\begin{align}
-		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
-	\end{align}
-	\hyperlink{eqm}{\beamergotobutton{Back}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Aggregate Laws of Motion} 
-	\label{laws}
-	\small
-	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
-	\begin{align}
-		%\label{eq:lomT}
-		\widetilde{H}'_{T} & = \Bigg[ \left(\kappa \cdot \gamma \cdot \eta\right)^{\frac{\eta}{1-\eta\gamma}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta\gamma}}\nonumber\\
-		& \times \sum_{g=1}^G \tau_{T,g}^\frac{\eta}{1-\eta\gamma} \cdot \int_0^\infty  s_{T,g}^\frac{\phi}{1-\eta\gamma} \cdot a^\frac{\alpha}{1-\eta\gamma}  f_{T,g}(a)da \Bigg]^\frac{\beta}{\sigma} \nonumber\\  
-		%\Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \nonumber\\
-		%& \times \Bigg( \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \Bigg)^\eta \nonumber\\
-		%& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^\frac{\beta}{\sigma} \nonumber\\
-		{H}'_{O} & = \left({A'}_O \cdot \eta\right)^\frac{\eta}{1-\eta} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta} \cdot  \sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot \int_0^\infty s_{O,g}^\frac{\phi}{1-\eta} \cdot a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
-		%\sum_{g=1}^G \left( \tau_{O,g}^\eta \cdot \eta^\eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot {A'}_O^\eta \cdot s_{T,g}^\phi \right)^\frac{1}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
-	\end{align}
-	where
-	\begin{align}
-		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
-	\end{align}
-	\hyperlink{eqm}{\beamergotobutton{Back}}
-\end{frame}
 
 % \begin{frame}
 	% 	\frametitle{Teacher's Wage Profile} 
@@ -745,114 +680,386 @@ where
 	%  \end{itemize}
 %\end{itemize}
 %\end{frame}
+
+% CHANGE IN BARRIERS
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/fT_women_steadystate.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Labor Market Barriers}
+	\label{barriers}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/tau_w_women_70.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+	\hyperlink{occupations}{\beamergotobutton{Occupations}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/fT_men_steadystate.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Labor Market Barriers}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/tau_w_women_70_90.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+	\hyperlink{occupations}{\beamergotobutton{Occupations}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/tau_w_women.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Labor Market Barriers}
+	\label{barriers3}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/tau_w_women_70_10.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+	\hyperlink{occupations}{\beamergotobutton{Occupations}}
+	\hyperlink{aggprod}{\beamergotobutton{Occupational Productivity}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/eT_women_steadystate.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Distribution of Teaching Abilities}
+	\framesubtitle{Female workers with lower abilities become teachers}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/fT_women_steadystate.eps}
+			\label{ }
+		\end{center}
+	\end{figure}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/eT_men_steadystate.eps}
+	\frametitle{Distribution of Teaching Abilities}
+	\framesubtitle{Male workers with higher abilities become teachers}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/fT_men_steadystate.eps}
+			\label{ }
+		\end{center}
+	\end{figure}
+\end{frame}
+
+%\begin{frame}
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=\textwidth]{fT_men_steadystate.eps}
 %\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+%\label{ }
+%\end{center}
+%\end{figure}
+%\end{frame}
+
+\begin{frame}
+	\frametitle{Human Capital Investment}
+	\framesubtitle{Human capital investment decline over time, given ability}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/eT_women_steadystate.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+\end{frame}
+
+
+% \begin{frame}
+	% \frametitle{Distribution of Teaching Human Capital}
+	% \framesubtitle{Female teachers have lower human capital}
+	% \begin{figure}
+		% \begin{center}
+			% \begin{subfigure}[b]{0.49\textwidth}
+				% \centering
+				% \includegraphics[width=\textwidth]{hT_fT_women_steadystate.eps}
+				% \end{subfigure}
+			% \hfill
+			% \begin{subfigure}[b]{0.49\textwidth}
+				% \centering
+				% \includegraphics[width=\textwidth]{hT_fT_men_steadystate.eps}
+				% \end{subfigure}
+			
+			%\includegraphics[width=\textwidth]{fT_women_steadystate.eps}
+			%\caption{ }
+			% \label{ }
+			% \end{center}
+		% \end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% \frametitle{Distribution of Teaching Human Capital}
+	% \framesubtitle{}
+	% \begin{figure}
+		%  		\begin{center}
+			%  			\includegraphics[width=0.8\textwidth]{hT_women_steadystate.eps}
+			%  			%\caption{ }
+			%  			\label{ }
+			%  		\end{center}
+		%  	\end{figure}
+	% \end{frame}
+
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{hT_fT_women_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{hT_fT_men_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{eT_women_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{eT_men_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{hT_women_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+% \begin{frame}
+	% 	\begin{figure}
+		% 		\begin{center}
+			% 			\includegraphics[width=\textwidth]{hT_men_steadystate.eps}
+			% 			%\caption{ }
+			% 			\label{ }
+			% 		\end{center}
+		% 	\end{figure}
+	% \end{frame}
+
+%\begin{frame}
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=\textwidth]{tau_w_women.eps}
+%\caption{ }
+%\label{ }
+%\end{center}
+%\end{figure}
+%\end{frame}
+
+\begin{frame}
+	\frametitle{Summing up}
+	
+	\begin{itemize}
+		\item Ability composition of teachers change over time:
+		\begin{itemize}
+			\item[$\circ$] Women with lower ability select into teaching career % because other careers are more attractive
+			\item[$\circ$] Men with higher ability select into teaching career % because other careers are more attractive
+		\end{itemize}
+		\item Human capital investment drop over time, given ability % because lower ability and lower wages
+		%\item $\Rightarrow$ Lower average teaching human capital 
+		%\item More women become teachers
+		%\item Fewer men become teachers
+		%\item Smaller class sizes
+		%\item $\Rightarrow$ Same level of aggregate teaching human capital 
+		%\item $\Rightarrow$ Lower output 
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/tau_w_women_70.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Conclusion}
+	%\framesubtitle{}
+	\textcolor{tblue}{Results}
+	\begin{itemize}
+		\item Develop a novel theory of occupational choice and human capital formation: 
+		\begin{itemize}
+			\item[$\circ$] non-linear wages %$\Rightarrow$ comparative and absolute advantage
+			\item[$\circ$] intergenerational dynamics of human capital accumulation
+		\end{itemize}
+		\item Calibrate reduction in barriers
+	\end{itemize}
+	\textcolor{tblue}{Ongoing and Future Work}
+	\begin{itemize}	
+		\item Decomposition:
+		\begin{itemize}
+			\item[$\circ$] static gains (as in Hsieh et al., 2019) vs.
+			\item[$\circ$] dynamic effects (human capital accumulation)
+		\end{itemize}
+		\item Multiple locations differentiated by amenities and/or local tax rates (implicit school segregation by income)
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/tau_w_women_70_90.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Law of Motion}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/LoM.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/tau_w_women_70_10.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Optimal Time Investment} 
+	\label{timeinv}
+	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
+	\begin{align}
+		%\label{eq:s_T}
+		s_{T,g} & = \frac{\mu \phi}{\mu \phi+\tfrac{1}{\gamma}-\eta} \nonumber\\
+		%\label{eq:e_T}
+		s_{O,g} & = \frac{\mu \phi}{\mu \phi+1-\eta} \nonumber
+	\end{align}
+	\hyperlink{eqm}{\beamergotobutton{Back}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/A_men_70.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Optimal Goods Investment} 
+	\label{goodinv}
+	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
+	\begin{align}
+		%\label{eq:s_T}
+		e_{T,g} & = \left( \left(\kappa \cdot \gamma \cdot \eta \cdot \tau_{T,g} \right)^\frac{1}{\gamma} \cdot a_T^{\alpha} \cdot s_{T,g}^{\phi} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\sigma}\right)^{\frac{1}{\frac{1}{\gamma}-\eta}}  \nonumber\\
+		%\label{eq:e_T}
+		e_{O,g} & = \left( {{A'}_{O}} \cdot \eta \cdot\tau_{O,g} \cdot a_O^\alpha \cdot s_{O,g}^\phi \cdot  \left(\tfrac{2\widetilde{H}_T}{M}\right)^\sigma \right)^{\frac{1}{1-\eta}} \nonumber
+	\end{align}
+	where
+	\begin{align}
+		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
+	\end{align}
+	\hyperlink{eqm}{\beamergotobutton{Back}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/A_men_70_90.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Aggregate Laws of Motion} 
+	\label{laws}
+	\small
+	%The F.O.C.s for $s^T$ and $e^T$, respectively, after a few steps of algebra are:
+	\begin{align}
+		%\label{eq:lomT}
+		\widetilde{H}'_{T} & = \Bigg[ \left(\kappa \cdot \gamma \cdot \eta\right)^{\frac{\eta}{1-\eta\gamma}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta\gamma}}\nonumber\\
+		& \times \sum_{g=1}^G \tau_{T,g}^\frac{\eta}{1-\eta\gamma} \cdot \int_0^\infty  s_{T,g}^\frac{\phi}{1-\eta\gamma} \cdot a^\frac{\alpha}{1-\eta\gamma}  f_{T,g}(a)da \Bigg]^\frac{\beta}{\sigma} \nonumber\\  
+		%\Bigg[ \left(\tfrac{\beta}{\sigma}\right)^\eta \cdot\eta^{\frac{1}{1-\eta}} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^{\frac{\sigma}{1-\eta}} \nonumber\\
+		%& \times \Bigg( \frac{\sum_{i=2}^I \sum_{g=1}^G {A_i'}^\frac{1}{1-\eta}\cdot\tau_{i,g}^\frac{\eta}{1-\eta} \cdot s_{i,g}^\frac{\phi}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{i,g}(a)da}{\sum_{i=2}^I \sum_{g=1}^G f_{i,g}(a)da} \Bigg)^\eta \nonumber\\
+		%& \times \Bigg(\sum_{g=1}^G \tau_{T,g}^\frac{\eta\beta }{\sigma-\eta\beta } \cdot s_{T,g}^\frac{\phi\beta }{\sigma-\eta\beta } \cdot \int_0^\infty a^\frac{\alpha\beta}{\sigma-\eta\beta } f^{g,T}(a)da \Bigg)^\frac{\sigma-\eta\beta}{\beta} \Bigg]^\frac{\beta}{\sigma} \nonumber\\
+		{H}'_{O} & = \left({A'}_O \cdot \eta\right)^\frac{\eta}{1-\eta} \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta} \cdot  \sum_{g=1}^G \tau_{O,g}^\frac{\eta}{1-\eta} \cdot \int_0^\infty s_{O,g}^\frac{\phi}{1-\eta} \cdot a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
+		%\sum_{g=1}^G \left( \tau_{O,g}^\eta \cdot \eta^\eta \cdot \left(\tfrac{2\widetilde{H}_T}{M}\right)^\frac{\sigma}{1-\eta}\cdot {A'}_O^\eta \cdot s_{T,g}^\phi \right)^\frac{1}{1-\eta}\cdot \int_0^\infty a^{\frac{\alpha}{1-\eta}} f_{O,g}(a)da \nonumber
+	\end{align}
+	where
+	\begin{align}
+		\tau_{i,g} =\frac{(1-t)(1-\tau^{\omega}_{i,g})}{1+\tau^e_{i,g}} \nonumber
+	\end{align}
+	\hyperlink{eqm}{\beamergotobutton{Back}}
 \end{frame}
 
 \begin{frame}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\textwidth]{/Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wage/plots/A_men_70_10.eps}
-%\caption{ }
-\label{ }
-\end{center}
-\end{figure}
+	\frametitle{Occupations} 
+	\label{occupations}
+	\scriptsize
+	\begin{enumerate}
+		\item Executives, Administrative, and Managerial
+		\vspace{-0.2cm}
+		\item Management Related
+		\vspace{-0.2cm}
+		\item Architects, Engineers, Math, and Computer Science
+		\vspace{-0.2cm}
+		\item Natural and Social Scientists, Recreation, Religious, Arts, Athletes
+		\vspace{-0.2cm}
+		\item Doctors and Lawyers
+		\vspace{-0.2cm}
+		\item Nurses, Therapists, and Other Health Service
+		\vspace{-0.2cm}
+		\item Teachers, Postsecondary
+		\vspace{-0.2cm}
+		\item Teachers, Non-Postsecondary and Librarians
+		\vspace{-0.2cm}
+		\item Health and Science Technicians
+		\vspace{-0.2cm}
+		\item Sales, All
+		\vspace{-0.2cm}
+		\item Administrative Support, Clerks, Record
+		\vspace{-0.2cm}
+		\item Fire, Police, and Guards
+		\vspace{-0.2cm}
+		\item Food, Cleaning, and Personal Services and Private Household
+		\vspace{-0.2cm}
+		\item Farm, Related Agriculture, Logging, and Extraction
+		\vspace{-0.2cm}
+		\item Mechanics and Construction
+		\vspace{-0.2cm}
+		\item Precision Manufacturing
+		\vspace{-0.2cm}
+		\item Manufacturing Operators
+		\vspace{-0.2cm}
+		\item Fabricators, Inspectors, and Material Handlers
+		\vspace{-0.2cm}
+		\item Vehicle Operators
+		\vspace{-0.2cm}
+		\item Home Production 
+	\end{enumerate}
+	
+	\hyperlink{barriers}{\beamergotobutton{Back}}
 \end{frame}
+
+\begin{frame}
+	\frametitle{Occupational Productivity}
+	\label{aggprod}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/A_men_70.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Occupational Productivity}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/A_men_70_90.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Occupational Productivity}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{plots/A_men_70_10.eps}
+			%\caption{ }
+			\label{ }
+		\end{center}
+	\end{figure}
+	\hyperlink{occupations}{\beamergotobutton{Occupations}}
+	\hyperlink{barriers3}{\beamergotobutton{Back}}
+\end{frame}
+
 
 \end{document}
