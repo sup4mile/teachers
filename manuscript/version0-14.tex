@@ -784,30 +784,48 @@
 	%{\sc Need to update this section to reflect the discussion from the previous meeting!.}
 	
 	%The model allows analyzing the effects of changes in the labor market barriers.
-	In the calibration exercise we parametrize the economy in order to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. We select these years since the respondents from Project TALENT, NLSY79, and NLSY97 are, on average, 29 years old at these three dates. The parameterization treats these three target years as steady states of the model.
+	In the calibration exercise we parametrize the economy in order to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. We select these years since the respondents from Project TALENT, NLSY79, and NLSY97 are, on average, 29 years old at these three dates. The parameterization treats these three target years as steady states of the model. We restrict our sample to two groups: men and women. We exclude individuals who report to be unemployed or on active military duty.
 	
-	We assume that the idiosyncratic occupation-specific abilities are drawn from a Fr\'echet distribution and the relative innate talent levels are identical across all groups. Tables \ref{tab:assump}-\ref{tab:calibr} summarize the elements of a sample parameterization. Table \ref{tab:assump} summarizes the assumptions and normalization for our base parameterization of the model. We assume that there are no labor and human capital barriers for men in all occupations. We also assume that labor and human capital barriers in home production are zero for all groups.
+	Project TALENT 11-year follow up report information on 29-year-old individuals who attended at least one year of high school. We select equivalent samples from NLSY79 and NLSY97. Census and ACS samples include individuals who attend at least one year of high school and ``young`` age group (age 25-34). 
 	
-	Table \ref{tab:param} summarizes the key parameters. Table \ref{tab:calibr} presents the endogenous variables and their targeted empirical counterparts. Parameter value for $\frac{\beta}{\sigma}$ is a crucial parameter that governs how skill distribution changes with respect to the changes in the barriers. Identification of this parameter allows calibrating the model to the data and conduct quantitative and counterfactual analysis. Another parameter that governs how selection into teaching career responds to the changes in the barriers is $\eta$. If $\eta<1$, a decrease in barriers in other occupations leads to the higher occupational threshold, making teaching career more selective. If $\eta>1$, a decrease in barriers in other occupations results in the lower occupational threshold.
-	%Table \ref{tab:mom} compares the data and the model's predictions.
+	We define a person working in the home production is out of labor force or works less than 15 hours per week. Individuals working at least 30 hours are classified as employed in one of 21 occupations. Those who work between 15 and 29 hours are classified as part-time workers. We split their sampling weight equally between the home production and the reported market occupation.
+	
+	We measure earnings as the sum of labor, business, and farm income in the previous year. To calculate the earnings, we restrict the sample to those employed at least 48 weeks per year, working at least 30 hours per week, and earning at least 1,000 dollars in 2010 dollars in the previous year. We convert all earnings data from the Census to constant dollars.
+	
+	We assume that the idiosyncratic occupation-specific abilities are drawn from a Fr\'echet distribution and the relative innate talent levels are identical across all groups. Focusing on the one age group (``young``), we cannot differentiate between labor market barriers and human capital barriers. Therefore, we assume that educational barriers are zero. In addition, we assume that men face no labor market barriers, while female workers face labor market in all occupations, besides teaching. We normalize elasticities of human capital with respect to ability and class size to one. Table \ref{tab:assump} summarizes the assumptions and normalizations.
+	
+	To estimate $\theta$ and $\eta$ to infer non-teaching occupational productivities. To estimate $\theta$, the distributional assumptions imply that wages within an occupation for a given group follow a Fr\'echet distribution with the shape parameter $\theta(1-\eta)$. Using Census/ACS data, we estimate $\theta(1-\eta)$ to fit the distribution of the residuals from a cross-sectional regression of log hourly wages on 20 x 2 x 10 occupation-group-age dummies in each year. The resulting estimates for $\theta(1-\eta)$ is 1.324. The parameter $\eta$ denotes the elasticity of human capital with respect to goods investment and is equal to the fraction of output spent on human capital accumulation. Public plus private spending on education as a share of GDP in the United States is, on average, 6.6 percent over the years 1995, 2000, and 2010. Since the labor share in the United States in the same three years was 0.641, this implies an $\eta$ of 0.103. With $\theta(1-\eta)$=1.324 and $\eta$=0.103, we get $\theta$=1.476.
+	
+	To estimate $\gamma$, distributional assumptions imply that wages within teaching occupation for a given group follow a Fr\'echet distribution with the shape parameter $\theta(1-\gamma\eta)$. We estimate $\theta(1-\gamma\eta)$ to fit the distribution of the residuals from a cross-sectional regression of log hourly wages on 2 x 10 group-age dummies in each year. We get $\theta(1-\gamma\eta)$ equal to 1.350 across years. Then, $\theta$=1.476 and $\eta$=0.103 give us $\gamma$=0.830.
+	
+	We pick $\phi$ to match the Mincerian return from a cross-sectional regression of log income on years of schooling (with occupation x group dummies), which gives us $\phi$=2.745. Schooling of teachers relative to schooling of non-teaching workers is 1.23 which gives us $\mu$=0.714. Table \ref{tab:param} summarizes the parameters.
+	
+	Table \ref{tab:param_time} summarizes the parameters that vary over time. Occupational productivities could be recovered from the data on non-teaching occupational shares for men at each year. We normalize home production productivity to be one. Figure \ref{fig:prod} illustrates occupational productivities over time. We pick labor market barriers in non-teaching occupations to match female non-teaching occupational shares at each year. Figure \ref{fig:bar} presents labor market barriers over time. The parameter for the aggregate productivity in teaching $\kappa$ is determined by matching the fraction of men who become teachers. We get 0.2895,0.190, and 0.169 for 1970, 1990, and 2010, correspondingly. The aggregate labor market barrier for women in non-teaching occupations $\lambda_f$ is imputed from the fraction of female choosing teaching occupation. The estimates are 0.879, 1.034, and 0.602 for 1970, 1990, and 2010, correspondingly.
+	
 	
 	\begin{table}[h!]
 		\centering
+		\small
 		\begin{tabular}{lccc}
 			\toprule
 			\toprule
 			Parameter & Definition & Determination & Value\\
 			\midrule
-			$\tau^{w}_{i,men}$ & Labor market barriers for men & Assumption & 0\\
-			$\tau^{e}_{i,men}$ & Human capital barriers for men & Assumption & 0\\
-			$\tau^{w}_{T,g}$ & Labor market barriers for all groups & Assumption & 0\\
-			$\tau^{e}_{T,g}$ & Human capital barriers for all groups & Assumption & 0\\
-			$\tau^{e}_{i,g}$ & Human capital barriers for other groups & Normalization & 0\\
-			$A_{T}$ & Teachers productivity & Normalization & 1\\
-			$\mu_a$ & Mean ability distribution & Normalization & 0\\
-			$\sigma_a$ & St.dev. ability distribution & Normalization & 1\\
+			$\tau^{w}_{o,{\rm men}}$ & labor market barriers for men & assumption & 0 \\
+			$\tau^{e}_{o,g}$ & human capital barriers for all groups & assumption & 0 \\
+			$\tau^{w}_{T,g}$ & labor market barriers in teaching  & assumption & 0 \\
+			& (all groups)&\\
+			$\tau^{e}_{T,g}$ & human capital barriers in teaching & assumption & 0 \\
+			& (all groups) & \\
+			$\alpha$ & elasticity of human capital with respect to & normalization & 1 \\
+			& idiosyncratic ability & \\
+			$\sigma$ & elasticity of human capital with respect to & normalization & 1 \\
+			& class size & \\
+			%					$\tau^{e}_{i,g}$ & Human capital barriers for other groups & Normalization & 0 \\
+			%					$A_{T}$ & Teachers productivity & Normalization & 1 \\
+			%					$\mu_a$ & Mean ability distribution & Normalization & 0 \\
+			%					$\sigma_a$ & St.dev. ability distribution & Normalization & 1 \\
 			\bottomrule
-			%			\bottomrule
 		\end{tabular}
 		\caption{Assumptions and Normalization}
 		\label{tab:assump}
@@ -815,43 +833,130 @@
 	
 	\begin{table}[h!]
 		\centering
-		\begin{tabular}{lcc}
+		\small
+		\begin{tabular}{lcccc}
 			\toprule
 			\toprule
-			Parameter & Definition & Determination\\
+			%					\toprule
+			Parameter & Definition & Determination & Value\\
 			\midrule
-			$\alpha$ & Ability elasticity of human capital & Wage dispersion \\
-			$\eta$ & Goods elasticity of human capital & Aggregate education spending share  \\
-			$\phi$ & Time elasticity of human capital & Mincerian return to education for other \\
-			$A_{i}$ & Occupation-specific productivity & Labor market shares for men\\
-			$\tau^{w}_{i,g}$ & Labor market barriers for other groups & Group gap by occupation\\
-			% s_T/s_O, where  s_i=years of school/25 years
+			$\theta$ & shape parameter of Fr\'echet-distributed & wage dispersion in non-teaching occupations & 1.476\\
+			& idiosyncratic abilities & (indirect inference) &\\
+			%					\midrule
+			$\eta$ & goods elasticity of human capital & aggregate education spending share  & 0.103\\
+			& & (indirect inference) &\\
+			%					\midrule
+			$\phi$ & time elasticity of human capital & Mincerian returns to education (non-teaching) & 2.745\\
+			& & (indirect inference) &\\
+			%					\midrule
+			$\gamma$ & curvature of wage function in teaching & wage dispersion in teaching & 0.83\\
+			&& (indirect inference) &\\
+			%\midrule
+			$\beta$ & elasticity of human capital with respect to & arbitrary & 0.5\\
+			& teacher's human capital & \\
+			$\mu$ &  trade-off between consumption and & schooling of teachers relative & 0.714\\
+			& time spent accumulating human capital & to schooling of others & \\
 			\bottomrule
 			%			\bottomrule
 		\end{tabular}
-		\caption{Baseline Parameter Values}
+		\caption{Baseline Parameter}
 		\label{tab:param}
 	\end{table}
 	
 	\begin{table}[h!]
 		\centering
+		\small
 		\begin{tabular}{lcc}
 			\toprule
-			\toprule
-			Parameter & Definition & Empirical Targets\\
-			\midrule
-			$\beta$ & Teacher elasticity of human capital & Skill composition by occupation and group \\
-			$\sigma$ & Class size elasticity of human capital & Normalization to 1\\
-			\multirow{2}{*}{$\mu$} &  Trade-off between consumption and & Schooling of teachers relative\\
-			& time spent accumulating human capital & to schooling of others\\
-			$\lambda_m$ & Scale for male labor market wedges & Share of teachers among men\\
-			$\lambda_f$ & Scale for other group labor market wedges & Share of teachers among other group\\
+			%					\toprule
+			Parameter & Definition & Determination \\
+			\midrule			
+			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men  \\
+			%					\midrule
+			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women \\
+			& faced by women & \\
+			%					\midrule
+			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers \\
+			%					\midrule
+			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers \\
+			& in non-teaching occupations & \\
+			% s_T/s_O, where  s_i=years of school/25 years
 			\bottomrule
 			%			\bottomrule
 		\end{tabular}
-		\caption{Benchmark Calibration}
-		\label{tab:calibr}
+		\caption{Parameter Varying over Time}
+		\label{tab:param_time}
 	\end{table}
+	
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{A_men_70_10.eps}
+			\caption{Occupational Productivities over Time}
+			\label{fig:prod}
+		\end{center}
+	\end{figure}
+	
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{tau_w_women_70_10.eps}
+			\caption{Labor Market Barriers over Time}
+			\label{fig:bar}
+		\end{center}
+	\end{figure}
+	
+	\subsection{Results}\label{sec:results}
+	\begin{itemize}
+		\item Ability composition of teachers change over time:
+		\begin{itemize}
+			\item[$\circ$] Women with lower ability select into teaching career (figure \ref{fig:fem_ab}) % because other careers are more attractive
+			\item[$\circ$] Men with higher ability select into teaching career (figure \ref{fig:m_ab})% because other careers are more attractive
+		\end{itemize}
+		\item Human capital investment drop over time, given ability (figure \ref{fig:humcap})% because lower ability and lower wages
+		%\item $\Rightarrow$ Lower average teaching human capital 
+		%\item More women become teachers
+		%\item Fewer men become teachers
+		%\item Smaller class sizes
+		%\item $\Rightarrow$ Same level of aggregate teaching human capital 
+		%\item $\Rightarrow$ Lower output 
+	\end{itemize}
+	
+	
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{fT_women_steadystate.eps}
+			\caption{Distribution of Female Teaching Abilities}
+			\label{fig:fem_ab}
+		\end{center}
+	\end{figure}
+	
+	
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{fT_men_steadystate.eps}
+			\caption{Distribution of Male Teaching Abilities}
+			\label{fig:m_ab}
+		\end{center}
+	\end{figure}
+	
+	
+	%\begin{frame}
+	%\begin{figure}
+	%\begin{center}
+	%\includegraphics[width=\textwidth]{fT_men_steadystate.eps}
+	%\caption{ }
+	%\label{ }
+	%\end{center}
+	%\end{figure}
+	%\end{frame}
+	
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{eT_women_steadystate.eps}
+			\caption{Human Capital Investment}
+			\label{fig:humcap}
+		\end{center}
+	\end{figure}
+	
 	
 	% 	\begin{table}[h!]
 		% 		\centering
@@ -897,6 +1002,31 @@
 	
 	\newpage
 	\appendix
+	\section{List of Occupations}
+	\begin{enumerate}
+		\item Executives, Administrative, and Managerial
+		\item Management Related
+		\item Architects, Engineers, Math, and Computer Science
+		\item Natural and Social Scientists, Recreation, Religious, Arts, Athletes
+		\item Doctors and Lawyers
+		\item Nurses, Therapists, and Other Health Service
+		\item Teachers, Postsecondary
+		\item Teachers, Non-Postsecondary and Librarians
+		\item Health and Science Technicians
+		\item Sales, All
+		\item Administrative Support, Clerks, Record
+		\item Fire, Police, and Guards
+		\item Food, Cleaning, and Personal Services and Private Household
+		\item Farm, Related Agriculture, Logging, and Extraction
+		\item Mechanics and Construction
+		\item Precision Manufacturing
+		\item Manufacturing Operators
+		\item Fabricators, Inspectors, and Material Handlers
+		\item Vehicle Operators
+		\item Home Production 
+		\item Kindergarten - Secondary Teachers
+	\end{enumerate}
+	
 	%\section{Equilibrium for special case: Teachers are paid marginal product}\label{sec:equilibrium}
 	\section{Special Case: Teacher's Are Paid Their Marginal Product}\label{app:equilibrium}
 	The model in section \ref{sec:model} assumes that teachers are paid according to an exogenous schedule $\omega_T$ and each teacher's level of pay is a function of her human capital $h_T$. Here we consider a special case where teachers are paid according to their contribution to the human capital acquisition of the students in their classroom. Since the assignment of students to teachers is random and equally-abled students acquire the same amount of human capital across classrooms ``run'' by different teachers, better teachers are compensated for the additional human capital they contribute to by virtue of differences in class size.
