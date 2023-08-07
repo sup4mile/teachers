@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex 2022.3.29)  6 AUG 2023 10:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=latex 2022.3.29)  7 AUG 2023 07:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1014,6 +1014,15 @@ LaTeX Warning: Label ` ' multiply defined.
 
 LaTeX Warning: Label ` ' multiply defined.
 
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
 )
 \openout1 = `ATT_slides_version0-3.aux'.
 
@@ -1297,6 +1306,27 @@ o_wage/plots/tau_w_women_70_10.eps Graphic file (type eps)
 e/plots/tau_w_women_70_10.eps> [36
 
 ]
+File: /Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_ex
+o_wage/plots/A_men_70.eps Graphic file (type eps)
+
+</Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wag
+e/plots/A_men_70.eps> [37
+
+]
+File: /Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_ex
+o_wage/plots/A_men_70_90.eps Graphic file (type eps)
+
+</Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wag
+e/plots/A_men_70_90.eps> [38
+
+]
+File: /Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_ex
+o_wage/plots/A_men_70_10.eps Graphic file (type eps)
+
+</Users/simeonalder/Dropbox/Work/Research/GitHub/teachers/julia/codes_w_exo_wag
+e/plots/A_men_70_10.eps> [39
+
+]
 \tf@nav=\write6
 \openout6 = `ATT_slides_version0-3.nav'.
 
@@ -1314,12 +1344,12 @@ Package rerunfilecheck Info: File `ATT_slides_version0-3.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 22663 strings out of 478995
- 428004 string characters out of 5858210
- 755691 words of memory out of 5000000
- 39627 multiletter control sequences out of 15000+600000
+ 22681 strings out of 478995
+ 429033 string characters out of 5858210
+ 755762 words of memory out of 5000000
+ 39642 multiletter control sequences out of 15000+600000
  414884 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  131i,14n,132p,541b,556s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on ATT_slides_version0-3.dvi (36 pages, 349808 bytes).
+Output written on ATT_slides_version0-3.dvi (39 pages, 374448 bytes).
