@@ -15,6 +15,8 @@
 \usepackage{lscape,rotating}
 \usepackage{xfrac}
 \usepackage{dsfont}
+\usepackage{geometry}
+\usepackage{pdflscape}
 \newtheorem{as}{Assumption}
 \newtheorem{conjecture}{Conjecture}
 \newtheorem{corr}{Corollary}
@@ -143,7 +145,7 @@
 	Then, the resource constraint (\ref{resource}) anchors the class size distribution.
 	\begin{prp}[Class size distribution] For a given teacher with human capital $h_{T,g}$, her class size is characterized by:
 		\begin{align}
-			\left(\frac{2\widetilde{H}_T}{M}\right)^\sigma=h_{T,g}^\beta N(h_{T,g})^{-\sigma},
+			\left(\frac{2\widetilde{H}_T}{M}\right)^\sigma=h_{T,g}^\beta N(h_{T,g})^{-\sigma},\label{eq:N(h)}
 		\end{align}
 		where $\widetilde{H}_T = \sum_{g=1}^G \int_0^\infty {h_{T,g}}^{\frac{\beta}{\sigma}} d\mathcal{F}_T(h_{T,g}) $.
 	\end{prp}
@@ -786,28 +788,19 @@
 	%The model allows analyzing the effects of changes in the labor market barriers.
 	In the calibration exercise we parametrize the economy in order to match aggregate and micro moments that characterize the US economy in 1970, 1990, and 2010 to their model counterparts. We select these years since the respondents from Project TALENT, NLSY79, and NLSY97 are, on average, 29 years old at these three dates. The parameterization treats these three target years as steady states of the model. We restrict our sample to two groups: men and women. We exclude individuals who report to be unemployed or on active military duty.
 	
-	Project TALENT 11-year follow up report information on 29-year-old individuals who attended at least one year of high school. We select equivalent samples from NLSY79 and NLSY97. Census and ACS samples include individuals who attend at least one year of high school and ``young`` age group (age 25-34). 
+	The Project TALENT 11-year follow up reports information on 29-year-old individuals who attended at least one year of high school. We select equivalent samples from the NLSY79 and NLSY97. The ``matching'' Census and ACS samples include individuals who attended at least one year of high school and are in the 25-34 age group. 
 	
-	We define a person working in the home production is out of labor force or works less than 15 hours per week. Individuals working at least 30 hours are classified as employed in one of 21 occupations. Those who work between 15 and 29 hours are classified as part-time workers. We split their sampling weight equally between the home production and the reported market occupation.
+	Respondents are assigned to home production if they are out of the labor force or if they work less than 15 hours per week. Individuals working at least 30 hours are classified as employed in one of 20 occupations. Those who work between 15 and 29 hours are classified as part-time workers. We split their sampling weight equally between home production and the reported market occupations.
 	
 	We measure earnings as the sum of labor, business, and farm income in the previous year. To calculate the earnings, we restrict the sample to those employed at least 48 weeks per year, working at least 30 hours per week, and earning at least 1,000 dollars in 2010 dollars in the previous year. We convert all earnings data from the Census to constant dollars.
 	
-	We assume that the idiosyncratic occupation-specific abilities are drawn from a Fr\'echet distribution and the relative innate talent levels are identical across all groups. Focusing on the one age group (``young``), we cannot differentiate between labor market barriers and human capital barriers. Therefore, we assume that educational barriers are zero. In addition, we assume that men face no labor market barriers, while female workers face labor market in all occupations, besides teaching. We normalize elasticities of human capital with respect to ability and class size to one. Table \ref{tab:assump} summarizes the assumptions and normalizations.
+	We assume that the idiosyncratic occupation-specific abilities are drawn from a Fr\'echet distribution. The draws are i.i.d.~across occupations and the distribution is identical across groups. Since workers currently participate in the labor market for a single period, we cannot disentangle cohort from time effects and this, in turn, implies that we cannot distinguish of educational barriers from labor market discrimination. For this reason we assume that on is facing any educational barriers. In addition, we assume that men face no labor market discrimination, while female workers face labor market barriers in all occupations except teaching. We normalize the elasticities of human capital  with respect to ability $(\alpha)$ and class size $\left(\frac{\beta}{\sigma}\right)$ to one. Table \ref{tab:assump} below summarizes our assumptions and reports all normalized parameters.
 	
-	To estimate $\theta$ and $\eta$ to infer non-teaching occupational productivities. To estimate $\theta$, the distributional assumptions imply that wages within an occupation for a given group follow a Fr\'echet distribution with the shape parameter $\theta(1-\eta)$. Using Census/ACS data, we estimate $\theta(1-\eta)$ to fit the distribution of the residuals from a cross-sectional regression of log hourly wages on 20 x 2 x 10 occupation-group-age dummies in each year. The resulting estimates for $\theta(1-\eta)$ is 1.324. The parameter $\eta$ denotes the elasticity of human capital with respect to goods investment and is equal to the fraction of output spent on human capital accumulation. Public plus private spending on education as a share of GDP in the United States is, on average, 6.6 percent over the years 1995, 2000, and 2010. Since the labor share in the United States in the same three years was 0.641, this implies an $\eta$ of 0.103. With $\theta(1-\eta)$=1.324 and $\eta$=0.103, we get $\theta$=1.476.
-	
-	To estimate $\gamma$, distributional assumptions imply that wages within teaching occupation for a given group follow a Fr\'echet distribution with the shape parameter $\theta(1-\gamma\eta)$. We estimate $\theta(1-\gamma\eta)$ to fit the distribution of the residuals from a cross-sectional regression of log hourly wages on 2 x 10 group-age dummies in each year. We get $\theta(1-\gamma\eta)$ equal to 1.350 across years. Then, $\theta$=1.476 and $\eta$=0.103 give us $\gamma$=0.830.
-	
-	We pick $\phi$ to match the Mincerian return from a cross-sectional regression of log income on years of schooling (with occupation x group dummies), which gives us $\phi$=2.745. Schooling of teachers relative to schooling of non-teaching workers is 1.23 which gives us $\mu$=0.714. Table \ref{tab:param} summarizes the parameters.
-	
-	Table \ref{tab:param_time} summarizes the parameters that vary over time. Occupational productivities could be recovered from the data on non-teaching occupational shares for men at each year. We normalize home production productivity to be one. Figure \ref{fig:prod} illustrates occupational productivities over time. We pick labor market barriers in non-teaching occupations to match female non-teaching occupational shares at each year. Figure \ref{fig:bar} presents labor market barriers over time. The parameter for the aggregate productivity in teaching $\kappa$ is determined by matching the fraction of men who become teachers. We get 0.2895,0.190, and 0.169 for 1970, 1990, and 2010, correspondingly. The aggregate labor market barrier for women in non-teaching occupations $\lambda_f$ is imputed from the fraction of female choosing teaching occupation. The estimates are 0.879, 1.034, and 0.602 for 1970, 1990, and 2010, correspondingly.
-	
-	
-	\begin{table}[h!]
+		\begin{table}[h!]
 		\centering
 		\small
 		\begin{tabular}{lccc}
-			\toprule
+%			\toprule
 			\toprule
 			Parameter & Definition & Determination & Value\\
 			\midrule
@@ -819,23 +812,40 @@
 			& (all groups) & \\
 			$\alpha$ & elasticity of human capital with respect to & normalization & 1 \\
 			& idiosyncratic ability & \\
-			$\sigma$ & elasticity of human capital with respect to & normalization & 1 \\
+			$A_{20}$ & Productivity in home production & normalization & 1 \\
+			\midrule
+			$\sigma$ & elasticity of human capital with respect to & free parameter & 0.5 \\
 			& class size & \\
+			$\beta$ & elasticity of human capital with respect to & free parameter & 0.5\\
+			& teacher's human capital & \\
+
 			%					$\tau^{e}_{i,g}$ & Human capital barriers for other groups & Normalization & 0 \\
 			%					$A_{T}$ & Teachers productivity & Normalization & 1 \\
 			%					$\mu_a$ & Mean ability distribution & Normalization & 0 \\
 			%					$\sigma_a$ & St.dev. ability distribution & Normalization & 1 \\
 			\bottomrule
 		\end{tabular}
-		\caption{Assumptions and Normalization}
+		\caption{Assumptions and Normalized Parameters}
 		\label{tab:assump}
 	\end{table}
 	
-	\begin{table}[h!]
+	To estimate $\theta$ and $\eta$ to infer non-teaching occupational productivities.
+	
+	Given our assumption that idiosyncratic abilities are i.i.d.~Fr\'echet draws it follows that wages within the same occupation and group follow a Fr\'echet distribution with shape parameter $\theta(1-\eta)$. Using Census and ACS data, we estimate the best fit of $\theta(1-\eta)$ using a cross-sectional regression of log hourly residual wages on 20 $\times$ 2 $\times$ 10 occupation-group-age dummies in each year. The estimate for $\theta(1-\eta)$ is 1.324, which is consistent found in the earlier literature. The parameter $\eta$ denotes the elasticity of human capital with respect to human capital investment (in terms of goods) and is equal to the fraction of output spent on human capital accumulation. Public plus private spending on education as a share of U.S.~GDP is, on average, 6.6 percent in 1995, 2000, and 2010. Since the labor share in the United States in the same three years was 0.641, this implies an $\eta$ of 0.103. Given our estimate for $\theta(1-\eta)$ this implies $\theta$=1.476.
+	
+	To estimate $\gamma$, distributional assumptions imply that 
+	Our assumption on the distribution of idiosyncratic abilities, the human capital accumulation technology, and the functional form of the teachers' wage profile imply that the wages of teachers (within a group) follow a Fr\'echet distribution with shape parameter $\theta(1-\gamma\eta)$. we estimate the best fit of $\theta(1-\gamma\eta)$ using a cross-sectional regression of log hourly residual wages on 2 $\times$ 10 group-age dummies in each year. The estimated value of $\theta(1-\gamma\eta)$ is 1.350. Given the estimates for $\theta$ and $\eta$, this implies $\gamma$=0.830.
+	
+	We pick $\phi$ to match the Mincerian return from a cross-sectional regression of log income on years of schooling (with occupation $\times$ group dummies). Our estimate for $\phi$ is 2.745. The average schooling of teachers (in terms of educational attainment) relative to the average schooling of other workers is 1.23. This implies $\mu=0.714$.
+	
+	A summary of all time-invariant parameters is in Table \ref{tab:param} below.
+	
+\begin{landscape}	
+		\begin{table}[h!]
 		\centering
 		\small
 		\begin{tabular}{lcccc}
-			\toprule
+%			\toprule
 			\toprule
 			%					\toprule
 			Parameter & Definition & Determination & Value\\
@@ -852,8 +862,6 @@
 			$\gamma$ & curvature of wage function in teaching & wage dispersion in teaching & 0.83\\
 			&& (indirect inference) &\\
 			%\midrule
-			$\beta$ & elasticity of human capital with respect to & arbitrary & 0.5\\
-			& teacher's human capital & \\
 			$\mu$ &  trade-off between consumption and & schooling of teachers relative & 0.714\\
 			& time spent accumulating human capital & to schooling of others & \\
 			\bottomrule
@@ -862,32 +870,10 @@
 		\caption{Baseline Parameter}
 		\label{tab:param}
 	\end{table}
-	
-	\begin{table}[h!]
-		\centering
-		\small
-		\begin{tabular}{lcc}
-			\toprule
-			%					\toprule
-			Parameter & Definition & Determination \\
-			\midrule			
-			$A_{o}$ & occupational productivities (non-teaching) & labor market shares for men  \\
-			%					\midrule
-			$\tau^{w}_{o,{\rm women}}$ & labor market barriers (non-teaching) & labor market shares for women \\
-			& faced by women & \\
-			%					\midrule
-			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers \\
-			%					\midrule
-			$\lambda_f$ & aggregate labor market barrier for women & fraction of females who are teachers \\
-			& in non-teaching occupations & \\
-			% s_T/s_O, where  s_i=years of school/25 years
-			\bottomrule
-			%			\bottomrule
-		\end{tabular}
-		\caption{Parameter Varying over Time}
-		\label{tab:param_time}
-	\end{table}
-	
+\end{landscape}
+
+Occupational productivities are recovered from men's occupational shares in 1970, 1990, and 2010. Without loss of generality, we normalize the productivity of home production (occupation 20) to one each year. Figure \ref{fig:prod} illustrates occupational productivities over time. The downward trend in productivities are a reflection of the gradual rise in the share of home production (which includes workers who are not in the labor force) among men.
+
 	\begin{figure}
 		\begin{center}
 			\includegraphics[width=0.8\textwidth]{A_men_70_10.eps}
@@ -896,7 +882,9 @@
 		\end{center}
 	\end{figure}
 	
-	\begin{figure}
+	We identify the extent of labor market discrimination against women in non-teaching occupations based on differences in the occupational shares of women relative to men year-by-year and we plot them in Figure \ref{fig:bar}. In general, the values of $\tau_w$ for women drift towards zero over time, albeit it with some exceptions. The ``subsidy'' on home production falls sharply from 1970 to 2010, which reflects the sizeable reduction in the proportion of women engaged in home production over this time.
+	
+		\begin{figure}
 		\begin{center}
 			\includegraphics[width=0.8\textwidth]{tau_w_women_70_10.eps}
 			\caption{Labor Market Barriers over Time}
@@ -904,27 +892,62 @@
 		\end{center}
 	\end{figure}
 	
-	\subsection{Results}\label{sec:results}
-	\begin{itemize}
-		\item Ability composition of teachers change over time:
-		\begin{itemize}
-			\item[$\circ$] Women with lower ability select into teaching career (figure \ref{fig:fem_ab}) % because other careers are more attractive
-			\item[$\circ$] Men with higher ability select into teaching career (figure \ref{fig:m_ab})% because other careers are more attractive
-		\end{itemize}
-		\item Human capital investment drop over time, given ability (figure \ref{fig:humcap})% because lower ability and lower wages
+	The scale parameter of the wage function in teaching, i.e., $\kappa$, determines the fraction of men who select into teaching. The calibrated values are 0.2895, 0.190, and 0.169 for 1970, 1990, and 2010, respectively. This downward trend reflects the gradual drop in this share from 2.4 precent in 1970 to 1.9 in 2010.
+	
+	The parameter that governs the extent of labor market discrimination against women in non-teaching occupations, $\lambda_f$, is imputed from the fraction of females who select teaching as their occupation. The calibrated steady-state values are 0.879, 1.034, and 0.602 for 1970, 1990, and 2010, respectively.
+
+Table \ref{tab:param_time} summarizes the parameters that vary over time. 		
+
+	\begin{table}[h!]
+		\centering
+		\small
+		\begin{tabular}{lcc}
+			\toprule
+			%					\toprule
+			Parameter & Definition & Determination \\
+			\midrule			
+			$A_{o}$ & occupational productivities & labor market shares for men  \\
+			& (non-teaching) & \\
+			%					\midrule
+			$\tau^{w}_{o,{\rm women}}$ & labor market discrimination & labor market shares for women \\
+			& (non-teaching) against women & \\
+			%					\midrule
+			$\kappa$ & scale parameter of wage function in teaching & fraction of males who are teachers \\
+			%					\midrule
+			$\lambda_f$ & aggregate labor market discrimination against & fraction of females who are teachers \\
+			& women in non-teaching occupations & \\
+			% s_T/s_O, where  s_i=years of school/25 years
+			\bottomrule
+			%			\bottomrule
+		\end{tabular}
+		\caption{Parameter Varying over Time}
+		\label{tab:param_time}
+	\end{table}
+		
+	\subsection{Calibration Results}\label{sec:results}
+	The evolution of occupational productivities and labor market discrimination -- captured by both $\tau^w$ and $\lambda_f$ -- gives rise to significant changes in the economy's human capital intensity and skill composition of teachers. While the skill composition of female teachers is broadly stable between 1970 and 1990, it shifts to the left between 1990 and 2010. The skill distribution of male teachers, on the other hand, shifts to the right at first and then partially reverts to the left between 1990 and 2010.
+	
+%	Figures \ref{fig:fem_ab} and \ref{fig:m_ab} plot the distribution of idiosyncratic abilities of teachers, female and male, respectively, across the three steady states. The decline of labor market discrimination 
+%		\begin{itemize}
+%		\item Ability composition of teachers change over time:
+%		\begin{itemize}
+%			\item[$\circ$] Women with lower ability select into teaching career (figure \ref{fig:fem_ab}) % because other careers are more attractive
+%			\item[$\circ$] Men with higher ability select into teaching career (figure \ref{fig:m_ab})% because other careers are more attractive
+%		\end{itemize}
+%		\item Human capital investment drop over time, given ability (figure \ref{fig:humcap})% because lower ability and lower wages
 		%\item $\Rightarrow$ Lower average teaching human capital 
 		%\item More women become teachers
 		%\item Fewer men become teachers
 		%\item Smaller class sizes
 		%\item $\Rightarrow$ Same level of aggregate teaching human capital 
 		%\item $\Rightarrow$ Lower output 
-	\end{itemize}
+%	\end{itemize}
 	
 	
 	\begin{figure}
 		\begin{center}
 			\includegraphics[width=0.8\textwidth]{fT_women_steadystate.eps}
-			\caption{Distribution of Female Teaching Abilities}
+			\caption{Female Teachers}
 			\label{fig:fem_ab}
 		\end{center}
 	\end{figure}
@@ -933,7 +956,7 @@
 	\begin{figure}
 		\begin{center}
 			\includegraphics[width=0.8\textwidth]{fT_men_steadystate.eps}
-			\caption{Distribution of Male Teaching Abilities}
+			\caption{Male Teachers}
 			\label{fig:m_ab}
 		\end{center}
 	\end{figure}
@@ -949,10 +972,14 @@
 	%\end{figure}
 	%\end{frame}
 	
+	Since women face no labor market discrimination in teaching, human capital investment by male and female teachers is identical once we control for ability (see Figure \ref{fig:humcap}). Strikingly, however, human capital investment falls sharply between 1970 and 1990. It stabilizes at this low level between 1990 and 2010. Together, the evolution of the skill distribution among teachers and of the human capital investment imply that the drop in human capital {\it per teacher} declines by 15 percent between 1970 and 1990. It drops an additional 9 percent between 1990 and 2010.
+	
+	The drop in human capital per teacher is offset by a rise in the number of teachers such that $\widetilde{H}_T$ is about the same in 1970 and 2010. Equation \ref{eq:N(h)} implies that class sizes are shrinking over time, which is indeed what we observe in the data.
+	
 	\begin{figure}
 		\begin{center}
 			\includegraphics[width=0.8\textwidth]{eT_women_steadystate.eps}
-			\caption{Human Capital Investment}
+			\caption{Human Capital Investment (Men and Women)}
 			\label{fig:humcap}
 		\end{center}
 	\end{figure}
