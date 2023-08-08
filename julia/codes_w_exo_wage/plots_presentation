@@ -24,7 +24,7 @@ plot!(plt3_2_70,ylabel=L"A_o",title="Occupational Productivities",grid=false,sub
 savefig(plt3_2_70,"./plots/A_men_70.eps")
 # (1.c) Distribution of 'e_T'
 plt4 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
-plt5 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+# plt5 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
 # (1.d) Law of motion for 'H_T'
 plt6 = plot(H_grid./H_grid[iHH],H_grid./H_grid[iHH],linewidth=.5,linestyle=:dash)
 plot!(plt6,H_grid./H_grid[iHH],HH_T./HH_T[iHH],linewidth=1,linestyle=:solid)
@@ -71,7 +71,7 @@ plt3_2_70_10 = scatter!(plt3_2_70_90,a_by_occ,label=string(year),markershape=:xc
 savefig(plt3_2_70_10,"./plots/A_men_70_10.eps")
 # (3.c)
 plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
-plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+# plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
 
 # (4) Add axis labels and titles:
 # (4.a.0)
@@ -89,8 +89,8 @@ plot!(plt3,ylabel=L"τ_w",title="Labor Market Barriers Against Women",grid=false
 plot!(plt3_1_70_90,ylabel=L"τ_w",title="Labor Market Barriers Against Women",grid=false,subplot=1)
 plot!(plt3_1_70_10,ylabel=L"τ_w",title="Labor Market Barriers Against Women",grid=false,subplot=1)
 # (4.c)
-plot!(plt4,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Female Teachers' Human Capital Investment",legend=:left,subplot=1)
-plot!(plt5,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Male Teachers' Human Capital Investment",legend=:left,subplot=1)
+plot!(plt4,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Teachers' Human Capital Investment",legend=:left,subplot=1)
+# plot!(plt5,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Male Teachers' Human Capital Investment",legend=:left,subplot=1)
 plot!(plt6,xlabel=L"\widetilde{H}_T",ylabel=L"\widetilde{H}_T^'",grid=false,title="Law of Motion for Teachers' Human Capital",legend=false)
 
 # (5) Save figures in EPS file format:
