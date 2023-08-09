@@ -49,7 +49,7 @@ plt3_2_70_90 = scatter!(plt3_2_70,a_by_occ,label=string(year),markershape=:diamo
 savefig(plt3_2_70_90,"./plots/A_men_70_90.eps")
 # (2.c)
 plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
-plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+# plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
 
 # (3) 'year' = 2010
 # (3.a.0)
@@ -103,6 +103,5 @@ savefig(plt2_2,"./plots/hT_fT_men_steadystate.eps")
 savefig(plt3,"./plots/tau_w_women.eps")
 savefig(plt3_1_70_90,"./plots/tau_w_women_70_90.eps")
 savefig(plt3_1_70_10,"./plots/tau_w_women_70_10.eps")
-savefig(plt4,"./plots/eT_women_steadystate.eps")
-savefig(plt5,"./plots/eT_men_steadystate.eps")
+savefig(plt4,"./plots/eT_steadystate.eps")
 savefig(plt6,"./plots/LoM.eps")
