@@ -1,3 +1,5 @@
+# This Julia script computes counterfactual steady states for 1970, 1990, and 2010 where the extent of labor market discrimination against women is frozen in 1970. The parameter κ is updated such that the employment shares for men match the calibration targets for each steady-state year. By construction, the counterfactual results in 1970 match the baseline calibration. The results for 1990 and 2010 illustrate what would have happened if women's educational and labor market opportunities had remained frozen in time.
+
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
 # Change directory, if necessary:
@@ -34,7 +36,7 @@ share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 1970
+year = 2010
 # Load data for selected year:
 if year == 1970
     share_occ_data[:,1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -69,12 +71,11 @@ end
 gm[end] = M/2 - sum(gm)
 gm=gm'
 # Load parameters and results from previous parameterization:
-    cd("./parameterization")
+    cd("./parameterization/counterfactuals")
     fyear = string(year)
     fnameJLD = string("previousParameterization",fyear,".jld")
     d = load(fnameJLD)
     a_by_occ_initial = d["a_by_occ"]
-    τ_w_initial = d["τ_w_opt"]
     τ_e_initial = d["τ_e"]
     a_T_thresh = d["a_T_thresh"]
     t = (d["t"])
@@ -90,7 +91,6 @@ gm=gm'
     γ = d["γ"]
     κ = d["κ"]
     theta = d["theta"]
-    λf = d["λf"]
     λm = d["λm"]
     iHH = d["iHH"]
     a_grid = d["a_grid"]
@@ -99,11 +99,15 @@ gm=gm'
     a_T_10p = d["a_T_10p"]
     a_T_90p = d["a_T_90p"]
     h_T_initial = d["h_T"]
+    d = load("tau_w_1970.jld")
+    τ_w_opt = d["τ_w_opt"]
+    d = load("lambda_f_1970.jld")
+    λf = d["λf"]
     cd("..")
-
+    cd("..")
 # Update model parameters, if required:
 # λf = .879 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = .2895 # scale parameter of teachers' wage profile
+κ = .1585 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -112,9 +116,6 @@ dist = Frechet(theta,1)
 τ_w=zeros(n_O-1,n_G)
 # Vector of education barriers in each occupation (relative to 'T')
 τ_e=zeros(n_O-1,n_G)
-
-# to match shares for Other for women
-τ_w_opt=zeros(n_O-1,n_G) # n_G-element vector of labor market discrimination in 'O' (relative to 'T')
 
 τ_w[:,2]=fill!(τ_w[:,2],0)
 τ_w[:,2]=ones(n_O-1).-λm*(ones(n_O-1).-τ_w[:,2])
@@ -226,9 +227,9 @@ end
 # res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
 
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
-res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
-τ_w_opt[:,1] = Optim.minimizer(res)
-println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",Optim.minimum(res))
+# res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
+# τ_w_opt[:,1] = Optim.minimizer(res)
+# println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",Optim.minimum(res))
 τ_w[:,1]=ones(n_O-1).-λf*(ones(n_O-1).-τ_w_opt[:,1])
 
 # Compute the share of individuals employed in non-teaching occupations in each group (indexed by 'iG'):
@@ -756,12 +757,9 @@ for iH in 1:n_H
     end
 end
 # Save parameterization in JLD file:
-cd("./parameterization")
+cd("./parameterization/counterfactuals")
 save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg)
-if year == 1970
-    save("tau_w_1970.jld","τ_w_opt",τ_w_opt)
-    save("lambda_f_1970.jld","λf",λf)
-end
+cd("..")
 cd("..")
 
 println("____________")
@@ -799,7 +797,7 @@ println("HH_fp= ",HH_fp)
 
 df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=4), α = round(α;digits=2) )
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
-fnameCSV = string("./results/moments",fyear,".csv")
+fnameCSV = string("./results/counterfactuals/moments",fyear,"_counter_1.csv")
 if isfile(fnameCSV) == true
     moments = DataFrame(CSV.File(fnameCSV))
     append!(moments,df)
