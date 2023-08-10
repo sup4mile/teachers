@@ -2,22 +2,25 @@
 \beamer@slide {}{13}
 \beamer@slide {}{14}
 \beamer@slide {eq:V}{14}
-\beamer@slide {eq:indiff}{16}
-\beamer@slide {eqm}{18}
-\beamer@slide {tab:assump}{22}
-\beamer@slide {tab:param}{23}
-\beamer@slide {tab:calibr}{24}
-\beamer@slide {time_inv}{26}
-\beamer@slide {good_inv}{27}
-\beamer@slide {laws}{28}
+\beamer@slide {eq:indiff}{17}
+\beamer@slide {eqm}{19}
+\beamer@slide {tab:assump}{23}
+\beamer@slide {tab:param}{24}
+\beamer@slide {tab:param}{25}
+\beamer@slide {barriers}{26}
+\beamer@slide { }{26}
+\beamer@slide { }{27}
+\beamer@slide {barriers3}{28}
+\beamer@slide { }{28}
 \beamer@slide { }{29}
 \beamer@slide { }{30}
 \beamer@slide { }{31}
-\beamer@slide { }{32}
-\beamer@slide { }{33}
 \beamer@slide { }{34}
-\beamer@slide { }{35}
-\beamer@slide { }{36}
-\beamer@slide { }{37}
-\beamer@slide { }{38}
+\beamer@slide {timeinv}{35}
+\beamer@slide {goodinv}{36}
+\beamer@slide {laws}{37}
+\beamer@slide {occupations}{38}
+\beamer@slide {aggprod}{39}
 \beamer@slide { }{39}
+\beamer@slide { }{40}
+\beamer@slide { }{41}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2022.3.29)  8 AUG 2023 13:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2022.3.29)  8 AUG 2023 14:39
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -980,7 +980,38 @@ Package: changepage 2009/10/20 v1.0c check page and change page layout
 (/usr/local/texlive/2021/texmf-dist/tex/latex/parskip/parskip.sty
 Package: parskip 2021-03-14 v2.0h non-zero parskip adjustments
 )
-(./ATT_slides_version0-3.aux)
+(./ATT_slides_version0-3.aux
+
+LaTeX Warning: Label `tab:param' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+
+LaTeX Warning: Label ` ' multiply defined.
+
+)
 \openout1 = `ATT_slides_version0-3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 57.
@@ -1152,7 +1183,405 @@ File: ts1cmss.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 
 ] [9
 
+] [10
+
+] [11
+
+] [12
+
 ]
-!pdfTeX error: /Library/TeX/texbin/pdflatex (file ./plots/TALENT_math_occ_no_no
-rm_female_no_lf.pdf): reading image file failed
- ==> Fatal error occurred, no output PDF file produced!
+
+Package hyperref Warning: Ignoring empty anchor on input line 264.
+
+
+Overfull \hbox (8.1465pt too wide) detected at line 264
+[]
+ []
+
+
+Package hyperref Warning: Ignoring empty anchor on input line 264.
+
+
+Overfull \vbox (2.091pt too high) detected at line 264
+ []
+
+[13
+
+]
+
+Package hyperref Warning: Ignoring empty anchor on input line 285.
+
+
+Overfull \hbox (3.56995pt too wide) detected at line 285
+[]
+ []
+
+[14
+
+] [15
+
+]
+Overfull \hbox (8.7212pt too wide) detected at line 308
+[]
+ []
+
+[16
+
+] [17
+
+] [18
+
+] [19
+
+] [20
+
+] [21
+
+]
+Overfull \hbox (17.43431pt too wide) detected at line 429
+[]
+ []
+
+[22
+
+] [23
+
+]
+Overfull \hbox (13.54666pt too wide) in paragraph at lines 520--520
+ [] 
+ []
+
+[24
+
+]pdfTeX warning (ext4): destination with the same identifier (name{tab:param}) 
+has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.549 \end{frame}
+                  [25
+
+]
+Package epstopdf Info: Source file: <plots/tau_w_women_70.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 19207 bytes
+(epstopdf)             Output file: <plots/tau_w_women_70-eps-converted-to.pdf>
+
+(epstopdf)                    date: 2023-08-08 14:22:43
+(epstopdf)                    size: 16069 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/tau_w_women_70-eps-c
+onverted-to.pdf plots/tau_w_women_70.eps>
+(epstopdf)             \includegraphics on input line 696.
+Package epstopdf Info: Output file is already uptodate.
+<plots/tau_w_women_70-eps-converted-to.pdf, id=684, 433.62pt x 289.08pt>
+File: plots/tau_w_women_70-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/tau_w_women_70-eps-converted-to.pdf>
+Package pdftex.def Info: plots/tau_w_women_70-eps-converted-to.pdf  used on inp
+ut line 696.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+ [26
+
+ <./plots/tau_w_women_70-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/tau_w_women_70_90.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 20351 bytes
+(epstopdf)             Output file: <plots/tau_w_women_70_90-eps-converted-to.p
+df>
+(epstopdf)                    date: 2023-08-08 14:22:43
+(epstopdf)                    size: 16842 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/tau_w_women_70_90-ep
+s-converted-to.pdf plots/tau_w_women_70_90.eps>
+(epstopdf)             \includegraphics on input line 708.
+Package epstopdf Info: Output file is already uptodate.
+<plots/tau_w_women_70_90-eps-converted-to.pdf, id=749, 433.62pt x 289.08pt>
+File: plots/tau_w_women_70_90-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/tau_w_women_70_90-eps-converted-to.pdf>
+Package pdftex.def Info: plots/tau_w_women_70_90-eps-converted-to.pdf  used on 
+input line 708.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.708 \end{frame}
+                  [27
+
+ <./plots/tau_w_women_70_90-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/tau_w_women_70_10.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 21855 bytes
+(epstopdf)             Output file: <plots/tau_w_women_70_10-eps-converted-to.p
+df>
+(epstopdf)                    date: 2023-08-08 14:22:43
+(epstopdf)                    size: 18561 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/tau_w_women_70_10-ep
+s-converted-to.pdf plots/tau_w_women_70_10.eps>
+(epstopdf)             \includegraphics on input line 722.
+Package epstopdf Info: Output file is already uptodate.
+<plots/tau_w_women_70_10-eps-converted-to.pdf, id=811, 433.62pt x 289.08pt>
+File: plots/tau_w_women_70_10-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/tau_w_women_70_10-eps-converted-to.pdf>
+Package pdftex.def Info: plots/tau_w_women_70_10-eps-converted-to.pdf  used on 
+input line 722.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.722 \end{frame}
+                  [28
+
+ <./plots/tau_w_women_70_10-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/fT_women_steadystate.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 30186 bytes
+(epstopdf)             Output file: <plots/fT_women_steadystate-eps-converted-t
+o.pdf>
+(epstopdf)                    date: 2023-08-08 14:22:44
+(epstopdf)                    size: 16817 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/fT_women_steadystate
+-eps-converted-to.pdf plots/fT_women_steadystate.eps>
+(epstopdf)             \includegraphics on input line 733.
+Package epstopdf Info: Output file is already uptodate.
+<plots/fT_women_steadystate-eps-converted-to.pdf, id=877, 433.62pt x 289.08pt>
+File: plots/fT_women_steadystate-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/fT_women_steadystate-eps-converted-to.pdf>
+Package pdftex.def Info: plots/fT_women_steadystate-eps-converted-to.pdf  used 
+on input line 733.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.733 \end{frame}
+                  [29
+
+ <./plots/fT_women_steadystate-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/fT_men_steadystate.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 29303 bytes
+(epstopdf)             Output file: <plots/fT_men_steadystate-eps-converted-to.
+pdf>
+(epstopdf)                    date: 2023-08-08 14:22:44
+(epstopdf)                    size: 17159 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/fT_men_steadystate-e
+ps-converted-to.pdf plots/fT_men_steadystate.eps>
+(epstopdf)             \includegraphics on input line 744.
+Package epstopdf Info: Output file is already uptodate.
+<plots/fT_men_steadystate-eps-converted-to.pdf, id=940, 433.62pt x 289.08pt>
+File: plots/fT_men_steadystate-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/fT_men_steadystate-eps-converted-to.pdf>
+Package pdftex.def Info: plots/fT_men_steadystate-eps-converted-to.pdf  used on
+ input line 744.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.744 \end{frame}
+                  [30
+
+ <./plots/fT_men_steadystate-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/eT_steadystate.eps>
+(epstopdf)                    date: 2023-08-08 14:39:02
+(epstopdf)                    size: 31993 bytes
+(epstopdf)             Output file: <plots/eT_steadystate-eps-converted-to.pdf>
+
+(epstopdf)                    date: 2023-08-08 14:22:44
+(epstopdf)                    size: 19095 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/eT_steadystate-eps-c
+onverted-to.pdf plots/eT_steadystate.eps>
+(epstopdf)             \includegraphics on input line 766.
+runsystem(repstopdf --outfile=plots/eT_steadystate-eps-converted-to.pdf plots/e
+T_steadystate.eps)...executed safely (allowed).
+
+Package epstopdf Info: Result file: <plots/eT_steadystate-eps-converted-to.pdf>
+
+(epstopdf)                    date: 2023-08-08 14:39:21
+(epstopdf)                    size: 18280 bytes.
+<plots/eT_steadystate-eps-converted-to.pdf, id=1004, 433.62pt x 289.08pt>
+File: plots/eT_steadystate-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/eT_steadystate-eps-converted-to.pdf>
+Package pdftex.def Info: plots/eT_steadystate-eps-converted-to.pdf  used on inp
+ut line 766.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.766 \end{frame}
+                  [31
+
+ <./plots/eT_steadystate-eps-converted-to.pdf>] [32
+
+]
+[33
+
+]
+Package epstopdf Info: Source file: <plots/LoM.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 20532 bytes
+(epstopdf)             Output file: <plots/LoM-eps-converted-to.pdf>
+(epstopdf)                    date: 2023-08-08 14:22:44
+(epstopdf)                    size: 14336 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/LoM-eps-converted-to
+.pdf plots/LoM.eps>
+(epstopdf)             \includegraphics on input line 925.
+Package epstopdf Info: Output file is already uptodate.
+<plots/LoM-eps-converted-to.pdf, id=1124, 433.62pt x 289.08pt>
+File: plots/LoM-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/LoM-eps-converted-to.pdf>
+Package pdftex.def Info: plots/LoM-eps-converted-to.pdf  used on input line 925
+.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.925 \end{frame}
+                  [34
+
+ <./plots/LoM-eps-converted-to.pdf>] [35
+
+] [36
+
+] [37
+
+]
+Overfull \vbox (3.39955pt too high) detected at line 1026
+ []
+
+[38
+
+]
+Package epstopdf Info: Source file: <plots/A_men_70.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 19051 bytes
+(epstopdf)             Output file: <plots/A_men_70-eps-converted-to.pdf>
+(epstopdf)                    date: 2023-08-08 14:22:45
+(epstopdf)                    size: 15117 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/A_men_70-eps-convert
+ed-to.pdf plots/A_men_70.eps>
+(epstopdf)             \includegraphics on input line 1038.
+Package epstopdf Info: Output file is already uptodate.
+<plots/A_men_70-eps-converted-to.pdf, id=1301, 433.62pt x 289.08pt>
+File: plots/A_men_70-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/A_men_70-eps-converted-to.pdf>
+Package pdftex.def Info: plots/A_men_70-eps-converted-to.pdf  used on input lin
+e 1038.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1038 \end{frame}
+                   [39
+
+ <./plots/A_men_70-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/A_men_70_90.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 20191 bytes
+(epstopdf)             Output file: <plots/A_men_70_90-eps-converted-to.pdf>
+(epstopdf)                    date: 2023-08-08 14:22:45
+(epstopdf)                    size: 15921 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/A_men_70_90-eps-conv
+erted-to.pdf plots/A_men_70_90.eps>
+(epstopdf)             \includegraphics on input line 1049.
+Package epstopdf Info: Output file is already uptodate.
+<plots/A_men_70_90-eps-converted-to.pdf, id=1359, 433.62pt x 289.08pt>
+File: plots/A_men_70_90-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/A_men_70_90-eps-converted-to.pdf>
+Package pdftex.def Info: plots/A_men_70_90-eps-converted-to.pdf  used on input 
+line 1049.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1049 \end{frame}
+                   [40
+
+ <./plots/A_men_70_90-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <plots/A_men_70_10.eps>
+(epstopdf)                    date: 2023-08-08 09:23:14
+(epstopdf)                    size: 21686 bytes
+(epstopdf)             Output file: <plots/A_men_70_10-eps-converted-to.pdf>
+(epstopdf)                    date: 2023-08-08 14:22:45
+(epstopdf)                    size: 17723 bytes
+(epstopdf)             Command: <repstopdf --outfile=plots/A_men_70_10-eps-conv
+erted-to.pdf plots/A_men_70_10.eps>
+(epstopdf)             \includegraphics on input line 1062.
+Package epstopdf Info: Output file is already uptodate.
+<plots/A_men_70_10-eps-converted-to.pdf, id=1415, 433.62pt x 289.08pt>
+File: plots/A_men_70_10-eps-converted-to.pdf Graphic file (type pdf)
+<use plots/A_men_70_10-eps-converted-to.pdf>
+Package pdftex.def Info: plots/A_men_70_10-eps-converted-to.pdf  used on input 
+line 1062.
+(pdftex.def)             Requested size: 245.83282pt x 163.89069pt.
+pdfTeX warning (ext4): destination with the same identifier (name{\040}) has be
+en already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1062 \end{frame}
+                   [41
+
+ <./plots/A_men_70_10-eps-converted-to.pdf>]
+\tf@nav=\write6
+\openout6 = `ATT_slides_version0-3.nav'.
+
+\tf@toc=\write7
+\openout7 = `ATT_slides_version0-3.toc'.
+
+\tf@snm=\write8
+\openout8 = `ATT_slides_version0-3.snm'.
+
+
+(./ATT_slides_version0-3.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package rerunfilecheck Info: File `ATT_slides_version0-3.out' has not changed.
+(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+ ) 
+Here is how much of TeX's memory you used:
+ 23161 strings out of 478994
+ 433560 string characters out of 5858184
+ 727765 words of memory out of 5000000
+ 40017 multiletter control sequences out of 15000+600000
+ 414884 words of font info for 75 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 131i,14n,132p,541b,556s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
+}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.p
+fb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex
+8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/c
+mex9.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
+i10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi
+5.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.
+pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pf
+b></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb>
+</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></
+usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></us
+r/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/l
+ocal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/loca
+l/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/t
+exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texl
+ive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texli
+ve/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texliv
+e/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/
+2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/texlive/20
+21/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/texlive/20
+21/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/202
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2021/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2021/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2021/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2021/texmf-
+dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2021/te
+xmf-dist/fonts/type1/public/cm-super/sfss1000.pfb>
+Output written on ATT_slides_version0-3.pdf (41 pages, 462757 bytes).
+PDF statistics:
+ 1582 PDF objects out of 1728 (max. 8388607)
+ 1179 compressed objects within 12 object streams
+ 96 named destinations out of 1000 (max. 500000)
+ 93 words of extra memory for PDF output out of 10000 (max. 10000000)
+
