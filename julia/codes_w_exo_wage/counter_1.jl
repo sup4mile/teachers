@@ -31,6 +31,28 @@ cd("./julia/codes_w_exo_wage")
 occ_O = tab1["A30:A49"]
 occ_T = tab1["A52"]
 occ = [occ_O;occ_T]
+# Short labels:
+occ_short = Array{String,1}(undef,n_O-1)
+occ_short[1] = "executives"
+occ_short[2] = "mgmt related"
+occ_short[3] = "engineers"
+occ_short[4] = "scientists"
+occ_short[5] = "doctors"
+occ_short[6] = "nurses"
+occ_short[7] = "professors"
+occ_short[8] = "librarians"
+occ_short[9] = "technicians"
+occ_short[10] = "sales(wo)men"
+occ_short[11] = "clerks"
+occ_short[12] = "fire & police" 
+occ_short[13] = "food services"
+occ_short[14] = "primary ind."
+occ_short[15] = "construction"
+occ_short[16] = "skilled mfg"
+occ_short[17] = "unskilled mfg"
+occ_short[18] = "fabricators"
+occ_short[19] = "drivers"
+occ_short[20] = "home production"
 
 share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
@@ -71,13 +93,14 @@ end
 gm[end] = M/2 - sum(gm)
 gm=gm'
 # Load parameters and results from previous parameterization:
-    cd("./parameterization/counterfactuals")
+    cd("./parameterization/counterfactuals/counter_1")
     fyear = string(year)
     fnameJLD = string("previousParameterization",fyear,".jld")
     d = load(fnameJLD)
     a_by_occ_initial = d["a_by_occ"]
     τ_e_initial = d["τ_e"]
     a_T_thresh = d["a_T_thresh"]
+    # a_O_thresh = d["a_O_thresh"]
     t = (d["t"])
     H_grid = d["H_grid"]
     H_O = d["H_O"]
@@ -99,15 +122,23 @@ gm=gm'
     a_T_10p = d["a_T_10p"]
     a_T_90p = d["a_T_90p"]
     h_T_initial = d["h_T"]
-    d = load("tau_w_1970.jld")
     τ_w_opt = d["τ_w_opt"]
-    d = load("lambda_f_1970.jld")
     λf = d["λf"]
+    # τ_w_opt_1 = d["τ_w_opt"]
+    # λf_1 = d["λf"]
+    # d = load("tau_w_1970.jld")
+    # τ_w_opt_2 = d["τ_w_opt"]
+    # d = load("lambda_f_1970.jld")
+    # λf_2 = d["λf"]
+    # wght = 0
+    # τ_w_opt = wght.*τ_w_opt_1 + (1-wght).*τ_w_opt_2
+    # λf = wght.*λf_1 + (1-wght).*λf_2
+    cd("..")
     cd("..")
     cd("..")
 # Update model parameters, if required:
 # λf = .879 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-κ = .1585 # scale parameter of teachers' wage profile
+# κ = 0.633 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -168,7 +199,7 @@ function share(occ_id,iG,a_by_occ,τ_w,τ_e)
     # if iG == 1
     # println("iO = ",occ_id,", τ_w = ",τ_w)
     # end
-    a_by_occ=a_by_occ./a_by_occ[end]
+    a_by_occ=a_by_occ./a_by_occ[12]
     for ia in 1:n_a
         B_tmp = (((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id]))
         # if minimum(B_tmp) <= 0
@@ -204,7 +235,7 @@ function calibrate_A(x)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res=optimize(calibrate_A,a_by_occ_initial./a_by_occ_initial[end], show_trace=false, iterations=10000)
+res=optimize(calibrate_A,a_by_occ_initial./a_by_occ_initial[12], show_trace=false, iterations=10000)
 a_by_occ=Optim.minimizer(res)
 println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ",Optim.minimum(res))
 
@@ -757,8 +788,9 @@ for iH in 1:n_H
     end
 end
 # Save parameterization in JLD file:
-cd("./parameterization/counterfactuals")
-save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg)
+cd("./parameterization/counterfactuals/counter_1")
+save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"a_O_thresh",a_O_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg,"Y_O",Y_O)
+cd("..")
 cd("..")
 cd("..")
 

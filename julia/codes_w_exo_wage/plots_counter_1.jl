@@ -28,6 +28,10 @@ plt4 = plot(a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
 # (1.d) Law of motion for 'H_T'
 plt6 = plot(H_grid./H_grid[iHH],H_grid./H_grid[iHH],linewidth=.5,linestyle=:dash)
 plot!(plt6,H_grid./H_grid[iHH],HH_T./HH_T[iHH],linewidth=1,linestyle=:solid)
+# (1.e.1) Women
+plt7w = plot(a_grid[2:end-1],a_O_thresh[2:end-1,iHH,1,1],label=string(year),linestyle=:dash)
+# (1.e.2) Men
+plt7m = plot(a_grid[2:end-1],a_O_thresh[2:end-1,iHH,2,1],label=string(year),linestyle=:dash)
 
 # (2) 'year' = 1990
 # (2.a.0) 
@@ -49,6 +53,10 @@ plt3_2_70_90 = scatter!(plt3_2_70,a_by_occ,label=string(year),markershape=:diamo
 savefig(plt3_2_70_90,"./plots/counterfactuals/counter_1/A_men_70_90.eps")
 # (2.c)
 plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
+# (2.e.1)
+plot!(plt7w,a_grid[2:end-1],a_O_thresh[2:end-1,iHH,1,1],label=string(year),linestyle=:dash)
+# (2.e.1)
+plot!(plt7m,a_grid[2:end-1],a_O_thresh[2:end-1,iHH,2,1],label=string(year),linestyle=:dash)
 
 # (3) 'year' = 2010
 # (3.a.0)
@@ -71,11 +79,15 @@ savefig(plt3_2_70_10,"./plots/counterfactuals/counter_1/A_men_70_10.eps")
 # (3.c)
 plot!(plt4,a_grid[2:end-2],e_T[2:end-2,iHH,1],label=string(year))
 # plot!(plt5,a_grid[2:end-2],e_T[2:end-2,iHH,2],label=string(year))
+# (3.e.1)
+plot!(plt7w,a_grid[2:end-1],a_O_thresh[2:end-1,iHH,1,1],label=string(year),linestyle=:dash)
+# (3.e.2)
+plot!(plt7m,a_grid[2:end-1],a_O_thresh[2:end-1,iHH,2,1],label=string(year),linestyle=:dash)
 
 # (4) Add axis labels and titles:
 # (4.a.0)
-plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Female Teachers' Abilities",subplot=1)
-plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Male Teachers' Abilities",subplot=1)
+plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Female Teachers' Abilities",ylims=(0,.105),subplot=1)
+plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Male Teachers' Abilities",ylims=(-.001,.057),subplot=1)
 # (4.a.1)
 plot!(plt1_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",grid=false,legend=:right,title="Teachers' Human Capital",subplot=1)
 plot!(plt2_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",grid=false,legend=:right,title="Teachers' Human Capital",subplot=1)
@@ -90,6 +102,10 @@ plot!(plt3_1_70_10,ylabel=L"τ_w",title="Labor Market Barriers Against Women",gr
 plot!(plt4,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Teachers' Human Capital Investment",legend=:left,subplot=1)
 # plot!(plt5,xlabel="Idiosyncratic Ability",ylabel=L"e_T",grid=false,title="Male Teachers' Human Capital Investment",legend=:left,subplot=1)
 plot!(plt6,xlabel=L"\widetilde{H}_T",ylabel=L"\widetilde{H}_T^'",grid=false,title="Law of Motion for Teachers' Human Capital",legend=false)
+# (4.e.1)
+plot!(plt7w,xlabel="Idiosyncratic Ability in Teaching",ylabel=L"\bar{a}_1(a)",grid=false,title="Occupational Threshold (Women)",legend=:topleft)
+# (4.e.2)
+plot!(plt7m,xlabel="Idiosyncratic Ability in Teaching",ylabel=L"\bar{a}_1(a)",grid=false,title="Occupational Threshold (Men)",legend=:topleft)
 
 # (5) Save figures in EPS file format:
 savefig(plt1,"./plots/counterfactuals/counter_1/fT_women_steadystate.eps")
@@ -103,3 +119,5 @@ savefig(plt3_1_70_90,"./plots/counterfactuals/counter_1/tau_w_women_70_90.eps")
 savefig(plt3_1_70_10,"./plots/counterfactuals/counter_1/tau_w_women_70_10.eps")
 savefig(plt4,"./plots/counterfactuals/counter_1/eT_steadystate.eps")
 savefig(plt6,"./plots/counterfactuals/counter_1/LoM.eps")
+savefig(plt7w,"./plots/counterfactuals/a_O_women.eps")
+savefig(plt7m,"./plots/counterfactuals/a_O_men.eps")
