@@ -8,7 +8,7 @@
     # (5) low_beta
     # (6) high_beta_high_sigma
     # (7) low_beta_low_sigma
-    paramname = "counter_1"
+    paramname = "counter_2"
     pathname = string("./plots/counterfactuals/",paramname,"/")
 # Select backend:
 pyplot()

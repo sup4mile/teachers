@@ -3,6 +3,16 @@ using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, Linear
 # Change directory, if necessary:
 # cd("./GitHub/teachers/julia/codes_w_exo_wage")
 
+# Select type of parameterization (from following list):
+    # (1) benchmark
+    # (2) counter_1
+    # (3) counter_2
+    # (4) high_beta
+    # (5) low_beta
+    # (6) high_beta_high_sigma
+    # (7) low_beta_low_sigma
+paramname = "benchmark"
+
 # Set (some of the) parameters:
 # Population size:
 M=1.0
@@ -34,7 +44,7 @@ share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 1970
+year = 2010
 # Load data for selected year:
 if year == 1970
     share_occ_data[:,1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -56,7 +66,7 @@ else
 end
 
 # Innovation step size for updates:
-ν = 0.8 # for tax rate that balances government's budget
+ν = 1 # for tax rate that balances government's budget
 ν2 = 0.8 # for fixed point of aggregate human capital in teaching
 
 n_G=length(g) # number of "groups"
@@ -69,7 +79,7 @@ end
 gm[end] = M/2 - sum(gm)
 gm=gm'
 # Load parameters and results from previous parameterization:
-    cd("./parameterization")
+    cd(string("./parameterization/",paramname))
     fyear = string(year)
     fnameJLD = string("previousParameterization",fyear,".jld")
     d = load(fnameJLD)
@@ -100,10 +110,11 @@ gm=gm'
     a_T_90p = d["a_T_90p"]
     h_T_initial = d["h_T"]
     cd("..")
-
+    cd("..")
 # Update model parameters, if required:
-# λf = .879 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = .2895 # scale parameter of teachers' wage profile
+# β = .4
+# λf = .599 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+# κ = .305 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -285,7 +296,7 @@ Y_O = Array{Float64,3}(undef,n_O-1,n_H,n_G)
 sum_E_O = Array{Float64,2}(undef,n_H,n_G)
 sum_Y_O = Array{Float64,2}(undef,n_H,n_G)
 
-HH_T_0 = Array{Float64,1}(undef,n_G)
+HH_T_0 = Array{Float64,2}(undef,n_G,n_H)
 HH_T = Array{Float64,1}(undef,n_H)
 H_O_0 = Array{Float64,3}(undef,n_O-1,n_G,n_H)
 H_O = Array{Float64,2}(undef,n_O-1,n_H)
@@ -408,7 +419,7 @@ while convHH > tolHH
             mass_T[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa),lowbnd,upbnd)[1]
 
             # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
-            HH_T_0[iG]= ( (1-t[iHH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
+            HH_T_0[iG,iHH]= ( (1-t[iHH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
             #*s_T^ϕ*(β/σ)^η*(sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
             # Total earnings of teachers in each group:
             E_T[iHH,iG]=f4[iHH,iG]
@@ -417,7 +428,7 @@ while convHH > tolHH
             #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
         end
         
-        H_grid[iHH]=sum(HH_T_0.*gm)
+        H_grid[iHH]=sum(HH_T_0[:,iHH].*gm)
         for iO in 1:n_O-1
             H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
         end
@@ -440,117 +451,8 @@ while convHH > tolHH
     HH_fp = (1-ν2)*HH_fp + ν2*H_grid[iHH]
 end
 println("Found fixed point for human capital in teaching!")
-#=
-###########################################################
-##################  PARAMETERIZATION  #####################
-###########################################################
-av_e_O=zeros(n_G)
-av_e_T=zeros(n_G)
-av_s_T=zeros(n_G)
-av_h_T=zeros(n_G)
-av_a_rank_T=zeros(n_G)
-av_N=zeros(n_G)
-for iH in iHH:iHH
-    for iG in 1:n_G
-        spl_e_T = Spline1D(a_grid,e_T[:,iH,iG])
-        spl_s_T = Spline1D(a_grid,s_T[:,iH,iG])
-        spl_h_T = Spline1D(a_grid,h_T[:,iH,iG])
-        spl_N=Spline1D(a_grid, N[:,iH,iG])
-        av_e_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_e_T(aa),lowbnd,upbnd)[1]/mass_T[iH,iG]
-        av_h_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_h_T(aa),lowbnd,upbnd)[1]/mass_T[iH,iG]
-        av_s_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_s_T(aa),lowbnd,upbnd)[1]/mass_T[iH,iG]
-        av_a_rank_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*cdf(dist,aa),lowbnd,upbnd)[1]/mass_T[iH,iG]
-        av_N[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_N(aa),lowbnd,upbnd)[1]/mass_T[iH,iG]
-    end
-end
-println("____________")
-println("share of teachers among women= ",mass_T[iHH,1])
-println("share of teachers among men= ",mass_T[iHH,2])
-println("average class size= ",sum(av_N.*gm))
-# println(" ")
- println("average a_rank_T_female= ",av_a_rank_T[1])
- println("average a_rank_T_male= ",av_a_rank_T[2])
- println("average e_T_female= ",av_e_T[1])
- println("average e_T_male= ",av_e_T[2])
- println("average h_T_female= ",av_h_T[1])
- println("average h_T_male= ",av_h_T[2])
- println("average s_T_female= ",av_s_T[1])
- println("average s_T_male= ",av_s_T[2])
- println("average w_T_female= ",E_T[iHH,1]/mass_T[iHH,1])
- println("average w_T_male= ",E_T[iHH,2]/mass_T[iHH,2])
 
-av_e_O=zeros(n_G)
-av_e_T=zeros(n_G)
-av_s_T=zeros(n_G)
-av_h_T=zeros(n_G)
-for iH in iHH:iHH
-    for iG in 1:n_G
-        spl_e_T = Spline1D(a_grid,e_T[:,iH,iG])
-        spl_s_T = Spline1D(a_grid,s_T[:,iH,iG])
-        spl_h_T = Spline1D(a_grid,h_T[:,iH,iG])
-        spl_N=Spline1D(a_grid, N[:,iH,iG])
-        av_e_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_e_T(aa),lowbnd,upbnd)[1]#/mass_T[iH,iG]
-        av_h_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_h_T(aa),lowbnd,upbnd)[1]#/mass_T[iH,iG]
-        av_s_T[iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_s_T(aa),lowbnd,upbnd)[1]#/mass_T[iH,iG]
-    end
-end
-
-println("____________")
- println("total e_T_female= ",av_e_T[1]*gm[1])
- println("total e_T_male= ",av_e_T[2]*gm[2])
- println("total h_T_female= ",av_h_T[1]*gm[1])
- println("total h_T_male= ",av_h_T[2]*gm[2])
- println("total s_T_female= ",av_s_T[1]*gm[1])
- println("total s_T_male= ",av_s_T[2]*gm[2])
-
-println(" ")
-println("tax rate= ",t[1,1])
-println("output= ",sum((Y_T[iHH,:]+sum_Y_O[iHH,:]).*gm))
-println("output_female= ",(Y_T[iHH,1]+sum_Y_O[iHH,1])*gm[1])
-println("output_male= ",(Y_T[iHH,2]+sum_Y_O[iHH,2])*gm[2])
-println("HH_fp= ",HH_fp)
-
-av_e_O=zeros(n_G,n_O-1)
-av_h_O=zeros(n_G,n_O-1)
- for iH in iHH:iHH
-    for iO in 1:n_O-1
-        for iG in 1:n_G
-            spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
-            # Inverse occupational threshold 
-            spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid)
-            spl_e_O = Spline1D(a_grid,e_O[:,iHH,iG,iO])
-            spl_h_O = Spline1D(a_grid,h_O[:,iHH,iG,iO])
-            av_e_O[iG,iO]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*spl_e_O(aa),lowbnd,upbnd)[1]/quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1]
-            av_h_O[iG,iO]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*spl_h_O(aa),lowbnd,upbnd)[1]/quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1]
-        end
-    end
-end
-println("average e_O_female= ",sum(av_e_O[1,:].*share_occ[:,1]))
-println("average e_O_male= ",sum(av_e_O[2,:].*share_occ[:,2]))
-println("average h_O_female= ",sum(av_h_O[1,:].*share_occ[:,1]))
-println("average h_O_male= ",sum(av_h_O[2,:].*share_occ[:,2]))
-
-av_e_O=zeros(n_G,n_O-1)
-av_h_O=zeros(n_G,n_O-1)
- for iH in iHH:iHH
-    for iO in 1:n_O-1
-        for iG in 1:n_G
-            spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
-            # Inverse occupational threshold 
-            spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid)
-            spl_e_O = Spline1D(a_grid,e_O[:,iHH,iG,iO])
-            spl_h_O = Spline1D(a_grid,h_O[:,iHH,iG,iO])
-            av_e_O[iG,iO]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*spl_e_O(aa),lowbnd,upbnd)[1]#/quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1]
-            av_h_O[iG,iO]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*spl_h_O(aa),lowbnd,upbnd)[1]#/quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1]
-        end
-    end
-end
-println("total e_O_female= ",sum(av_e_O[1,:].*share_occ[:,1])*gm[1])
-println("total e_O_male= ",sum(av_e_O[2,:].*share_occ[:,2])*gm[2])
-println("total h_O_female= ",sum(av_h_O[1,:].*share_occ[:,1])*gm[1])
-println("total h_O_male= ",sum(av_h_O[2,:].*share_occ[:,2])*gm[2])
-=#
-
+if transition == 1
 ##############################
 # Transition dynamics of H_T #
 ##############################
@@ -648,7 +550,7 @@ for iH in 1:n_H
             f4[iH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iH,iG](aa)*spl_wa(aa),lowbnd,upbnd)[1]
             
             # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
-            HH_T_0[iG]= ( (1-t[iH,1])^η*η^η*(2*H/M)^σ)^(β/σ/(1-η))*f2[iH,iG]
+            HH_T_0[iG,iH]= ( (1-t[iH,1])^η*η^η*(2*H/M)^σ)^(β/σ/(1-η))*f2[iH,iG]
             # Total earnings of teachers in each group:
             E_T[iH,iG]=f4[iH,iG]
             # Total output of teachers in each group:
@@ -708,7 +610,7 @@ for iH in 1:n_H
         a_T_90p[iH,n_G+1] = find_zero(fn_F_T_90p_all_g,a_T_90p[iH,n_G+1])
         ω_90_10[iH,n_G+1] = spl_ω[iH](a_T_90p[iH,n_G+1])/spl_ω[iH](a_T_10p[iH,n_G+1])
         # Law of motion for aggregate human in teaching: 
-        HH_T[iH]=sum(HH_T_0.*gm)
+        HH_T[iH]=sum(HH_T_0[:,iH].*gm)
         for iO in 1:n_O-1
             H_O[iO,iH]=sum(H_O_0[iO,:,iH].*gm)
         end
@@ -736,6 +638,8 @@ for iH in 1:n_H
     end
 end
 
+end
+
 ###########################################################
 ##################  PARAMETERIZATION  #####################
 ###########################################################
@@ -756,12 +660,13 @@ for iH in 1:n_H
     end
 end
 # Save parameterization in JLD file:
-cd("./parameterization")
+cd(string("./parameterization/",paramname))
 save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg)
 if year == 1970
     save("tau_w_1970.jld","τ_w_opt",τ_w_opt)
     save("lambda_f_1970.jld","λf",λf)
 end
+cd("..")
 cd("..")
 
 println("____________")
@@ -799,7 +704,7 @@ println("HH_fp= ",HH_fp)
 
 df = DataFrame(λf = round(λf;digits=4),share_teachers_female = round(mass_T[iHH,1];digits=4),κ = round(κ;digits=4),share_teachers_male = round(mass_T[iHH,2];digits=4),γ = round(γ;digits=4),p90_p10_ω_teachers = round(ω_90_10[iHH,end];digits=2), θ = round(theta;digits=4),p90_p10_w_other = round(w_90_10[iHH,n_G+1,n_O];digits=2), η = round(η;digits=4), α = round(α;digits=2) )
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
-fnameCSV = string("./results/moments",fyear,".csv")
+fnameCSV = string("./results/",paramname,"/moments",fyear,".csv")
 if isfile(fnameCSV) == true
     moments = DataFrame(CSV.File(fnameCSV))
     append!(moments,df)
