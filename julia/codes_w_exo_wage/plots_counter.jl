@@ -2,13 +2,12 @@
 
 # Select type of parameterization (from following list):
     # (1) benchmark
-    # (2) counter_1
-    # (3) counter_2
-    # (4) high_beta
-    # (5) low_beta
-    # (6) high_beta_high_sigma
-    # (7) low_beta_low_sigma
-    paramname = "counter_2"
+    # (2) counter_# (check # of counterfactual)
+    # (3) high_beta
+    # (4) low_beta
+    # (5) high_beta_high_sigma
+    # (6) low_beta_low_sigma
+    paramname = "counter_4"
     pathname = string("./plots/counterfactuals/",paramname,"/")
 # Select backend:
 pyplot()
@@ -104,8 +103,8 @@ plot!(plt7m,a_grid[2:end-1],a_O_thresh[2:end-1,iHH,2,1],label=string(year),lines
 
 # (4) Add axis labels and titles:
 # (4.a.0)
-plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Female Teachers' Abilities",ylims=(0,.105),subplot=1)
-plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Male Teachers' Abilities",ylims=(-.001,.057),subplot=1)
+plot!(plt1,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Female Teachers' Abilities",ylims=(-0.001,.105),subplot=1)
+plot!(plt2,xlabel="Idiosyncratic Ability",ylabel="Density",grid=false,legend=:right,title="Distribution of Male Teachers' Abilities",ylims=(-.001,.065),subplot=1)
 # (4.a.1)
 plot!(plt1_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",grid=false,legend=:right,title="Teachers' Human Capital",subplot=1)
 plot!(plt2_1,xlabel="Idiosyncratic Ability",ylabel="Human Capital",grid=false,legend=:right,title="Teachers' Human Capital",subplot=1)
