@@ -65,6 +65,9 @@ else
     println("No a_by_occ for the selected year")
 end
 
+# Aggregate productivity growth
+growth=(1+0.02)^(year-1970)
+
 # Innovation step size for updates:
 ν = 1 # for tax rate that balances government's budget
 ν2 = 0.8 # for fixed point of aggregate human capital in teaching
@@ -255,6 +258,38 @@ for iG in 1:n_G
     share_occ[:,iG]=share_occ[:,iG]./sum(share_occ[:,iG])
 end
 
+# Calculate aggregate productivity in 1970
+cd(string("./parameterization/",paramname))
+fnameJLD_1970 = string("previousParameterization1970.jld")
+d_1970 = load(fnameJLD_1970)
+a_by_occ_1970 = d_1970["a_by_occ"]
+τ_e_1970 = d_1970["τ_e"]
+κ_1970 = d_1970["κ"]
+λm_1970 = d_1970["λm"]
+
+fnameJLD_1970 = string("tau_w_1970.jld")
+d_1970 = load(fnameJLD_1970)
+τ_w_opt_1970 = d_1970["τ_w_opt"]
+
+fnameJLD_1970 = string("lambda_f_1970.jld")
+d_1970 = load(fnameJLD_1970)
+λf_1970 = d_1970["λf"]
+
+fnameJLD_1970 = string("mass_T_1970.jld")
+d_1970 = load(fnameJLD_1970)
+mass_T_1970 = d_1970["mass_T"]
+
+fnameJLD_1970 = string("mass_O_1970.jld")
+d_1970 = load(fnameJLD_1970)
+mass_O_1970 = d_1970["mass_O"]
+
+τ_w_1970=zeros(n_O-1,n_G)    
+τ_w_1970[:,2]=fill!(τ_w[:,2],0)
+τ_w_1970[:,1]=ones(n_O-1).-λf_1970*(ones(n_O-1).-τ_w_opt_1970[:,1])
+
+aggA_1970=(sum(a_by_occ_1970.*(ones(n_O-1)-τ_w_1970[:,1])*gm[1].*mass_O_1970[1,:]+a_by_occ_1970.*(ones(n_O-1)-τ_w_1970[:,2])*gm[2].*mass_O_1970[2,:])+κ_1970*gm[1]*mass_T_1970[1]+κ_1970*gm[2]*mass_T_1970[2])/(sum(gm[1].*mass_O_1970[1,:]+gm[2].*mass_O_1970[2,:])+gm[1]*mass_T_1970[1]+gm[2]*mass_T_1970[2])
+
+
 a_T_thresh = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 a_O_thresh = Array{Float64,4}(undef,n_a,n_H,n_G,n_O-1)
 
@@ -329,9 +364,9 @@ f_1_T_tmp=Array{Float64,3}(undef,n_a,n_G,n_O-1)
 #######################################
 # Exogenous wage profile for teachers #
 #######################################
-ω_fn(h_T) = κ.*h_T.^γ
+ω_fn(κ,h_T) = κ.*h_T.^γ
 # Derivative of wage profile:
-der_ω_fn(h_T) = κ.*γ.*h_T.^(γ-1)
+der_ω_fn(κ,h_T) = κ.*γ.*h_T.^(γ-1)
 
 
 #######################
@@ -347,6 +382,9 @@ tolHH = 1e-5
 # (b) Income tax rate:
 tolT= 1e-5
 maxiterT = 100
+# (c) Growth:
+tolG= 1e-5
+maxiterG = 100
 
 # Time investment doesn't depend on any endogenous variables, only on parameters:
 s_O = μ*ϕ / (μ*ϕ + 1 - η)
@@ -361,90 +399,110 @@ while convHH > tolHH
     println("t[iHH,1] = ",t[iHH,1])
     println("")
     H_grid[iHH] = HH_fp
-    # Initiate 'while' loop ('not indexed') over the tax rate:
-    convT = 1; iterT = 1
-    while convT > tolT && iterT < maxiterT
-        for iG in 1:n_G
-            for ia in 1:n_a
-                a=a_grid[ia]
-                fn_s_T(k)=μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
-                fn_h_T(k)=(η^η*(1-t[iHH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
-                hh_T = find_zero(fn_h_T,h_T_initial[ia,iHH,iG])
-                h_T[ia,iHH,iG]=hh_T
-                s_T[ia,iHH,iG]=fn_s_T(hh_T)
-                e_T[ia,iHH,iG]=η*(1-t[iHH,1])*der_ω_fn(hh_T)*hh_T
-                ω[ia,iHH,iG]=ω_fn(hh_T)
-                der_ω[ia,iHH,iG]=der_ω_fn(hh_T)
-                for iO in 1:n_O-1
-                    # Occupational choice threshold (workers with 'a' in occupation 'iO' become teachers if 'a' < 'a_O_thresh[.,.,.]' for given teaching ability a_T = a[ia]):
-                    a_O_thresh[ia,iHH,iG,iO] = ((1+τ_e[iO,iG])/(1-τ_w[iO,iG])*(1+τ_e[iO,iG])^(-(1-η))*((1-s_T[ia,iHH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iHH,iG]/s_O)^ϕ*(der_ω[ia,iHH,iG]/a_by_occ[iO])*((ω[ia,iHH,iG]/(der_ω[ia,iHH,iG]*h_T[ia,iHH,iG])-η)/(1-η))^(1-η))^(1/α)*a
-                    h_O[ia,iHH,iG,iO] = (η^η*(1-t[iHH,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
-                    e_O[ia,iHH,iG,iO] = η * (1-t[iHH,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
+    # Initiate 'while' loop ('not indexed') over the agg econ growth:
+    convG = 1; iterG = 1
+    while convG > tolG && iterG < maxiterG
+        # Initiate 'while' loop ('not indexed') over the tax rate:
+        convT = 1; iterT = 1
+        while convT > tolT && iterT < maxiterT
+            for iG in 1:n_G
+                for ia in 1:n_a
+                    a=a_grid[ia]
+                    fn_s_T(k)=μ*ϕ*der_ω_fn(κ,k)*k/((μ*ϕ-η)*der_ω_fn(κ,k)*k+ω_fn(κ,k))
+                    fn_h_T(k)=(η^η*(1-t[iHH,1])^η*der_ω_fn(κ,k)^η*a^α*fn_s_T(k)^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))-k
+                    hh_T = find_zero(fn_h_T,h_T_initial[ia,iHH,iG])
+                    h_T[ia,iHH,iG]=hh_T
+                    s_T[ia,iHH,iG]=fn_s_T(hh_T)
+                    e_T[ia,iHH,iG]=η*(1-t[iHH,1])*der_ω_fn(κ,hh_T)*hh_T
+                    ω[ia,iHH,iG]=ω_fn(κ,hh_T)
+                    der_ω[ia,iHH,iG]=der_ω_fn(κ,hh_T)
+                    for iO in 1:n_O-1
+                        # Occupational choice threshold (workers with 'a' in occupation 'iO' become teachers if 'a' < 'a_O_thresh[.,.,.]' for given teaching ability a_T = a[ia]):
+                        a_O_thresh[ia,iHH,iG,iO] = ((1+τ_e[iO,iG])/(1-τ_w[iO,iG])*(1+τ_e[iO,iG])^(-(1-η))*((1-s_T[ia,iHH,iG])/(1-s_O))^((1-η)/μ)*(s_T[ia,iHH,iG]/s_O)^ϕ*(der_ω[ia,iHH,iG]/a_by_occ[iO])*((ω[ia,iHH,iG]/(der_ω[ia,iHH,iG]*h_T[ia,iHH,iG])-η)/(1-η))^(1-η))^(1/α)*a
+                        h_O[ia,iHH,iG,iO] = (η^η*(1-t[iHH,1])^η*(1-τ_w[iO,iG])^η/(1+τ_e[iO,iG])^η*a_by_occ[iO]^η*a_grid[ia]^α*s_O^ϕ*(2*HH_fp/M)^σ)^(1/(1-η))
+                        e_O[ia,iHH,iG,iO] = η * (1-t[iHH,1]) * (1-τ_w[iO,iG]) / (1+τ_e[iO,iG]) * a_by_occ[iO] * h_O[ia,iHH,iG,iO]
+                    end
                 end
-            end
-            spl_s=Spline1D(a_grid, s_T[:,iHH,iG])
-            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iHH,iG]))
+                spl_s=Spline1D(a_grid, s_T[:,iHH,iG])
+                spl_dw=Spline1D(a_grid, der_ω_fn.(κ,h_T[:,iHH,iG]))
 
-            for iO in 1:n_O-1
-                spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
-                # Inverse occupational threshold 
-                spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid)
-                f3[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*aa^(α/(1-η)),lowbnd,upbnd)[1]
+                for iO in 1:n_O-1
+                    spl_marg = Spline1D(a_grid, marginal[:,iO,iG])
+                    # Inverse occupational threshold 
+                    spl_inv = Spline1D(a_O_thresh[:,iHH,iG,iO],a_grid)
+                    f3[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa))*aa^(α/(1-η)),lowbnd,upbnd)[1]
 
-                f1[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
-                # Compute H_O:
-                H_O_0[iO,iG,iHH]=(((1-t[iHH,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*HH_fp/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
-                # Total earnings of others in each group:
-                E_O[iO,iHH,iG]=a_by_occ[iO]*(1-τ_w[iO,iG])*H_O_0[iO,iG,iHH]
-                # Total output of others in each group:
-                Y_O[iO,iHH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iHH]
+                    f1[iO,iG]=quadgk(aa -> spl_marg(aa)*pdf(dist,aa)*cdf(dist,spl_inv(aa)),lowbnd,upbnd)[1] # total mass of other using direct threshold
+                    # Compute H_O:
+                    H_O_0[iO,iG,iHH]=(((1-t[iHH,1])*(1-τ_w[iO,iG])/(1+τ_e[iO,iG]))^η*η^η*(2*HH_fp/M)^σ*s_O^ϕ*a_by_occ[iO]^η)^(1/(1-η))*f3[iO,iG]
+                    # Total earnings of others in each group:
+                    E_O[iO,iHH,iG]=a_by_occ[iO]*(1-τ_w[iO,iG])*H_O_0[iO,iG,iHH]
+                    # Total output of others in each group:
+                    Y_O[iO,iHH,iG]=a_by_occ[iO]*H_O_0[iO,iG,iHH]
+
+                    # Inverse occupational threshold between occupation 'iO' and teaching: 
+                    f_1_O[:,iHH,iG,iO] = marginal[:,iO,iG] .* cdf.(dist,spl_inv(a_grid))
+                    # Compute p.d.f.:
+                    spl_f_1_O[iHH,iG,iO]=Spline1D(a_grid, f_1_O[:,iHH,iG,iO])
+                    mass_O[iHH,iG,iO]=quadgk(aa -> pdf(dist,aa)*spl_f_1_O[iHH,iG,iO](aa),lowbnd,upbnd)[1]
+
+                    for ia in 1:n_a
+                        a = a_grid[ia]
+                        # Fraction of teachers occupation-by-occupation, given 'a' in teaching (see integration in equation 17 of manuscript for details):
+                        f_1_T_tmp[ia,iG,iO]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iHH,iG,iO])[1],0.0])
+                    end
+                end
 
                 for ia in 1:n_a
-                    a = a_grid[ia]
-                    # Fraction of teachers occupation-by-occupation, given 'a' in teaching (see integration in equation 17 of manuscript for details):
-                    f_1_T_tmp[ia,iG,iO]=maximum([quadgk(aa ->spl_marg(aa)*pdf(dist,aa),lowbnd,a_O_thresh[ia,iHH,iG,iO])[1],0.0])
+                    # Fraction of teachers given a_T (across all occupations):
+                    f_1_T[ia,iG]= sum(f_1_T_tmp[ia,iG,:])
                 end
+                spl_f_1_T[iHH,iG]=Spline1D(a_grid, f_1_T[:,iG])
+                spl_wa=Spline1D(a_grid, ω[:,iHH,iG])
+
+                f2[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
+                f4[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa)*spl_wa(aa),lowbnd,upbnd)[1]
+
+                mass_T[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa),lowbnd,upbnd)[1]
+
+                # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
+                HH_T_0[iG,iHH]= ( (1-t[iHH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
+                #*s_T^ϕ*(β/σ)^η*(sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
+                # Total earnings of teachers in each group:
+                E_T[iHH,iG]=f4[iHH,iG]
+                # Total output of teachers in each group:
+                Y_T[iHH,iG] = sum(H_O_0[:,iG,iHH].*a_by_occ)#sum(H_O_0[1:n_O-2,iG,iHH].*a_by_occ[1:n_O-2])
+                #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
             end
-
-            for ia in 1:n_a
-                # Fraction of teachers given a_T (across all occupations):
-                f_1_T[ia,iG]= sum(f_1_T_tmp[ia,iG,:])
+            
+            H_grid[iHH]=sum(HH_T_0[:,iHH].*gm)
+            for iO in 1:n_O-1
+                H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
             end
-            spl_f_1_T[iHH,iG]=Spline1D(a_grid, f_1_T[:,iG])
-            spl_wa=Spline1D(a_grid, ω[:,iHH,iG])
+            for iG in 1:n_G
+                sum_E_O[iHH,iG]=sum(E_O[:,iHH,iG])#sum(E_O[1:n_O-2,iHH,iG])
+                sum_Y_O[iHH,iG]=sum(Y_O[:,iHH,iG])#sum(Y_O[1:n_O-2,iHH,iG])
+            end
+            t[iHH,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
+            #Y=sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm)
+            convT = abs(t[iHH,2]-t[iHH,1])
+            println("convT=",round(convT,digits=3))
+            println("t[iHH,:]=",round.(t[iHH,:],digits=3))
+            t[iHH,1] =  (1-ν)*t[iHH,1] + ν*t[iHH,2]
 
-            f2[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa)*aa^(α*β/σ/(1-η))*spl_s(aa)^(ϕ*β/σ/(1-η))*spl_dw(aa)^(η*β/σ/(1-η)),lowbnd,upbnd)[1]
-            f4[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa)*spl_wa(aa),lowbnd,upbnd)[1]
-
-            mass_T[iHH,iG]=quadgk(aa -> pdf(dist,aa)*spl_f_1_T[iHH,iG](aa),lowbnd,upbnd)[1]
-
-            # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
-            HH_T_0[iG,iHH]= ( (1-t[iHH,1])^η*η^η*(2*HH_fp/M)^σ)^(β/σ/(1-η))*f2[iHH,iG]
-            #*s_T^ϕ*(β/σ)^η*(sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG]))^η*(f2[iG])^(σ/β-η) )^(β/σ)
-            # Total earnings of teachers in each group:
-            E_T[iHH,iG]=f4[iHH,iG]
-            # Total output of teachers in each group:
-            Y_T[iHH,iG] = sum(H_O_0[:,iG,iHH].*a_by_occ)#sum(H_O_0[1:n_O-2,iG,iHH].*a_by_occ[1:n_O-2])
-            #η^(η/(1-η))*(2*HH_fp/M)^(σ/(1-η))*sum( a_by_occ.^(1/(1-η)).*((1-t[1,1]).*(ones(n_O-1).-τ_w[:,iG])./(ones(n_O-1).+τ_e[:,iG])).^(η/(1-η)).*s_O^(ϕ/(1-η)).*f3[:,iG] )/sum(f1[:,iG])
+            iterT = iterT+1
         end
-        
-        H_grid[iHH]=sum(HH_T_0[:,iHH].*gm)
-        for iO in 1:n_O-1
-            H_O[iO,iHH]=sum(H_O_0[iO,:,iHH].*gm)
-        end
-        for iG in 1:n_G
-            sum_E_O[iHH,iG]=sum(E_O[:,iHH,iG])#sum(E_O[1:n_O-2,iHH,iG])
-            sum_Y_O[iHH,iG]=sum(Y_O[:,iHH,iG])#sum(Y_O[1:n_O-2,iHH,iG])
-        end
-        t[iHH,2]=sum(E_T[iHH,:].*gm)/(sum(E_T[iHH,:].*gm)+sum(sum_E_O[iHH,:].*gm))
-        #Y=sum(Y_T[iHH,:].*gm)+sum(sum_Y_O[iHH,:].*gm)
-        convT = abs(t[iHH,2]-t[iHH,1])
-         println("convT=",round(convT,digits=3))
-         println("t[iHH,:]=",round.(t[iHH,:],digits=3))
-        t[iHH,1] =  (1-ν)*t[iHH,1] + ν*t[iHH,2]
+        # Calculate aggregate productivity in the current year
+        aggA=(sum(a_by_occ.*(ones(n_O-1)-τ_w[:,1])*gm[1].*mass_O[iHH,1,:]+a_by_occ.*(ones(n_O-1)-τ_w[:,2])*gm[2].*mass_O[iHH,2,:])+κ*gm[1]*mass_T[iHH,1]+κ*gm[2]*mass_T[iHH,2])/(sum(gm[1].*mass_O[iHH,1,:]+gm[2].*mass_O[iHH,2,:])+gm[1]*mass_T[iHH,1]+gm[2]*mass_T[iHH,2])
+        # Calculate level of adjustment for aggregate productivites to match agg growth
+        delta=aggA_1970*growth/aggA
 
-        iterT = iterT+1
-    end
+        convG = abs(aggA_1970*growth-aggA)
+        println("convG=",round(convG,digits=3))
+        # Adjust aggregtate productivities
+        a_by_occ=a_by_occ*delta
+        κ=κ*delta
+    end 
     convHH = abs(log(H_grid[iHH]/HH_fp))
     println(convHH)
     println(H_grid[iHH])
@@ -471,14 +529,14 @@ for iH in 1:n_H
             for ia in 1:n_a
                 a=a_grid[ia]
                 # Human capital investments and wages in teaching:
-                fn_s_T(k) = μ*ϕ*der_ω_fn(k)*k/((μ*ϕ-η)*der_ω_fn(k)*k+ω_fn(k))
-                fn_h_T(k) = (η^η*(1-t[iH,1])^η*der_ω_fn(k)^η*a^α*fn_s_T(k)^ϕ*(2*H/M)^σ)^(1/(1-η))-k
+                fn_s_T(k) = μ*ϕ*der_ω_fn(κ,k)*k/((μ*ϕ-η)*der_ω_fn(κ,k)*k+ω_fn(κ,k))
+                fn_h_T(k) = (η^η*(1-t[iH,1])^η*der_ω_fn(κ,k)^η*a^α*fn_s_T(k)^ϕ*(2*H/M)^σ)^(1/(1-η))-k
                 hh_T = find_zero(fn_h_T,h_T_initial[ia,iH,iG])
                 h_T[ia,iH,iG] = hh_T
                 s_T[ia,iH,iG] = fn_s_T(hh_T)
-                e_T[ia,iH,iG] = η*(1-t[iH,1])*der_ω_fn(hh_T)*hh_T
-                ω[ia,iH,iG] = ω_fn(hh_T)
-                der_ω[ia,iH,iG] = der_ω_fn(hh_T)
+                e_T[ia,iH,iG] = η*(1-t[iH,1])*der_ω_fn(κ,hh_T)*hh_T
+                ω[ia,iH,iG] = ω_fn(κ,hh_T)
+                der_ω[ia,iH,iG] = der_ω_fn(κ,hh_T)
                 # Human capital investments and wages in other occupations:
                 for iO in 1:n_O-1
                     # Occupational threshold ():
@@ -489,7 +547,7 @@ for iH in 1:n_H
                 end
             end
             spl_s=Spline1D(a_grid, s_T[:,iH,iG])
-            spl_dw=Spline1D(a_grid, der_ω_fn.(h_T[:,iH,iG]))
+            spl_dw=Spline1D(a_grid, der_ω_fn.(κ,h_T[:,iH,iG]))
 
             for iO in 1:n_O-1
                 # Spline for fraction of workers in occupation 'iO':
@@ -665,6 +723,8 @@ save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a
 if year == 1970
     save("tau_w_1970.jld","τ_w_opt",τ_w_opt)
     save("lambda_f_1970.jld","λf",λf)
+    save("mass_T_1970.jld","mass_T",mass_T[iHH,:])
+    save("mass_O_1970.jld","mass_O",mass_O[iHH,:,:])
 end
 cd("..")
 cd("..")
