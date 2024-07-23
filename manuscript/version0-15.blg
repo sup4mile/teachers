@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2021)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: version0-15.aux
+The style file: ecta.bst
+Database file #1: /Users/simeonalder/Dropbox/Bibliography/MasterBibliography.bib
+You've used 8 entries,
+            2849 wiz_defined-function locations,
+            663 strings with 6195 characters,
+and the built_in function-call counts, 5193 in all, are:
+= -- 434
+> -- 227
+< -- 6
++ -- 72
+- -- 64
+* -- 446
+:= -- 800
+add.period$ -- 16
+call.type$ -- 8
+change.case$ -- 53
+chr.to.int$ -- 8
+cite$ -- 8
+duplicate$ -- 374
+empty$ -- 385
+format.name$ -- 91
+if$ -- 1033
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 70
+newline$ -- 29
+num.names$ -- 41
+pop$ -- 124
+preamble$ -- 1
+purify$ -- 52
+quote$ -- 0
+skip$ -- 131
+stack$ -- 0
+substring$ -- 291
+swap$ -- 192
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 96
+warning$ -- 0
+while$ -- 39
+width$ -- 0
+write$ -- 100
