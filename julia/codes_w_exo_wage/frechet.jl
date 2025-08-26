@@ -13,6 +13,9 @@ using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, Linear
     # (7) low_beta_low_sigma
 paramname = "benchmark"
 
+# Compute transition dynamics (= 1) or not (= 0):
+transition = 1
+
 # Set (some of the) parameters:
 # Population size:
 M=1.0
@@ -44,7 +47,7 @@ share_occ_data = Array{Float64,2}(undef,length(occ)-1,2)
 w_90_10_data = Array{Float64,1}(undef,2) 
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 2010
+year = 1970
 # Load data for selected year:
 if year == 1970
     share_occ_data[:,1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -115,6 +118,7 @@ gm=gm'
     cd("..")
     cd("..")
 # Update model parameters, if required:
+ϕ = 2.745
 # β = .4
 # λf = .599 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
 # κ = .305 # scale parameter of teachers' wage profile
@@ -184,9 +188,10 @@ function share(occ_id,iG,a_by_occ,τ_w,τ_e)
     a_by_occ=a_by_occ./a_by_occ[end]
     for ia in 1:n_a
         B_tmp = (((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id]))
-        # if minimum(B_tmp) <= 0
-        #     println("Negative base!")
-        # end
+        if minimum(B_tmp) <= 0
+            println("Negative base!")
+            println("Maximum τ_w is ",maximum(τ_w),"!")
+        end
         A_tmp = B_tmp.^(1/α)
         # A_tmp = (( ((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id])).^(1/α))
         marg[ia,occ_id,iG] = prod(cdf.(dist,A_tmp.*a_grid[ia]))
@@ -235,12 +240,13 @@ end
 # Compute labor market barriers for women (group 1) with a box constraint for τ_w (which has to be smaller than 1 for all occupations):
 
 # Optimization with box constraint (τ_w < 1):
-# lower = -Inf*ones(size(τ_w_initial[:,1]))
-# upper = ones(size(τ_w_initial[:,1]))
-# res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
+lower = -Inf*ones(size(τ_w_initial[:,1]))
+upper = ones(size(τ_w_initial[:,1])) .- 1e-5
+res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
 
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
 res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
+# COMMENT: given the correct τ_w, the optimizer is looking for a better solution and explores values in excess of 1! The two solutions I can think of are a box constraint or some sort of penalty function. The box constraint doesn't appear to work very well with the NelderMead algorithm; I haven't tried the penalty function yet.
 τ_w_opt[:,1] = Optim.minimizer(res)
 println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",Optim.minimum(res))
 τ_w[:,1]=ones(n_O-1).-λf*(ones(n_O-1).-τ_w_opt[:,1])
@@ -395,6 +401,8 @@ while convHH > tolHH
     global convHH
     global tolHH
     global H_grid
+    global a_by_occ
+    global κ
     println("HH_fp = ", HH_fp)
     println("t[iHH,1] = ",t[iHH,1])
     println("")
@@ -499,7 +507,7 @@ while convHH > tolHH
 
         convG = abs(aggA_1970*growth-aggA)
         println("convG=",round(convG,digits=3))
-        # Adjust aggregtate productivities
+        # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
         a_by_occ=a_by_occ*delta
         κ=κ*delta
     end 
