@@ -118,10 +118,8 @@ gm=gm'
     cd("..")
     cd("..")
 # Update model parameters, if required:
-ϕ = 2.745
-# β = .4
 # λf = .599 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = .305 # scale parameter of teachers' wage profile
+κ = .305 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta,1)
@@ -188,10 +186,10 @@ function share(occ_id,iG,a_by_occ,τ_w,τ_e)
     a_by_occ=a_by_occ./a_by_occ[end]
     for ia in 1:n_a
         B_tmp = (((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id]))
-        if minimum(B_tmp) <= 0
-            println("Negative base!")
-            println("Maximum τ_w is ",maximum(τ_w),"!")
-        end
+        # if minimum(B_tmp) <= 0
+        #     println("Negative base!")
+        #     println("Maximum τ_w is ",maximum(τ_w),"!")
+        # end
         A_tmp = B_tmp.^(1/α)
         # A_tmp = (( ((ones(n_O-2).-τ_w[occ_id])./(ones(n_O-2).-τ_w[1:end.!=occ_id])).*(((ones(n_O-2).+τ_e[occ_id])./(ones(n_O-2).+τ_e[1:end.!=occ_id])).^(-η)).*(a_by_occ[occ_id]./a_by_occ[1:end .!=occ_id])).^(1/α))
         marg[ia,occ_id,iG] = prod(cdf.(dist,A_tmp.*a_grid[ia]))
@@ -218,11 +216,11 @@ function calibrate_A(x)
     end
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Sum of squared differences (in relative terms) between data and model:
-    return sum(((share_occ_model[1:end].-share_occ_data[1:end,2])./share_occ_data[1:end,2]).^2)
+    return sum((((share_occ_model[1:end].-share_occ_data[1:end,2])./share_occ_data[1:end,2])*1e3).^4)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res=optimize(calibrate_A,a_by_occ_initial./a_by_occ_initial[end], show_trace=false, iterations=10000)
+res=optimize(calibrate_A,a_by_occ_initial./a_by_occ_initial[end], show_trace=false, iterations=100000)
 a_by_occ=Optim.minimizer(res)
 println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ",Optim.minimum(res))
 
@@ -231,21 +229,25 @@ function calibrate_τ(x)
     # Share of individuals employed in occupation 'iO' among all non-teaching individuals (the elements of share_occ_model will add up to 1):
     share_occ_model = Array{Float64,1}(undef,n_O-1)
     for iO = 1:(n_O-1)
+        # println(iO)
         share_occ_model[iO]=share(iO,1,a_by_occ,x,τ_e[:,1])[1]
     end
     share_occ_model=share_occ_model./sum(share_occ_model)
     # Sum of squared differences (in relative terms) between data and model:
-    return sum(((share_occ_model[1:end].-share_occ_data[1:end,1])./share_occ_data[1:end,1]).^2)
+    return sum((((share_occ_model[1:end].-share_occ_data[1:end,1])./share_occ_data[1:end,1])*1e3).^4)
+    # share_occ_data_tmp = share_occ_data[1:end,2]+10e-1*(share_occ_data[1:end,1]-share_occ_data[1:end,2])
+    # return sum((((share_occ_model[1:end].-share_occ_data_tmp)./share_occ_data_tmp)*1e3).^4)
 end
 # Compute labor market barriers for women (group 1) with a box constraint for τ_w (which has to be smaller than 1 for all occupations):
 
 # Optimization with box constraint (τ_w < 1):
 lower = -Inf*ones(size(τ_w_initial[:,1]))
 upper = ones(size(τ_w_initial[:,1])) .- 1e-5
-res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
+# res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
 
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
-res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
+# res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
+res = optimize(calibrate_τ,zeros(size(τ_w_initial[:,1])), show_trace=false, iterations=100000)
 # COMMENT: given the correct τ_w, the optimizer is looking for a better solution and explores values in excess of 1! The two solutions I can think of are a box constraint or some sort of penalty function. The box constraint doesn't appear to work very well with the NelderMead algorithm; I haven't tried the penalty function yet.
 τ_w_opt[:,1] = Optim.minimizer(res)
 println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ",Optim.minimum(res))
@@ -508,8 +510,9 @@ while convHH > tolHH
         convG = abs(aggA_1970*growth-aggA)
         println("convG=",round(convG,digits=3))
         # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
-        a_by_occ=a_by_occ*delta
-        κ=κ*delta
+        # WHY ARE WE ADJUSTING AGGRETATE PRODUCTIVITIES BY 'DELTA'?
+        # a_by_occ=a_by_occ*delta
+        # κ=κ*delta
     end 
     convHH = abs(log(H_grid[iHH]/HH_fp))
     println(convHH)
@@ -726,7 +729,8 @@ for iH in 1:n_H
     end
 end
 # Save parameterization in JLD file:
-cd(string("./parameterization/",paramname))
+pwd()
+# cd(string("./parameterization/",paramname))
 save(fnameJLD,"a_by_occ",a_by_occ,"τ_w",τ_w,"τ_w_opt",τ_w_opt,"τ_e",τ_e,"a_T_thresh",a_T_thresh,"t",t,"H_grid",H_grid,"H_O",H_O,"HH_fp",HH_fp,"HH_T",HH_T,"α",α,"β",β,"η",η, "σ",σ,"μ",μ,"ϕ",ϕ,"γ",γ,"κ",κ,"theta",theta,"λf",λf,"λm",λm,"iHH",iHH,"a_grid",a_grid,"a_O_10p",a_O_10p,"a_O_90p",a_O_90p,"a_T_10p",a_T_10p,"a_T_90p",a_T_90p,"h_T",h_T,"f_T",f_T,"f_O",f_O,"h_T_avg",h_T_avg)
 if year == 1970
     save("tau_w_1970.jld","τ_w_opt",τ_w_opt)
