@@ -1,4 +1,4 @@
-\begin{thebibliography}{8}
+\begin{thebibliography}{15}
 \newcommand{\enquote}[1]{``#1''}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
@@ -7,11 +7,33 @@
 \textsc{Altonji, J., P.~Bharadwaj, and F.~Lange} (2009): \enquote{Constructing
   AFQT Scores that are Comparable Across the NLSY79 and the NLSY97,} Data Note.
 
+\bibitem[\protect\citeauthoryear{Biasi}{Biasi}{2021}]{Biasi:2021}
+\textsc{Biasi, B.} (2021): \enquote{{The Labor Market for Teachers under
+  Different Pay Schemes},} \emph{American Economic Journal: Economic Policy},
+  13, 63 -- 102.
+
+\bibitem[\protect\citeauthoryear{Biasi}{Biasi}{2023}]{Biasi:2023}
+---\hspace{-.1pt}---\hspace{-.1pt}--- (2023): \enquote{{School Finance
+  Equalization Increases Intergenerational Mobility},} \emph{Journal of Labor
+  Economics}, 41, 1--38.
+
 \bibitem[\protect\citeauthoryear{Bowles, Gintis, and Osborne}{Bowles
   et~al.}{2001}]{Bowles:2001}
 \textsc{Bowles, S., H.~Gintis, and M.~Osborne} (2001): \enquote{{The
   Determinants of Earnings: A Behavioral Approach},} \emph{Journal of Economic
   Literature}, 39, 1137--1176.
+
+\bibitem[\protect\citeauthoryear{Chetty, Friedman, and Rockoff}{Chetty
+  et~al.}{2014{\natexlab{a}}}]{Chetty:2014a}
+\textsc{Chetty, R., J.~N. Friedman, and J.~E. Rockoff} (2014{\natexlab{a}}):
+  \enquote{{Measuring the Impacts of Teachers I: Evaluating Bias in Teacher
+  Value-Added Estimates},} \emph{American Economic Review}, 104, 2593--2632.
+
+\bibitem[\protect\citeauthoryear{Chetty, Friedman, and Rockoff}{Chetty
+  et~al.}{2014{\natexlab{b}}}]{Chetty:2014b}
+---\hspace{-.1pt}---\hspace{-.1pt}--- (2014{\natexlab{b}}): \enquote{{Measuring
+  the Impacts of Teachers II: Teacher Value-Added and Student Outcomes in
+  Adulthood},} \emph{American Economic Review}, 104, 2633--2679.
 
 \bibitem[\protect\citeauthoryear{Cooksey}{Cooksey}{2018}]{Cooksey:2018}
 \textsc{Cooksey, E.~C.} (2018): \enquote{Using the National Longitudinal
@@ -43,8 +65,21 @@
   \enquote{{The Allocation of Talent and U.S. Economic Growth},}
   \emph{Econometrica}, 87, 1439--1474.
 
+\bibitem[\protect\citeauthoryear{Kolm, Krusell, Larkin, and Mitman}{Kolm
+  et~al.}{2024}]{Kolm:2024}
+\textsc{Kolm, A.-S., P.~Krusell, K.~Larkin, and K.~Mitman} (2024):
+  \enquote{{The Rise of Women and Decline of Education},} \emph{Working Paper}.
+
 \bibitem[\protect\citeauthoryear{Roy}{Roy}{1951}]{Roy:1951}
 \textsc{Roy, A.} (1951): \enquote{Some Thoughts on the Distribution of
   Earnings,} \emph{Oxford Economic Papers New Series}, 3, 135--146.
+
+\bibitem[\protect\citeauthoryear{Wiswall}{Wiswall}{2010}]{Wiswall:2010}
+\textsc{Wiswall, M.} (2010): \enquote{{Licensing and Occupational Sorting in
+  the Market for Teachers},} \emph{Working Paper}.
+
+\bibitem[\protect\citeauthoryear{Wiswall}{Wiswall}{2013}]{Wiswall:2013}
+---\hspace{-.1pt}---\hspace{-.1pt}--- (2013): \enquote{{The dynamics of teacher
+  quality},} \emph{Journal of Public Economics}, 100, 61--78.
 
 \end{thebibliography}
