@@ -118,8 +118,8 @@ h_T_initial = d["h_T"]
 cd("..")
 cd("..")
 # Update model parameters, if required:
-# λf = .599 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = 0.305 # scale parameter of teachers' wage profile
+# λf = .563 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+κ = 0.19 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta, 1)
@@ -271,6 +271,8 @@ cd(string("./parameterization/", paramname))
 fnameJLD_1970 = string("previousParameterization1970.jld")
 d_1970 = load(fnameJLD_1970)
 a_by_occ_1970 = d_1970["a_by_occ"]
+# Normalize productivities so that home production has productivity equal to 1 for men:
+a_by_occ_1970 = a_by_occ_1970 ./ a_by_occ_1970[end]
 τ_e_1970 = d_1970["τ_e"]
 κ_1970 = d_1970["κ"]
 λm_1970 = d_1970["λm"]
@@ -506,14 +508,15 @@ while convHH > tolHH
         end
         # Calculate aggregate productivity in the current year
         aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
+        println("aggA =", round(aggA, digits=3)," , aggA_1970 =", round(aggA_1970, digits=3))
         # Calculate level of adjustment for aggregate productivites to match agg growth
         delta = aggA_1970 * growth / aggA
-        println("delta =", round(delta, digits=3))
+        println("delta =", round(delta, digits=10))
 
         convG = abs(aggA_1970 * growth - aggA)
         println("convG=", round(convG, digits=3))
         # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
-        # WHY ARE WE ADJUSTING AGGRETATE PRODUCTIVITIES BY 'DELTA'?
+        # WHY ARE WE ADJUSTING AGGREGATE PRODUCTIVITIES BY 'DELTA'?
         a_by_occ = a_by_occ * delta
         κ = κ * delta
         # end
