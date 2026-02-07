@@ -47,7 +47,7 @@ share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
 w_90_10_data = Array{Float64,1}(undef, 2)
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 1970
+year = 1990
 # Load data for selected year:
 if year == 1970
     share_occ_data[:, 1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -119,7 +119,7 @@ cd("..")
 cd("..")
 # Update model parameters, if required:
 # λf = .563 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-κ = 0.19 # scale parameter of teachers' wage profile
+# κ = 0.2708 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta, 1)
