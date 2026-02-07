@@ -118,8 +118,8 @@ h_T_initial = d["h_T"]
 cd("..")
 cd("..")
 # Update model parameters, if required:
-# λf = .563 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = 0.2708 # scale parameter of teachers' wage profile
+λf = .59 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+κ = .41 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta, 1)
@@ -516,10 +516,7 @@ while convHH > tolHH
         convG = abs(aggA_1970 * growth - aggA)
         println("convG=", round(convG, digits=3))
         # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
-        # WHY ARE WE ADJUSTING AGGREGATE PRODUCTIVITIES BY 'DELTA'?
         a_by_occ = a_by_occ * delta
-        κ = κ * delta
-        # end
         convHH = abs(log(H_grid[iHH] / HH_fp))
         println(convHH)
         println(H_grid[iHH])
