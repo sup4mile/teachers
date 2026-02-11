@@ -118,8 +118,8 @@ h_T_initial = d["h_T"]
 cd("..")
 cd("..")
 # Update model parameters, if required:
-λf = .59 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-κ = .41 # scale parameter of teachers' wage profile
+# λf = .58 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+# κ = .41 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta, 1)
@@ -220,7 +220,7 @@ function calibrate_A(x)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res = optimize(calibrate_A, a_by_occ_initial ./ a_by_occ_initial[end], show_trace=false, iterations=100000)
+res = optimize(calibrate_A, a_by_occ_initial ./ a_by_occ_initial[end], Optim.Options(show_trace=false, iterations=100000))
 a_by_occ = Optim.minimizer(res)
 println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ", Optim.minimum(res))
 
@@ -247,7 +247,7 @@ upper = ones(size(τ_w_initial[:, 1])) .- 1e-5
 
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
 # res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
-res = optimize(calibrate_τ, zeros(size(τ_w_initial[:, 1])), show_trace=false, iterations=100000)
+res = optimize(calibrate_τ, zeros(size(τ_w_initial[:, 1])), Optim.Options(show_trace=false, iterations=100000))
 # COMMENT: given the correct τ_w, the optimizer is looking for a better solution and explores values in excess of 1! The two solutions I can think of are a box constraint or some sort of penalty function. The box constraint doesn't appear to work very well with the NelderMead algorithm; I haven't tried the penalty function yet.
 τ_w_opt[:, 1] = Optim.minimizer(res)
 println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ", Optim.minimum(res))
@@ -507,7 +507,8 @@ while convHH > tolHH
             iterT = iterT + 1
         end
         # Calculate aggregate productivity in the current year
-        aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
+        # aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
+        aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
         println("aggA =", round(aggA, digits=3)," , aggA_1970 =", round(aggA_1970, digits=3))
         # Calculate level of adjustment for aggregate productivites to match agg growth
         delta = aggA_1970 * growth / aggA
