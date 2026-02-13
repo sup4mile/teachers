@@ -266,8 +266,9 @@ for iG in 1:n_G
     share_occ[:, iG] = share_occ[:, iG] ./ sum(share_occ[:, iG])
 end
 
-#= Calculate aggregate productivity in 1970
 cd(string("./parameterization/", paramname))
+#= Calculate aggregate productivity in 1970
+
 fnameJLD_1970 = string("previousParameterization1970.jld")
 d_1970 = load(fnameJLD_1970)
 a_by_occ_1970 = d_1970["a_by_occ"]
