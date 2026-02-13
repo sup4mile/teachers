@@ -526,10 +526,6 @@ while convHH > tolHH
         println("convG=", round(convG, digits=3))
         # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
         a_by_occ = a_by_occ * delta
-        convHH = abs(log(H_grid[iHH] / HH_fp))
-        println(convHH)
-        println(H_grid[iHH])
-        HH_fp = (1 - ν2) * HH_fp + ν2 * H_grid[iHH]
         =#
 
         # Aggregate productivity matching
@@ -553,6 +549,10 @@ while convHH > tolHH
             convG = 0.0
         end
     end
+    convHH = abs(log(H_grid[iHH] / HH_fp))
+    println(convHH)
+    println(H_grid[iHH])
+    HH_fp = (1 - ν2) * HH_fp + ν2 * H_grid[iHH]
 end
 println("Found fixed point for human capital in teaching!")
 # Compute aggregate productivity at steady state
