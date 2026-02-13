@@ -47,7 +47,7 @@ share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
 w_90_10_data = Array{Float64,1}(undef, 2)
 
 # Select calendar your for calibration (1970, 1990, or 2010)
-year = 1990
+year = 1970
 # Load data for selected year:
 if year == 1970
     share_occ_data[:, 1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -266,7 +266,7 @@ for iG in 1:n_G
     share_occ[:, iG] = share_occ[:, iG] ./ sum(share_occ[:, iG])
 end
 
-# Calculate aggregate productivity in 1970
+#= Calculate aggregate productivity in 1970
 cd(string("./parameterization/", paramname))
 fnameJLD_1970 = string("previousParameterization1970.jld")
 d_1970 = load(fnameJLD_1970)
@@ -276,28 +276,35 @@ a_by_occ_1970 = a_by_occ_1970 ./ a_by_occ_1970[end]
 τ_e_1970 = d_1970["τ_e"]
 κ_1970 = d_1970["κ"]
 λm_1970 = d_1970["λm"]
-
 fnameJLD_1970 = string("tau_w_1970.jld")
 d_1970 = load(fnameJLD_1970)
 τ_w_opt_1970 = d_1970["τ_w_opt"]
-
 fnameJLD_1970 = string("lambda_f_1970.jld")
 d_1970 = load(fnameJLD_1970)
 λf_1970 = d_1970["λf"]
-
 fnameJLD_1970 = string("mass_T_1970.jld")
 d_1970 = load(fnameJLD_1970)
 mass_T_1970 = d_1970["mass_T"]
-
 fnameJLD_1970 = string("mass_O_1970.jld")
 d_1970 = load(fnameJLD_1970)
 mass_O_1970 = d_1970["mass_O"]
-
 τ_w_1970 = zeros(n_O - 1, n_G)
 τ_w_1970[:, 2] = fill!(τ_w[:, 2], 0)
 τ_w_1970[:, 1] = ones(n_O - 1) .- λf_1970 * (ones(n_O - 1) .- τ_w_opt_1970[:, 1])
-
 aggA_1970 = (sum(a_by_occ_1970 .* (ones(n_O - 1) - τ_w_1970[:, 1]) * gm[1] .* mass_O_1970[1, :] + a_by_occ_1970 .* (ones(n_O - 1) - τ_w_1970[:, 2]) * gm[2] .* mass_O_1970[2, :]) + κ_1970 * gm[1] * mass_T_1970[1] + κ_1970 * gm[2] * mass_T_1970[2]) / (sum(gm[1] .* mass_O_1970[1, :] + gm[2] .* mass_O_1970[2, :]) + gm[1] * mass_T_1970[1] + gm[2] * mass_T_1970[2])
+=#
+
+# Load aggregate productivity from 1970 parameterization
+# When year == 1970, aggA_1970 is not needed because the model is solving for it
+# computed aggA will be stored at the end for use in other years
+if year != 1970
+    cd(string("./parameterization/", paramname))
+    fnameJLD_aggA_1970 = string("aggA_1970.jld")
+    d_aggA = load(fnameJLD_aggA_1970)
+    aggA_1970 = d_aggA["aggA_1970"]
+    cd("..")
+    cd("..")
+end
 
 
 a_T_thresh = Array{Float64,4}(undef, n_a, n_H, n_G, n_O - 1)
@@ -506,6 +513,7 @@ while convHH > tolHH
 
             iterT = iterT + 1
         end
+        #=
         # Calculate aggregate productivity in the current year
         # aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
         aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
@@ -522,9 +530,35 @@ while convHH > tolHH
         println(convHH)
         println(H_grid[iHH])
         HH_fp = (1 - ν2) * HH_fp + ν2 * H_grid[iHH]
+        =#
+
+        # Aggregate productivity matching
+        # When year = 1970, there's no target to match so we skip the productivity adjustment
+        # aggA is stored at the end for use by later years.
+        if year != 1970
+            # Calculate aggregate productivity in the current year (new formula):
+            # aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
+            aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
+            println("aggA =", round(aggA, digits=3), " , aggA_1970 =", round(aggA_1970, digits=3))
+            # Calculate level of adjustment for aggregate productivites to match agg growth
+            delta = aggA_1970 * growth / aggA
+            println("delta =", round(delta, digits=10))
+
+            convG = abs(aggA_1970 * growth - aggA)
+            println("convG=", round(convG, digits=3))
+            # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
+            a_by_occ = a_by_occ * delta
+        else
+            # No productivity adjustment needed for the baseline year:
+            convG = 0.0
+        end
     end
 end
 println("Found fixed point for human capital in teaching!")
+# Compute aggregate productivity at steady state
+# when year == 1970, used for storing the baseline value
+aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
+println("aggA (converged) = ", round(aggA, digits=6))
 
 if transition == 1
     ##############################
@@ -742,6 +776,7 @@ if year == 1970
     save("lambda_f_1970.jld", "λf", λf)
     save("mass_T_1970.jld", "mass_T", mass_T[iHH, :])
     save("mass_O_1970.jld", "mass_O", mass_O[iHH, :, :])
+    save("aggA_1970.jld", "aggA_1970", aggA)
 end
 cd("..")
 cd("..")
