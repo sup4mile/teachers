@@ -15,6 +15,8 @@ paramname = "benchmark"
 
 # Compute transition dynamics (= 1) or not (= 0):
 transition = 1
+include_HP = 1 # whether to include home production in TFP growth
+A_idx = include_HP == 1 ? 1 : 2 # 1 = with HP, 2 = without HP
 
 # Set (some of the) parameters:
 # Population size:
@@ -266,9 +268,7 @@ for iG in 1:n_G
     share_occ[:, iG] = share_occ[:, iG] ./ sum(share_occ[:, iG])
 end
 
-cd(string("./parameterization/", paramname))
 #= Calculate aggregate productivity in 1970
-
 fnameJLD_1970 = string("previousParameterization1970.jld")
 d_1970 = load(fnameJLD_1970)
 a_by_occ_1970 = d_1970["a_by_occ"]
@@ -403,6 +403,7 @@ maxiterT = 100
 # (c) Growth:
 tolG = 1e-5
 maxiterG = 100
+aggA = zeros(2) # Aggregate productivity: aggA[1] = w/ home production, aggA[2] = w/o home production
 
 # Time investment doesn't depend on any endogenous variables, only on parameters:
 s_O = μ * ϕ / (μ * ϕ + 1 - η)
@@ -415,6 +416,7 @@ while convHH > tolHH
     global H_grid
     global a_by_occ
     global κ
+    global aggA
     println("HH_fp = ", HH_fp)
     println("t[iHH,1] = ", t[iHH, 1])
     println("")
@@ -533,15 +535,18 @@ while convHH > tolHH
         # When year = 1970, there's no target to match so we skip the productivity adjustment
         # aggA is stored at the end for use by later years.
         if year != 1970
-            # Calculate aggregate productivity in the current year (new formula):
+
             # aggA = (sum(a_by_occ .* (ones(n_O - 1) - τ_w[:, 1]) * gm[1] .* mass_O[iHH, 1, :] + a_by_occ .* (ones(n_O - 1) - τ_w[:, 2]) * gm[2] .* mass_O[iHH, 2, :]) + κ * gm[1] * mass_T[iHH, 1] + κ * gm[2] * mass_T[iHH, 2]) / (sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :]) + gm[1] * mass_T[iHH, 1] + gm[2] * mass_T[iHH, 2])
-            aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
-            println("aggA =", round(aggA, digits=3), " , aggA_1970 =", round(aggA_1970, digits=3))
+            println("convG=", round(convG, digits=3))
+            # aggA[1] = with home production, aggA[2] = without home production
+            aggA[1] = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
+            aggA[2] = sum((sum_Y_O[iHH, :] .- Y_O[n_O-1, iHH, :]) .* gm) / sum(gm[1] .* mass_O[iHH, 1, 1:n_O-2] + gm[2] .* mass_O[iHH, 2, 1:n_O-2])
+            println("aggA =", round.(aggA, digits=3), " , aggA_1970 =", round.(aggA_1970, digits=3))
             # Calculate level of adjustment for aggregate productivites to match agg growth
-            delta = aggA_1970 * growth / aggA
+            delta = aggA_1970[A_idx] * growth / aggA[A_idx]
             println("delta =", round(delta, digits=10))
 
-            convG = abs(aggA_1970 * growth - aggA)
+            convG = abs(aggA_1970[A_idx] * growth - aggA[A_idx])
             println("convG=", round(convG, digits=3))
             # Adjust aggregate productivities (in outer scope; i.e., need to declare that they are global rather than local):
             a_by_occ = a_by_occ * delta
@@ -558,8 +563,10 @@ end
 println("Found fixed point for human capital in teaching!")
 # Compute aggregate productivity at steady state
 # when year == 1970, used for storing the baseline value
-aggA = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
-println("aggA (converged) = ", round(aggA, digits=6))
+# aggA[1] = with home production, aggA[2] = without home production
+aggA[1] = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
+aggA[2] = sum((sum_Y_O[iHH, :] .- Y_O[n_O-1, iHH, :]) .* gm) / sum(gm[1] .* mass_O[iHH, 1, 1:n_O-2] + gm[2] .* mass_O[iHH, 2, 1:n_O-2])
+println("aggA (converged) = ", round.(aggA, digits=6))
 
 if transition == 1
     ##############################
@@ -770,7 +777,7 @@ for iH in 1:n_H
 end
 # Save parameterization in JLD file:
 pwd()
-# cd(string("./parameterization/",paramname))
+cd(string("./parameterization/",paramname))
 save(fnameJLD, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
 if year == 1970
     save("tau_w_1970.jld", "τ_w_opt", τ_w_opt)
