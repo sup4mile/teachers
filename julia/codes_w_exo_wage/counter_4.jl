@@ -1,5 +1,7 @@
 # This Julia script computes counterfactual steady states for 1970, 1990, and 2010 where τ_w = 0 (i.e. there is no labor market discrimination against women). The occupational productivities remain as in the steady-state calibration and κ is such that the share of teachers among men matches the steady-state share in 1970, 1990, 2010.
 
+# Note (2/22/2026): This is effectively the same as counter_2.jl. To replicate the distinction between counter_1.jl and counter_3.jl, this counterfactual experimant should fix the parameter κ at the values from the benchmark calibration for each steady state. The idea is (as in counter_3.jl) to freeze relative productivities in time and to explore the effects of variations (or lack thereof) in barriers across time.
+
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
 # Change directory, if necessary:
