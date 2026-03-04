@@ -1,16 +1,18 @@
+# frechet.jl
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
 # Change directory, if necessary:
 # cd("./GitHub/teachers/julia/codes_w_exo_wage")
 
 # Select type of parameterization (from following list):
-# (1) benchmark
-# (2) counter_1
-# (3) counter_2
-# (4) high_beta
+# (1) benchmark - no growth, no HP in TFP growth
+# (2) benchmark_w_growth
+# (3) benchmark_w_HP
+# (4) benchmark_w_growth_HP
 # (5) low_beta
-# (6) high_beta_high_sigma
-# (7) low_beta_low_sigma
+# (6) high_beta 
+# (7) high_beta_high_sigma
+# (8) low_beta_low_sigma
 paramname = "benchmark"
 
 # Compute transition dynamics (= 1) or not (= 0):
@@ -71,7 +73,7 @@ elseif year == 2010
     share_occ_data[:, 1] = tab1["O30:O49"] # ACS 2009-2013 for NLSY97 (women)
     share_occ_data[:, 2] = tab1["G30:G49"] # ACS 2009-2013 1990 for NLSY97 (men)
     w_90_10_data[1] = tab2["G50"] # Dispersion in non-teaching occupations
-    w_90_10_data[1] = tab2["G51"] # Dispersion in teaching
+    w_90_10_data[2] = tab2["G51"] # Dispersion in teaching
 else
     println("No a_by_occ for the selected year")
 end
@@ -786,8 +788,9 @@ end
 # Save parameterization in JLD file:
 pwd()
 cd(string("./parameterization/",paramname))
+a_by_occ_level = copy(a_by_occ)
 a_by_occ = a_by_occ ./ a_by_occ[1] # normalize productivity?
-save(fnameJLD, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
+save(fnameJLD, "a_by_occ", a_by_occ, "a_by_occ_level", a_by_occ_level, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
 if year == 1970
     save("tau_w_1970.jld", "τ_w_opt", τ_w_opt)
     save("lambda_f_1970.jld", "λf", λf)
