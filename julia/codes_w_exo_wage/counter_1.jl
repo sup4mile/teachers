@@ -83,6 +83,8 @@ for year in [1990, 2010]
 
 println("  COUNTERFACTUAL 1: year = ", year, " with 1970 barriers for women")
 
+local fyear, fnameJLD, d, df
+
 global share_occ_data, w_90_10_data
 share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
 w_90_10_data = Array{Float64,1}(undef, 2)
@@ -475,8 +477,7 @@ println("Found fixed point for human capital in teaching (counterfactual)!")
 
 
 #############################################################
-# Compute wage dispersion metrics at steady state (iHH)     #
-# (previously computed inside transition dynamics only)     #
+# Compute wage dispersion at steady state (iHH)             #
 #############################################################
 for iG in 1:n_G
     # --- Teachers ---
@@ -486,11 +487,13 @@ for iG in 1:n_G
 
     # 10th percentile of teacher ability distribution:
     fn_F_T_10p(x) = 0.1 - quadgk(aa -> spl_f_T[iG](aa), lowbnd, x)[1]
-    a_T_10p[iHH, iG] = find_zero(fn_F_T_10p, a_T_10p[iHH, iG])
+    # a_T_10p[iHH, iG] = find_zero(fn_F_T_10p, a_T_10p[iHH, iG]) # doesn't converge
+    a_T_10p[iHH, iG] = find_zero(fn_F_T_10p, (lowbnd, upbnd), Bisection())
 
     # 90th percentile of teacher ability distribution:
     fn_F_T_90p(x) = 0.9 - quadgk(aa -> spl_f_T[iG](aa), lowbnd, x)[1]
-    a_T_90p[iHH, iG] = find_zero(fn_F_T_90p, a_T_90p[iHH, iG])
+    # a_T_90p[iHH, iG] = find_zero(fn_F_T_90p, a_T_90p[iHH, iG])
+    a_T_90p[iHH, iG] = find_zero(fn_F_T_90p, (lowbnd, upbnd), Bisection())
 
     # 90-10 wage ratio for teachers:
     spl_ω[iHH] = Spline1D(a_grid, ω[:, iHH, iG])
@@ -507,10 +510,12 @@ for iG in 1:n_G
         spl_f_O[iHH, iG, iO] = Spline1D(a_grid, f_O[:, iHH, iG, iO])
 
         fn_F_O_10p(x) = 0.1 - quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa) / mass_O[iHH, iG, iO], lowbnd, x)[1]
-        a_O_10p[iHH, iG, iO] = find_zero(fn_F_O_10p, a_O_10p[iHH, iG, iO])
+        # a_O_10p[iHH, iG, iO] = find_zero(fn_F_O_10p, a_O_10p[iHH, iG, iO])
+        a_O_10p[iHH, iG, iO] = find_zero(fn_F_O_10p, (lowbnd, upbnd), Bisection())
 
         fn_F_O_90p(x) = 0.9 - quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa) / mass_O[iHH, iG, iO], lowbnd, x)[1]
-        a_O_90p[iHH, iG, iO] = find_zero(fn_F_O_90p, a_O_90p[iHH, iG, iO])
+        #a_O_90p[iHH, iG, iO] = find_zero(fn_F_O_90p, a_O_90p[iHH, iG, iO])
+        a_O_90p[iHH, iG, iO] = find_zero(fn_F_O_90p, (lowbnd, upbnd), Bisection())
 
         spl_h = Spline1D(a_grid, h_O[:, iHH, iG, iO])
         w_90_10[iHH, iG, iO] = spl_h(a_O_90p[iHH, iG, iO]) / spl_h(a_O_10p[iHH, iG, iO])
@@ -526,8 +531,10 @@ function fn_f_T_all_g(x)
 end
 fn_F_T_10p_all_g(x) = 0.1 - quadgk(aa -> fn_f_T_all_g(aa), lowbnd, x)[1]
 fn_F_T_90p_all_g(x) = 0.9 - quadgk(aa -> fn_f_T_all_g(aa), lowbnd, x)[1]
-a_T_10p[iHH, n_G+1] = find_zero(fn_F_T_10p_all_g, a_T_10p[iHH, n_G+1])
-a_T_90p[iHH, n_G+1] = find_zero(fn_F_T_90p_all_g, a_T_90p[iHH, n_G+1])
+# a_T_10p[iHH, n_G+1] = find_zero(fn_F_T_10p_all_g, a_T_10p[iHH, n_G+1])
+a_T_10p[iHH, n_G+1] = find_zero(fn_F_T_10p_all_g, (lowbnd, upbnd), Bisection())
+# a_T_90p[iHH, n_G+1] = find_zero(fn_F_T_90p_all_g, a_T_90p[iHH, n_G+1])
+a_T_90p[iHH, n_G+1] = find_zero(fn_F_T_90p_all_g, (lowbnd, upbnd), Bisection())
 ω_90_10[iHH, n_G+1] = spl_ω[iHH](a_T_90p[iHH, n_G+1]) / spl_ω[iHH](a_T_10p[iHH, n_G+1])
 
 # Pooled weighted-average 90-10 ratio across non-teaching occupations:
