@@ -1,19 +1,24 @@
-# counter_4.jl
-# This Julia script computes counterfactual steady states for 1970, 1990, and 2010 where
-# labor market discrimination against women is eliminated in all occupations EXCEPT
-# home production, and in home production the barriers are frozen at their 1970 level.
-# This is an in-between of counterfactual 1 (all barriers frozen at 1970) and
-# counterfactual 3 (all barriers eliminated except HP at calibrated year-specific level).
+# counter_5.jl
+# This Julia script computes counterfactual steady states for 1990 and 2010 where:
+# (1) The teacher wage scale parameter κ is frozen at its 1970 calibrated level.
+# (2) Labor market barriers τ_w for women are frozen at their 1970 calibrated levels
+#     in all occupations except home production.
+# (3) Home production barriers use the year-specific calibrated values (λf and τ_w_opt
+#     from the main model solution for that year).
+#
+# By construction the 1970 counterfactual would match the baseline, so we only run
+# 1990 and 2010 like counter_1.jl
 #
 # Key changes relative to the main solution (frechet.jl):
-# (1) Load λf and τ_w_opt from the 1970 solution. Set τ_w[:, 1] = 0 for all
-#     non-teaching occupations except home production (index n_O-1), where we use the 1970 barrier.
-# (2) Load calibrated a_by_occ from the main model solution, no recalibration.
-# (3) Remove the TFP growth adjustment loop - aggregate productivity changes endogenously.
-# (4) Skip transition dynamics — only compute counterfactual steady states.
-# (5) Recompute occupation shares and marginals for women using modified barriers.
-
-# Note (2/22/2026): This is effectively the same as counter_2.jl. To replicate the distinction between counter_1.jl and counter_3.jl, this counterfactual experimant should fix the parameter κ at the values from the benchmark calibration for each steady state. The idea is (as in counter_3.jl) to freeze relative productivities in time and to explore the effects of variations (or lack thereof) in barriers across time.
+# (1) Load λf_1970, τ_w_opt_1970, and κ_1970 from the 1970 solution.
+# (2) For each year, load year-specific calibrated parameters (a_by_occ, λf, τ_w_opt, etc.).
+# (3) Override κ with κ_1970.
+# (4) Set τ_w for women: use 1970 barriers for all non-HP occupations; use year-specific
+#     barriers for home production (index n_O-1).
+# (5) Load calibrated a_by_occ from the main model solution, no recalibration.
+# (6) Remove the TFP growth adjustment loop — aggregate productivity changes endogenously.
+# (7) Skip transition dynamics — only compute counterfactual steady states.
+# (8) Recompute occupation shares and marginals for women using modified barriers.
 
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
@@ -26,7 +31,7 @@ using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, Linear
 # (3) benchmark_w_HP
 # (4) benchmark_w_growth_HP
 # (5) low_beta
-# (6) high_beta 
+# (6) high_beta
 # (7) high_beta_high_sigma
 # (8) low_beta_low_sigma
 paramname = "benchmark"
@@ -74,33 +79,31 @@ end
 gm[end] = M / 2 - sum(gm)
 gm = gm'
 
-# Change: Load 1970 barriers (λf and τ_w_opt) — used for home production in all years
+# Load 1970 barriers (λf and τ_w_opt) and κ — used for non-HP occupations in all years
 cd(string("./parameterization/", paramname))
 d_1970_tau = load("tau_w_1970.jld")
 τ_w_opt_1970 = d_1970_tau["τ_w_opt"]
 d_1970_lam = load("lambda_f_1970.jld")
 λf_1970 = d_1970_lam["λf"]
+# Load κ from the 1970 main parameterization:
+d_1970_main = load("previousParameterization1970.jld")
+κ_1970 = d_1970_main["κ"]
 cd("..")
 cd("..")
 
-# Loop over counterfactual years (1970, 1990, and 2010)
-for year in [1970, 1990, 2010]
+# Loop over counterfactual years (1990 and 2010 only; 1970 is the baseline by construction)
+for year in [1990, 2010]
 
 local fyear, fnameJLD, d, df
 
-println("  COUNTERFACTUAL 4: year = ", year, " with barriers eliminated EXCEPT home production (frozen at 1970)")
+println("  COUNTERFACTUAL 5: year = ", year, " with κ and barriers frozen at 1970 EXCEPT home production (year-specific)")
 
 global share_occ_data, w_90_10_data
 share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
 w_90_10_data = Array{Float64,1}(undef, 2)
 
 # Load data for selected year:
-if year == 1970
-    share_occ_data[:, 1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
-    share_occ_data[:, 2] = tab1["C30:C49"] # Census 1970 for Project TALENT (men)
-    w_90_10_data[1] = tab2["C50"] # Dispersion in non-teaching occupations
-    w_90_10_data[2] = tab2["C51"] # Dispersion in teaching
-elseif year == 1990
+if year == 1990
     share_occ_data[:, 1] = tab1["M30:M49"] # Census 1990 for NLSY79 (women)
     share_occ_data[:, 2] = tab1["E30:E49"] # Census 1990 for NLSY79 (men)
     w_90_10_data[1] = tab2["E50"] # Dispersion in non-teaching occupations
@@ -137,9 +140,9 @@ HH_fp = d["HH_fp"]
 μ = d["μ"]
 ϕ = d["ϕ"]
 γ = d["γ"]
-κ = d["κ"]
+κ = d["κ"]           # year-specific κ (will be overridden below)
 theta = d["theta"]
-λf = d["λf"]
+λf = d["λf"]         # year-specific λf (used for home production)
 λm = d["λm"]
 iHH = d["iHH"]
 a_grid = d["a_grid"]
@@ -148,8 +151,17 @@ a_O_90p = d["a_O_90p"]
 a_T_10p = d["a_T_10p"]
 a_T_90p = d["a_T_90p"]
 h_T_initial = d["h_T"]
+
+# Store the year-specific λf and τ_w_opt for home production before overriding:
+λf_year = d["λf"]
+τ_w_opt_year = d["τ_w_opt"]
+
 cd("..")
 cd("..")
+
+# Override κ with the 1970 calibrated value:
+κ = κ_1970
+println("Using κ from 1970: κ = ", κ)
 
 # Distribution of abilities:
 global dist
@@ -167,17 +179,19 @@ global τ_w, τ_e, τ_w_opt
 τ_w[:, 2] = ones(n_O - 1) .- λm * (ones(n_O - 1) .- τ_w[:, 2])
 τ_e = fill!(τ_e, 0.0)
 
-# Change: Eliminate barriers for women in all occupations EXCEPT home production (index n_O-1).
-# For non-HP occupations (indices 1 to n_O-2): set τ_w_opt = 0, so τ_w = 0.
-# For home production (index n_O-1): freeze to 1970 calibrated level using λf_1970 and τ_w_opt_1970.
-τ_w_opt[:, 1] .= 0.0
-τ_w[:, 1] .= 0.0
-# Restore home production barrier (last non-teaching occupation) to 1970 level:
-τ_w_opt[n_O-1, 1] = τ_w_opt_1970[n_O-1, 1]
-τ_w[n_O-1, 1] = 1.0 - λf_1970 * (1.0 - τ_w_opt_1970[n_O-1, 1])
-println("Eliminating barriers for women in all occupations EXCEPT home production (frozen at 1970)")
+# Set women's barriers:
+# All non-HP occupations (indices 1 to n_O-2): use 1970 barriers
+τ_w_opt[:, 1] = τ_w_opt_1970[:, 1]
+τ_w[:, 1] = ones(n_O - 1) .- λf_1970 * (ones(n_O - 1) .- τ_w_opt_1970[:, 1])
+
+# Home production (index n_O-1): use year-specific calibrated barriers
+τ_w_opt[n_O-1, 1] = τ_w_opt_year[n_O-1, 1]
+τ_w[n_O-1, 1] = 1.0 - λf_year * (1.0 - τ_w_opt_year[n_O-1, 1])
+
+println("Using 1970 barriers for women in non-HP occupations: λf_1970 = ", λf_1970)
 println("τ_w[:, 1] for non-HP occupations = ", τ_w[1:n_O-2, 1])
-println("τ_w[n_O-1, 1] for home production = ", τ_w[n_O-1, 1], " (1970 level, λf_1970 = ", λf_1970, ")")
+println("Using year-specific barriers for home production: λf_year = ", λf_year)
+println("τ_w[n_O-1, 1] for home production = ", τ_w[n_O-1, 1], " (year-specific)")
 
 global quantile_top, quantile_bottom
 quantile_top = 1 - 1e-4
@@ -245,7 +259,8 @@ end
 
 # Skip calibration of a_by_occ and τ_w
 
-# Recompute occupation shares and marginals using modified barriers for women (zero except HP at 1970 level), unchanged for men
+# Recompute occupation shares and marginals using modified barriers
+# (1970 barriers for non-HP, year-specific for HP) for women; unchanged for men
 global share_occ, marginal
 share_occ = Array{Float64,2}(undef, n_O - 1, n_G)
 marginal = Array{Float64,3}(undef, n_a, n_O - 1, n_G)
@@ -258,7 +273,7 @@ for iG in 1:n_G
     share_occ[:, iG] = share_occ[:, iG] ./ sum(share_occ[:, iG])
 end
 
-println("Counterfactual (no barriers except HP at 1970) share of women in non-teaching occupations:")
+println("Counterfactual (κ & barriers at 1970 except HP year-specific) share of women in non-teaching occupations:")
 println(round.(share_occ[:, 1]; digits=4))
 println("Main model data share of women in non-teaching occupations:")
 println(round.(share_occ_data[:, 1]; digits=4))
@@ -487,7 +502,7 @@ while convHH > tolHH
     println(H_grid[iHH])
     HH_fp = (1 - ν2) * HH_fp + ν2 * H_grid[iHH]
 end
-println("Found fixed point for human capital in teaching (counterfactual 4 - no barriers except HP at 1970)!")
+println("Found fixed point for human capital in teaching (counterfactual 5 - κ & barriers at 1970 except HP year-specific)!")
 
 
 #############################################################
@@ -501,12 +516,10 @@ for iG in 1:n_G
 
     # 10th percentile of teacher ability distribution:
     fn_F_T_10p(x) = 0.1 - quadgk(aa -> spl_f_T[iG](aa), lowbnd, x)[1]
-    # a_T_10p[iHH, iG] = find_zero(fn_F_T_10p, a_T_10p[iHH, iG]) # doesn't converge
     a_T_10p[iHH, iG] = find_zero(fn_F_T_10p, (lowbnd, upbnd), Bisection())
 
     # 90th percentile of teacher ability distribution:
     fn_F_T_90p(x) = 0.9 - quadgk(aa -> spl_f_T[iG](aa), lowbnd, x)[1]
-    # a_T_90p[iHH, iG] = find_zero(fn_F_T_90p, a_T_90p[iHH, iG])
     a_T_90p[iHH, iG] = find_zero(fn_F_T_90p, (lowbnd, upbnd), Bisection())
 
     # 90-10 wage ratio for teachers:
@@ -524,11 +537,9 @@ for iG in 1:n_G
         spl_f_O[iHH, iG, iO] = Spline1D(a_grid, f_O[:, iHH, iG, iO])
 
         fn_F_O_10p(x) = 0.1 - quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa) / mass_O[iHH, iG, iO], lowbnd, x)[1]
-        # a_O_10p[iHH, iG, iO] = find_zero(fn_F_O_10p, a_O_10p[iHH, iG, iO])
         a_O_10p[iHH, iG, iO] = find_zero(fn_F_O_10p, (lowbnd, upbnd), Bisection())
 
         fn_F_O_90p(x) = 0.9 - quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa) / mass_O[iHH, iG, iO], lowbnd, x)[1]
-        #a_O_90p[iHH, iG, iO] = find_zero(fn_F_O_90p, a_O_90p[iHH, iG, iO])
         a_O_90p[iHH, iG, iO] = find_zero(fn_F_O_90p, (lowbnd, upbnd), Bisection())
 
         spl_h = Spline1D(a_grid, h_O[:, iHH, iG, iO])
@@ -545,9 +556,7 @@ function fn_f_T_all_g(x)
 end
 fn_F_T_10p_all_g(x) = 0.1 - quadgk(aa -> fn_f_T_all_g(aa), lowbnd, x)[1]
 fn_F_T_90p_all_g(x) = 0.9 - quadgk(aa -> fn_f_T_all_g(aa), lowbnd, x)[1]
-# a_T_10p[iHH, n_G+1] = find_zero(fn_F_T_10p_all_g, a_T_10p[iHH, n_G+1])
 a_T_10p[iHH, n_G+1] = find_zero(fn_F_T_10p_all_g, (lowbnd, upbnd), Bisection())
-# a_T_90p[iHH, n_G+1] = find_zero(fn_F_T_90p_all_g, a_T_90p[iHH, n_G+1])
 a_T_90p[iHH, n_G+1] = find_zero(fn_F_T_90p_all_g, (lowbnd, upbnd), Bisection())
 ω_90_10[iHH, n_G+1] = spl_ω[iHH](a_T_90p[iHH, n_G+1]) / spl_ω[iHH](a_T_10p[iHH, n_G+1])
 
@@ -557,7 +566,7 @@ w_90_10[iHH, n_G+1, n_O] = mean(w_90_10[iHH, 1:n_G, n_O])
 # Compute aggregate productivity at counterfactual steady state
 aggA[1] = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
 aggA[2] = sum((sum_Y_O[iHH, :] .- Y_O[n_O-1, iHH, :]) .* gm) / sum(gm[1] .* mass_O[iHH, 1, 1:n_O-2] + gm[2] .* mass_O[iHH, 2, 1:n_O-2])
-println("aggA (counterfactual 4 - no barriers except HP at 1970) = ", round.(aggA, digits=6))
+println("aggA (counterfactual 5 - κ & barriers at 1970 except HP year-specific) = ", round.(aggA, digits=6))
 
 
 # Transition dynamics are skipped
@@ -580,25 +589,26 @@ end
 
 # Save counterfactual parameterization in JLD file:
 cd(string("./parameterization/", paramname))
-fnameJLD_cf = string("counter_4_", fyear, ".jld")
-save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf_1970", λf_1970, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
+fnameJLD_cf = string("counter_5_", fyear, ".jld")
+save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "κ_1970", κ_1970, "theta", theta, "λf_1970", λf_1970, "λf_year", λf_year, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
 cd("..")
 cd("..")
 
 println("____________")
-println("COUNTERFACTUAL 4 RESULTS (year = ", year, ", barriers eliminated except HP frozen at 1970)")
+println("COUNTERFACTUAL 5 RESULTS (year = ", year, ", κ & barriers at 1970 except HP year-specific)")
+println("κ (1970) = ", κ)
 println("share of teachers among women= ", mass_T[iHH, 1])
 println("share of teachers among men= ", mass_T[iHH, 2])
 println(" ")
 println("tax rate= ", t[iHH, 1])
 println("output= ", sum(Y_T[iHH, :] .* gm) + sum(sum_Y_O[iHH, :] .* gm))
 println("HH_fp= ", HH_fp)
-println("aggA (counterfactual 4) = ", round.(aggA, digits=6))
+println("aggA (counterfactual 5) = ", round.(aggA, digits=6))
 
 # Write counterfactual moments to CSV file using DataFrame:
-df = DataFrame(year=year, λf_1970=round(λf_1970; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2))
+df = DataFrame(year=year, κ_1970=round(κ_1970; digits=4), λf_1970=round(λf_1970; digits=4), λf_year=round(λf_year; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2))
 # If it exists, load previous counterfactual results, append 'df':
-fnameCSV_cf = string("./results/", paramname, "/counter_4_moments.csv")
+fnameCSV_cf = string("./results/", paramname, "/counter_5_moments.csv")
 if isfile(fnameCSV_cf) == true
     moments_cf = DataFrame(CSV.File(fnameCSV_cf))
     append!(moments_cf, df)
@@ -611,7 +621,7 @@ show(moments_cf)
 CSV.write(fnameCSV_cf, moments_cf)
 
 println("")
-println("Counterfactual 4 for year ", year, " complete.")
+println("Counterfactual 5 for year ", year, " complete.")
 println("================================================================")
 println("")
 

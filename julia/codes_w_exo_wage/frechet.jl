@@ -1,22 +1,31 @@
+# frechet.jl
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
 # Change directory, if necessary:
 # cd("./GitHub/teachers/julia/codes_w_exo_wage")
 
 # Select type of parameterization (from following list):
-# (1) benchmark
-# (2) counter_1
-# (3) counter_2
-# (4) high_beta
+# (1) benchmark - no growth, no HP in TFP growth
+# (2) benchmark_w_growth
+# (3) benchmark_w_HP
+# (4) benchmark_w_growth_HP
 # (5) low_beta
-# (6) high_beta_high_sigma
-# (7) low_beta_low_sigma
+# (6) high_beta 
+# (7) high_beta_high_sigma
+# (8) low_beta_low_sigma
 paramname = "benchmark"
 
 # Compute transition dynamics (= 1) or not (= 0):
 transition = 1
-include_HP = 1 # whether to include home production in TFP growth
+include_HP = 0 # whether to include home production in TFP growth
 A_idx = include_HP == 1 ? 1 : 2 # 1 = with HP, 2 = without HP
+
+# Select calendar your for calibration (1970, 1990, or 2010)
+year = 1970
+
+# Aggregate productivity growth
+growth_pct = 0.00
+growth = (1 + growth_pct)^(year - 1970)
 
 # Set (some of the) parameters:
 # Population size:
@@ -48,8 +57,7 @@ occ = [occ_O; occ_T]
 share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
 w_90_10_data = Array{Float64,1}(undef, 2)
 
-# Select calendar your for calibration (1970, 1990, or 2010)
-year = 1970
+
 # Load data for selected year:
 if year == 1970
     share_occ_data[:, 1] = tab1["K30:K49"] # Census 1970 for Project TALENT (women)
@@ -65,13 +73,12 @@ elseif year == 2010
     share_occ_data[:, 1] = tab1["O30:O49"] # ACS 2009-2013 for NLSY97 (women)
     share_occ_data[:, 2] = tab1["G30:G49"] # ACS 2009-2013 1990 for NLSY97 (men)
     w_90_10_data[1] = tab2["G50"] # Dispersion in non-teaching occupations
-    w_90_10_data[1] = tab2["G51"] # Dispersion in teaching
+    w_90_10_data[2] = tab2["G51"] # Dispersion in teaching
 else
     println("No a_by_occ for the selected year")
 end
 
-# Aggregate productivity growth
-growth = (1 + 0.0)^(year - 1970)
+
 
 # Innovation step size for updates:
 ν = 1 # for tax rate that balances government's budget
@@ -120,8 +127,8 @@ h_T_initial = d["h_T"]
 cd("..")
 cd("..")
 # Update model parameters, if required:
-# λf = .58 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
-# κ = .41 # scale parameter of teachers' wage profile
+# λf = 0.525592 # composite barrier for women in non-teaching occupations (note: share of female teachers is decreasing in λf)
+# κ = 0.256641 # scale parameter of teachers' wage profile
 
 # Distribution of abilities:
 dist = Frechet(theta, 1)
@@ -222,7 +229,9 @@ function calibrate_A(x)
 end
 
 # Compute occupation-specific productivies to match employment shares of men (group 2):
-res = optimize(calibrate_A, a_by_occ_initial ./ a_by_occ_initial[end], Optim.Options(show_trace=false, iterations=100000))
+res = optimize(calibrate_A, a_by_occ_initial ./ a_by_occ_initial[end], 
+    LBFGS(),
+    Optim.Options(show_trace=false, iterations=200000, f_abstol=1e-15, f_reltol=1e-15, g_tol=1e-14))
 a_by_occ = Optim.minimizer(res)
 println("Sum of squared distances between a_by_occ_initial and a_by_occ for men is ", Optim.minimum(res))
 
@@ -243,13 +252,14 @@ end
 # Compute labor market barriers for women (group 1) with a box constraint for τ_w (which has to be smaller than 1 for all occupations):
 
 # Optimization with box constraint (τ_w < 1):
-lower = -Inf * ones(size(τ_w_initial[:, 1]))
-upper = ones(size(τ_w_initial[:, 1])) .- 1e-5
+#lower = -Inf * ones(size(τ_w_initial[:, 1]))
+#upper = ones(size(τ_w_initial[:, 1])) .- 1e-5
 # res = optimize(calibrate_τ, lower, upper, τ_w_initial[:,1], Fminbox(NelderMead()), Optim.Options(show_trace=false,iterations=10000,outer_iterations=2))
 
 # Unconstrained optimization (preferred, if possible; Nelder Mead algorithm doesn't always work well with box constraints):
 # res = optimize(calibrate_τ,τ_w_initial[:,1], show_trace=false, iterations=10000)
-res = optimize(calibrate_τ, zeros(size(τ_w_initial[:, 1])), Optim.Options(show_trace=false, iterations=100000))
+res0 = optimize(calibrate_τ, zeros(size(τ_w_initial[:, 1])), Optim.Options(show_trace=false, iterations=100000))
+res = optimize(calibrate_τ, Optim.minimizer(res0), LBFGS(), Optim.Options(show_trace=false, iterations=200000, f_abstol=1e-14, f_reltol=1e-14, g_tol=1e-13))
 # COMMENT: given the correct τ_w, the optimizer is looking for a better solution and explores values in excess of 1! The two solutions I can think of are a box constraint or some sort of penalty function. The box constraint doesn't appear to work very well with the NelderMead algorithm; I haven't tried the penalty function yet.
 τ_w_opt[:, 1] = Optim.minimizer(res)
 println("Sum of squared distances between τ_w_initial and τ_w_opt for women is ", Optim.minimum(res))
@@ -396,13 +406,13 @@ iHH = convert(Int, ceil(n_H / 2))
 # Iteration and tolerance settings for fixed-point problems:
 # (a) Aggregate human capital:
 convHH = 1
-tolHH = 1e-5
+tolHH = 1e-7
 # (b) Income tax rate:
-tolT = 1e-5
-maxiterT = 100
+tolT = 1e-7
+maxiterT = 200
 # (c) Growth:
-tolG = 1e-5
-maxiterG = 100
+tolG = 1e-7
+maxiterG = 200
 aggA = zeros(2) # Aggregate productivity: aggA[1] = w/ home production, aggA[2] = w/o home production
 
 # Time investment doesn't depend on any endogenous variables, only on parameters:
@@ -601,7 +611,7 @@ if transition == 1
                         # Occupational threshold ():
                         a_O_thresh[ia, iH, iG, iO] = ((1 + τ_e[iO, iG]) / (1 - τ_w[iO, iG]) * (1 + τ_e[iO, iG])^(-(1 - η)) * ((1 - s_T[ia, iH, iG]) / (1 - s_O))^((1 - η) / μ) * (s_T[ia, iH, iG] / s_O)^ϕ * (der_ω[ia, iH, iG] / a_by_occ[iO]) * ((ω[ia, iH, iG] / (der_ω[ia, iH, iG] * h_T[ia, iH, iG]) - η) / (1 - η))^(1 - η))^(1 / α) * a
                         h_O[ia, iH, iG, iO] = (η^η * (1 - t[iH, 1])^η * (1 - τ_w[iO, iG])^η / (1 + τ_e[iO, iG])^η * a_by_occ[iO]^η * a_grid[ia]^α * s_O^ϕ * (2 * H / M)^σ)^(1 / (1 - η))
-                        e_O[ia, iH, iG, iO] = η * (1 - t[iH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]) * a_by_occ[iO] * h_O[ia, iHH, iG, iO]
+                        e_O[ia, iH, iG, iO] = η * (1 - t[iH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]) * a_by_occ[iO] * h_O[ia, iH, iG, iO]
                         w[ia, iH, iG, iO] = a_by_occ[iO] * (1 - τ_w[iO, iG]) * h_O[ia, iH, iG, iO]
                     end
                 end
@@ -778,7 +788,9 @@ end
 # Save parameterization in JLD file:
 pwd()
 cd(string("./parameterization/",paramname))
-save(fnameJLD, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
+a_by_occ_level = copy(a_by_occ)
+a_by_occ = a_by_occ ./ a_by_occ[1] # normalize productivity?
+save(fnameJLD, "a_by_occ", a_by_occ, "a_by_occ_level", a_by_occ_level, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
 if year == 1970
     save("tau_w_1970.jld", "τ_w_opt", τ_w_opt)
     save("lambda_f_1970.jld", "λf", λf)
