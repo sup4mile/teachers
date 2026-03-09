@@ -800,7 +800,7 @@ pwd()
 cd(string("./parameterization/",paramname))
 a_by_occ_level = copy(a_by_occ)
 a_by_occ = a_by_occ ./ a_by_occ[1] # normalize productivity?
-save(fnameJLD, "a_by_occ", a_by_occ, "a_by_occ_level", a_by_occ_level, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
+save(fnameJLD, "a_by_occ", a_by_occ, "a_by_occ_level", a_by_occ_level, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "a_O_thresh", a_O_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_T", HH_T, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "h_T_avg", h_T_avg)
 if year == 1970
     save("tau_w_1970.jld", "τ_w_opt", τ_w_opt)
     save("lambda_f_1970.jld", "λf", λf)

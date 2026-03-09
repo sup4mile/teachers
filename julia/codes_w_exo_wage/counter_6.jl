@@ -1,24 +1,18 @@
-# counter_5.jl
-# This Julia script computes counterfactual steady states for 1990 and 2010 where:
-# (1) The teacher wage scale parameter κ is frozen at its 1970 calibrated level.
-# (2) Labor market barriers τ_w for women are frozen at their 1970 calibrated levels
-#     in all occupations except home production.
-# (3) Home production barriers use the year-specific calibrated values (λf and τ_w_opt
-#     from the main model solution for that year).
-#
-# By construction the 1970 counterfactual would match the baseline, so we only run
-# 1990 and 2010 like counter_1.jl
-#
+# counter_6.jl
+# This Julia script computes counterfactual steady states for 1990 and 2010 where
+# aggregate teacher human capital (H̃_T) is held fixed at its 1970 benchmark value.
+# Everything else about the benchmark calibration (barriers, productivities, κ, etc.) is unchanged.
+# This serves as a check of partial vs general equilibrium effects:
+# by fixing the aggregate state variable, we isolate the direct (partial equilibrium) effects
+# of parameter changes from the indirect (general equilibrium) feedback through H̃_T.
+
 # Key changes relative to the main solution (frechet.jl):
-# (1) Load λf_1970, τ_w_opt_1970, and κ_1970 from the 1970 solution.
-# (2) For each year, load year-specific calibrated parameters (a_by_occ, λf, τ_w_opt, etc.).
-# (3) Override κ with κ_1970.
-# (4) Set τ_w for women: use 1970 barriers for all non-HP occupations; use year-specific
-#     barriers for home production (index n_O-1).
-# (5) Load calibrated a_by_occ from the main model solution, no recalibration.
-# (6) Remove the TFP growth adjustment loop — aggregate productivity changes endogenously.
-# (7) Skip transition dynamics — only compute counterfactual steady states.
-# (8) Recompute occupation shares and marginals for women using modified barriers.
+# (1) Load HH_fp from the 1970 benchmark and hold it fixed across all years.
+# (2) No fixed-point iteration over HH_fp — it is taken as exogenous.
+# (3) Load calibrated a_by_occ, τ_w, κ, etc. from the benchmark for each year.
+# (4) Recompute human capital investments, tax rate, wages, and distributions given fixed HH_fp.
+# (5) Skip transition dynamics — only compute counterfactual steady states.
+# (6) Only run for 1990 and 2010 (1970 values are identical to the benchmark by construction).
 
 using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, LinearAlgebra, Optim, Roots, PyCall, Random, Plots
 
@@ -31,7 +25,7 @@ using Distributions, Dierckx, QuadGK, JLD, LaTeXStrings, CSV, DataFrames, Linear
 # (3) benchmark_w_HP
 # (4) benchmark_w_growth_HP
 # (5) low_beta
-# (6) high_beta
+# (6) high_beta 
 # (7) high_beta_high_sigma
 # (8) low_beta_low_sigma
 paramname = "benchmark"
@@ -67,7 +61,6 @@ occ = [occ_O; occ_T]
 
 # Innovation step size for updates:
 ν = 1 # for tax rate that balances government's budget
-ν2 = 0.8 # for fixed point of aggregate human capital in teaching
 
 n_G = length(g) # number of "groups"
 n_O = length(occ) # number of occupations
@@ -79,24 +72,20 @@ end
 gm[end] = M / 2 - sum(gm)
 gm = gm'
 
-# Load 1970 barriers (λf and τ_w_opt) and κ — used for non-HP occupations in all years
+# Load 1970 benchmark HH_fp (the value we hold fixed across all years):
 cd(string("./parameterization/", paramname))
-d_1970_tau = load("tau_w_1970.jld")
-τ_w_opt_1970 = d_1970_tau["τ_w_opt"]
-d_1970_lam = load("lambda_f_1970.jld")
-λf_1970 = d_1970_lam["λf"]
-# Load κ from the 1970 main parameterization:
-d_1970_main = load("previousParameterization1970.jld")
-κ_1970 = d_1970_main["κ"]
+d_1970 = load("previousParameterization1970.jld")
+HH_fp_1970 = d_1970["HH_fp"]
 cd("..")
 cd("..")
+println("Loaded 1970 benchmark HH_fp = ", HH_fp_1970)
 
-# Loop over counterfactual years (1990 and 2010 only; 1970 is the baseline by construction)
+# Loop over counterfactual years (1990 and 2010 only; 1970 is identical to benchmark by construction)
 for year in [1990, 2010]
 
 local fyear, fnameJLD, d, df, h_T_avg_ss, H_T_total
 
-println("  COUNTERFACTUAL 5: year = ", year, " with κ and barriers frozen at 1970 EXCEPT home production (year-specific)")
+println("  COUNTERFACTUAL 6: year = ", year, " with HH_fp fixed at 1970 benchmark value")
 
 global share_occ_data, w_90_10_data
 share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
@@ -132,7 +121,7 @@ a_T_thresh = d["a_T_thresh"]
 t = (d["t"])
 H_grid = d["H_grid"]
 H_O = d["H_O"]
-HH_fp = d["HH_fp"]
+HH_fp = d["HH_fp"] # benchmark value (will be overridden below)
 α = d["α"]
 β = d["β"]
 η = d["η"]
@@ -140,9 +129,9 @@ HH_fp = d["HH_fp"]
 μ = d["μ"]
 ϕ = d["ϕ"]
 γ = d["γ"]
-κ = d["κ"]           # year-specific κ (will be overridden below)
+κ = d["κ"]
 theta = d["theta"]
-λf = d["λf"]         # year-specific λf (used for home production)
+λf = d["λf"]
 λm = d["λm"]
 iHH = d["iHH"]
 a_grid = d["a_grid"]
@@ -151,23 +140,20 @@ a_O_90p = d["a_O_90p"]
 a_T_10p = d["a_T_10p"]
 a_T_90p = d["a_T_90p"]
 h_T_initial = d["h_T"]
-
-# Store the year-specific λf and τ_w_opt for home production before overriding:
-λf_year = d["λf"]
-τ_w_opt_year = d["τ_w_opt"]
-
 cd("..")
 cd("..")
 
-# Override κ with the 1970 calibrated value:
-κ = κ_1970
-println("Using κ from 1970: κ = ", κ)
+# Override HH_fp with the 1970 benchmark value:
+println("Benchmark HH_fp for year ", year, " = ", HH_fp)
+HH_fp = HH_fp_1970
+println("Setting HH_fp to 1970 value = ", HH_fp)
 
 # Distribution of abilities:
 global dist
 dist = Frechet(theta, 1)
 
 # Vector of labor market discrimination in each occupation (relative to 'T')
+# Change: Keep all barriers at their benchmark-calibrated values
 global τ_w, τ_e, τ_w_opt
 τ_w = zeros(n_O - 1, n_G)
 # Vector of education barriers in each occupation (relative to 'T')
@@ -179,19 +165,10 @@ global τ_w, τ_e, τ_w_opt
 τ_w[:, 2] = ones(n_O - 1) .- λm * (ones(n_O - 1) .- τ_w[:, 2])
 τ_e = fill!(τ_e, 0.0)
 
-# Set women's barriers:
-# All non-HP occupations (indices 1 to n_O-2): use 1970 barriers
-τ_w_opt[:, 1] = τ_w_opt_1970[:, 1]
-τ_w[:, 1] = ones(n_O - 1) .- λf_1970 * (ones(n_O - 1) .- τ_w_opt_1970[:, 1])
-
-# Home production (index n_O-1): use year-specific calibrated barriers
-τ_w_opt[n_O-1, 1] = τ_w_opt_year[n_O-1, 1]
-τ_w[n_O-1, 1] = 1.0 - λf_year * (1.0 - τ_w_opt_year[n_O-1, 1])
-
-println("Using 1970 barriers for women in non-HP occupations: λf_1970 = ", λf_1970)
-println("τ_w[:, 1] for non-HP occupations = ", τ_w[1:n_O-2, 1])
-println("Using year-specific barriers for home production: λf_year = ", λf_year)
-println("τ_w[n_O-1, 1] for home production = ", τ_w[n_O-1, 1], " (year-specific)")
+# Keep benchmark barriers for women (no change from calibration):
+τ_w_opt[:, 1] = τ_w_initial[:, 1]
+τ_w[:, 1] = ones(n_O - 1) .- λf * (ones(n_O - 1) .- τ_w_opt[:, 1])
+println("Keeping benchmark barriers: λf = ", λf)
 
 global quantile_top, quantile_bottom
 quantile_top = 1 - 1e-4
@@ -257,10 +234,9 @@ function share(occ_id, iG, a_by_occ, τ_w, τ_e)
     return out1, out2
 end
 
-# Skip calibration of a_by_occ and τ_w
+# Skip calibration of a_by_occ and τ_w — use benchmark values
 
-# Recompute occupation shares and marginals using modified barriers
-# (1970 barriers for non-HP, year-specific for HP) for women; unchanged for men
+# Compute occupation shares and marginals using benchmark barriers and productivities
 global share_occ, marginal
 share_occ = Array{Float64,2}(undef, n_O - 1, n_G)
 marginal = Array{Float64,3}(undef, n_a, n_O - 1, n_G)
@@ -272,11 +248,6 @@ for iG in 1:n_G
     end
     share_occ[:, iG] = share_occ[:, iG] ./ sum(share_occ[:, iG])
 end
-
-println("Counterfactual (κ & barriers at 1970 except HP year-specific) share of women in non-teaching occupations:")
-println(round.(share_occ[:, 1]; digits=4))
-println("Main model data share of women in non-teaching occupations:")
-println(round.(share_occ_data[:, 1]; digits=4))
 
 global a_T_thresh, a_O_thresh
 a_T_thresh = Array{Float64,4}(undef, n_a, n_H, n_G, n_O - 1)
@@ -365,19 +336,14 @@ f_1_T_tmp = Array{Float64,3}(undef, n_a, n_G, n_O - 1)
 der_ω_fn(κ, h_T) = κ .* γ .* h_T .^ (γ - 1)
 
 
-#######################
-# Steady-state of H_T #
-#######################
+###############################################################
+# Compute equilibrium given fixed HH_fp (no HH fixed-point)  #
+###############################################################
 
 # Set the array index to the midpoint of H_grid:
 global iHH
 iHH = convert(Int, ceil(n_H / 2))
-# Iteration and tolerance settings for fixed-point problems:
-# (a) Aggregate human capital:
-global convHH, tolHH
-convHH = 1
-tolHH = 1e-7
-# (b) Income tax rate:
+# Iteration and tolerance settings for the income tax rate fixed-point:
 global tolT, maxiterT
 tolT = 1e-7
 maxiterT = 200
@@ -388,121 +354,111 @@ aggA = zeros(2) # Aggregate productivity: aggA[1] = w/ home production, aggA[2] 
 global s_O
 s_O = μ * ϕ / (μ * ϕ + 1 - η)
 
+# No HH fixed-point loop — HH_fp is held fixed at its 1970 value.
+# Only the tax rate fixed-point remains.
 
-# HH fixed-point loop — the TFP growth loop is removed.
-# Only the tax rate fixed-point and the HH fixed-point remain.
+H_grid[iHH] = HH_fp
+println("HH_fp (fixed at 1970 value) = ", HH_fp)
+println("t[iHH,1] = ", t[iHH, 1])
+println("")
 
-# Initiate 'while' loop (not indexed) over aggregate human capital in teaching:
-while convHH > tolHH
-    global s_O
-    global HH_fp
-    global convHH
-    global tolHH
-    global H_grid
-    global a_by_occ
-    global κ
-    global aggA
-    println("HH_fp = ", HH_fp)
-    println("t[iHH,1] = ", t[iHH, 1])
-    println("")
-    H_grid[iHH] = HH_fp
-    # Initiate 'while' loop ('not indexed') over the tax rate:
-    convT = 1
-    iterT = 1
-    while convT > tolT && iterT < maxiterT
-        for iG in 1:n_G
+# Initiate 'while' loop ('not indexed') over the tax rate:
+convT = 1
+iterT = 1
+while convT > tolT && iterT < maxiterT
+    for iG in 1:n_G
+        for ia in 1:n_a
+            a = a_grid[ia]
+            fn_s_T(k) = μ * ϕ * der_ω_fn(κ, k) * k / ((μ * ϕ - η) * der_ω_fn(κ, k) * k + ω_fn(κ, k))
+            fn_h_T(k) = (η^η * (1 - t[iHH, 1])^η * der_ω_fn(κ, k)^η * a^α * fn_s_T(k)^ϕ * (2 * HH_fp / M)^σ)^(1 / (1 - η)) - k
+            hh_T = find_zero(fn_h_T, h_T_initial[ia, iHH, iG])
+            h_T[ia, iHH, iG] = hh_T
+            s_T[ia, iHH, iG] = fn_s_T(hh_T)
+            e_T[ia, iHH, iG] = η * (1 - t[iHH, 1]) * der_ω_fn(κ, hh_T) * hh_T
+            ω[ia, iHH, iG] = ω_fn(κ, hh_T)
+            der_ω[ia, iHH, iG] = der_ω_fn(κ, hh_T)
+            for iO in 1:n_O-1
+                # Occupational choice threshold:
+                a_O_thresh[ia, iHH, iG, iO] = ((1 + τ_e[iO, iG]) / (1 - τ_w[iO, iG]) * (1 + τ_e[iO, iG])^(-(1 - η)) * ((1 - s_T[ia, iHH, iG]) / (1 - s_O))^((1 - η) / μ) * (s_T[ia, iHH, iG] / s_O)^ϕ * (der_ω[ia, iHH, iG] / a_by_occ[iO]) * ((ω[ia, iHH, iG] / (der_ω[ia, iHH, iG] * h_T[ia, iHH, iG]) - η) / (1 - η))^(1 - η))^(1 / α) * a
+                h_O[ia, iHH, iG, iO] = (η^η * (1 - t[iHH, 1])^η * (1 - τ_w[iO, iG])^η / (1 + τ_e[iO, iG])^η * a_by_occ[iO]^η * a_grid[ia]^α * s_O^ϕ * (2 * HH_fp / M)^σ)^(1 / (1 - η))
+                e_O[ia, iHH, iG, iO] = η * (1 - t[iHH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]) * a_by_occ[iO] * h_O[ia, iHH, iG, iO]
+            end
+        end
+        spl_s = Spline1D(a_grid, s_T[:, iHH, iG])
+        spl_dw = Spline1D(a_grid, der_ω_fn.(κ, h_T[:, iHH, iG]))
+
+        for iO in 1:n_O-1
+            spl_marg = Spline1D(a_grid, marginal[:, iO, iG])
+            # Inverse occupational threshold 
+            spl_inv = Spline1D(a_O_thresh[:, iHH, iG, iO], a_grid)
+            f3[iO, iG] = quadgk(aa -> spl_marg(aa) * pdf(dist, aa) * cdf(dist, spl_inv(aa)) * aa^(α / (1 - η)), lowbnd, upbnd)[1]
+
+            f1[iO, iG] = quadgk(aa -> spl_marg(aa) * pdf(dist, aa) * cdf(dist, spl_inv(aa)), lowbnd, upbnd)[1] # total mass of other using direct threshold
+            # Compute H_O:
+            H_O_0[iO, iG, iHH] = (((1 - t[iHH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]))^η * η^η * (2 * HH_fp / M)^σ * s_O^ϕ * a_by_occ[iO]^η)^(1 / (1 - η)) * f3[iO, iG]
+            # Total earnings of others in each group:
+            E_O[iO, iHH, iG] = a_by_occ[iO] * (1 - τ_w[iO, iG]) * H_O_0[iO, iG, iHH]
+            # Total output of others in each group:
+            Y_O[iO, iHH, iG] = a_by_occ[iO] * H_O_0[iO, iG, iHH]
+
+            # Inverse occupational threshold between occupation 'iO' and teaching: 
+            f_1_O[:, iHH, iG, iO] = marginal[:, iO, iG] .* cdf.(dist, spl_inv(a_grid))
+            # Compute p.d.f.:
+            spl_f_1_O[iHH, iG, iO] = Spline1D(a_grid, f_1_O[:, iHH, iG, iO])
+            mass_O[iHH, iG, iO] = quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa), lowbnd, upbnd)[1]
+
             for ia in 1:n_a
                 a = a_grid[ia]
-                fn_s_T(k) = μ * ϕ * der_ω_fn(κ, k) * k / ((μ * ϕ - η) * der_ω_fn(κ, k) * k + ω_fn(κ, k))
-                fn_h_T(k) = (η^η * (1 - t[iHH, 1])^η * der_ω_fn(κ, k)^η * a^α * fn_s_T(k)^ϕ * (2 * HH_fp / M)^σ)^(1 / (1 - η)) - k
-                hh_T = find_zero(fn_h_T, h_T_initial[ia, iHH, iG])
-                h_T[ia, iHH, iG] = hh_T
-                s_T[ia, iHH, iG] = fn_s_T(hh_T)
-                e_T[ia, iHH, iG] = η * (1 - t[iHH, 1]) * der_ω_fn(κ, hh_T) * hh_T
-                ω[ia, iHH, iG] = ω_fn(κ, hh_T)
-                der_ω[ia, iHH, iG] = der_ω_fn(κ, hh_T)
-                for iO in 1:n_O-1
-                    # Occupational choice threshold:
-                    a_O_thresh[ia, iHH, iG, iO] = ((1 + τ_e[iO, iG]) / (1 - τ_w[iO, iG]) * (1 + τ_e[iO, iG])^(-(1 - η)) * ((1 - s_T[ia, iHH, iG]) / (1 - s_O))^((1 - η) / μ) * (s_T[ia, iHH, iG] / s_O)^ϕ * (der_ω[ia, iHH, iG] / a_by_occ[iO]) * ((ω[ia, iHH, iG] / (der_ω[ia, iHH, iG] * h_T[ia, iHH, iG]) - η) / (1 - η))^(1 - η))^(1 / α) * a
-                    h_O[ia, iHH, iG, iO] = (η^η * (1 - t[iHH, 1])^η * (1 - τ_w[iO, iG])^η / (1 + τ_e[iO, iG])^η * a_by_occ[iO]^η * a_grid[ia]^α * s_O^ϕ * (2 * HH_fp / M)^σ)^(1 / (1 - η))
-                    e_O[ia, iHH, iG, iO] = η * (1 - t[iHH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]) * a_by_occ[iO] * h_O[ia, iHH, iG, iO]
-                end
+                # Fraction of teachers occupation-by-occupation, given 'a' in teaching:
+                f_1_T_tmp[ia, iG, iO] = maximum([quadgk(aa -> spl_marg(aa) * pdf(dist, aa), lowbnd, a_O_thresh[ia, iHH, iG, iO])[1], 0.0])
             end
-            spl_s = Spline1D(a_grid, s_T[:, iHH, iG])
-            spl_dw = Spline1D(a_grid, der_ω_fn.(κ, h_T[:, iHH, iG]))
-
-            for iO in 1:n_O-1
-                spl_marg = Spline1D(a_grid, marginal[:, iO, iG])
-                # Inverse occupational threshold 
-                spl_inv = Spline1D(a_O_thresh[:, iHH, iG, iO], a_grid)
-                f3[iO, iG] = quadgk(aa -> spl_marg(aa) * pdf(dist, aa) * cdf(dist, spl_inv(aa)) * aa^(α / (1 - η)), lowbnd, upbnd)[1]
-
-                f1[iO, iG] = quadgk(aa -> spl_marg(aa) * pdf(dist, aa) * cdf(dist, spl_inv(aa)), lowbnd, upbnd)[1] # total mass of other using direct threshold
-                # Compute H_O:
-                H_O_0[iO, iG, iHH] = (((1 - t[iHH, 1]) * (1 - τ_w[iO, iG]) / (1 + τ_e[iO, iG]))^η * η^η * (2 * HH_fp / M)^σ * s_O^ϕ * a_by_occ[iO]^η)^(1 / (1 - η)) * f3[iO, iG]
-                # Total earnings of others in each group:
-                E_O[iO, iHH, iG] = a_by_occ[iO] * (1 - τ_w[iO, iG]) * H_O_0[iO, iG, iHH]
-                # Total output of others in each group:
-                Y_O[iO, iHH, iG] = a_by_occ[iO] * H_O_0[iO, iG, iHH]
-
-                # Inverse occupational threshold between occupation 'iO' and teaching: 
-                f_1_O[:, iHH, iG, iO] = marginal[:, iO, iG] .* cdf.(dist, spl_inv(a_grid))
-                # Compute p.d.f.:
-                spl_f_1_O[iHH, iG, iO] = Spline1D(a_grid, f_1_O[:, iHH, iG, iO])
-                mass_O[iHH, iG, iO] = quadgk(aa -> pdf(dist, aa) * spl_f_1_O[iHH, iG, iO](aa), lowbnd, upbnd)[1]
-
-                for ia in 1:n_a
-                    a = a_grid[ia]
-                    # Fraction of teachers occupation-by-occupation, given 'a' in teaching:
-                    f_1_T_tmp[ia, iG, iO] = maximum([quadgk(aa -> spl_marg(aa) * pdf(dist, aa), lowbnd, a_O_thresh[ia, iHH, iG, iO])[1], 0.0])
-                end
-            end
-
-            for ia in 1:n_a
-                # Fraction of teachers given a_T (across all occupations):
-                f_1_T[ia, iG] = sum(f_1_T_tmp[ia, iG, :])
-            end
-            spl_f_1_T[iHH, iG] = Spline1D(a_grid, f_1_T[:, iG])
-            spl_wa = Spline1D(a_grid, ω[:, iHH, iG])
-
-            f2[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa) * aa^(α * β / σ / (1 - η)) * spl_s(aa)^(ϕ * β / σ / (1 - η)) * spl_dw(aa)^(η * β / σ / (1 - η)), lowbnd, upbnd)[1]
-            f4[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa) * spl_wa(aa), lowbnd, upbnd)[1]
-
-            mass_T[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa), lowbnd, upbnd)[1]
-
-            # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
-            HH_T_0[iG, iHH] = ((1 - t[iHH, 1])^η * η^η * (2 * HH_fp / M)^σ)^(β / σ / (1 - η)) * f2[iHH, iG]
-            # Total earnings of teachers in each group:
-            E_T[iHH, iG] = f4[iHH, iG]
-            # Total output of teachers in each group:
-            Y_T[iHH, iG] = sum(H_O_0[:, iG, iHH] .* a_by_occ)
         end
 
-        H_grid[iHH] = sum(HH_T_0[:, iHH] .* gm)
-        for iO in 1:n_O-1
-            H_O[iO, iHH] = sum(H_O_0[iO, :, iHH] .* gm)
+        for ia in 1:n_a
+            # Fraction of teachers given a_T (across all occupations):
+            f_1_T[ia, iG] = sum(f_1_T_tmp[ia, iG, :])
         end
-        for iG in 1:n_G
-            sum_E_O[iHH, iG] = sum(E_O[:, iHH, iG])
-            sum_Y_O[iHH, iG] = sum(Y_O[:, iHH, iG])
-        end
-        t[iHH, 2] = sum(E_T[iHH, :] .* gm) / (sum(E_T[iHH, :] .* gm) + sum(sum_E_O[iHH, :] .* gm))
-        convT = abs(t[iHH, 2] - t[iHH, 1])
-        println("convT=", round(convT, digits=3))
-        println("t[iHH,:]=", round.(t[iHH, :], digits=3))
-        t[iHH, 1] = (1 - ν) * t[iHH, 1] + ν * t[iHH, 2]
+        spl_f_1_T[iHH, iG] = Spline1D(a_grid, f_1_T[:, iG])
+        spl_wa = Spline1D(a_grid, ω[:, iHH, iG])
 
-        iterT = iterT + 1
+        f2[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa) * aa^(α * β / σ / (1 - η)) * spl_s(aa)^(ϕ * β / σ / (1 - η)) * spl_dw(aa)^(η * β / σ / (1 - η)), lowbnd, upbnd)[1]
+        f4[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa) * spl_wa(aa), lowbnd, upbnd)[1]
+
+        mass_T[iHH, iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa), lowbnd, upbnd)[1]
+
+        # Compute tomorrow's aggregate human capital in teaching ('HH_T'):
+        # Note: this is the implied HH_T from the law of motion, NOT the fixed HH_fp.
+        HH_T_0[iG, iHH] = ((1 - t[iHH, 1])^η * η^η * (2 * HH_fp / M)^σ)^(β / σ / (1 - η)) * f2[iHH, iG]
+        # Total earnings of teachers in each group:
+        E_T[iHH, iG] = f4[iHH, iG]
+        # Total output of teachers in each group:
+        Y_T[iHH, iG] = sum(H_O_0[:, iG, iHH] .* a_by_occ)
     end
 
-    # No TFP growth loop — aggregate productivity changes endogenously.
+    H_grid[iHH] = sum(HH_T_0[:, iHH] .* gm)
+    for iO in 1:n_O-1
+        H_O[iO, iHH] = sum(H_O_0[iO, :, iHH] .* gm)
+    end
+    for iG in 1:n_G
+        sum_E_O[iHH, iG] = sum(E_O[:, iHH, iG])
+        sum_Y_O[iHH, iG] = sum(Y_O[:, iHH, iG])
+    end
+    t[iHH, 2] = sum(E_T[iHH, :] .* gm) / (sum(E_T[iHH, :] .* gm) + sum(sum_E_O[iHH, :] .* gm))
+    convT = abs(t[iHH, 2] - t[iHH, 1])
+    println("convT=", round(convT, digits=3))
+    println("t[iHH,:]=", round.(t[iHH, :], digits=3))
+    t[iHH, 1] = (1 - ν) * t[iHH, 1] + ν * t[iHH, 2]
 
-    convHH = abs(log(H_grid[iHH] / HH_fp))
-    println(convHH)
-    println(H_grid[iHH])
-    HH_fp = (1 - ν2) * HH_fp + ν2 * H_grid[iHH]
+    iterT = iterT + 1
 end
-println("Found fixed point for human capital in teaching (counterfactual 5 - κ & barriers at 1970 except HP year-specific)!")
+
+# No TFP growth loop — using benchmark-calibrated productivities directly.
+# No HH fixed-point loop — HH_fp is exogenously held at 1970 value.
+
+# Report the implied next-period HH_T from the law of motion (will differ from HH_fp):
+println("Implied HH_T from law of motion = ", H_grid[iHH])
+println("Fixed HH_fp (1970 value) = ", HH_fp)
+println("Difference = ", H_grid[iHH] - HH_fp)
 
 
 #############################################################
@@ -566,7 +522,7 @@ w_90_10[iHH, n_G+1, n_O] = mean(w_90_10[iHH, 1:n_G, n_O])
 # Compute aggregate productivity at counterfactual steady state
 aggA[1] = sum(sum_Y_O[iHH, :] .* gm) / sum(gm[1] .* mass_O[iHH, 1, :] + gm[2] .* mass_O[iHH, 2, :])
 aggA[2] = sum((sum_Y_O[iHH, :] .- Y_O[n_O-1, iHH, :]) .* gm) / sum(gm[1] .* mass_O[iHH, 1, 1:n_O-2] + gm[2] .* mass_O[iHH, 2, 1:n_O-2])
-println("aggA (counterfactual 5 - κ & barriers at 1970 except HP year-specific) = ", round.(aggA, digits=6))
+println("aggA (counterfactual 6 - fixed HH_fp) = ", round.(aggA, digits=6))
 
 
 # Transition dynamics are skipped
@@ -597,31 +553,32 @@ end
 
 # Save counterfactual parameterization in JLD file:
 cd(string("./parameterization/", paramname))
-fnameJLD_cf = string("counter_5_", fyear, ".jld")
-save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "κ_1970", κ_1970, "theta", theta, "λf_1970", λf_1970, "λf_year", λf_year, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
+fnameJLD_cf = string("counter_6_", fyear, ".jld")
+save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "HH_fp_1970", HH_fp_1970, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "theta", theta, "λf", λf, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
 cd("..")
 cd("..")
 
 println("____________")
-println("COUNTERFACTUAL 5 RESULTS (year = ", year, ", κ & barriers at 1970 except HP year-specific)")
-println("κ (1970) = ", κ)
+println("COUNTERFACTUAL 6 RESULTS (year = ", year, ", HH_fp fixed at 1970 value)")
 println("share of teachers among women= ", mass_T[iHH, 1])
 println("share of teachers among men= ", mass_T[iHH, 2])
 println(" ")
 println("tax rate= ", t[iHH, 1])
 println("output= ", sum(Y_T[iHH, :] .* gm) + sum(sum_Y_O[iHH, :] .* gm))
-println("HH_fp= ", HH_fp)
-println("aggA (counterfactual 5) = ", round.(aggA, digits=6))
+println("HH_fp (fixed at 1970) = ", HH_fp)
+println("Implied HH_T from law of motion = ", H_grid[iHH])
+println("aggA (counterfactual 6) = ", round.(aggA, digits=6))
 
 # Write counterfactual moments to CSV file using DataFrame:
-df = DataFrame(year=year, κ_1970=round(κ_1970; digits=4), λf_1970=round(λf_1970; digits=4), λf_year=round(λf_year; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2),
+df = DataFrame(year=year, HH_fp_1970=round(HH_fp_1970; digits=6), λf=round(λf; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2),
     h_T_avg_female=round(h_T_avg_ss[1]; digits=6),
     h_T_avg_male=round(h_T_avg_ss[2]; digits=6),
     H_T_total_female=round(H_T_total[1]; digits=6),
     H_T_total_male=round(H_T_total[2]; digits=6),
-    H_T_total_all=round(sum(H_T_total); digits=6))
+    H_T_total_all=round(sum(H_T_total); digits=6),
+    implied_HH_T=round(H_grid[iHH]; digits=6))
 # If it exists, load previous counterfactual results, append 'df':
-fnameCSV_cf = string("./results/", paramname, "/counter_5_moments.csv")
+fnameCSV_cf = string("./results/", paramname, "/counter_6_moments.csv")
 if isfile(fnameCSV_cf) == true
     moments_cf = DataFrame(CSV.File(fnameCSV_cf))
     append!(moments_cf, df, cols=:union)
@@ -634,7 +591,7 @@ show(moments_cf)
 CSV.write(fnameCSV_cf, moments_cf)
 
 println("")
-println("Counterfactual 5 for year ", year, " complete.")
+println("Counterfactual 6 for year ", year, " complete.")
 println("================================================================")
 println("")
 
