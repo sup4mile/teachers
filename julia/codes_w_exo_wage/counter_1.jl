@@ -83,7 +83,7 @@ for year in [1990, 2010]
 
 println("  COUNTERFACTUAL 1: year = ", year, " with 1970 barriers for women")
 
-local fyear, fnameJLD, d, df
+local fyear, fnameJLD, d, df, h_T_avg_ss, H_T_total
 
 global share_occ_data, w_90_10_data
 share_occ_data = Array{Float64,2}(undef, length(occ) - 1, 2)
@@ -564,6 +564,14 @@ for iG in 1:n_G
     av_a_rank_T[iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iHH, iG](aa) * cdf(dist, aa), lowbnd, upbnd)[1] / mass_T[iHH, iG]
 end
 
+h_T_avg_ss = zeros(n_G)
+H_T_total = zeros(n_G)
+for iG in 1:n_G
+    spl_h_T_ss = Spline1D(a_grid, h_T[:, iHH, iG])
+    h_T_avg_ss[iG] = quadgk(aa -> spl_h_T_ss(aa) * pdf(dist, aa) * spl_f_1_T[iHH, iG](aa), lowbnd, upbnd)[1] / mass_T[iHH, iG]
+    H_T_total[iG] = h_T_avg_ss[iG] * mass_T[iHH, iG] * gm[iG]
+end
+
 # Save counterfactual parameterization in JLD file:
 cd(string("./parameterization/", paramname))
 fnameJLD_cf = string("counter_1_", fyear, ".jld")
@@ -582,12 +590,17 @@ println("HH_fp= ", HH_fp)
 println("aggA (counterfactual 1) = ", round.(aggA, digits=6))
 
 # Write counterfactual moments to CSV file using DataFrame:
-df = DataFrame(year=year, λf_1970=round(λf_1970; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2))
+df = DataFrame(year=year, λf_1970=round(λf_1970; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2),
+    h_T_avg_female=round(h_T_avg_ss[1]; digits=6),
+    h_T_avg_male=round(h_T_avg_ss[2]; digits=6),
+    H_T_total_female=round(H_T_total[1]; digits=6),
+    H_T_total_male=round(H_T_total[2]; digits=6),
+    H_T_total_all=round(sum(H_T_total); digits=6))
 # If it exists, load previous counterfactual results, append 'df':
 fnameCSV_cf = string("./results/", paramname, "/counter_1_moments.csv")
 if isfile(fnameCSV_cf) == true
     moments_cf = DataFrame(CSV.File(fnameCSV_cf))
-    append!(moments_cf, df)
+    append!(moments_cf, df, cols = :union)
 else
     moments_cf = df
 end

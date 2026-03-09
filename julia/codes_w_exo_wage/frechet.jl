@@ -785,6 +785,16 @@ for iH in 1:n_H
         av_N[iG] = quadgk(aa -> pdf(dist, aa) * spl_f_1_T[iH, iG](aa) * spl_N(aa), lowbnd, upbnd)[1] / mass_T[iH, iG]
     end
 end
+
+# Compute mean and total h_T at the steady-state grid point (iHH)
+h_T_avg_ss = zeros(n_G)
+H_T_total = zeros(n_G)
+for iG in 1:n_G
+    spl_h_T_ss = Spline1D(a_grid, h_T[:, iHH, iG])
+    h_T_avg_ss[iG] = quadgk(aa -> spl_h_T_ss(aa) * pdf(dist, aa) * spl_f_1_T[iHH, iG](aa), lowbnd, upbnd)[1] / mass_T[iHH, iG]
+    H_T_total[iG] = h_T_avg_ss[iG] * mass_T[iHH, iG] * gm[iG]
+end
+
 # Save parameterization in JLD file:
 pwd()
 cd(string("./parameterization/",paramname))
@@ -834,12 +844,17 @@ println("HH_fp= ", HH_fp)
 
 # Write parameter values and moments to CSV file using DataFrame:
 
-df = DataFrame(λf=round(λf; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2))
+df = DataFrame(λf=round(λf; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2),
+    h_T_avg_female=round(h_T_avg_ss[1]; digits=6),
+    h_T_avg_male=round(h_T_avg_ss[2]; digits=6),
+    H_T_total_female=round(H_T_total[1]; digits=6),
+    H_T_total_male=round(H_T_total[2]; digits=6),
+    H_T_total_all=round(sum(H_T_total); digits=6))
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
 fnameCSV = string("./results/", paramname, "/moments", fyear, ".csv")
 if isfile(fnameCSV) == true
     moments = DataFrame(CSV.File(fnameCSV))
-    append!(moments, df)
+    append!(moments, df, cols=:union)
 else
     # If the CSV file doesn't exist, create a new DataFrame named "moments":
     moments = df
