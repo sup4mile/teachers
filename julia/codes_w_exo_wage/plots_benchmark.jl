@@ -156,22 +156,9 @@ savefig(plt7m,string(pathname,"a_O_men.eps"))
 #=
     plots_benchmark.jl
     ───────────────────
-    Standalone plotting script for the teacher occupational choice model.
+    Script for the teacher occupational choice model.
     Loads saved JLD parameterization files and moments CSVs, then generates
     PNG plots comparing steady-state results across calibration years.
-
-    Run from the same working directory as frechet.jl (julia/codes_w_exo_wage/).
-
-    Fixes vs. previous version:
-      - All soft-scope ambiguities resolved with explicit `local` declarations
-      - Replaced LaTeXStrings (L"...") with plain Unicode where system LaTeX is
-        unavailable; the GR backend renders Unicode math symbols natively
-      - Replaced `groupedbar` (StatsPlots) with a manual side-by-side bar chart
-        using only base Plots.jl
-      - Removed unavailable "serif" font; uses GR default sans-serif
-      - Improved figure sizes, margins, legend placement, and label rotation
-        so that occupation labels don't dominate the canvas
-      - Occupation scatter plots use abbreviated labels + increased figure width
 
     Plots generated (all PNG):
       1.  fT_female_steadystate        — Female teachers' ability distribution
@@ -381,36 +368,34 @@ end
 #  7. LABOR MARKET BARRIERS  (τ_w)  — sorted by 1970 magnitude
 # ═══════════════════════════════════════════════════════════════════
 
-# Sort occupations by 1970 barrier for consistent ordering
 let τ_ref  = DATA[1970]["τ_w"][:, 1],
     sidx   = sortperm(τ_ref),
     labels = OCC_LABELS[sidx]
 
-    # --- All three years ---
-    local p = occ_scatter(; title="Labor Market Barriers Against Women",
-                            ylabel="τ_w")
-    for (i, yr) in enumerate(YEARS)
-        local τ_w = DATA[yr]["τ_w"][:, 1]
-        scatter!(p, 1:N_OCC, τ_w[sidx];
-                 label=string(yr), color=CB_COLORS[i],
-                 markershape=MARKERS[i], markersize=4.5, msw=0.4)
-    end
-    xticks!(p, 1:N_OCC, labels; rotation=50, tickfontsize=6)
-    savefig(p, string(PLOTPATH, "tau_w_women.png"))
-
-    # --- Pairwise: 1970-90, 1970-2010 ---
-    for (yr_end, suffix) in [(1990, "70_90"), (2010, "70_10")]
-        local p2 = occ_scatter(; title="Labor Market Barriers Against Women",
-                                  ylabel="τ_w")
+    # Define the progression of years to plot and their file suffixes
+    local plot_setups = [
+        (1970, "70"),
+        (1990, "70_90"),
+        (2010, "70_10")
+    ]
+    for (yr_end, suffix) in plot_setups
+        local p = occ_scatter(; title="Labor Market Barriers Against Women",
+                                ylabel="τ_w")
+        
+        # Filter and plot only the years up to yr_end
         for yr in filter(y -> y <= yr_end, YEARS)
             local τ_w = DATA[yr]["τ_w"][:, 1]
             local yi  = findfirst(==(yr), YEARS)
-            scatter!(p2, 1:N_OCC, τ_w[sidx];
+            
+            scatter!(p, 1:N_OCC, τ_w[sidx];
                      label=string(yr), color=CB_COLORS[yi],
                      markershape=MARKERS[yi], markersize=4.5, msw=0.4)
         end
-        xticks!(p2, 1:N_OCC, labels; rotation=50, tickfontsize=6)
-        savefig(p2, string(PLOTPATH, "tau_w_women_$suffix.png"))
+        
+        xticks!(p, 1:N_OCC, labels; rotation=50, tickfontsize=6)
+        
+        # Save the plot with the progressive suffix
+        savefig(p, string(PLOTPATH, "tau_w_women_$suffix.png"))
     end
 end
 

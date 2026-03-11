@@ -842,14 +842,52 @@ println("tax rate= ", t[1, 1])
 println("output= ", sum(Y_T[iHH, :] .* gm) + sum(sum_Y_O[iHH, :] .* gm))
 println("HH_fp= ", HH_fp)
 
-# Write parameter values and moments to CSV file using DataFrame:
+# some new moments to add to the output CSV file:
+H_O_total = zeros(n_G)
+h_O_avg_ss = zeros(n_G)
+for iG in 1:n_G
+    # Sum H_O_0 across all non-teaching occupations except home production (1:n_O-2)
+    H_O_total[iG] = sum(H_O_0[1:n_O-2, iG, iHH]) * gm[iG]
+    # Mean human capital is the total (pre-measure) divided by the mass
+    h_O_avg_ss[iG] = sum(H_O_0[1:n_O-2, iG, iHH]) / sum(mass_O[iHH, iG, 1:n_O-2])
+end
+# Output per non-teaching worker (excluding HP) is already calculated as aggA[2]
+Y_O_per_L = aggA[2]
+# Mean wage per teacher (pooled across groups)
+mean_wage_T = sum(E_T[iHH, :] .* gm) / sum(mass_T[iHH, :] .* gm)
+# Mean wage per non-teaching worker (pooled, excluding HP)
+mean_wage_O = sum((sum_E_O[iHH, :] .- E_O[n_O-1, iHH, :]) .* gm) / 
+              sum(gm[1] .* mass_O[iHH, 1, 1:n_O-2] + gm[2] .* mass_O[iHH, 2, 1:n_O-2])
+# Tax rate
+tax_rate = t[iHH, 1]
 
-df = DataFrame(λf=round(λf; digits=4), share_teachers_female=round(mass_T[iHH, 1]; digits=4), κ=round(κ; digits=4), share_teachers_male=round(mass_T[iHH, 2]; digits=4), γ=round(γ; digits=4), p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), θ=round(theta; digits=4), p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), η=round(η; digits=4), α=round(α; digits=2),
+# Write parameter values and moments to CSV file using DataFrame:
+df = DataFrame(
+    λf=round(λf; digits=4), 
+    share_teachers_female=round(mass_T[iHH, 1]; digits=4), 
+    κ=round(κ; digits=4), 
+    share_teachers_male=round(mass_T[iHH, 2]; digits=4), 
+    γ=round(γ; digits=4), 
+    p90_p10_ω_teachers=round(ω_90_10[iHH, end]; digits=2), 
+    θ=round(theta; digits=4), 
+    p90_p10_w_other=round(w_90_10[iHH, n_G+1, n_O]; digits=2), 
+    η=round(η; digits=4), 
+    α=round(α; digits=2),
     h_T_avg_female=round(h_T_avg_ss[1]; digits=6),
     h_T_avg_male=round(h_T_avg_ss[2]; digits=6),
     H_T_total_female=round(H_T_total[1]; digits=6),
     H_T_total_male=round(H_T_total[2]; digits=6),
-    H_T_total_all=round(sum(H_T_total); digits=6))
+    H_T_total_all=round(sum(H_T_total); digits=6),
+    h_O_avg_female=round(h_O_avg_ss[1]; digits=6),
+    h_O_avg_male=round(h_O_avg_ss[2]; digits=6),
+    H_O_total_female=round(H_O_total[1]; digits=6),
+    H_O_total_male=round(H_O_total[2]; digits=6),
+    H_O_total_all=round(sum(H_O_total); digits=6),
+    tax_rate=round(tax_rate; digits=4),
+    Y_O_per_L=round(Y_O_per_L; digits=4),
+    mean_wage_T=round(mean_wage_T; digits=4),
+    mean_wage_O=round(mean_wage_O; digits=4)
+)
 # If it exists, load previous parameterization (in CSV format), convert to DataFrame, and append 'df':
 fnameCSV = string("./results/", paramname, "/moments", fyear, ".csv")
 if isfile(fnameCSV) == true
