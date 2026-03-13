@@ -635,9 +635,9 @@ for spec in CF_SPECS
                 xlabel = "Idiosyncratic Ability", ylabel = "Density",
                 legend = :topright, size = SZ_NORMAL)
             plot!(p, A_GRID[TRIM], d_b["f_T"][TRIM, iH_b, ig];
-                  label="Baseline"; COMP_BASELINE...)
+                  label="Baseline", COMP_BASELINE...)
             plot!(p, A_GRID[TRIM], d_cf["f_T"][TRIM, iH_cf, ig];
-                  label=spec.shortname; COMP_COUNTER...)
+                  label=spec.shortname, COMP_COUNTER...)
             savefig(p, string(PLOTPATH, "comp_fT_$(lowercase(glabel))_$(tag).png"))
         end
 
@@ -648,9 +648,9 @@ for spec in CF_SPECS
                 xlabel = "Idiosyncratic Ability", ylabel = "Human Capital",
                 legend = :topleft, size = SZ_NORMAL)
             plot!(p, A_GRID[TRIM], d_b["h_T"][TRIM, iH_b, ig];
-                  label="Baseline"; COMP_BASELINE...)
+                  label="Baseline", COMP_BASELINE...)
             plot!(p, A_GRID[TRIM], d_cf["h_T"][TRIM, iH_cf, ig];
-                  label=spec.shortname; COMP_COUNTER...)
+                  label=spec.shortname, COMP_COUNTER...)
             savefig(p, string(PLOTPATH, "comp_hT_$(lowercase(glabel))_$(tag).png"))
         end
 
@@ -661,9 +661,9 @@ for spec in CF_SPECS
                 xlabel = "Human Capital", ylabel = "Density",
                 legend = :topright, size = SZ_NORMAL)
             plot!(p, d_b["h_T"][TRIM, iH_b, ig], d_b["f_T"][TRIM, iH_b, ig];
-                  label="Baseline"; COMP_BASELINE...)
+                  label="Baseline", COMP_BASELINE...)
             plot!(p, d_cf["h_T"][TRIM, iH_cf, ig], d_cf["f_T"][TRIM, iH_cf, ig];
-                  label=spec.shortname; COMP_COUNTER...)
+                  label=spec.shortname, COMP_COUNTER...)
             savefig(p, string(PLOTPATH, "comp_hT_fT_$(lowercase(glabel))_$(tag).png"))
         end
 
@@ -692,9 +692,9 @@ for spec in CF_SPECS
             xlabel = "Idiosyncratic Ability", ylabel = L"e_T",
             legend = :topleft, size = SZ_NORMAL)
         plot!(p, A_GRID[TRIM], eT_b[TRIM, 1];
-              label="Baseline"; COMP_BASELINE...)
+              label="Baseline", COMP_BASELINE...)
         plot!(p, A_GRID[TRIM], eT_cf[TRIM, 1];
-              label=spec.shortname; COMP_COUNTER...)
+              label=spec.shortname, COMP_COUNTER...)
         savefig(p, string(PLOTPATH, "comp_eT_$(tag).png"))
 
         # ── B6. Unnormalised f_T · m_T comparison ────────────────
@@ -707,10 +707,10 @@ for spec in CF_SPECS
                 legend = :topright, size = SZ_NORMAL)
             plot!(p, A_GRID[TRIM],
                   d_b["f_T"][TRIM, iH_b, ig] .* mT_b;
-                  label="Baseline"; COMP_BASELINE...)
+                  label="Baseline", COMP_BASELINE...)
             plot!(p, A_GRID[TRIM],
                   d_cf["f_T"][TRIM, iH_cf, ig] .* mT_cf;
-                  label=spec.shortname; COMP_COUNTER...)
+                  label=spec.shortname, COMP_COUNTER...)
             savefig(p, string(PLOTPATH, "comp_fT_unnorm_$(lowercase(glabel))_$(tag).png"))
         end
 
@@ -725,9 +725,9 @@ for spec in CF_SPECS
                     xlabel = "Ability in Teaching", ylabel = "ā₁(a)",
                     legend = :topleft, size = SZ_NORMAL)
                 plot!(p, A_GRID[trim_th], d_b[thresh_key_b][trim_th, iH_b, ig, 1];
-                      label="Baseline"; COMP_BASELINE...)
+                      label="Baseline", COMP_BASELINE...)
                 plot!(p, A_GRID[trim_th], d_cf[thresh_key_cf][trim_th, iH_cf, ig, 1];
-                      label=spec.shortname; COMP_COUNTER...)
+                      label=spec.shortname, COMP_COUNTER...)
                 savefig(p, string(PLOTPATH, "comp_a_O_$(lowercase(glabel))_$(tag).png"))
             end
         end
