@@ -598,7 +598,7 @@ end
 # Save counterfactual parameterization in JLD file:
 cd(string("./parameterization/", paramname))
 fnameJLD_cf = string("counter_5_", fyear, ".jld")
-save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "κ_1970", κ_1970, "theta", theta, "λf_1970", λf_1970, "λf_year", λf_year, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
+save(fnameJLD_cf, "a_by_occ", a_by_occ, "τ_w", τ_w, "τ_w_opt", τ_w_opt, "τ_e", τ_e, "a_T_thresh", a_T_thresh, "a_O_thresh", a_O_thresh, "t", t, "H_grid", H_grid, "H_O", H_O, "HH_fp", HH_fp, "α", α, "β", β, "η", η, "σ", σ, "μ", μ, "ϕ", ϕ, "γ", γ, "κ", κ, "κ_1970", κ_1970, "theta", theta, "λf_1970", λf_1970, "λf_year", λf_year, "λm", λm, "iHH", iHH, "a_grid", a_grid, "a_O_10p", a_O_10p, "a_O_90p", a_O_90p, "a_T_10p", a_T_10p, "a_T_90p", a_T_90p, "h_T", h_T, "f_T", f_T, "f_O", f_O, "mass_T", mass_T[iHH, :], "mass_O", mass_O[iHH, :, :], "aggA", aggA, "share_occ", share_occ, "ω_90_10", ω_90_10, "w_90_10", w_90_10)
 cd("..")
 cd("..")
 

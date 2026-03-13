@@ -328,7 +328,9 @@ end
 
 function get_mass_T_cf(cf_id::Int, yr::Int)
     haskey(CF_DATA, cf_id) || return [NaN, NaN]
-    haskey(CF_DATA[cf_id], yr) || return [NaN, NaN]
+    # If this year has no CF data (e.g. 1970 for CF1/5/6 which equal benchmark),
+    # fall back to the benchmark moments for that year.
+    haskey(CF_DATA[cf_id], yr) || return get_mass_T_bench(yr)
     d = CF_DATA[cf_id][yr]
     # Counterfactuals save mass_T as a vector (length n_G)
     return d["mass_T"]
@@ -380,6 +382,13 @@ for spec in CF_SPECS
 
     # Gather data dicts for available years:
     DD = Dict(yr => CF_DATA[cf_id][yr] for yr in cf_years)
+
+    # For CFs where 1970 == benchmark (CF1, CF5, CF6), inject benchmark 1970 data
+    # so that within-CF plots include the 1970 reference line:
+    if 1970 ∉ cf_years && haskey(BENCH, 1970)
+        DD[1970] = BENCH[1970]
+        cf_years = vcat([1970], cf_years)
+    end
 
     # Use a_grid from CF (should match benchmark):
     a_grid_cf = DD[cf_years[1]]["a_grid"]
