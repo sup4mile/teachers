@@ -179,36 +179,37 @@ savefig(plt7m,string(pathname,"a_O_men.eps"))
      16.  net_flow_teaching_fem/male   — Net flow into/out of teaching by ability
      17.  mass_T_over_time             — Teaching shares over time (bar chart)
      18.  cdf_fT_female/male           — CDF of teachers' abilities
+     19.  fT_unnorm_female/male        — Unnormalised teacher density (f_T · m_T)
 =#
 
-using Plots, JLD, CSV, DataFrames
+using Plots, JLD, CSV, DataFrames, LaTeXStrings
 import XLSX
 
 # ═══════════════════════════════════════════════════════════════════
 #  1. CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════
 
-const PARAMNAME = "benchmark"
-const YEARS     = [1970, 1990, 2010]
-const BASEPATH  = string("./parameterization/", PARAMNAME, "/")
-const PLOTPATH  = string("./plots/", PARAMNAME, "/")
+PARAMNAME = "benchmark"
+YEARS     = [1970, 1990, 2010]
+BASEPATH  = string("./parameterization/", PARAMNAME, "/")
+PLOTPATH  = string("./plots/", PARAMNAME, "/")
 mkpath(PLOTPATH)
 
 # Colorblind-safe palette (Okabe–Ito)
-const CB_BLUE   = RGB(0/255, 114/255, 178/255)
-const CB_ORANGE = RGB(230/255, 159/255, 0/255)
-const CB_GREEN  = RGB(0/255, 158/255, 115/255)
-const CB_COLORS = [CB_BLUE, CB_ORANGE, CB_GREEN]
-const LSTYLES   = [:solid, :dash, :dot]
-const MARKERS   = [:circle, :diamond, :xcross]
+CB_BLUE   = RGB(0/255, 114/255, 178/255)
+CB_ORANGE = RGB(230/255, 159/255, 0/255)
+CB_GREEN  = RGB(0/255, 158/255, 115/255)
+CB_COLORS = [CB_BLUE, CB_ORANGE, CB_GREEN]
+LSTYLES   = [:solid, :dash, :dot]
+MARKERS   = [:circle, :diamond, :xcross]
 
 # Tiny constant to avoid log(0)
-const ε = 1e-12
+ε = 1e-12
 
 # Use GR backend (ships with Plots.jl, no external deps)
 gr()
 
-# Global defaults — no "serif" (GR may not ship it), no grid
+# Global defaults — no grid
 default(;
     framestyle     = :box,
     grid           = false,
@@ -221,16 +222,16 @@ default(;
 )
 
 # Standard figure sizes
-const SZ_NORMAL = (620, 400)     # line / area plots
-const SZ_WIDE   = (960, 480)     # scatter with occupation labels
-const SZ_BAR    = (480, 380)     # bar chart
+SZ_NORMAL = (620, 400)     # line / area plots
+SZ_WIDE   = (960, 480)     # scatter with occupation labels
+SZ_BAR    = (480, 380)     # bar chart
 
 # ═══════════════════════════════════════════════════════════════════
 #  2. LOAD DATA
 # ═══════════════════════════════════════════════════════════════════
 
 # --- JLD parameterization files ---
-const DATA = Dict{Int, Dict{String, Any}}()
+DATA = Dict{Int, Dict{String, Any}}()
 for yr in YEARS
     local fname = string(BASEPATH, "previousParameterization", yr, ".jld")
     DATA[yr] = load(fname)
@@ -238,7 +239,7 @@ for yr in YEARS
 end
 
 # --- Moments CSVs ---
-const MOMENTS = Dict{Int, DataFrame}()
+MOMENTS = Dict{Int, DataFrame}()
 for yr in YEARS
     local csvname = string("./results/", PARAMNAME, "/moments", yr, ".csv")
     if isfile(csvname)
@@ -247,8 +248,8 @@ for yr in YEARS
 end
 
 # --- Occupation labels from Excel ---
-const XLSX_PATH = "../../data/LaborMarketData/wages_occ_shares_v2.xlsx"
-const OCC_LABELS_FULL = if isfile(XLSX_PATH)
+XLSX_PATH = "../../data/LaborMarketData/wages_occ_shares_v2.xlsx"
+OCC_LABELS_FULL = if isfile(XLSX_PATH)
     local xs  = XLSX.readxlsx(XLSX_PATH)
     local tab = xs["moments_shares"]
     string.(vec(tab["A30:A49"]))
@@ -257,8 +258,8 @@ else
 end
 
 # Abbreviated labels: truncate to 18 chars for readability on x-axis
-const OCC_LABELS = [length(s) > 18 ? s[1:17] * "…" : s for s in OCC_LABELS_FULL]
-const N_OCC = length(OCC_LABELS)
+OCC_LABELS = [length(s) > 18 ? s[1:17] * "…" : s for s in OCC_LABELS_FULL]
+N_OCC = length(OCC_LABELS)
 
 # ═══════════════════════════════════════════════════════════════════
 #  3. HELPER FUNCTIONS
@@ -309,10 +310,10 @@ function occ_scatter(; title="", ylabel="", ylims_val=nothing)
 end
 
 # Common grid and index (shared across all years)
-const A_GRID = DATA[YEARS[1]]["a_grid"]
-const N_A    = length(A_GRID)
-const IHH    = DATA[YEARS[1]]["iHH"]
-const TRIM   = 3:N_A-3          # skip 3 boundary points (safer than 2)
+A_GRID = DATA[YEARS[1]]["a_grid"]
+N_A    = length(A_GRID)
+IHH    = DATA[YEARS[1]]["iHH"]
+TRIM   = 3:N_A-3          # skip 3 boundary points (safer than 2)
 
 # ═══════════════════════════════════════════════════════════════════
 #  4. DISTRIBUTION OF TEACHERS' ABILITIES  (f_T)
@@ -366,6 +367,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 #  7. LABOR MARKET BARRIERS  (τ_w)  — sorted by 1970 magnitude
+#     Y-axis uses LaTeX label
 # ═══════════════════════════════════════════════════════════════════
 
 let τ_ref  = DATA[1970]["τ_w"][:, 1],
@@ -380,7 +382,7 @@ let τ_ref  = DATA[1970]["τ_w"][:, 1],
     ]
     for (yr_end, suffix) in plot_setups
         local p = occ_scatter(; title="Labor Market Barriers Against Women",
-                                ylabel="τ_w")
+                                ylabel=L"\tau_w")
         
         # Filter and plot only the years up to yr_end
         for yr in filter(y -> y <= yr_end, YEARS)
@@ -401,13 +403,14 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 #  8. OCCUPATIONAL PRODUCTIVITIES  — sorted by 1970 values
+#     Y-axis uses LaTeX label
 # ═══════════════════════════════════════════════════════════════════
 
 let a_ref   = haskey(DATA[1970], "a_by_occ_level") ? DATA[1970]["a_by_occ_level"] : DATA[1970]["a_by_occ"],
     sidx    = sortperm(a_ref),
     labels  = OCC_LABELS[sidx]
 
-    local p = occ_scatter(; title="Occupational Productivities", ylabel="A_o")
+    local p = occ_scatter(; title="Occupational Productivities", ylabel=L"A_o")
     for (i, yr) in enumerate(YEARS)
         local a = haskey(DATA[yr], "a_by_occ_level") ? DATA[yr]["a_by_occ_level"] : DATA[yr]["a_by_occ"]
         scatter!(p, 1:N_OCC, a[sidx];
@@ -420,11 +423,12 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 #  9. TEACHERS' HUMAN CAPITAL INVESTMENT  (e_T)
+#     Y-axis uses LaTeX label
 # ═══════════════════════════════════════════════════════════════════
 
 let p = plot(;
         title  = "Teachers' Human Capital Investment",
-        xlabel = "Idiosyncratic Ability", ylabel = "e_T",
+        xlabel = "Idiosyncratic Ability", ylabel = L"e_T",
         legend = :topleft, size = SZ_NORMAL)
     for (i, yr) in enumerate(YEARS)
         local eT = compute_e_T(DATA[yr])
@@ -435,6 +439,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 # 10. LAW OF MOTION FOR AGGREGATE TEACHING HUMAN CAPITAL
+#     Axes use LaTeX labels
 # ═══════════════════════════════════════════════════════════════════
 
 let d       = DATA[YEARS[end]],
@@ -446,7 +451,8 @@ let d       = DATA[YEARS[end]],
 
     local p = plot(;
         title  = "Law of Motion for Teachers' Human Capital",
-        xlabel = "H_T  (normalised)", ylabel = "H_T'  (normalised)",
+        xlabel = L"H_T \; \mathrm{(normalised)}",
+        ylabel = L"H_T' \; \mathrm{(normalised)}",
         legend = false, size = SZ_NORMAL)
     plot!(p, x_norm, x_norm; color=:gray, linewidth=0.8, linestyle=:dash)
     plot!(p, x_norm, y_norm; color=CB_BLUE, linewidth=2)
@@ -476,6 +482,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 # 12. Δlog(f_T): SHIFTS IN CONDITIONAL ABILITY DISTRIBUTION
+#     Y-axis uses LaTeX label; legend placed at topright
 # ═══════════════════════════════════════════════════════════════════
 
 for (ig, glabel) in enumerate(["Female", "Male"])
@@ -488,8 +495,8 @@ for (ig, glabel) in enumerate(["Female", "Male"])
 
     local p = plot(;
         title  = "Δ log Conditional Density ($glabel Teachers)",
-        xlabel = "Idiosyncratic Ability", ylabel = "Δ log f_T",
-        legend = :topleft, size = SZ_NORMAL)
+        xlabel = "Idiosyncratic Ability", ylabel = L"\Delta \log f_T",
+        legend = :topright, size = SZ_NORMAL)
     plot!(p, A_GRID[TRIM], Δ1;
           label="1990 − 1970", color=CB_ORANGE, linewidth=1.8)
     plot!(p, A_GRID[TRIM], Δ2;
@@ -501,6 +508,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 # 13. Δlog(f_T × mass_T): UNCONDITIONAL MASS SHIFTS
+#     Y-axis uses LaTeX label; legend placed at topright
 # ═══════════════════════════════════════════════════════════════════
 
 let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
@@ -514,8 +522,9 @@ let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
 
         local p = plot(;
             title  = "Δ log Unconditional Teacher Mass ($glabel)",
-            xlabel = "Idiosyncratic Ability", ylabel = "Δ log(f_T · m_T)",
-            legend = :topleft, size = SZ_NORMAL)
+            xlabel = "Idiosyncratic Ability",
+            ylabel = L"\Delta \log(f_T \cdot m_T)",
+            legend = :topright, size = SZ_NORMAL)
         plot!(p, A_GRID[TRIM], Δ1;
               label="1990 − 1970", color=CB_ORANGE, linewidth=1.8)
         plot!(p, A_GRID[TRIM], Δ2;
@@ -528,6 +537,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 # 14. NET FLOW INTO / OUT OF TEACHING BY ABILITY
+#     Legend placed at topright
 # ═══════════════════════════════════════════════════════════════════
 
 let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
@@ -539,8 +549,8 @@ let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
         local p = plot(;
             title  = "Net Flow Into Teaching ($glabel)",
             xlabel = "Idiosyncratic Ability",
-            ylabel = "f_T·m_T (new) − f_T·m_T (old)",
-            legend = :topleft, size = SZ_NORMAL)
+            ylabel = L"f_T \cdot m_T \; \mathrm{(new)} - f_T \cdot m_T \; \mathrm{(old)}",
+            legend = :topright, size = SZ_NORMAL)
         plot!(p, A_GRID[TRIM], u90 .- u70;
               label="1990 − 1970", color=CB_ORANGE,
               fillrange=0, fillalpha=0.2, linewidth=1.4)
@@ -555,6 +565,7 @@ end
 
 # ═══════════════════════════════════════════════════════════════════
 # 15. TEACHING SHARES OVER TIME  (manual grouped bar — no StatsPlots)
+#     Legend placed at topleft
 # ═══════════════════════════════════════════════════════════════════
 
 let mass     = Dict(yr => get_mass_T(yr) for yr in YEARS),
@@ -567,7 +578,7 @@ let mass     = Dict(yr => get_mass_T(yr) for yr in YEARS),
     local p = plot(;
         title  = "Share of Teachers Over Time",
         ylabel = "Fraction",
-        legend = :topright,
+        legend = :topleft,
         size   = SZ_BAR,
         xlims  = (0.3, n + 0.7),
         xticks = (xticks_x, string.(YEARS)))
@@ -600,6 +611,29 @@ for (ig, glabel) in enumerate(["Female", "Male"])
         plot!(p, A_GRID[TRIM], cdf_vals; label=string(yr), ystyle(i)...)
     end
     savefig(p, string(PLOTPATH, "cdf_fT_$(lowercase(glabel)).png"))
+end
+
+# ═══════════════════════════════════════════════════════════════════
+# 17. UNNORMALISED DISTRIBUTION OF TEACHERS' ABILITIES  (f_T · m_T)
+#     Shows the mass of teachers at each ability level, reflecting
+#     changes in both the conditional density and the overall share
+#     of teachers over time.
+# ═══════════════════════════════════════════════════════════════════
+
+let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
+    for (ig, glabel) in enumerate(["Female", "Male"])
+        local p = plot(;
+            title  = "Unnormalised Distribution of $glabel Teachers",
+            xlabel = "Idiosyncratic Ability",
+            ylabel = L"f_T \cdot m_T",
+            legend = :topright, size = SZ_NORMAL)
+        for (i, yr) in enumerate(YEARS)
+            local fT = DATA[yr]["f_T"][TRIM, IHH, ig]
+            plot!(p, A_GRID[TRIM], fT .* mass[yr][ig];
+                  label=string(yr), ystyle(i)...)
+        end
+        savefig(p, string(PLOTPATH, "fT_unnorm_$(lowercase(glabel)).png"))
+    end
 end
 
 println("\n✓ All plots saved to: $PLOTPATH")
