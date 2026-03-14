@@ -636,4 +636,30 @@ let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
     end
 end
 
+# ═══════════════════════════════════════════════════════════════════
+# 18. OCCUPATIONAL SHARES  — sorted by 1970 female share (descending)
+#     share_occ is (n_O-1 × n_G): rows = non-teaching occupations,
+#     columns = [female, male]; each column sums to 1 within each gender.
+# ═══════════════════════════════════════════════════════════════════
+
+if haskey(DATA[1970], "share_occ")
+    local share_ref  = DATA[1970]["share_occ"][:, 1]   # 1970 female shares for ordering
+    local sidx_occ   = sortperm(share_ref; rev=true)    # descending: largest share first
+    local labels_occ = OCC_LABELS[sidx_occ]
+
+    for (ig, glabel) in enumerate(["Female", "Male"])
+        local p = occ_scatter(;
+            title  = "$glabel Occupational Shares (Non-Teaching)",
+            ylabel = "Share of $glabel Non-Teaching Workers")
+        for (i, yr) in enumerate(YEARS)
+            local so = DATA[yr]["share_occ"][:, ig]
+            scatter!(p, 1:N_OCC, so[sidx_occ];
+                     label=string(yr), color=CB_COLORS[i],
+                     markershape=MARKERS[i], markersize=4.5, msw=0.4)
+        end
+        xticks!(p, 1:N_OCC, labels_occ; rotation=50, tickfontsize=6)
+        savefig(p, string(PLOTPATH, "occ_shares_$(lowercase(glabel)).png"))
+    end
+end
+
 println("\n✓ All plots saved to: $PLOTPATH")

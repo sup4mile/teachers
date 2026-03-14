@@ -610,6 +610,31 @@ for spec in CF_SPECS
         end
     end
 
+    # ── A11. Occupational shares ──────────────────────────────────
+    # Sort by benchmark 1970 female shares so the same occupation order
+    # is used consistently across all plots.
+    if haskey(DD[cf_years[1]], "share_occ")
+        share_ref_1970 = (haskey(BENCH, 1970) && haskey(BENCH[1970], "share_occ")) ?
+                         BENCH[1970]["share_occ"][:, 1] :
+                         DD[cf_years[1]]["share_occ"][:, 1]
+        sidx_occ_a  = sortperm(share_ref_1970; rev=true)
+        labels_occ_a = OCC_LABELS[sidx_occ_a]
+
+        for (ig, glabel) in enumerate(["Female", "Male"])
+            p = occ_scatter(;
+                title  = "$(spec.shortname): $glabel Occupational Shares",
+                ylabel = "Share of $glabel Non-Teaching Workers")
+            for yr in cf_years
+                so = DD[yr]["share_occ"][:, ig]
+                scatter!(p, 1:N_OCC, so[sidx_occ_a];
+                         label=string(yr), color=YEAR_COLORS[yr],
+                         markershape=YEAR_MARKERS[yr], markersize=4.5, msw=0.4)
+            end
+            xticks!(p, 1:N_OCC, labels_occ_a; rotation=50, tickfontsize=6)
+            savefig(p, string(PLOTPATH, "occ_shares_$(lowercase(glabel)).png"))
+        end
+    end
+
     println("  ✓ Within-counterfactual plots saved to $PLOTPATH")
 end
 
@@ -740,9 +765,52 @@ for spec in CF_SPECS
                 savefig(p, string(PLOTPATH, "comp_a_O_$(lowercase(glabel))_$(tag).png"))
             end
         end
+
+        # ── B8. Occupational share comparison + difference ────────
+        if haskey(d_b, "share_occ") && haskey(d_cf, "share_occ")
+            so_b  = d_b["share_occ"]
+            so_cf = d_cf["share_occ"]
+
+            # Sort by benchmark 1970 female shares for consistency
+            share_ref_b = (haskey(BENCH, 1970) && haskey(BENCH[1970], "share_occ")) ?
+                          BENCH[1970]["share_occ"][:, 1] : so_b[:, 1]
+            sidx_occ_b  = sortperm(share_ref_b; rev=true)
+            labels_occ_b = OCC_LABELS[sidx_occ_b]
+
+            # B8a. Comparison scatter: baseline vs CF
+            for (ig, glabel) in enumerate(["Female", "Male"])
+                p = occ_scatter(;
+                    title  = "$glabel Occ. Shares: Baseline vs $(spec.shortname) ($yr)",
+                    ylabel = "Share of $glabel Non-Teaching Workers")
+                scatter!(p, 1:N_OCC, so_b[sidx_occ_b, ig];
+                         label="Baseline", color=CB_BLUE,
+                         markershape=:circle, markersize=4.5, msw=0.4)
+                scatter!(p, 1:N_OCC, so_cf[sidx_occ_b, ig];
+                         label=spec.shortname, color=CB_RED,
+                         markershape=:diamond, markersize=4.5, msw=0.4)
+                xticks!(p, 1:N_OCC, labels_occ_b; rotation=50, tickfontsize=6)
+                savefig(p, string(PLOTPATH, "comp_occ_shares_$(lowercase(glabel))_$(tag).png"))
+            end
+
+            # B8b. Difference bar chart: CF − Baseline
+            for (ig, glabel) in enumerate(["Female", "Male"])
+                Δso = so_cf[:, ig] .- so_b[:, ig]
+                Δso_sorted = Δso[sidx_occ_b]
+                bar_colors = [Δ >= 0 ? CB_BLUE : CB_RED for Δ in Δso_sorted]
+
+                p = occ_scatter(;
+                    title  = "$glabel Occ. Share Diff: $(spec.shortname) − Baseline ($yr)",
+                    ylabel = "Δ Share of $glabel Non-Teaching Workers")
+                bar!(p, 1:N_OCC, Δso_sorted;
+                     color=bar_colors, alpha=0.8, bar_width=0.7, label="")
+                hline!(p, [0.0]; color=:black, linewidth=0.6, label="")
+                xticks!(p, 1:N_OCC, labels_occ_b; rotation=50, tickfontsize=6)
+                savefig(p, string(PLOTPATH, "diff_occ_shares_$(lowercase(glabel))_$(tag).png"))
+            end
+        end
     end
 
-    # ── B8. Teaching shares: baseline vs CF grouped bar ──────────
+    # ── B9. Teaching shares: baseline vs CF grouped bar ──────────
     common_years = sort(intersect(cf_years, collect(keys(BENCH))))
     if length(common_years) >= 1
         n = length(common_years)
@@ -1072,6 +1140,86 @@ if !isempty(summary_rows)
     CSV.write(summary_csv, summary_df)
     println("\n✓ Summary CSV saved to $summary_csv")
     println(summary_df)
+end
+
+# ── C9. Occupational shares: all CFs for each year ───────────────
+# One plot per year per gender; baseline + each available CF overlaid.
+for yr in ALL_YEARS
+    # Use benchmark 1970 female shares for sorting
+    share_ref_c = (haskey(BENCH, 1970) && haskey(BENCH[1970], "share_occ")) ?
+                  BENCH[1970]["share_occ"][:, 1] : nothing
+    share_ref_c === nothing && continue
+
+    sidx_occ_c  = sortperm(share_ref_c; rev=true)
+    labels_occ_c = OCC_LABELS[sidx_occ_c]
+
+    for (ig, glabel) in enumerate(["Female", "Male"])
+        p = occ_scatter(;
+            title  = "$glabel Occupational Shares — All CFs ($yr)",
+            ylabel = "Share of $glabel Non-Teaching Workers")
+
+        # Baseline
+        if haskey(BENCH, yr) && haskey(BENCH[yr], "share_occ")
+            so_b = BENCH[yr]["share_occ"][:, ig]
+            scatter!(p, 1:N_OCC, so_b[sidx_occ_c];
+                     label="Baseline", color=:black,
+                     markershape=:circle, markersize=5, msw=0.5)
+        end
+
+        # Each counterfactual
+        cf_markers = [:diamond, :xcross, :utriangle, :dtriangle, :star5, :hexagon]
+        for (ci, spec) in enumerate(CF_SPECS)
+            haskey(CF_DATA[spec.id], yr) || continue
+            d_c = CF_DATA[spec.id][yr]
+            haskey(d_c, "share_occ") || continue
+            so_c = d_c["share_occ"][:, ig]
+            scatter!(p, 1:N_OCC, so_c[sidx_occ_c];
+                     label="CF$(spec.id)", color=CF_COLORS[ci],
+                     markershape=cf_markers[min(ci, length(cf_markers))],
+                     markersize=4, msw=0.3)
+        end
+
+        xticks!(p, 1:N_OCC, labels_occ_c; rotation=50, tickfontsize=6)
+        savefig(p, string(COMPPATH, "occ_shares_all_cf_$(lowercase(glabel))_$(yr).png"))
+    end
+end
+
+# ── C10. Occupational share differences vs baseline: all CFs ─────
+# For each year and gender, one plot showing (CF − Baseline) for
+# every counterfactual overlaid, so changes in allocation can be
+# compared across counterfactuals.
+for yr in ALL_YEARS
+    haskey(BENCH, yr) && haskey(BENCH[yr], "share_occ") || continue
+
+    share_ref_c = (haskey(BENCH, 1970) && haskey(BENCH[1970], "share_occ")) ?
+                  BENCH[1970]["share_occ"][:, 1] : BENCH[yr]["share_occ"][:, 1]
+    sidx_occ_c  = sortperm(share_ref_c; rev=true)
+    labels_occ_c = OCC_LABELS[sidx_occ_c]
+
+    for (ig, glabel) in enumerate(["Female", "Male"])
+        so_base = BENCH[yr]["share_occ"][:, ig]
+
+        p = occ_scatter(;
+            title  = "$glabel Occ. Share Diff vs Baseline — All CFs ($yr)",
+            ylabel = "Δ Share of $glabel Non-Teaching Workers (CF − Baseline)")
+        hline!(p, [0.0]; color=:black, linewidth=0.6, label="")
+
+        cf_lstyles = [:dash, :dot, :dashdot, :dashdotdot, :dash, :dot]
+        cf_markers = [:diamond, :xcross, :utriangle, :dtriangle, :star5, :hexagon]
+        for (ci, spec) in enumerate(CF_SPECS)
+            haskey(CF_DATA[spec.id], yr) || continue
+            d_c = CF_DATA[spec.id][yr]
+            haskey(d_c, "share_occ") || continue
+            Δso = (d_c["share_occ"][:, ig] .- so_base)[sidx_occ_c]
+            scatter!(p, 1:N_OCC, Δso;
+                     label="CF$(spec.id)", color=CF_COLORS[ci],
+                     markershape=cf_markers[min(ci, length(cf_markers))],
+                     markersize=4, msw=0.3)
+        end
+
+        xticks!(p, 1:N_OCC, labels_occ_c; rotation=50, tickfontsize=6)
+        savefig(p, string(COMPPATH, "diff_occ_shares_all_cf_$(lowercase(glabel))_$(yr).png"))
+    end
 end
 
 println("\n✓ All counterfactual plots complete.")
