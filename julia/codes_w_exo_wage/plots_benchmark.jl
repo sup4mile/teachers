@@ -548,7 +548,7 @@ let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
 
         local p = plot(;
             title  = "Net Flow Into Teaching ($glabel)",
-            xlabel = "Idiosyncratic Ability",
+            xlabel = "Teaching Ability",
             ylabel = L"f_T \cdot m_T \; \mathrm{(new)} - f_T \cdot m_T \; \mathrm{(old)}",
             legend = :topright, size = SZ_NORMAL)
         plot!(p, A_GRID[TRIM], u90 .- u70;
@@ -623,8 +623,8 @@ end
 let mass = Dict(yr => get_mass_T(yr) for yr in YEARS)
     for (ig, glabel) in enumerate(["Female", "Male"])
         local p = plot(;
-            title  = "Unnormalised Distribution of $glabel Teachers",
-            xlabel = "Idiosyncratic Ability",
+            title  = "Non-normalised Distribution of $glabel Teachers",
+            xlabel = "Teaching Ability",
             ylabel = L"f_T \cdot m_T",
             legend = :topright, size = SZ_NORMAL)
         for (i, yr) in enumerate(YEARS)
