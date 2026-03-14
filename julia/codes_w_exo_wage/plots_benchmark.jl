@@ -469,11 +469,11 @@ if haskey(DATA[YEARS[1]], "a_O_thresh")
         local p = plot(;
             title  = "Occupational Threshold ($glabel)",
             xlabel = "Ability in Teaching",
-            ylabel = "ā₁(a)",
+            ylabel = L"a_{hp}^*(a_T)",
             legend = :topleft, size = SZ_NORMAL)
         for (i, yr) in enumerate(YEARS)
             local a_O_thresh = DATA[yr]["a_O_thresh"]
-            plot!(p, A_GRID[trim_th], a_O_thresh[trim_th, IHH, ig, 1];
+            plot!(p, A_GRID[trim_th], a_O_thresh[trim_th, IHH, ig, end];
                   label=string(yr), ystyle(i)...)
         end
         savefig(p, string(PLOTPATH, "a_O_$(lowercase(glabel)).png"))
