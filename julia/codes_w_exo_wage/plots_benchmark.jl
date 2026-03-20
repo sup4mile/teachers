@@ -467,9 +467,9 @@ if haskey(DATA[YEARS[1]], "a_O_thresh")
     local trim_th = 3:N_A-2
     for (ig, glabel) in enumerate(["Women", "Men"])
         local p = plot(;
-            title  = "Occupational Threshold ($glabel)",
-            xlabel = "Ability in Teaching",
-            ylabel = L"a_{hp}^*(a_T)",
+            title  = latexstring("Occupational Threshold for $glabel: \$ a_{HP}^*(a_T) \$"),
+            xlabel = latexstring("Ability in Teaching: \$ a_T \$"),
+            ylabel = latexstring("\$ a_{HP} \$"),
             legend = :topleft, size = SZ_NORMAL)
         for (i, yr) in enumerate(YEARS)
             local a_O_thresh = DATA[yr]["a_O_thresh"]

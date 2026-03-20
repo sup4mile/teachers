@@ -532,8 +532,8 @@ for spec in CF_SPECS
     # ── A9. Unnormalised f_T · m_T ───────────────────────────────
     for (ig, glabel) in enumerate(["Female", "Male"])
         p = plot(;
-            title  = "$(spec.shortname): Unnorm. $glabel Teacher Density",
-            xlabel = "Idiosyncratic Ability", ylabel = L"f_T \cdot m_T",
+            title  = "$(spec.shortname): Non-normalised Distribution of $glabel Teachers",
+            xlabel = "Teaching Ability", ylabel = L"f_T \cdot m_T",
             legend = :topright, size = SZ_NORMAL)
         for yr in cf_years
             fT   = DD[yr]["f_T"]
@@ -665,8 +665,8 @@ for spec in CF_SPECS
         # ── B1. f_T comparison ───────────────────────────────────
         for (ig, glabel) in enumerate(["Female", "Male"])
             p = plot(;
-                title  = "$glabel Teachers' Ability Dist. ($yr)",
-                xlabel = "Idiosyncratic Ability", ylabel = "Density",
+                title  = "$glabel Teachers' Ability Distribution ($yr)",
+                xlabel = "Teaching Ability", ylabel = "Density",
                 legend = :topright, size = SZ_NORMAL)
             plot!(p, A_GRID[TRIM], d_b["f_T"][TRIM, iH_b, ig];
                   label="Baseline", COMP_BASELINE...)
