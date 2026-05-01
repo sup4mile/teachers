@@ -105,3 +105,17 @@ $$
 \bar V(h_i; i,g,l) \;=\; \sigma_\nu \ln\!\sum_{l'}\exp\!\big[(V_{l'}(h_i; i,g,l) + B_{l'})/\sigma_\nu\big]
 $$
 folds the Stage-2 problem cleanly into Stage-1 occupational choice, replacing the deterministic old-age.
+
+## 7 Occupation and Human Capital Choice
+
+For non-teaching ($i \neq T$, with $\omega_i(h_i)=A_i h_i$), the FOCs reduce to:
+
+**FOC for $e_{i,g,l}$:**
+$$
+\sum_{l'} \pi_{l'}\, \mathbb E_{\vec a'\mid \vec a}\!\left[\frac{(1-t_{l'})(1-\tau^\omega_{i,g})A_i\eta\,h_i/e \;-\; (1-\varepsilon)(1+\tau^e_{i,g})}{C(l',\vec a')}\right]\;=\;0.
+$$
+
+**FOC for $s_{i,g,l}$:**
+$$
+\frac{1}{1-s} \;=\; \mu\,\phi\,(1-\tau^\omega_{i,g})A_i\,\frac{h_i}{s}\,\sum_{l'}\pi_{l'}\,\mathbb E_{\vec a'\mid \vec a}\!\left[\frac{1-t_{l'}}{C(l',\vec a')}\right].
+$$
