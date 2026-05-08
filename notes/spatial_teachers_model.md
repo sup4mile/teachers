@@ -44,11 +44,11 @@ Stacking across $i$ yields $F(\vec a' \mid \vec a)$ with stationary marginal $F(
 
 ## 4 Technologies
 
-**Human capital.** As the baseline, a young agent of group $g$ in location $l$ with abilities $\vec a$ acquires occupation-specific human capital
+**Human capital.** A young agent of group $g$ in location $l$ with abilities $\vec a$ acquires occupation-specific human capital
 $$
 h_{i,g,l}(\vec a) = (h_{T,l})^\beta (a_i)^\alpha (s_{i,g,l})^{\phi}\,(e_{i,g,l})^{\eta}\,N(h_{T,l})^{-\sigma},
 $$
-with $h_{T,l}$ the human capital of a generic teacher working in $l$. Student-teacher matching is random within $l$ (modular production, as in the baseline), and the indifference condition $h^\beta N(h)^{-\sigma}=$ const. across teachers in $l$ combined with the local class-size resource constraint
+with $h_{T,l}$ the human capital of a generic teacher working in $l$. Student-teacher matching is random within $l$, and the indifference condition $h^\beta N(h)^{-\sigma}=$ const. across teachers in $l$ combined with the local class-size resource constraint
 $$
 \frac{M_l}{2} = \sum_g \int_0^\infty N(h_{T,l,g})\,dF_{T,l,g}(h_{T,l,g})
 $$
@@ -109,7 +109,7 @@ When young, the agent solves
 $$
 i^*(\vec a; g, l) \;=\; \arg\max_{i \in \{1,\dots,I\}}\; \Big[\ln(1 - s^*_{i,g,l}) + \bar V\!\big(h^*_{i,g,l}(\vec a); i, g, l\big)\Big],
 $$
-with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ from Section 6 and the child's policy functions as given.
+with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given.
 
 For non-teaching ($i \neq T$, with $\omega_{i,l'}(h)=A_i h$), the FOCs reduce to:
 
@@ -188,7 +188,7 @@ such that:
 
 ## 11 Computational Notes
 
-The model does not admit closed-form analogues of baseline Proposition 2 because teaching wages depend on the work location $l'$ rather than the training location $l$, so the prospective teacher's expected return is a $\pi_{l'\mid l}$-weighted average across locations rather than a single-location expression; and altruism plus the $\varepsilon$-share of child education couples the parent's consumption to the child's optimal $e'_{i'(\vec a',l'),g,l'}(\vec a')$, which is itself the solution of a problem in the child's location $l'$ with aggregates $(\widetilde{H}_{T,l'}, M_{l'}, t_{l'})$.
+The model does not admit closed-form analogues of baseline Proposition 2 (that occupational choice does not depend on aggregate teacher human capital $\widetilde H$) because teaching wages depend on the work location $l'$ rather than the training location $l$, so the prospective teacher's expected return is a $\pi_{l'\mid l}$-weighted average across locations rather than a single-location expression; and altruism plus the $\varepsilon$-share of child education couples the parent's consumption to the child's optimal $e'_{i'(\vec a',l'),g,l'}(\vec a')$, which is itself the solution of a problem in the child's location $l'$ with aggregates $(\widetilde{H}_{T,l'}, M_{l'}, t_{l'})$.
 
 Coding the model amounts to four nested fixed points:
 
