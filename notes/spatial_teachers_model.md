@@ -188,7 +188,7 @@ such that:
 
 ## 11 Computational Notes
 
-The model does not admit closed-form analogues of baseline Proposition 2 (that occupational choice does not depend on aggregate teacher human capital $\widetilde H$) because teaching wages depend on the work location $l'$ rather than the training location $l$, so the prospective teacher's expected return is a $\pi_{l'\mid l}$-weighted average across locations rather than a single-location expression; and altruism plus the $\varepsilon$-share of child education couples the parent's consumption to the child's optimal $e'_{i'(\vec a',l'),g,l'}(\vec a')$, which is itself the solution of a problem in the child's location $l'$ with aggregates $(\widetilde{H}_{T,l'}, M_{l'}, t_{l'})$.
+I don't believe we recover closed-form analogues of baseline Proposition 2 (that occupational choice does not depend on aggregate teacher human capital $\widetilde H$) because teaching wages depend on the work location $l'$ rather than the training location $l$, so the prospective teacher's expected return is a $\pi_{l'\mid l}$-weighted average across locations rather than a single-location expression; and altruism plus the $\varepsilon$-share of child education couples the parent's consumption to the child's optimal $e'_{i'(\vec a',l'),g,l'}(\vec a')$, which is itself the solution of a problem in the child's location $l'$ with aggregates $(\widetilde{H}_{T,l'}, M_{l'}, t_{l'})$.
 
 Coding the model amounts to four nested fixed points:
 
