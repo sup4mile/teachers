@@ -204,6 +204,10 @@ struct Eqm
 	t::Vector{Float64}
 	E_logh::Array{Float64,3}    # [k,l,g]
 	E_cost::Array{Float64,3}    # [k,l,g]
+	UT::Array{Float64,4}        # [k,l,g,eps] utility for teaching
+	UO_best::Array{Float64,4}   # [k,l,g,eps] utility for best non-teaching
+	costT::Array{Float64,4}     # [k,l,g,eps] goods cost if teaching
+	costO_best::Array{Float64,4}# [k,l,g,eps] goods cost if best non-teaching
 end
 
 function avg_eqm(a::Eqm, b::Eqm)
@@ -216,6 +220,10 @@ function avg_eqm(a::Eqm, b::Eqm)
 		0.5 .* (a.t .+ b.t),
 		0.5 .* (a.E_logh .+ b.E_logh),
 		0.5 .* (a.E_cost .+ b.E_cost),
+		0.5 .* (a.UT .+ b.UT),
+		0.5 .* (a.UO_best .+ b.UO_best),
+		0.5 .* (a.costT .+ b.costT),
+		0.5 .* (a.costO_best .+ b.costO_best),
 	)
 end
 
@@ -232,11 +240,121 @@ end
 	return (2.0 * Htilde_l / M_l)^p.σ
 end
 
-"""Given a birth location l, z, eps, and a scalar p1=Pr(dest=1), solve location choice fixed point for occupation T."""
-function solve_T(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64}, child_cost::Matrix{Float64}, l_birth::Int, k::Int, gsym::Symbol, epsT::Float64)
-	# scalar fixed point on π1
+@inline function safe_logC(C::Float64)
+	return C > 1e-12 ? log(C) : -1e12
+end
+
+@inline function safe_invC(C::Float64)
+	return C > 1e-12 ? 1.0 / C : 1e12
+end
+
+"""Solve for s in 1/(1-s) = K * s^(expo-1) via bisection."""
+function solve_s_bisection(K::Float64, expo::Float64; tol::Float64 = 1e-10)
+	if K <= 0
+		return 1e-8
+	end
+	lo = 1e-8
+	hi = 1.0 - 1e-8
+	f_lo = 1.0 / (1.0 - lo) - K * lo^(expo - 1.0)
+	f_hi = 1.0 / (1.0 - hi) - K * hi^(expo - 1.0)
+	if f_lo >= 0
+		return lo
+	end
+	if f_hi <= 0
+		return hi
+	end
+	for _ in 1:80
+		mid = 0.5 * (lo + hi)
+		f_mid = 1.0 / (1.0 - mid) - K * mid^(expo - 1.0)
+		if f_mid > 0
+			hi = mid
+		else
+			lo = mid
+		end
+		if (hi - lo) < tol
+			break
+		end
+	end
+	return 0.5 * (lo + hi)
+end
+
+"""Expected log C and 1/C for a given child state (k,l,g), conditional on A (pre-child-cost resources)."""
+function expected_logC_invC(
+	p::Params,
+	grids::Grids,
+	UT::AbstractVector{Float64},
+	UO_best::AbstractVector{Float64},
+	costT::AbstractVector{Float64},
+	costO_best::AbstractVector{Float64},
+	A::Float64,
+)
+	Ne = length(UT)
+	eps = grids.eps_nodes
+	w = grids.eps_w
+	log_sum = 0.0
+	inv_sum = 0.0
+	@inbounds for i in 1:Ne
+		thr = invert_threshold(eps, UO_best, UT[i])
+		pT = hist_cdf(eps, w, thr)
+		Ct = A - p.ε_parent * costT[i]
+		logT = safe_logC(Ct)
+		invT = safe_invC(Ct)
+		logO = 0.0
+		invO = 0.0
+		@inbounds for j in 1:Ne
+			if eps[j] > thr
+				Cj = A - p.ε_parent * costO_best[j]
+				logO += w[j] * safe_logC(Cj)
+				invO += w[j] * safe_invC(Cj)
+			end
+		end
+		log_sum += w[i] * (pT * logT + logO)
+		inv_sum += w[i] * (pT * invT + invO)
+	end
+	return log_sum, inv_sum
+end
+
+"""Expected log C and 1/C for parent with z index k and destination ldest."""
+function expected_child_terms(
+	p::Params,
+	grids::Grids,
+	eqm::Eqm,
+	k_parent::Int,
+	ldest::Int,
+	A::Float64,
+)
+	log_sum = 0.0
+	inv_sum = 0.0
+	for kp in 1:p.Nz
+		wkp = grids.Pz[k_parent, kp]
+		for ig in 1:length(p.genders)
+			UT = view(eqm.UT, kp, ldest, ig, :)
+			UO = view(eqm.UO_best, kp, ldest, ig, :)
+			cT = view(eqm.costT, kp, ldest, ig, :)
+			cO = view(eqm.costO_best, kp, ldest, ig, :)
+			logc, invc = expected_logC_invC(p, grids, UT, UO, cT, cO, A)
+			log_sum += 0.5 * wkp * logc
+			inv_sum += 0.5 * wkp * invc
+		end
+	end
+	return log_sum, inv_sum
+end
+
+"""Expected child cost (goods) for parent with z index k and destination ldest."""
+function expected_child_cost(p::Params, grids::Grids, eqm::Eqm, k_parent::Int, ldest::Int)
+	c = 0.0
+	for kp in 1:p.Nz
+		wkp = grids.Pz[k_parent, kp]
+		c += wkp * 0.5 * (eqm.E_cost[kp, ldest, 1] + eqm.E_cost[kp, ldest, 2])
+	end
+	return c
+end
+
+"""Given a birth location l, z, eps, solve location-choice and (s,e) fixed point for occupation T."""
+function solve_T(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64}, l_birth::Int, k::Int, gsym::Symbol, epsT::Float64)
 	π1 = 0.5
 	sT = s_T_const(p)
+	eT = 0.5
 	Q = Q_l(p, eqm.Htilde[l_birth], eqm.M[l_birth])
 	aT = grids.z[k] * epsT
 
@@ -245,30 +363,76 @@ function solve_T(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64},
 
 	for _ in 1:200
 		π = (π1, 1.0 - π1)
-		κeff = π[1] * (1.0 - eqm.t[1]) * p.κ[1] + π[2] * (1.0 - eqm.t[2]) * p.κ[2]
-		κeff = max(κeff, 1e-12)
-		# closed form for power wage profile
-		h = (p.η^p.η * (κeff * p.γ)^p.η * aT^p.α * sT^p.ϕ * Q)^(1.0 / (1.0 - p.η * p.γ))
-		e = p.η * (κeff * p.γ) * h^p.γ
+		h_base = Q * aT^p.α * sT^p.ϕ
+		h = h_base * eT^p.η
+
 		# destination-specific wages
 		w1 = p.κ[1] * h^p.γ
 		w2 = p.κ[2] * h^p.γ
-		# consumption per destination
-		C1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w1 - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 1]
-		C2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w2 - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 2]
-		u1 = (C1 > 1e-12 ? p.μ * log(C1) : -1e12) + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
-		u2 = (C2 > 1e-12 ? p.μ * log(C2) : -1e12) + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
+
+		A1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w1 - (1.0 - p.ε_parent) * (1.0 + τe) * eT
+		A2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w2 - (1.0 - p.ε_parent) * (1.0 + τe) * eT
+
+		logC1, invC1 = expected_child_terms(p, grids, eqm, k, 1, A1)
+		logC2, invC2 = expected_child_terms(p, grids, eqm, k, 2, A2)
+
+		u1 = p.μ * logC1 + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
+		u2 = p.μ * logC2 + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
+
 		π1_new, _ = softmax2(u1, u2, p.σν)
-		if abs(π1_new - π1) < 1e-10
-			inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
-			πmat = (π1_new, 1.0 - π1_new)
-			return (inc, πmat, h, e, (w1, w2), (C1, C2))
+
+		S0 = π[1] * invC1 + π[2] * invC2
+		Sκ = π[1] * (1.0 - eqm.t[1]) * p.κ[1] * invC1 + π[2] * (1.0 - eqm.t[2]) * p.κ[2] * invC2
+		Sκ = max(Sκ, 1e-12)
+		S0 = max(S0, 1e-12)
+
+		# update e via teaching FOC
+		denom = (1.0 - τw) * p.γ * p.η * h_base^p.γ * Sκ
+		if denom > 0
+			rhs = (1.0 - p.ε_parent) * (1.0 + τe) * S0 / denom
+			eT_new = rhs^(1.0 / (p.η * p.γ - 1.0))
+			eT_new = max(eT_new, 1e-8)
+		else
+			eT_new = 1e-8
 		end
+
+		# update s via teaching FOC (K excludes s to isolate s^(ϕγ-1))
+		base_no_s = Q * aT^p.α
+		Ks = p.μ * p.ϕ * p.γ * (1.0 - τw) * base_no_s^p.γ * eT^(p.η * p.γ) * Sκ
+		sT_new = solve_s_bisection(Ks, p.ϕ * p.γ)
+
+		s_err = abs(sT_new - sT)
+		e_err = abs(eT_new - eT)
+		π_err = abs(π1_new - π1)
+
+		# damped updates
+		sT = 0.6 * sT + 0.4 * sT_new
+		eT = 0.6 * eT + 0.4 * eT_new
 		π1 = 0.6 * π1 + 0.4 * π1_new
+
+		if max(s_err, e_err, π_err) < 1e-8
+			inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
+			πmat = (π1, 1.0 - π1)
+			C1 = A1 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 1)
+			C2 = A2 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 2)
+			return (inc, πmat, h, eT, (w1, w2), (C1, C2), sT)
+		end
 	end
-	inc = -1e12
+	h_base = Q * aT^p.α * sT^p.ϕ
+	h = h_base * eT^p.η
+	w1 = p.κ[1] * h^p.γ
+	w2 = p.κ[2] * h^p.γ
+	A1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w1 - (1.0 - p.ε_parent) * (1.0 + τe) * eT
+	A2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w2 - (1.0 - p.ε_parent) * (1.0 + τe) * eT
+	logC1, _ = expected_child_terms(p, grids, eqm, k, 1, A1)
+	logC2, _ = expected_child_terms(p, grids, eqm, k, 2, A2)
+	u1 = p.μ * logC1 + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
+	u2 = p.μ * logC2 + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
+	inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
 	πmat = (π1, 1.0 - π1)
-	return (inc, πmat, NaN, NaN, (NaN, NaN), (NaN, NaN))
+	C1 = A1 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 1)
+	C2 = A2 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 2)
+	return (inc, πmat, h, eT, (w1, w2), (C1, C2), sT)
 end
 
 """Solve location choice fixed point for occupation O (non-teaching)."""
@@ -277,7 +441,6 @@ function solve_O(
 	grids::Grids,
 	eqm::Eqm,
 	child_logh::Matrix{Float64},
-	child_cost::Matrix{Float64},
 	l_birth::Int,
 	k::Int,
 	gsym::Symbol,
@@ -286,6 +449,7 @@ function solve_O(
 )
 	π1 = 0.5
 	sO = s_O_const(p)
+	eO = 0.5
 	Q = Q_l(p, eqm.Htilde[l_birth], eqm.M[l_birth])
 	aO = grids.z[k] * epsO
 	A_occ = p.A_O[occ_idx]
@@ -294,31 +458,72 @@ function solve_O(
 
 	for _ in 1:200
 		π = (π1, 1.0 - π1)
-		taxeff = π[1] * (1.0 - eqm.t[1]) + π[2] * (1.0 - eqm.t[2])
-		taxeff = max(taxeff, 1e-12)
-		scale = taxeff * (1.0 - τw) / (1.0 + τe) * A_occ
-		h = (p.η^p.η * scale^p.η * aO^p.α * sO^p.ϕ * Q)^(1.0 / (1.0 - p.η))
-		e = p.η * scale * h
+		h_base = Q * aO^p.α * sO^p.ϕ
+		h = h_base * eO^p.η
 		w = A_occ * h
-		C1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 1]
-		C2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 2]
-		u1 = (C1 > 1e-12 ? p.μ * log(C1) : -1e12) + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
-		u2 = (C2 > 1e-12 ? p.μ * log(C2) : -1e12) + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
+
+		A1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * eO
+		A2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * eO
+
+		logC1, invC1 = expected_child_terms(p, grids, eqm, k, 1, A1)
+		logC2, invC2 = expected_child_terms(p, grids, eqm, k, 2, A2)
+
+		u1 = p.μ * logC1 + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
+		u2 = p.μ * logC2 + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
 		π1_new, _ = softmax2(u1, u2, p.σν)
-		if abs(π1_new - π1) < 1e-10
-			inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
-			πmat = (π1_new, 1.0 - π1_new)
-			return (inc, πmat, h, e, w, (C1, C2))
+
+		S0 = π[1] * invC1 + π[2] * invC2
+		S1 = π[1] * (1.0 - eqm.t[1]) * invC1 + π[2] * (1.0 - eqm.t[2]) * invC2
+		S1 = max(S1, 1e-12)
+		S0 = max(S0, 1e-12)
+
+		denom = (1.0 - τw) * A_occ * p.η * h_base * S1
+		if denom > 0
+			rhs = (1.0 - p.ε_parent) * (1.0 + τe) * S0 / denom
+			eO_new = rhs^(1.0 / (p.η - 1.0))
+			eO_new = max(eO_new, 1e-8)
+		else
+			eO_new = 1e-8
 		end
+
+		base_no_s = Q * aO^p.α
+		Ks = p.μ * p.ϕ * (1.0 - τw) * A_occ * base_no_s * eO^p.η * S1
+		sO_new = solve_s_bisection(Ks, p.ϕ)
+
+		s_err = abs(sO_new - sO)
+		e_err = abs(eO_new - eO)
+		π_err = abs(π1_new - π1)
+
+		sO = 0.6 * sO + 0.4 * sO_new
+		eO = 0.6 * eO + 0.4 * eO_new
 		π1 = 0.6 * π1 + 0.4 * π1_new
+
+		if max(s_err, e_err, π_err) < 1e-8
+			inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
+			πmat = (π1, 1.0 - π1)
+			C1 = A1 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 1)
+			C2 = A2 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 2)
+			return (inc, πmat, h, eO, w, (C1, C2), sO)
+		end
 	end
-	inc = -1e12
+	h_base = Q * aO^p.α * sO^p.ϕ
+	h = h_base * eO^p.η
+	w = A_occ * h
+	A1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * eO
+	A2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * eO
+	logC1, _ = expected_child_terms(p, grids, eqm, k, 1, A1)
+	logC2, _ = expected_child_terms(p, grids, eqm, k, 2, A2)
+	u1 = p.μ * logC1 + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
+	u2 = p.μ * logC2 + p.B[2] - p.τmove[l_birth, 2] + p.λ * child_logh[k, 2]
+	inc = p.σν * logsumexp2(u1 / p.σν, u2 / p.σν)
 	πmat = (π1, 1.0 - π1)
-	return (inc, πmat, NaN, NaN, NaN, (NaN, NaN))
+	C1 = A1 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 1)
+	C2 = A2 - p.ε_parent * expected_child_cost(p, grids, eqm, k, 2)
+	return (inc, πmat, h, eO, w, (C1, C2), sO)
 end
 
 """Invert U_O(epsO) to find threshold epsO such that U_O = U_T, assuming monotone U_O."""
-function invert_threshold(epsO_nodes::Vector{Float64}, UO::Vector{Float64}, UT::Float64)
+function invert_threshold(epsO_nodes::AbstractVector{Float64}, UO::AbstractVector{Float64}, UT::Float64)
 	n = length(epsO_nodes)
 	if UT <= UO[1]
 		return epsO_nodes[1] - 1e-12
@@ -344,7 +549,7 @@ function invert_threshold(epsO_nodes::Vector{Float64}, UO::Vector{Float64}, UT::
 end
 
 """Compute deterministic moments for a given (birth location l, z-state k, gender g)."""
-function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64}, child_cost::Matrix{Float64}, l_birth::Int, k::Int, gsym::Symbol)
+function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64}, l_birth::Int, k::Int, gsym::Symbol)
 	Ne = p.Neps
 	eps = grids.eps_nodes
 	w = grids.eps_w
@@ -360,8 +565,8 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 	hpowT = Vector{Float64}(undef, Ne) # h^{β/σ}
 
 	@inbounds for i in 1:Ne
-		inc, π, h, e, (w1, w2), _ = solve_T(p, grids, eqm, child_logh, child_cost, l_birth, k, gsym, eps[i])
-		UT[i] = log(1.0 - s_T_const(p)) + inc
+		inc, π, h, e, (w1, w2), _, sT = solve_T(p, grids, eqm, child_logh, l_birth, k, gsym, eps[i])
+		UT[i] = log(max(1.0 - sT, 1e-12)) + inc
 		loghT[i] = log(max(h, 1e-300))
 		costT[i] = (1.0 + 0.0) * e
 		πT[i, 1] = π[1]
@@ -387,8 +592,8 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 		τw_occ = p.τw_O[gsym][iocc]
 		τe_occ = p.τe_O[gsym][iocc]
 		for i in 1:Ne
-			inc, π, h, e, wgross, _ = solve_O(p, grids, eqm, child_logh, child_cost, l_birth, k, gsym, eps[i], iocc)
-			UO[i, iocc] = log(1.0 - s_O_const(p)) + inc
+			inc, π, h, e, wgross, _, sO = solve_O(p, grids, eqm, child_logh, l_birth, k, gsym, eps[i], iocc)
+			UO[i, iocc] = log(max(1.0 - sO, 1e-12)) + inc
 			loghO[i, iocc] = log(max(h, 1e-300))
 			costO[i, iocc] = (1.0 + τe_occ) * e
 			πO[i, iocc, 1] = π[1]
@@ -465,7 +670,7 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 		end
 	end
 
-	return (probT, E_logh, E_cost, mig, Hcontrib, taxbase, wagebill)
+	return (probT, E_logh, E_cost, mig, Hcontrib, taxbase, wagebill, UT, UO_best, costT, costO_best)
 end
 
 function solve_stationary(p::Params)
@@ -488,35 +693,38 @@ function solve_stationary(p::Params)
 	t0 = fill(0.2, p.L)
 	Elogh0 = zeros(p.Nz, p.L, length(p.genders))
 	Ecost0 = zeros(p.Nz, p.L, length(p.genders))
-	eqm = Eqm(m0, M0, H0, t0, Elogh0, Ecost0)
+	UT0 = zeros(p.Nz, p.L, length(p.genders), p.Neps)
+	UO0 = zeros(p.Nz, p.L, length(p.genders), p.Neps)
+	costT0 = zeros(p.Nz, p.L, length(p.genders), p.Neps)
+	costO0 = zeros(p.Nz, p.L, length(p.genders), p.Neps)
+	eqm = Eqm(m0, M0, H0, t0, Elogh0, Ecost0, UT0, UO0, costT0, costO0)
 
 	# main fixed point loop
 	eqm_prev = eqm
 	eqm_prev2 = eqm
 	for it in 1:p.maxit
-		# continuation objects for parents: child expected logh and cost by (parent z k, destination l')
+		# continuation objects for parents: child expected logh by (parent z k, destination l')
 		child_logh = Matrix{Float64}(undef, p.Nz, p.L)
-		child_cost = Matrix{Float64}(undef, p.Nz, p.L)
 		for k in 1:p.Nz
 			for ldest in 1:p.L
 				# average across genders for child
 				elog = 0.0
-				eco = 0.0
 				for kp in 1:p.Nz
 					wkp = grids.Pz[k, kp]
 					elog_kp = 0.5 * (eqm.E_logh[kp, ldest, 1] + eqm.E_logh[kp, ldest, 2])
-					eco_kp = 0.5 * (eqm.E_cost[kp, ldest, 1] + eqm.E_cost[kp, ldest, 2])
 					elog += wkp * elog_kp
-					eco += wkp * eco_kp
 				end
 				child_logh[k, ldest] = elog
-				child_cost[k, ldest] = eco
 			end
 		end
 
 		# compute new E objects and aggregation moments
 		Elogh_new = similar(eqm.E_logh)
 		Ecost_new = similar(eqm.E_cost)
+		UT_new = similar(eqm.UT)
+		UO_new = similar(eqm.UO_best)
+		costT_new = similar(eqm.costT)
+		costO_new = similar(eqm.costO_best)
 		barπ = Array{Float64,3}(undef, p.L, p.Nz, p.L)       # [l_birth,k,dest]
 		mig_prob = Array{Float64,4}(undef, p.L, p.Nz, length(p.genders), p.L) # [l,k,g,dest]
 		Hcontrib = Array{Float64,4}(undef, p.L, p.Nz, length(p.genders), p.L) # [l,k,g,dest]
@@ -527,9 +735,13 @@ function solve_stationary(p::Params)
 			for k in 1:p.Nz
 				# gender-specific moments
 				for (ig, gsym) in enumerate(p.genders)
-					probT, elog, eco, mig, Hc, tb, wb = state_moments(p, grids, eqm, child_logh, child_cost, l, k, gsym)
+					probT, elog, eco, mig, Hc, tb, wb, UT, UO_best, costT, costO_best = state_moments(p, grids, eqm, child_logh, l, k, gsym)
 					Elogh_new[k, l, ig] = elog
 					Ecost_new[k, l, ig] = eco
+					UT_new[k, l, ig, :] = UT
+					UO_new[k, l, ig, :] = UO_best
+					costT_new[k, l, ig, :] = costT
+					costO_new[k, l, ig, :] = costO_best
 					mig_prob[l, k, ig, 1] = mig[1]
 					mig_prob[l, k, ig, 2] = mig[2]
 					Hcontrib[l, k, ig, 1] = Hc[1]
@@ -611,13 +823,18 @@ function solve_stationary(p::Params)
 		Ecost_upd = (1 - p.damp_E) .* eqm.E_cost .+ p.damp_E .* Ecost_new
 		M_upd = (1 - p.damp_m) .* eqm.M .+ p.damp_m .* M_new
 
+		UT_upd = UT_new
+		UO_upd = UO_new
+		costT_upd = costT_new
+		costO_upd = costO_new
+
 		# convergence check
 		err_m = maximum(abs.(m_upd .- eqm.m_young))
 		err_H = maximum(abs.(H_upd .- eqm.Htilde) ./ max.(abs.(eqm.Htilde), 1e-8))
 		err_t = maximum(abs.(t_upd .- eqm.t))
 		err = max(err_m, err_H, err_t)
 
-		eqm_new = Eqm(m_upd, M_upd, H_upd, t_upd, Elogh_upd, Ecost_upd)
+		eqm_new = Eqm(m_upd, M_upd, H_upd, t_upd, Elogh_upd, Ecost_upd, UT_upd, UO_upd, costT_upd, costO_upd)
 
 		if it % 25 == 0
 			println("iter=", it, " err=", err, " M=", eqm_new.M, " t=", eqm_new.t, " H=", eqm_new.Htilde)

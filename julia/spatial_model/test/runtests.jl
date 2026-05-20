@@ -40,7 +40,18 @@ function make_small_params(; τmove = [0.0 0.2; 0.2 0.0], B = [0.0, 0.0], κ = [
     eps_nodes, eps_w = quantile_histogram(eps_dist, p.Neps)
     grids = Grids(xz, z, Pz, eps_nodes, eps_w)
     m = fill(1.0 / (p.L * p.Nz), p.L, p.Nz)
-    eqm = Eqm(m, [1.0, 1.0], [1.0, 1.0], t, zeros(p.Nz, p.L, 2), zeros(p.Nz, p.L, 2))
+    eqm = Eqm(
+        m,
+        [1.0, 1.0],
+        [1.0, 1.0],
+        t,
+        zeros(p.Nz, p.L, 2),
+        zeros(p.Nz, p.L, 2),
+        zeros(p.Nz, p.L, 2, p.Neps),
+        zeros(p.Nz, p.L, 2, p.Neps),
+        zeros(p.Nz, p.L, 2, p.Neps),
+        zeros(p.Nz, p.L, 2, p.Neps),
+    )
     return p, grids, eqm
 end
 
@@ -84,27 +95,27 @@ end
     child_cost = zeros(p.Nz, p.L)
     k = 2
 
-    _, πO, hO, eO, _, _ = solve_O(p, grids, eqm, child_logh, child_cost, 1, k, :f, grids.eps_nodes[3], 1)
+    _, πO, hO, eO, _, _, _ = solve_O(p, grids, eqm, child_logh, 1, k, :f, grids.eps_nodes[3], 1)
     @test πO[1] + πO[2] ≈ 1.0 atol = 1e-10
     @test 0.0 <= πO[1] <= 1.0
     @test hO > 0.0
     @test eO > 0.0
 
-    _, _, hO_low, _, _, _ = solve_O(p, grids, eqm, child_logh, child_cost, 1, k, :f, grids.eps_nodes[3], argmin(p.A_O))
+    _, _, hO_low, _, _, _, _ = solve_O(p, grids, eqm, child_logh, 1, k, :f, grids.eps_nodes[3], argmin(p.A_O))
     @test hO > hO_low
 
-    _, πT, hT, eT, _, _ = solve_T(p, grids, eqm, child_logh, child_cost, 1, k, :m, grids.eps_nodes[3])
+    _, πT, hT, eT, _, _, _ = solve_T(p, grids, eqm, child_logh, 1, k, :m, grids.eps_nodes[3])
     @test πT[1] + πT[2] ≈ 1.0 atol = 1e-10
     @test 0.0 <= πT[1] <= 1.0
     @test hT > 0.0
     @test eT > 0.0
 
     p_sym, grids_sym, eqm_sym = make_small_params(τmove = [0.0 0.0; 0.0 0.0], B = [0.0, 0.0], κ = [1.0, 1.0], t = [0.2, 0.2])
-    _, π_sym, _, _, _, _ = solve_O(p_sym, grids_sym, eqm_sym, child_logh, child_cost, 1, k, :m, grids_sym.eps_nodes[3], 1)
+    _, π_sym, _, _, _, _, _ = solve_O(p_sym, grids_sym, eqm_sym, child_logh, 1, k, :m, grids_sym.eps_nodes[3], 1)
     @test π_sym[1] ≈ 0.5 atol = 1e-6
 
     p_sticky, grids_sticky, eqm_sticky = make_small_params(τmove = [0.0 8.0; 8.0 0.0], B = [0.0, 0.0], κ = [1.0, 1.0], t = [0.2, 0.2])
-    _, π_sticky, _, _, _, _ = solve_O(p_sticky, grids_sticky, eqm_sticky, child_logh, child_cost, 1, k, :m, grids_sticky.eps_nodes[3], 1)
+    _, π_sticky, _, _, _, _, _ = solve_O(p_sticky, grids_sticky, eqm_sticky, child_logh, 1, k, :m, grids_sticky.eps_nodes[3], 1)
     @test π_sticky[1] > 0.999
 end
 
@@ -163,7 +174,7 @@ end
     W = zeros(p.L)
     H = zeros(p.L)
     for l0 in 1:p.L, k in 1:p.Nz, (ig, gsym) in enumerate(p.genders)
-        _, _, _, mig, Hc, tb, wb = state_moments(p, grids, eqm, child_logh, child_cost, l0, k, gsym)
+        _, _, _, mig, Hc, tb, wb, _, _, _, _ = state_moments(p, grids, eqm, child_logh, l0, k, gsym)
         @test mig[1] + mig[2] ≈ 1.0 atol = 1e-8
         @test (0.0 <= mig[1] <= 1.0) && (0.0 <= mig[2] <= 1.0)
         wgt = 0.5 * eqm.m_young[l0, k]
