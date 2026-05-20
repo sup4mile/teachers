@@ -5,6 +5,7 @@ using Test
 include(joinpath(@__DIR__, "..", "spatial.jl"))
 
 function make_small_params(; τmove = [0.0 0.2; 0.2 0.0], B = [0.0, 0.0], κ = [1.0, 1.05], t = [0.2, 0.25])
+    A_O = [1.1, 0.95, 1.05]
     p = Params(
         2,
         [:f, :m],
@@ -16,9 +17,9 @@ function make_small_params(; τmove = [0.0 0.2; 0.2 0.0], B = [0.0, 0.0], κ = [
         0.4,   # ϕ
         0.9,   # γ
         κ,
-        1.1,   # A_O
-        Dict(:f => 0.1, :m => 0.0),
-        Dict(:f => 0.05, :m => 0.0),
+        A_O,
+        Dict(:f => [0.1, 0.05, 0.0], :m => [0.0, 0.0, 0.0]),
+        Dict(:f => [0.05, 0.02, 0.0], :m => [0.0, 0.0, 0.0]),
         0.2,   # ε_parent
         0.1,   # λ
         B,
@@ -83,11 +84,14 @@ end
     child_cost = zeros(p.Nz, p.L)
     k = 2
 
-    _, πO, hO, eO, _, _ = solve_O(p, grids, eqm, child_logh, child_cost, 1, k, :f, grids.eps_nodes[3])
+    _, πO, hO, eO, _, _ = solve_O(p, grids, eqm, child_logh, child_cost, 1, k, :f, grids.eps_nodes[3], 1)
     @test πO[1] + πO[2] ≈ 1.0 atol = 1e-10
     @test 0.0 <= πO[1] <= 1.0
     @test hO > 0.0
     @test eO > 0.0
+
+    _, _, hO_low, _, _, _ = solve_O(p, grids, eqm, child_logh, child_cost, 1, k, :f, grids.eps_nodes[3], argmin(p.A_O))
+    @test hO > hO_low
 
     _, πT, hT, eT, _, _ = solve_T(p, grids, eqm, child_logh, child_cost, 1, k, :m, grids.eps_nodes[3])
     @test πT[1] + πT[2] ≈ 1.0 atol = 1e-10
@@ -96,11 +100,11 @@ end
     @test eT > 0.0
 
     p_sym, grids_sym, eqm_sym = make_small_params(τmove = [0.0 0.0; 0.0 0.0], B = [0.0, 0.0], κ = [1.0, 1.0], t = [0.2, 0.2])
-    _, π_sym, _, _, _, _ = solve_O(p_sym, grids_sym, eqm_sym, child_logh, child_cost, 1, k, :m, grids_sym.eps_nodes[3])
+    _, π_sym, _, _, _, _ = solve_O(p_sym, grids_sym, eqm_sym, child_logh, child_cost, 1, k, :m, grids_sym.eps_nodes[3], 1)
     @test π_sym[1] ≈ 0.5 atol = 1e-6
 
     p_sticky, grids_sticky, eqm_sticky = make_small_params(τmove = [0.0 8.0; 8.0 0.0], B = [0.0, 0.0], κ = [1.0, 1.0], t = [0.2, 0.2])
-    _, π_sticky, _, _, _, _ = solve_O(p_sticky, grids_sticky, eqm_sticky, child_logh, child_cost, 1, k, :m, grids_sticky.eps_nodes[3])
+    _, π_sticky, _, _, _, _ = solve_O(p_sticky, grids_sticky, eqm_sticky, child_logh, child_cost, 1, k, :m, grids_sticky.eps_nodes[3], 1)
     @test π_sticky[1] > 0.999
 end
 
@@ -120,9 +124,9 @@ end
         Float64(d["ϕ"]),
         Float64(d["γ"]),
         [κ0, 1.03 * κ0],
-        mean(Vector{Float64}(d["a_by_occ"])),
-        Dict(:f => mean(τw[:, 1]), :m => mean(τw[:, 2])),
-        Dict(:f => mean(τe[:, 1]), :m => mean(τe[:, 2])),
+        Vector{Float64}(d["a_by_occ"]),
+        Dict(:f => Vector{Float64}(τw[:, 1]), :m => Vector{Float64}(τw[:, 2])),
+        Dict(:f => Vector{Float64}(τe[:, 1]), :m => Vector{Float64}(τe[:, 2])),
         0.2,
         0.1,
         [0.0, 0.0],
@@ -137,6 +141,9 @@ end
         1e-4,
         500
     )
+    @test n_nonteach_occupations(p) == size(τw, 1)
+    @test length(p.τw_O[:f]) == n_nonteach_occupations(p)
+    @test length(p.τe_O[:m]) == n_nonteach_occupations(p)
 
     eqm, grids = solve_stationary(p)
 

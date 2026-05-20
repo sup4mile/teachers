@@ -1,6 +1,3 @@
-
-#!/usr/bin/env julia
-
 using LinearAlgebra
 using Statistics
 using Distributions
@@ -158,9 +155,9 @@ struct Params
 	ϕ::Float64
 	γ::Float64
 	κ::Vector{Float64}              # κ_l for teaching wages
-	A_O::Float64                    # non-teaching composite productivity
-	τw_O::Dict{Symbol, Float64}     # labor wedge in O by gender
-	τe_O::Dict{Symbol, Float64}     # education barrier in O by gender
+	A_O::Vector{Float64}            # non-teaching productivities by occupation
+	τw_O::Dict{Symbol, Vector{Float64}} # labor wedges in O by gender and occupation
+	τe_O::Dict{Symbol, Vector{Float64}} # education barriers in O by gender and occupation
 	ε_parent::Float64               # parent finance share
 	λ::Float64                      # altruism
 	B::Vector{Float64}              # amenities
@@ -177,6 +174,19 @@ struct Params
 	damp_E::Float64
 	tol::Float64
 	maxit::Int
+end
+
+@inline n_nonteach_occupations(p::Params) = length(p.A_O)
+
+function validate_occupation_primitives(p::Params)
+	n_occ = n_nonteach_occupations(p)
+	for gsym in p.genders
+		@assert haskey(p.τw_O, gsym) "Missing τw_O entry for gender $(gsym)"
+		@assert haskey(p.τe_O, gsym) "Missing τe_O entry for gender $(gsym)"
+		@assert length(p.τw_O[gsym]) == n_occ "τw_O[$(gsym)] must have length $(n_occ)"
+		@assert length(p.τe_O[gsym]) == n_occ "τe_O[$(gsym)] must have length $(n_occ)"
+	end
+	return nothing
 end
 
 struct Grids
@@ -262,22 +272,34 @@ function solve_T(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64},
 end
 
 """Solve location choice fixed point for occupation O (non-teaching)."""
-function solve_O(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64}, child_cost::Matrix{Float64}, l_birth::Int, k::Int, gsym::Symbol, epsO::Float64)
+function solve_O(
+	p::Params,
+	grids::Grids,
+	eqm::Eqm,
+	child_logh::Matrix{Float64},
+	child_cost::Matrix{Float64},
+	l_birth::Int,
+	k::Int,
+	gsym::Symbol,
+	epsO::Float64,
+	occ_idx::Int,
+)
 	π1 = 0.5
 	sO = s_O_const(p)
 	Q = Q_l(p, eqm.Htilde[l_birth], eqm.M[l_birth])
 	aO = grids.z[k] * epsO
-	τw = p.τw_O[gsym]
-	τe = p.τe_O[gsym]
+	A_occ = p.A_O[occ_idx]
+	τw = p.τw_O[gsym][occ_idx]
+	τe = p.τe_O[gsym][occ_idx]
 
 	for _ in 1:200
 		π = (π1, 1.0 - π1)
 		taxeff = π[1] * (1.0 - eqm.t[1]) + π[2] * (1.0 - eqm.t[2])
 		taxeff = max(taxeff, 1e-12)
-		scale = taxeff * (1.0 - τw) / (1.0 + τe) * p.A_O
+		scale = taxeff * (1.0 - τw) / (1.0 + τe) * A_occ
 		h = (p.η^p.η * scale^p.η * aO^p.α * sO^p.ϕ * Q)^(1.0 / (1.0 - p.η))
 		e = p.η * scale * h
-		w = p.A_O * h
+		w = A_occ * h
 		C1 = (1.0 - eqm.t[1]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 1]
 		C2 = (1.0 - eqm.t[2]) * (1.0 - τw) * w - (1.0 - p.ε_parent) * (1.0 + τe) * e - p.ε_parent * child_cost[k, 2]
 		u1 = (C1 > 1e-12 ? p.μ * log(C1) : -1e12) + p.B[1] - p.τmove[l_birth, 1] + p.λ * child_logh[k, 1]
@@ -353,30 +375,56 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 		hpowT[i] = h^(p.β / p.σ)
 	end
 
-	# Solve O side over eps_O nodes
-	UO = Vector{Float64}(undef, Ne)
-	loghO = Vector{Float64}(undef, Ne)
-	costO = Vector{Float64}(undef, Ne)
-	πO = Matrix{Float64}(undef, Ne, 2)
-	taxableO = Matrix{Float64}(undef, Ne, 2)
+	# Solve O side over eps_O nodes and all non-teaching occupations.
+	n_occ = n_nonteach_occupations(p)
+	UO = Matrix{Float64}(undef, Ne, n_occ)
+	loghO = Matrix{Float64}(undef, Ne, n_occ)
+	costO = Matrix{Float64}(undef, Ne, n_occ)
+	πO = Array{Float64}(undef, Ne, n_occ, 2)
+	taxableO = Array{Float64}(undef, Ne, n_occ, 2)
 
-	τw = p.τw_O[gsym]
-	@inbounds for i in 1:Ne
-		inc, π, h, e, wgross, _ = solve_O(p, grids, eqm, child_logh, child_cost, l_birth, k, gsym, eps[i])
-		UO[i] = log(1.0 - s_O_const(p)) + inc
-		loghO[i] = log(max(h, 1e-300))
-		costO[i] = (1.0 + p.τe_O[gsym]) * e
-		πO[i, 1] = π[1]
-		πO[i, 2] = π[2]
-		taxableO[i, 1] = (1.0 - τw) * wgross
-		taxableO[i, 2] = (1.0 - τw) * wgross
+	@inbounds for iocc in 1:n_occ
+		τw_occ = p.τw_O[gsym][iocc]
+		τe_occ = p.τe_O[gsym][iocc]
+		for i in 1:Ne
+			inc, π, h, e, wgross, _ = solve_O(p, grids, eqm, child_logh, child_cost, l_birth, k, gsym, eps[i], iocc)
+			UO[i, iocc] = log(1.0 - s_O_const(p)) + inc
+			loghO[i, iocc] = log(max(h, 1e-300))
+			costO[i, iocc] = (1.0 + τe_occ) * e
+			πO[i, iocc, 1] = π[1]
+			πO[i, iocc, 2] = π[2]
+			taxableO[i, iocc, 1] = (1.0 - τw_occ) * wgross
+			taxableO[i, iocc, 2] = (1.0 - τw_occ) * wgross
+		end
 	end
 
-	# Ensure monotonicity for inversion (small numerical noise may violate)
-	# Sort by eps (already sorted). Smooth UO to be nondecreasing.
+	# Collapse to best non-teaching option at each eps node.
+	UO_best = Vector{Float64}(undef, Ne)
+	loghO_best = Vector{Float64}(undef, Ne)
+	costO_best = Vector{Float64}(undef, Ne)
+	πO_best = Matrix{Float64}(undef, Ne, 2)
+	taxableO_best = Matrix{Float64}(undef, Ne, 2)
+	@inbounds for i in 1:Ne
+		jstar = argmax(@view UO[i, :])
+		UO_best[i] = UO[i, jstar]
+		loghO_best[i] = loghO[i, jstar]
+		costO_best[i] = costO[i, jstar]
+		πO_best[i, 1] = πO[i, jstar, 1]
+		πO_best[i, 2] = πO[i, jstar, 2]
+		taxableO_best[i, 1] = taxableO[i, jstar, 1]
+		taxableO_best[i, 2] = taxableO[i, jstar, 2]
+	end
+
+	# Ensure monotonicity for inversion (small numerical noise may violate).
 	@inbounds for i in 2:Ne
-		if UO[i] < UO[i - 1]
-			UO[i] = UO[i - 1]
+		if UO_best[i] < UO_best[i - 1]
+			UO_best[i] = UO_best[i - 1]
+			loghO_best[i] = loghO_best[i - 1]
+			costO_best[i] = costO_best[i - 1]
+			πO_best[i, 1] = πO_best[i - 1, 1]
+			πO_best[i, 2] = πO_best[i - 1, 2]
+			taxableO_best[i, 1] = taxableO_best[i - 1, 1]
+			taxableO_best[i, 2] = taxableO_best[i - 1, 2]
 		end
 	end
 
@@ -390,7 +438,7 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 	wagebill = (0.0, 0.0)
 
 	@inbounds for i in 1:Ne
-		thr = invert_threshold(eps, UO, UT[i])
+		thr = invert_threshold(eps, UO_best, UT[i])
 		pT = hist_cdf(eps, w, thr)
 		probT += w[i] * pT
 
@@ -406,10 +454,10 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 		# non-teaching part (conditional epsO > thr)
 		wo = w[i] * (1.0 - pT)
 		if wo > 0
-			loghO_gt = hist_cond_gt(eps, w, loghO, thr)
-			costO_gt = hist_cond_gt(eps, w, costO, thr)
-			πO1_gt, πO2_gt = hist_cond_gt2(eps, w, πO, thr)
-			tax1_gt, tax2_gt = hist_cond_gt2(eps, w, taxableO, thr)
+			loghO_gt = hist_cond_gt(eps, w, loghO_best, thr)
+			costO_gt = hist_cond_gt(eps, w, costO_best, thr)
+			πO1_gt, πO2_gt = hist_cond_gt2(eps, w, πO_best, thr)
+			tax1_gt, tax2_gt = hist_cond_gt2(eps, w, taxableO_best, thr)
 			E_logh += wo * loghO_gt
 			E_cost += wo * costO_gt
 			mig = (mig[1] + wo * πO1_gt, mig[2] + wo * πO2_gt)
@@ -421,6 +469,7 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 end
 
 function solve_stationary(p::Params)
+	validate_occupation_primitives(p)
 	xz, Pz = tauchen(p.Nz, p.ρz, p.σξ)
 	zgrid = exp.(xz)
 	eps_dist = LogNormal(-0.5 * p.σeps^2, p.σeps) # mean 1
@@ -645,17 +694,13 @@ function main()
 	κ = [κ0, 1.05 * κ0]  # location-specific scale
 
 	a_by_occ = Vector{Float64}(d["a_by_occ"])
-	A_O = mean(a_by_occ)  # composite non-teaching productivity (simple v1)
+	A_O = copy(a_by_occ)
 
 	τ_w = Array{Float64}(d["τ_w"])
 	τ_e = Array{Float64}(d["τ_e"])
-	# τ_* dimensions: (nOccNonTeach, nG). We collapse to one composite by simple mean.
-	τw_f = mean(τ_w[:, 1])
-	τw_m = mean(τ_w[:, 2])
-	τe_f = mean(τ_e[:, 1])
-	τe_m = mean(τ_e[:, 2])
-	τw_O = Dict(:f => τw_f, :m => τw_m)
-	τe_O = Dict(:f => τe_f, :m => τe_m)
+	# τ_* dimensions: (nOccNonTeach, nG), kept at full occupation detail.
+	τw_O = Dict(:f => Vector{Float64}(τ_w[:, 1]), :m => Vector{Float64}(τ_w[:, 2]))
+	τe_O = Dict(:f => Vector{Float64}(τ_e[:, 1]), :m => Vector{Float64}(τ_e[:, 2]))
 
 	p = Params(
 		2,
@@ -709,4 +754,3 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
 	main()
 end
-
