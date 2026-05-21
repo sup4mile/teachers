@@ -19,7 +19,7 @@ The economy is populated by overlapping generations of finite-lived agents (youn
 
 Each cohort's life cycle proceeds in three stages.
 
-**Stage 1 — Young.** Born in location $l$ (chosen by the parent in Stage 2 of the previous cohort), with persistent ability $z$ inherited from the parent. Conditional on $l$ and $z$:
+**Stage 1 — Young.** Born in location $l$ (chosen by the parent in Stage 2 of the previous cohort), with persistent ability $z$ inherited from the parent. Given $l$ and $z$:
 
 1. The vector of occupation-specific idiosyncratic shocks $\vec\epsilon = (\epsilon_1,\ldots,\epsilon_I)$ is drawn iid from $F_\epsilon$, giving ability $a_i = z\,\epsilon_i$ in each occupation.
 2. The agent chooses time investment $s_{i,g,l}$ and goods investment $e_{i,g,l}$ in occupation-specific human capital, and selects an occupation $i$.
@@ -85,7 +85,7 @@ For notational convenience define the *teacher-quality shifter* $Q_l \equiv (2\w
 $$
 \omega_{T,l'}(h) \;=\; \kappa_{l'}\,h^{\gamma},
 $$
-with location-specific intercepts $\kappa_{l'}$ and a common elasticity $\gamma$; location-specific tax rates $t_{l'}$ adjust endogenously to satisfy the local balanced-budget condition. A teacher trained in $l$ with human capital $h$ who works in $l'$ earns $\omega_{T,l'}(h)$.
+with location-specific intercepts $\kappa_{l'}$ and a common elasticity $\gamma$; location-specific tax rates $t_{l'}$ adjust endogenously to satisfy the local balanced-budget condition. A teacher trained in $l$ with human capital $h$ who works in $l'$ earns $\omega_{T,l'}(h)$. These specifics are more a question of calibration and are subject to change.
 
 ## 5 Preferences
 
@@ -133,7 +133,7 @@ When young, the agent solves
 $$
 i^*(z,\vec\epsilon; g, l) \;=\; \arg\max_{i \in \{1,\dots,I\}}\; \Big[\ln(1 - s^*_{i,g,l}) + \bar V\!\big(h^*_{i,g,l}(z,\epsilon_i); i, g, l, z\big)\Big],
 $$
-with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Verbose derivations are in Appendix A.2–A.3.)
+with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Verbose derivations are in the appendix)
 
 For non-teaching ($i \neq T$, with $\omega_{i,l'}(h)=A_i h$), the FOCs reduce to:
 
@@ -222,21 +222,21 @@ such that:
 
 1. **(Optimization)** For each $(g,l,z,\vec\epsilon)$, $\big(s_{i,g,l}, e_{i,g,l}\big)$ satisfy the FOCs given $\big(\widetilde{H}_{T,1}, \widetilde{H}_{T,2}, M_1, M_2, t_1, t_2\big)$ and the location-choice probabilities $\pi_{l'\mid l}$. Occupational choice $i^*(z,\vec\epsilon;g,l) = \arg\max_i\big[\ln(1-s_{i,g,l}) + \bar V(h_{i,g,l};i,g,l,z)\big]$.
 
-2. **(Endogenous spatial distribution)** $\Phi_l$ is a stationary fixed point of the law of motion in §8:
+2. **(Endogenous spatial distribution)** $\Phi_l$ is a stationary fixed point of the law of motion:
 $$
 \Phi_l(z') \;=\; \sum_{l_0}\int \pi_z(z'\mid z)\,\bar\pi_{l_0\to l}(z)\,\Phi_{l_0}(dz),
 $$
 and total population $M_l = 2\int\Phi_l(dz)$ is consistent with the row-stochastic migration matrix $[\bar\Pi_{l_0,l'}]$. Young agents are evenly split by gender ($\tfrac{1}{2}$ each) in every location by construction.
 
-3. **(Teacher distribution and aggregates)** $F_{T,l,g}$ is the push-forward described in §8, and
+1. **(Teacher distribution and aggregates)** $F_{T,l,g}$ is the push-forward, and
 $$
 \widetilde{H}_{T,l} \;=\; \sum_g \int h^{\beta/\sigma}\,dF_{T,l,g}(h)
 $$
-coincides with the explicit aggregator in §8 (using policies and $\Phi$).
+coincides with the explicit aggregator (using policies and $\Phi$).
 
-4. **(Class size)** $h^{\beta} N(h)^{-\sigma} = (2\widetilde{H}_{T,l}/M_l)^{\sigma}$ for all teachers in $l$, with $\sum_g\int N\,dF_{T,l,g} = M_l/2$.
+1. **(Class size)** $h^{\beta} N(h)^{-\sigma} = (2\widetilde{H}_{T,l}/M_l)^{\sigma}$ for all teachers in $l$, with $\sum_g\int N\,dF_{T,l,g} = M_l/2$.
 
-5. **(Budget)** Each $t_l$ satisfies the local balanced-budget condition $t_{l}\mathcal{I}_{l}=\mathcal{W}_{l}$.
+2. **(Budget)** Each $t_l$ satisfies the local balanced-budget condition $t_{l}\mathcal{I}_{l}=\mathcal{W}_{l}$.
 
 ---
 
@@ -252,11 +252,10 @@ h \;=\; h_{T,l}^{\beta}\,(z\epsilon_i)^{\alpha}\,s^{\phi}\,e^{\eta}\,N(h_{T,l})^
 $$
 where $N(h_{T,l})$ is the class size the teacher is willing to take. The dependence on $N$ captures congestion in instruction.
 
-**Teacher's indifference condition.** A teacher of human capital $h_{T,l}$ working in $l$ is paid $\omega_{T,l}(h_{T,l})$ regardless of class size, but exerts effort that disutility scales with $N$. In equilibrium, all active teachers in $l$ must be indifferent over choosing different $N$. Standard arguments (see baseline derivation) yield that the locally relevant student-side product $h^{\beta}N(h)^{-\sigma}$ is constant across all $h$ among active teachers in $l$:
+**Teacher's indifference condition.** A teacher of human capital $h_{T,l}$ working in $l$ is paid $\omega_{T,l}(h_{T,l})$ regardless of class size, but exerts effort that disutility scales with $N$. In equilibrium, all active teachers in $l$ must be indifferent over choosing different $N$. We assume that the locally relevant student-side product $h^{\beta}N(h)^{-\sigma}$ is constant across all $h$ among active teachers in $l$:
 $$
 h_{T,l}^{\beta}\,N(h_{T,l})^{-\sigma} \;=\; \mathcal{Q}_l \quad \text{(constant in $l$).} \tag{A.2}
 $$
-This is the indifference condition referenced in §4.
 
 **Pinning down $\mathcal Q_l$ via the class-size resource constraint.** Total student–teacher slots in $l$ must absorb the local young cohort of size $M_l/2$:
 $$
@@ -275,7 +274,7 @@ $$
 $$
 h_{i,g,l}(z,\epsilon_i) \;=\; \big[h_{T,l}^{\beta}N(h_{T,l})^{-\sigma}\big]\,(z\epsilon_i)^{\alpha}\,s_{i,g,l}^{\phi}\,e_{i,g,l}^{\eta} \;=\; Q_l\,(z\epsilon_i)^{\alpha}\,s_{i,g,l}^{\phi}\,e_{i,g,l}^{\eta}, \tag{A.5}
 $$
-matching the boxed expression in §4. The dependence on the specific teacher drops out, because the indifference condition forces $h^{\beta}N^{-\sigma}=Q_l$ for every $h$ in the support of $F_{T,l,g}$.
+matching the expression in section 4. The dependence on the specific teacher drops out, because the indifference condition forces $h^{\beta}N^{-\sigma}=Q_l$ for every $h$ in the support of $F_{T,l,g}$.
 
 ### A.2 FOCs for non-teaching occupations
 
@@ -372,7 +371,7 @@ This matches `s_T_const(p) = μϕγ/((μϕ-η)γ + 1)` in `spatial.jl`. Both con
 
 ### A.5 Stationarity of $\Phi_l$
 
-From §8, $\Phi_{l,t+1}(z') = \sum_{l_0}\int \pi_z(z'\mid z)\,\bar\pi_{l_0\to l}(z)\,\Phi_{l_0,t}(dz)$. Integrating in $z'$ and using $\int\pi_z(z'\mid z)\,dz' = 1$:
+From section 8, $\Phi_{l,t+1}(z') = \sum_{l_0}\int \pi_z(z'\mid z)\,\bar\pi_{l_0\to l}(z)\,\Phi_{l_0,t}(dz)$. Integrating in $z'$ and using $\int\pi_z(z'\mid z)\,dz' = 1$:
 $$
 \int\Phi_{l,t+1}(dz') \;=\; \sum_{l_0}\int \bar\pi_{l_0\to l}(z)\,\Phi_{l_0,t}(dz),
 $$
