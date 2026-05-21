@@ -55,7 +55,7 @@ function hist_cond_gt(nodes::Vector{Float64}, w::Vector{Float64}, x::Vector{Floa
 		end
 	end
 	if den <= 0
-		return NaN
+		return 0.0  # empty conditioning set; caller multiplies by wo ≈ 0
 	end
 	return num / den
 end
@@ -74,7 +74,7 @@ function hist_cond_gt2(nodes::Vector{Float64}, w::Vector{Float64}, x::Matrix{Flo
 		end
 	end
 	if den <= 0
-		return (NaN, NaN)
+		return (0.0, 0.0)  # empty conditioning set; caller multiplies by wo ≈ 0
 	end
 	return (num1 / den, num2 / den)
 end
@@ -95,9 +95,24 @@ function hist_cond_gt2_and_scalar(nodes::Vector{Float64}, w::Vector{Float64}, x2
 		end
 	end
 	if den <= 0
-		return (NaN, NaN, NaN)
+		return (0.0, 0.0, 0.0)  # empty conditioning set; caller multiplies by wo ≈ 0
 	end
 	return (num1 / den, num2 / den, numy / den)
+end
+
+"""Compute Σ_{node > thresh} w[i]*π[i,1]*x[i,1] and Σ w[i]*π[i,2]*x[i,2] as a joint weighted sum.
+Avoids the product-of-conditional-means approximation: returns E_{ε_O}[π_{l'}*taxO_{l'} | ε_O>thresh]*P(ε_O>thresh)."""
+function hist_weighted_sum_gt_joint(nodes::Vector{Float64}, w::Vector{Float64}, π::Matrix{Float64}, x::Matrix{Float64}, thresh::Float64)
+	s1 = 0.0
+	s2 = 0.0
+	@inbounds for i in eachindex(nodes)
+		if nodes[i] > thresh
+			wi = w[i]
+			s1 += wi * π[i, 1] * x[i, 1]
+			s2 += wi * π[i, 2] * x[i, 2]
+		end
+	end
+	return (s1, s2)
 end
 
 """Tauchen discretization of AR(1): x' = ρ x + ε, ε ~ N(0, σ_ε^2). Returns grid x and transition matrix P."""
@@ -158,6 +173,8 @@ struct Params
 	A_O::Vector{Float64}            # non-teaching productivities by occupation
 	τw_O::Dict{Symbol, Vector{Float64}} # labor wedges in O by gender and occupation
 	τe_O::Dict{Symbol, Vector{Float64}} # education barriers in O by gender and occupation
+	τw_T::Dict{Symbol, Float64}         # labor wedge for teaching by gender
+	τe_T::Dict{Symbol, Float64}         # education barrier for teaching by gender
 	ε_parent::Float64               # parent finance share
 	λ::Float64                      # altruism
 	B::Vector{Float64}              # amenities
@@ -185,6 +202,8 @@ function validate_occupation_primitives(p::Params)
 		@assert haskey(p.τe_O, gsym) "Missing τe_O entry for gender $(gsym)"
 		@assert length(p.τw_O[gsym]) == n_occ "τw_O[$(gsym)] must have length $(n_occ)"
 		@assert length(p.τe_O[gsym]) == n_occ "τe_O[$(gsym)] must have length $(n_occ)"
+		@assert haskey(p.τw_T, gsym) "Missing τw_T entry for gender $(gsym)"
+		@assert haskey(p.τe_T, gsym) "Missing τe_T entry for gender $(gsym)"
 	end
 	return nothing
 end
@@ -358,8 +377,8 @@ function solve_T(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Float64},
 	Q = Q_l(p, eqm.Htilde[l_birth], eqm.M[l_birth])
 	aT = grids.z[k] * epsT
 
-	τw = 0.0
-	τe = 0.0
+	τw = p.τw_T[gsym]
+	τe = p.τe_T[gsym]
 
 	for _ in 1:200
 		π = (π1, 1.0 - π1)
@@ -568,13 +587,13 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 		inc, π, h, e, (w1, w2), _, sT = solve_T(p, grids, eqm, child_logh, l_birth, k, gsym, eps[i])
 		UT[i] = log(max(1.0 - sT, 1e-12)) + inc
 		loghT[i] = log(max(h, 1e-300))
-		costT[i] = (1.0 + 0.0) * e
+		costT[i] = (1.0 + p.τe_T[gsym]) * e
 		πT[i, 1] = π[1]
 		πT[i, 2] = π[2]
 		wT[i, 1] = w1
 		wT[i, 2] = w2
-		taxableT[i, 1] = (1.0 - 0.0) * w1
-		taxableT[i, 2] = (1.0 - 0.0) * w2
+		taxableT[i, 1] = (1.0 - p.τw_T[gsym]) * w1
+		taxableT[i, 2] = (1.0 - p.τw_T[gsym]) * w2
 		billT[i, 1] = w1
 		billT[i, 2] = w2
 		hpowT[i] = h^(p.β / p.σ)
@@ -662,11 +681,12 @@ function state_moments(p::Params, grids::Grids, eqm::Eqm, child_logh::Matrix{Flo
 			loghO_gt = hist_cond_gt(eps, w, loghO_best, thr)
 			costO_gt = hist_cond_gt(eps, w, costO_best, thr)
 			πO1_gt, πO2_gt = hist_cond_gt2(eps, w, πO_best, thr)
-			tax1_gt, tax2_gt = hist_cond_gt2(eps, w, taxableO_best, thr)
+			# joint weighted sum Σ_{j>thr} w[j]*π[j,l']*taxO[j,l'] — avoids product-of-means bias
+			tax_joint1, tax_joint2 = hist_weighted_sum_gt_joint(eps, w, πO_best, taxableO_best, thr)
 			E_logh += wo * loghO_gt
 			E_cost += wo * costO_gt
 			mig = (mig[1] + wo * πO1_gt, mig[2] + wo * πO2_gt)
-			taxbase = (taxbase[1] + wo * πO1_gt * tax1_gt, taxbase[2] + wo * πO2_gt * tax2_gt)
+			taxbase = (taxbase[1] + w[i] * tax_joint1, taxbase[2] + w[i] * tax_joint2)
 		end
 	end
 
@@ -918,6 +938,9 @@ function main()
 	# τ_* dimensions: (nOccNonTeach, nG), kept at full occupation detail.
 	τw_O = Dict(:f => Vector{Float64}(τ_w[:, 1]), :m => Vector{Float64}(τ_w[:, 2]))
 	τe_O = Dict(:f => Vector{Float64}(τ_e[:, 1]), :m => Vector{Float64}(τ_e[:, 2]))
+	# Teaching distortions: set to zero unless the calibration provides them.
+	τw_T = Dict(:f => 0.0, :m => 0.0)
+	τe_T = Dict(:f => 0.0, :m => 0.0)
 
 	p = Params(
 		2,
@@ -927,6 +950,8 @@ function main()
 		A_O,
 		τw_O,
 		τe_O,
+		τw_T,
+		τe_T,
 		ε_parent,
 		λ,
 		B,

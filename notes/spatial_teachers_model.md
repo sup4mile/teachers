@@ -395,17 +395,21 @@ A natural outer loop iterates on $\big(\Phi_1,\Phi_2,\widetilde{H}_{T,1},\wideti
 
 ### B.1 Simplifications used in `spatial.jl`
 
-The Julia implementation introduces three numerical simplifications relative to the exact model in the main text. Each is best viewed as a computational expedient; future revisions should test how much they distort the equilibrium.
+The Julia implementation introduces one structural simplification relative to the exact model in the main text. All other aspects of the model are fully and exactly implemented.
 
-1. **Constant time-investment $s$.** The code sets $s_{O,g,l} = \mu\phi/(\mu\phi+1-\eta)$ and $s_{T,g,l} = \mu\phi\gamma/((\mu\phi-\eta)\gamma+1)$ — the closed forms derived in Appendix A.4 — *uniformly across $(z,\vec\epsilon,g,l)$ and ignoring migration*. With $\varepsilon>0$, $\lambda>0$, and $L>1$, the exact (A.8)/(A.12) values of $s$ depend on $(z,\vec\epsilon,g,l)$ through the consumption term; the code's constant-$s$ shortcut suppresses this dependence.
+**Two-draw idiosyncratic shocks.** The model in §3 specifies $I$ i.i.d. draws $(\epsilon_1,\ldots,\epsilon_I)$, one per occupation. Integrating over the full $I$-dimensional joint distribution is computationally expensive. The code instead uses two independent draws: $\epsilon_T \sim F_\epsilon$ for teaching and a single $\epsilon_O \sim F_\epsilon$ applied uniformly to all non-teaching occupations. Within the teaching-vs-non-teaching comparison the threshold method integrates over $(\epsilon_T, \epsilon_O)$ jointly — the outer loop in `state_moments` runs over $\epsilon_T$ nodes, and for each $\epsilon_T$ the function `invert_threshold` finds the $\epsilon_O^*$ such that $U_{O^*}(\epsilon_O^*) = U_T(\epsilon_T)$, so the integral over $(\epsilon_T, \epsilon_O)$ is exact conditional on this two-draw structure. The optimal non-teaching occupation at a given $\epsilon_O$ is $\arg\max_i A_i \cdot h(\epsilon_O)$, which in practice is determined by the occupation-specific productivities $\{A_i\}$ and distortions $\{\tau^\omega_{i,g}\}$ rather than by $\epsilon_O$ itself.
 
-2. **Goods-investment FOC.** The closed-form expression in `solve_O` and `solve_T` for $e$ uses a tax-/discount-aggregated wage $\kappa^{\text{eff}}\equiv\sum_{l'}\pi_{l'\mid l}(1-t_{l'})\kappa_{l'}$ (and analogously a `taxeff` for non-teaching) and *drops* the $(1-\varepsilon)$ factor and the child's education cost from the numerator of the FOC. In effect, the code solves the FOC as if $\varepsilon=0$ and the parent's MRS between her own labor income and goods investment were the only force pinning $e$.
+**The following aspects of the model are fully implemented without simplification:**
 
-3. **Jensen approximation in old-age utility.** The exact utility integrates $\mu\,\mathbb E[\ln C]$ over $(z',\vec\epsilon',g')$. The code instead computes
-$$
-\mu\,\ln\!\Big((1-t_{l'})(1-\tau^\omega)\omega - (1-\varepsilon)(1+\tau^e)e - \varepsilon\,\overline{\text{child\_cost}}_{(l',z)}\Big),
-$$
-where $\overline{\text{child\_cost}}_{(l',z)} = \mathbb E_{z'\mid z}\,\mathbb E_{\vec\epsilon'}\,\mathbb E_{g'}[(1+\tau^e_{i',g'})e'_{i',g',l'}]$ is the *conditional mean* of the child's outlay. The continuation $\lambda f(h')$ is handled analogously, with $f(h')=\log h'$ and $\overline{\log h'}_{(l',z)}$ replacing the integrated $\lambda\,\mathbb E[\log h']$. These substitutions replace $\mathbb E[\log C]$ with $\log(\mathbb E[C])$, which is exact only when the child's cost realization is degenerate (or trivially when $\varepsilon = 0$).
+- **State-dependent time investment $s$.** Both `solve_T` and `solve_O` solve the exact FOCs (A.8) and (A.12) for $s$ via bisection at each $(z,\epsilon,g,l)$ point. The closed-form constants from Appendix A.4 serve only as initial guesses for the bisection; the converged $s$ is fully state-dependent.
+
+- **Goods-investment FOC.** The FOCs (A.7) and (A.11) for $e$ are implemented exactly, including the $(1-\varepsilon)$ factor on the RHS and the child's education costs inside $C$ (through `expected_child_terms`, which integrates $1/C$ over $(z',\epsilon_T',\epsilon_O',g')$ using the threshold method).
+
+- **Expected log utility.** Old-age utility $\mu\,\mathbb E[\ln C]$ is computed by explicit integration over the child's $(\epsilon_T',\epsilon_O')$ draws in `expected_logC_invC`, using the same threshold-histogram method as the occupation-choice aggregation. The Jensen approximation $\mu\ln(\mathbb E[C])$ is not used.
+
+- **Non-teacher taxable income.** The contribution of non-teachers to the tax base in location $l'$ is computed as the joint expectation $\mathbb E_{\epsilon_T,\epsilon_O}[\mathbf 1[\text{choose O}]\cdot\pi_{l'\mid l}(\epsilon_O)\cdot(1-\tau^\omega_O)\,w(\epsilon_O)]$ via `hist_weighted_sum_gt_joint`. This avoids the otherwise tempting product of separately computed conditional means $\mathbb E[\pi_{l'}|\epsilon_O>\epsilon^*]\cdot\mathbb E[\text{taxO}_{l'}|\epsilon_O>\epsilon^*]$, which ignores the positive correlation between $\pi_{l'}$ and taxable wages through $\epsilon_O$.
+
+- **Teaching distortions.** The `Params` struct carries gender-specific labor-market distortion $\tau^\omega_{T,g}$ (`τw_T`) and educational barrier $\tau^e_{T,g}$ (`τe_T`) for teaching. Both enter `solve_T` (consumption and FOCs), `state_moments` (the child's reported cost `costT` and taxable income `taxableT`), and the budget aggregation. In the current baseline calibration they are set to zero for both genders, but the infrastructure is in place to set them non-trivially.
 
 ### B.2 Outer iteration in the code
 
