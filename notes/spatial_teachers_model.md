@@ -79,7 +79,7 @@ where $F_{T,l,g}$ is the (endogenous) cdf of human capital among teachers workin
 $$
 \quad h_{i,g,l}(z,\epsilon_i) \;=\; \left(\frac{2\widetilde{H}_{T,l}}{M_l}\right)^{\sigma}\,(z\,\epsilon_i)^{\alpha}\,s_{i,g,l}^{\phi}\,e_{i,g,l}^{\eta}.\quad
 $$
-For notational convenience define the *teacher-quality shifter* $Q_l \equiv (2\widetilde{H}_{T,l}/M_l)^{\sigma}$.
+For notational convenience define the teacher-quality shifter $Q_l \equiv (2\widetilde{H}_{T,l}/M_l)^{\sigma}$.
 
 **Production.** Non-teaching output is $y_{i,g}=A_i\,h_{i,g,l}$, with $\omega_{i,l'}(h)=A_i h$ for $i\neq T$ — i.e., non-teaching wages depend on training location $l$ only through $h_{i,g,l}$, not on the work location $l'$. Teaching wages $\omega_{T,l'}(h)$ are taken as exogenous primitives in shape (strictly increasing, continuously differentiable). We adopt the parametric form
 $$
@@ -133,7 +133,7 @@ When young, the agent solves
 $$
 i^*(z,\vec\epsilon; g, l) \;=\; \arg\max_{i \in \{1,\dots,I\}}\; \Big[\ln(1 - s^*_{i,g,l}) + \bar V\!\big(h^*_{i,g,l}(z,\epsilon_i); i, g, l, z\big)\Big],
 $$
-with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Verbose derivations are in the appendix)
+with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Derivations are in the appendix)
 
 For non-teaching ($i \neq T$, with $\omega_{i,l'}(h)=A_i h$), the FOCs reduce to:
 
@@ -360,14 +360,13 @@ $$
 \frac{1}{1-s} \;=\; \frac{\mu\phi}{s(1-\eta)} \quad\Longrightarrow\quad s\,(1-\eta) \;=\; \mu\phi\,(1-s) \quad\Longrightarrow\quad
 \boxed{\;s_O^{*} \;=\; \frac{\mu\phi}{\mu\phi + 1 - \eta}.\;}
 $$
-This matches `s_O_const(p) = μϕ/(μϕ + 1 - η)` in `spatial.jl`.
 
 For teaching with $\omega_T(h)=\kappa h^{\gamma}$, the analogous algebra gives $(1-t)(1-\tau^\omega)\kappa h^\gamma / C = 1/(1-\gamma\eta)$ and
 $$
 \frac{1}{1-s} \;=\; \frac{\mu\phi\gamma}{s(1-\gamma\eta)} \quad\Longrightarrow\quad
 \boxed{\;s_T^{*} \;=\; \frac{\mu\phi\gamma}{(\mu\phi-\eta)\gamma + 1}.\;}
 $$
-This matches `s_T_const(p) = μϕγ/((μϕ-η)γ + 1)` in `spatial.jl`. Both constants are independent of $(z,\vec\epsilon,l)$ in this limit; with migration, altruism, and parental finance, the full FOCs are needed.
+Both constants are independent of $(z,\vec\epsilon,l)$ in this limit; with migration, altruism, and parental finance, the full FOCs are needed.
 
 ### A.5 Stationarity of $\Phi_l$
 
@@ -377,39 +376,5 @@ $$
 $$
 which gives the population law $M_{l,t+1} = \sum_{l_0}M_{l_0,t}\bar\Pi_{l_0,l,t}$ via $M_l = 2\int\Phi_l$. In a stationary equilibrium the joint mass $\Phi_l(\cdot)$ is the dominant left eigenfunction (eigenvalue 1) of the joint kernel $K_{(l_0,z)\to(l,z')} = \pi_z(z'\mid z)\,\bar\pi_{l_0\to l}(z)$ on $\{1,\ldots,L\}\times\mathbb{R}_+$.
 
----
 
-## Appendix B — Computational Notes
 
-I don't believe we recover closed-form analogues of baseline Proposition 2 (that occupational choice does not depend on aggregate teacher human capital $\widetilde H$) because teaching wages depend on the work location $l'$ rather than the training location $l$, so the prospective teacher's expected return is a $\pi_{l'\mid l}$-weighted average across locations rather than a single-location expression; and altruism plus the $\varepsilon$-share of child education couples the parent's consumption to the child's optimal $e'_{i'(z',\vec\epsilon',l',g'),g',l'}(z',\epsilon'_{i'})$, which is itself the solution of a problem in the child's location $l'$ with aggregates $(\widetilde{H}_{T,l'}, M_{l'}, t_{l'})$.
-
-Coding the model amounts to four nested fixed points:
-
-- **Inner:** for each $(z,\vec\epsilon, g, l, i)$, jointly solve the FOCs and the choice probabilities for $(s_{i,g,l}, e_{i,g,l}, \pi_{l'\mid l})$ given aggregates and the child's policy.
-- **Child consistency:** the child's policy $\big(s'_{i',g',l'}, e'_{i',g',l'}\big)$ entering $C(l',z',\vec\epsilon',g' \mid i,g,l,z,\vec\epsilon)$ must coincide with the equilibrium policy of a gender-$g'$ agent in stationary equilibrium, for each $g' \in \{m,f\}$.
-- **Aggregation:** integrate individual policies against the *endogenous* joint mass $\Phi_{l}$ on the birth-location side and the *exogenous* iid $\epsilon$ distribution to compute $\widetilde{H}_{T,l}$, $M_l$, and gender shares.
-- **Budget:** find $t_l$ satisfying local budget for each $l$.
-
-A natural outer loop iterates on $\big(\Phi_1,\Phi_2,\widetilde{H}_{T,1},\widetilde{H}_{T,2},M_1,M_2,t_1,t_2\big)$ until all flow, aggregation, and budget equations balance. In `julia/spatial_model/spatial.jl` the joint mass $\Phi_l$ is represented as the matrix `m_young[l, k]`, a discrete approximation indexed by location and Tauchen node for $z$.
-
-### B.1 Simplifications used in `spatial.jl`
-
-The Julia implementation introduces one structural simplification relative to the exact model in the main text. All other aspects of the model are fully and exactly implemented.
-
-**Two-draw idiosyncratic shocks.** The model in §3 specifies $I$ i.i.d. draws $(\epsilon_1,\ldots,\epsilon_I)$, one per occupation. Integrating over the full $I$-dimensional joint distribution is computationally expensive. The code instead uses two independent draws: $\epsilon_T \sim F_\epsilon$ for teaching and a single $\epsilon_O \sim F_\epsilon$ applied uniformly to all non-teaching occupations. Within the teaching-vs-non-teaching comparison the threshold method integrates over $(\epsilon_T, \epsilon_O)$ jointly — the outer loop in `state_moments` runs over $\epsilon_T$ nodes, and for each $\epsilon_T$ the function `invert_threshold` finds the $\epsilon_O^*$ such that $U_{O^*}(\epsilon_O^*) = U_T(\epsilon_T)$, so the integral over $(\epsilon_T, \epsilon_O)$ is exact conditional on this two-draw structure. The optimal non-teaching occupation at a given $\epsilon_O$ is $\arg\max_i A_i \cdot h(\epsilon_O)$, which in practice is determined by the occupation-specific productivities $\{A_i\}$ and distortions $\{\tau^\omega_{i,g}\}$ rather than by $\epsilon_O$ itself.
-
-**The following aspects of the model are fully implemented without simplification:**
-
-- **State-dependent time investment $s$.** Both `solve_T` and `solve_O` solve the exact FOCs (A.8) and (A.12) for $s$ via bisection at each $(z,\epsilon,g,l)$ point. The closed-form constants from Appendix A.4 serve only as initial guesses for the bisection; the converged $s$ is fully state-dependent.
-
-- **Goods-investment FOC.** The FOCs (A.7) and (A.11) for $e$ are implemented exactly, including the $(1-\varepsilon)$ factor on the RHS and the child's education costs inside $C$ (through `expected_child_terms`, which integrates $1/C$ over $(z',\epsilon_T',\epsilon_O',g')$ using the threshold method).
-
-- **Expected log utility.** Old-age utility $\mu\,\mathbb E[\ln C]$ is computed by explicit integration over the child's $(\epsilon_T',\epsilon_O')$ draws in `expected_logC_invC`, using the same threshold-histogram method as the occupation-choice aggregation. The Jensen approximation $\mu\ln(\mathbb E[C])$ is not used.
-
-- **Non-teacher taxable income.** The contribution of non-teachers to the tax base in location $l'$ is computed as the joint expectation $\mathbb E_{\epsilon_T,\epsilon_O}[\mathbf 1[\text{choose O}]\cdot\pi_{l'\mid l}(\epsilon_O)\cdot(1-\tau^\omega_O)\,w(\epsilon_O)]$ via `hist_weighted_sum_gt_joint`. This avoids the otherwise tempting product of separately computed conditional means $\mathbb E[\pi_{l'}|\epsilon_O>\epsilon^*]\cdot\mathbb E[\text{taxO}_{l'}|\epsilon_O>\epsilon^*]$, which ignores the positive correlation between $\pi_{l'}$ and taxable wages through $\epsilon_O$.
-
-- **Teaching distortions.** The `Params` struct carries gender-specific labor-market distortion $\tau^\omega_{T,g}$ (`τw_T`) and educational barrier $\tau^e_{T,g}$ (`τe_T`) for teaching. Both enter `solve_T` (consumption and FOCs), `state_moments` (the child's reported cost `costT` and taxable income `taxableT`), and the budget aggregation. In the current baseline calibration they are set to zero for both genders, but the infrastructure is in place to set them non-trivially.
-
-### B.2 Outer iteration in the code
-
-The outer loop in `solve_stationary` damps updates of $(m_{\text{young}}, M, \widetilde H, t, E[\log h], E[\text{cost}])$ separately, with damping weights `damp_m, damp_H, damp_t, damp_E`. A period-2 cycle detector is included: if the iterates revisit the same point every two steps (a common pathology of threshold/histogram maps), the average of the two phases is returned. The convergence criterion is a sup-norm error across $m_{\text{young}}$, $\widetilde H$, and $t$.
