@@ -27,7 +27,7 @@ using Optim
 # -----------------------------------------------------------------------------
 Base.@kwdef struct Params
     T::Int = 1                                   # index of the teaching occupation
-    A::Vector{Float64} = [NaN, 1.0]              # non-teaching productivity (A[T] unused)
+    A::Vector{Float64} = [NaN, 1.25]              # non-teaching productivity (A[T] unused)
     # Reduced-form schooling tech: h = Q_l (zϵ)^α s^φ e^η ,  Q_l = (2 H̃_T/M)^σ
     α::Float64 = 0.30                            # ability elasticity
     φ::Float64 = 0.40                            # time-investment elasticity
@@ -39,13 +39,13 @@ Base.@kwdef struct Params
     # Preferences
     μ::Float64 = 1.00                            # weight on log consumption
     λ::Float64 = 0.50                            # altruism strength, f(h') = log h'
-    ε::Float64 = 0.50                            # parental share of child's education
+    ε::Float64 = 0.1                            # parental share of child's education
     # Locations: amenity, Gumbel scale, utility moving-cost matrix τ[l,l']
     B::Vector{Float64}      = [0.0, 0.10]
     σν::Float64             = 0.50
     τmove::Matrix{Float64}  = [0.0 0.30; 0.30 0.0]
     # Gender-/occupation-specific distortions
-    τω::Matrix{Float64} = [0.0 0.00; 0.0 0.15]   # labor-income wedge  (1-τω)
+    τω::Matrix{Float64} = [0.0 0.00; 0.0 0.1]   # labor-income wedge  (1-τω)
     τe::Matrix{Float64} = [0.0 0.00; 0.0 0.00]   # education barrier   (1+τe)
     # Ability processes:  log z' = ρz log z + σξ ξ ;  log ϵ ~ N(-σϵ²/2, σϵ²)
     ρz::Float64 = 0.70
@@ -115,27 +115,27 @@ end
 # Child-side objects entering a parent's consumption: for a child born in `l`
 # with gender g, persistent state z'(zi), and shock pair (ϵ1=j, ϵ2=k), the child
 # optimally chooses an occupation; we store its education outlay D=(1+τe)e' and
-# its human capital h'. Built from the current policy guess (E, H, W).
-function child_objects(E, H, W, p::Params, grids)
+# its human capital h'. Built from the current policy guess (E, H, V).
+function child_objects(E, H, V, p::Params, grids)
     (; Nz, Nϵ) = grids
     Dc = zeros(2, 2, Nz, Nϵ, Nϵ)                 # [birth-loc, gender, z', ϵ1, ϵ2]
     Hc = zeros(2, 2, Nz, Nϵ, Nϵ)
     for l in 1:2, g in 1:2, zi in 1:Nz, j in 1:Nϵ, k in 1:Nϵ
         # Compare teaching (own shock j) vs non-teaching (own shock k).
-        i′, ei = W[1, g, l, zi, j] ≥ W[2, g, l, zi, k] ? (1, j) : (2, k)
+        i′, ei = V[1, g, l, zi, j] ≥ V[2, g, l, zi, k] ? (1, j) : (2, k)
         Dc[l, g, zi, j, k] = (1 + p.τe[i′, g]) * E[i′, g, l, zi, ei]
         Hc[l, g, zi, j, k] = H[i′, g, l, zi, ei]
     end
     return Dc, Hc
 end
 
-# Expected value V_l' of working in each location, given the parent's own
+# Expected value W_l' of working in each location, given the parent's own
 # (occupation i, gender g, birth loc l, ability zi, shock ei) and choice (s,e).
-# Returns the length-2 vector V and the parent's human capital h.
+# Returns the length-2 vector W and the parent's human capital h.
 function location_values(i, g, l, zi, ei, s, e, Dc, Hc, p::Params, grids)
     (; z, ϵgrid, ϵw, Πz, Nz, Nϵ, Q, t) = grids
     h = Q[l] * (z[zi] * ϵgrid[ei])^p.α * s^p.φ * e^p.η
-    V = fill(-Inf, 2)
+    W = fill(-Inf, 2)
     for lp in 1:2
         wage = i == p.T ? p.κ[lp] * h^p.γ : p.A[i] * h
         # Part of consumption independent of the child's realized state:
@@ -147,6 +147,7 @@ function location_values(i, g, l, zi, ei, s, e, Dc, Hc, p::Params, grids)
             for j in 1:Nϵ, k in 1:Nϵ              # child's fresh idiosyncratic vector
                 C = Y - p.ε * Dc[lp, gp, zpi, j, k]
                 if C ≤ 0
+                    println("  infeasible (s,e) = ($s, $e) for parent state (i=$i, g=$g, l=$l, z=$zi, ϵ=$ei) and child state (gp=$gp, zpi=$zpi, j=$j, k=$k)")
                     feasible = false; break       # infeasible (s,e): bail out
                 end
                 EV += pz * ϵw[j] * ϵw[k] * 0.5 *
@@ -154,9 +155,9 @@ function location_values(i, g, l, zi, ei, s, e, Dc, Hc, p::Params, grids)
             end
             feasible || break
         end
-        V[lp] = feasible ? EV : -Inf
+        W[lp] = feasible ? EV : -Inf
     end
-    return V, h
+    return W, h
 end
 
 # Gumbel log-sum over locations (folds in amenity B and moving cost τ) and the
@@ -176,27 +177,27 @@ end
 function neg_objective(x, i, g, l, zi, ei, Dc, Hc, p::Params, grids)
     s = 1 / (1 + exp(-x[1]))
     e = exp(x[2])
-    V, _ = location_values(i, g, l, zi, ei, s, e, Dc, Hc, p, grids)
-    all(==(-Inf), V) && return 1e10              # penalize fully infeasible choices
-    V̄, _ = logsum_probs(V, l, p)
+    W, _ = location_values(i, g, l, zi, ei, s, e, Dc, Hc, p, grids)
+    all(==(-Inf), W) && return 1e10              # penalize fully infeasible choices
+    V̄, _ = logsum_probs(W, l, p)
     return -(log(1 - s) + V̄)                     # Optim minimizes
 end
 
 # One sweep: re-optimize (s,e) at every state given the current child objects.
 # Warm-starts from the incumbent policy for speed.
-function update_policy!(S, E, H, W, Dc, Hc, p::Params, grids)
+function update_policy!(S, E, H, V, Dc, Hc, p::Params, grids)
     (; z, ϵgrid, Nz, Nϵ, Q) = grids
     for i in 1:2, g in 1:2, l in 1:2, zi in 1:Nz, ei in 1:Nϵ
         s0, e0 = S[i, g, l, zi, ei], E[i, g, l, zi, ei]
         x0  = [log(s0 / (1 - s0)), log(e0)]
         res = optimize(x -> neg_objective(x, i, g, l, zi, ei, Dc, Hc, p, grids),
-                       x0, NelderMead())
+                       x0, LBFGS())
         x = Optim.minimizer(res)
         s, e = 1 / (1 + exp(-x[1])), exp(x[2])
         S[i, g, l, zi, ei] = s
         E[i, g, l, zi, ei] = e
         H[i, g, l, zi, ei] = Q[l] * (z[zi] * ϵgrid[ei])^p.α * s^p.φ * e^p.η
-        W[i, g, l, zi, ei] = -Optim.minimum(res)
+        V[i, g, l, zi, ei] = -Optim.minimum(res)
     end
 end
 
@@ -209,24 +210,24 @@ function solve_household(p::Params, grids; tol = 1e-5, maxit = 300)
     S = fill(0.40, dims...)                       # time investment   s ∈ (0,1)
     E = fill(0.10, dims...)                       # goods investment  e > 0
     H = zeros(dims...)                            # human capital     (derived)
-    W = zeros(dims...)                            # value of occupation i at state
+    V = zeros(dims...)                            # value of occupation i at state
     for I in CartesianIndices(H)                  # initialize H consistent with (S,E)
         i, g, l, zi, ei = Tuple(I)
         H[I] = Q[l] * (z[zi] * ϵgrid[ei])^p.α * S[I]^p.φ * E[I]^p.η
     end
 
     for it in 1:maxit
-        Dc, Hc = child_objects(E, H, W, p, grids) # child policy enters parent's C
-        E0, W0 = copy(E), copy(W)
-        update_policy!(S, E, H, W, Dc, Hc, p, grids)
-        err = max(maximum(abs, E .- E0), maximum(abs, W .- W0))
-        @printf("  iter %3d   ‖ΔE,ΔW‖∞ = %.3e\n", it, err)
+        Dc, Hc = child_objects(E, H, V, p, grids) # child policy enters parent's C
+        E0, V0 = copy(E), copy(V)
+        update_policy!(S, E, H, V, Dc, Hc, p, grids)
+        err = max(maximum(abs, E .- E0), maximum(abs, V .- V0))
+        @printf("  iter %3d   ‖ΔE,ΔV‖∞ = %.3e\n", it, err)
         if err < tol
             println("  household policy converged.")
             break
         end
     end
-    return S, E, H, W
+    return S, E, H, V
 end
 
 # -----------------------------------------------------------------------------
@@ -234,16 +235,16 @@ end
 # -----------------------------------------------------------------------------
 
 "Population-weighted teaching share for (gender g, birth loc l) using the ergodic z."
-function teaching_share(W, g, l, grids, πz)
+function teaching_share(V, g, l, grids, πz)
     (; Nz, Nϵ, ϵw) = grids
     s = 0.0
     for zi in 1:Nz, j in 1:Nϵ, k in 1:Nϵ
-        W[1, g, l, zi, j] ≥ W[2, g, l, zi, k] && (s += πz[zi] * ϵw[j] * ϵw[k])
+        V[1, g, l, zi, j] ≥ V[2, g, l, zi, k] && (s += πz[zi] * ϵw[j] * ϵw[k])
     end
     return s
 end
 
-function report(S, E, H, W, p::Params, grids)
+function report(S, E, H, V, p::Params, grids)
     (; Nz, Nϵ, Q, t, Πz) = grids
     πz   = stationary(Πz)
     zmed, ϵmed = (Nz + 1) ÷ 2, (Nϵ + 1) ÷ 2
@@ -254,15 +255,15 @@ function report(S, E, H, W, p::Params, grids)
 
     println("\nTeaching share (ergodic-z weighted):")
     for l in 1:2, g in 1:2
-        @printf("   born in %d, %s : %.3f\n", l, gnames[g], teaching_share(W, g, l, grids, πz))
+        @printf("   born in %d, %s : %.3f\n", l, gnames[g], teaching_share(V, g, l, grids, πz))
     end
 
     println("\nNon-teacher (g=m) at median (z,ϵ): policy + location choice probs")
     for l in 1:2
         # rebuild π_{l'|l} from the converged policy for a representative worker
         s, e = S[2, 1, l, zmed, ϵmed], E[2, 1, l, zmed, ϵmed]
-        V, h = location_values(2, 1, l, zmed, ϵmed, s, e, child_objects(E, H, W, p, grids)..., p, grids)
-        _, π = logsum_probs(V, l, p)
+        W, h = location_values(2, 1, l, zmed, ϵmed, s, e, child_objects(E, H, V, p, grids)..., p, grids)
+        _, π = logsum_probs(W, l, p)
         @printf("   born %d :  s=%.3f  e=%.3f  h=%.3f  ->  π(stay,move)=(%.3f, %.3f)\n",
                 l, s, e, h, π[l], π[3 - l])
     end
@@ -274,10 +275,12 @@ end
 function main()
     p     = Params()
     grids = build_grids(p; H̃T = [1.0, 1.5], M = [1.0, 1.0], t = [0.10, 0.12],
-                        Nz = 3, Nϵ = 9)
+                        Nz = 3, Nϵ = 15)
     println("Solving partial-equilibrium household fixed point ...")
-    S, E, H, W = solve_household(p, grids)
-    report(S, E, H, W, p, grids)
+    S, E, H, V = solve_household(p, grids)
+    report(S, E, H, V, p, grids)
 end
 
-@time main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    @time main()
+end
