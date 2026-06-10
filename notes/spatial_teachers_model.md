@@ -65,7 +65,7 @@ Denote the common scalar law by $F_\epsilon$ and the joint distribution over $\v
 $$
 h_{i,g,l}(z,\epsilon_i) \;=\; (h_{T,l})^{\beta}\,(z\,\epsilon_i)^{\alpha}\,(s_{i,g,l})^{\phi}\,(e_{i,g,l})^{\eta}\,N(h_{T,l})^{-\sigma},
 $$
-with $h_{T,l}$ the human capital of the (randomly matched) teacher working in $l$. Student-teacher matching is random within $l$. The teacher's optimal class-size choice yields the indifference condition $h^{\beta} N(h)^{-\sigma}=\text{const}$ across all active teachers in $l$ (derived in Appendix A.1). Combined with the local class-size resource constraint
+with $h_{T,l}$ the human capital of the (randomly matched) teacher working in $l$. Student-teacher matching is random within $l$. Class sizes are allocated efficiently — to maximize aggregate student human capital subject to the local slot constraint — which yields the equalization condition $h^{\beta} N(h)^{-\sigma}=\text{const}$ across all active teachers in $l$ (derived in Appendix A.1). Combined with the local class-size resource constraint
 $$
 \frac{M_l}{2} \;=\; \sum_g \int_0^\infty N(h)\,dF_{T,l,g}(h),
 $$
@@ -135,6 +135,8 @@ i^*(z,\vec\epsilon; g, l) \;=\; \arg\max_{i \in \{1,\dots,I\}}\; \Big[\ln(1 - s^
 $$
 with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Derivations are in the appendix)
 
+The investment policies are functions of the agent's state: $s^*_{i,g,l}=s^*_{i,g,l}(z,\epsilon_i)$ and $e^*_{i,g,l}=e^*_{i,g,l}(z,\epsilon_i)$. We suppress these arguments for readability, but they are not constant across $(z,\epsilon_i)$ in the spatial model. The closed forms in Appendix A.4 are constant only in the single-location limit, where the $\sum_{l'}\pi_{l'\mid l}$ collapses; with $L=2$ the FOCs aggregate returns across locations using $\pi_{l'\mid l}$ weights that themselves depend on $h_{i,g,l}(z,\epsilon_i)$.
+
 For non-teaching ($i \neq T$, with $\omega_{i,l'}(h)=A_i h$), the FOCs reduce to:
 
 **FOC for $e_{i,g,l}$:**
@@ -147,7 +149,7 @@ $$
 \frac{1}{1-s_{i,g,l}} \;=\; \mu\,\phi\,(1-\tau^\omega_{i,g})A_i\,\frac{h_{i,g,l}}{s_{i,g,l}}\,\sum_{l'} \pi_{l'\mid l}\;\tfrac{1}{2}\!\sum_{g'}\mathbb E_{z'\mid z}\,\mathbb E_{\vec\epsilon'}\!\left[\frac{1-t_{l'}}{C(l',z',\vec\epsilon',g' \mid i,g,l,z,\vec\epsilon)}\right].
 $$
 
-For teaching ($i=T$), the FOCs are analogous with $\partial\omega_{T,l'}(h)/\partial h$ replacing $A_i$ and $\omega_{T,l'}(h)$ replacing $A_i h$ in the consumption term — i.e., $A_i\eta h/e$ becomes $\eta\,(\partial \omega_{T,l'}/\partial h)\,h/e$ and the wage entering $C$ is $\omega_{T,l'}(h_{T,g,l})$. Because $\omega_{T,l'}$ depends on the work location $l'$, optimal $(s_{T,g,l}, e_{T,g,l})$ depend on the full vector $\{\pi_{l'\mid l}\}_{l'}$ rather than only own-location returns. For the power-form $\omega_{T,l'}(h)=\kappa_{l'} h^{\gamma}$ used in the code, $\partial\omega_{T,l'}/\partial h = \gamma\kappa_{l'}h^{\gamma-1}$.
+For teaching ($i=T$), the FOCs are analogous with $\partial\omega_{T,l'}(h)/\partial h$ replacing $A_i$ and $\omega_{T,l'}(h)$ replacing $A_i h$ in the consumption term — i.e., $A_i\eta h/e$ becomes $\eta\,(\partial \omega_{T,l'}/\partial h)\,h/e$ and the wage entering $C$ is $\omega_{T,l'}(h_{T,g,l})$. Because $\omega_{T,l'}$ depends on the work location $l'$, optimal $(s_{T,g,l}, e_{T,g,l})$ depend on the full vector $\{\pi_{l'\mid l}\}_{l'}$ through both the wage intercepts $\kappa_{l'}$ and the tax rates $t_{l'}$. (Non-teaching policies likewise depend on $\{\pi_{l'\mid l}\}_{l'}$, but only through the $t_{l'}$ — and, when $\varepsilon>0$, the child-education — terms in $C$, since $\omega_{i,l'}=A_i h$ is independent of $l'$.) For the power-form $\omega_{T,l'}(h)=\kappa_{l'} h^{\gamma}$ used in the code, $\partial\omega_{T,l'}/\partial h = \gamma\kappa_{l'}h^{\gamma-1}$.
 
 Note two things. First, the moving cost $\tau_{l,l'}$ enters the FOCs only through the choice probabilities $\pi_{l'\mid l}$: $\tau_{l,l'}$ shifts the weights $\pi_{l'\mid l}$ on each location's return. Second, since $\pi_{l'\mid l}$ depends on $V_{l'}$, which depends on $C$, which depends on $(s,e)$, the FOCs constitute a fixed-point problem in $(s, e, \pi)$ for each $(i,g,l,z,\vec\epsilon)$.
 
@@ -216,7 +218,7 @@ Both the wage bill and tax base sum across training locations $l_0$, since teach
 
 A stationary equilibrium is a tuple
 $$
-\Big\{\,t_l,\; \widetilde{H}_{T,l},\; M_l,\; \Phi_l,\; F_{T,l,g},\; \big(s_{i,g,l},\, e_{i,g,l}\big)_{i,g},\; i^*(\,\cdot\,;g,l)\,\Big\}_{l\in\{1,2\},\,g}
+\Big\{\,t_l,\; \widetilde{H}_{T,l},\; M_l,\; \Phi_l,\; F_{T,l,g},\; \big(s_{i,g,l}(z,\epsilon_i),\, e_{i,g,l}(z,\epsilon_i)\big)_{i,g},\; i^*(\,\cdot\,;g,l)\,\Big\}_{l\in\{1,2\},\,g}
 $$
 such that:
 
@@ -228,15 +230,15 @@ $$
 $$
 and total population $M_l = 2\int\Phi_l(dz)$ is consistent with the row-stochastic migration matrix $[\bar\Pi_{l_0,l'}]$. Young agents are evenly split by gender ($\tfrac{1}{2}$ each) in every location by construction.
 
-1. **(Teacher distribution and aggregates)** $F_{T,l,g}$ is the push-forward, and
+3. **(Teacher distribution and aggregates)** $F_{T,l,g}$ is the push-forward, and
 $$
 \widetilde{H}_{T,l} \;=\; \sum_g \int h^{\beta/\sigma}\,dF_{T,l,g}(h)
 $$
 coincides with the explicit aggregator (using policies and $\Phi$).
 
-1. **(Class size)** $h^{\beta} N(h)^{-\sigma} = (2\widetilde{H}_{T,l}/M_l)^{\sigma}$ for all teachers in $l$, with $\sum_g\int N\,dF_{T,l,g} = M_l/2$.
+4. **(Class size)** $h^{\beta} N(h)^{-\sigma} = (2\widetilde{H}_{T,l}/M_l)^{\sigma}$ for all teachers in $l$, with $\sum_g\int N\,dF_{T,l,g} = M_l/2$.
 
-2. **(Budget)** Each $t_l$ satisfies the local balanced-budget condition $t_{l}\mathcal{I}_{l}=\mathcal{W}_{l}$.
+5. **(Budget)** Each $t_l$ satisfies the local balanced-budget condition $t_{l}\mathcal{I}_{l}=\mathcal{W}_{l}$.
 
 ---
 
@@ -252,10 +254,11 @@ h \;=\; h_{T,l}^{\beta}\,(z\epsilon_i)^{\alpha}\,s^{\phi}\,e^{\eta}\,N(h_{T,l})^
 $$
 where $N(h_{T,l})$ is the class size the teacher is willing to take. The dependence on $N$ captures congestion in instruction.
 
-**Teacher's indifference condition.** A teacher of human capital $h_{T,l}$ working in $l$ is paid $\omega_{T,l}(h_{T,l})$ regardless of class size, but exerts effort that disutility scales with $N$. In equilibrium, all active teachers in $l$ must be indifferent over choosing different $N$. We assume that the locally relevant student-side product $h^{\beta}N(h)^{-\sigma}$ is constant across all $h$ among active teachers in $l$:
+**Efficient class-size allocation.** A teacher of human capital $h_{T,l}$ working in $l$ is paid $\omega_{T,l}(h_{T,l})$ regardless of class size. Class sizes $\{N_j\}$ are allocated across the active teachers $j$ in $l$ to maximize aggregate student human capital subject to the local slot constraint $\sum_j N_j = M_l/2$. Because students are randomly matched, each teacher's class contributes $N_j$ students whose human capital is proportional to $h_j^{\beta}N_j^{-\sigma}$ times the common (matching-independent) average of $(z\epsilon)^\alpha s^\phi e^\eta$; the planner therefore maximizes $\sum_j N_j^{1-\sigma}h_j^{\beta}$ subject to $\sum_j N_j = M_l/2$. The FOC $(1-\sigma)N_j^{-\sigma}h_j^{\beta}=\text{const}$ equalizes the student-side product $h^{\beta}N(h)^{-\sigma}$ across all active teachers in $l$:
 $$
 h_{T,l}^{\beta}\,N(h_{T,l})^{-\sigma} \;=\; \mathcal{Q}_l \quad \text{(constant in $l$).} \tag{A.2}
 $$
+(Equivalently, this is the allocation a competitive market for school slots would implement; it requires no class-size disutility in preferences, consistent with §5.)
 
 **Pinning down $\mathcal Q_l$ via the class-size resource constraint.** Total student–teacher slots in $l$ must absorb the local young cohort of size $M_l/2$:
 $$

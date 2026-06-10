@@ -139,7 +139,7 @@ end
 function main()
     p = Params()
     grids = build_grids(p; H̃T = [1.0, 1.5], M = [1.0, 1.0], t = [0.10, 0.12],
-                        Nz = 3, Nϵ = 15)
+                        Nz = 7, Nϵ = 21)
     println("Solving baseline partial-equilibrium household fixed point ...")
     S, E, H, V = solve_household(p, grids)
     report(S, E, H, V, p, grids)

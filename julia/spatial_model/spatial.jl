@@ -21,6 +21,11 @@ using LinearAlgebra
 using Printf
 using Optim
 
+# When an (s,e) trial yields negative consumption we report it.  The general-
+# equilibrium driver (spatial_ge.jl) silences this during intermediate iterations
+# by flipping the flag to `false`; the partial-equilibrium runs keep it `true`.
+const INFEASIBLE_VERBOSE = Ref(true)
+
 # -----------------------------------------------------------------------------
 # 1. Parameters.  Occupation 1 = Teacher (T); occupation 2 = non-teaching.
 #    Gender index: 1 = m, 2 = f.  Distortion matrices are [occupation, gender].
@@ -147,7 +152,7 @@ function location_values(i, g, l, zi, ei, s, e, Dc, Hc, p::Params, grids)
             for j in 1:Nϵ, k in 1:Nϵ              # child's fresh idiosyncratic vector
                 C = Y - p.ε * Dc[lp, gp, zpi, j, k]
                 if C ≤ 0
-                    println("  infeasible (s,e) = ($s, $e) for parent state (i=$i, g=$g, l=$l, z=$zi, ϵ=$ei) and child state (gp=$gp, zpi=$zpi, j=$j, k=$k)")
+                    INFEASIBLE_VERBOSE[] && println("  infeasible (s,e) = ($s, $e) for parent state (i=$i, g=$g, l=$l, z=$zi, ϵ=$ei) and child state (gp=$gp, zpi=$zpi, j=$j, k=$k)")
                     feasible = false; break       # infeasible (s,e): bail out
                 end
                 EV += pz * ϵw[j] * ϵw[k] * 0.5 *
