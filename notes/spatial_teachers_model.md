@@ -133,7 +133,7 @@ When young, the agent solves
 $$
 i^*(z,\vec\epsilon; g, l) \;=\; \arg\max_{i \in \{1,\dots,I\}}\; \Big[\ln(1 - s^*_{i,g,l}) + \bar V\!\big(h^*_{i,g,l}(z,\epsilon_i); i, g, l, z\big)\Big],
 $$
-with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Derivations are in the appendix)
+with $\big(s^*_{i,g,l}, e^*_{i,g,l}\big)$ given by the FOCs below, taking the location-choice probabilities $\pi_{l'\mid l}$ and the child's policy functions as given. (Derivations are in the appendix.) The *occupational threshold* separating occupations $i$ and $j$ is the level set $\{(z,\vec\epsilon): W_{i,g,l}=W_{j,g,l}\}$ of the bracketed value $W_{i,g,l}$ — the spatial counterpart of the baseline teacher/other cutoff $a^*_{T,g}(a_O)$. In the full model this threshold is only an implicit locus; it admits a closed form solely in the $\varepsilon=0$, destination-homogeneous special case derived in Appendix A.8.
 
 The investment policies are functions of the agent's state: $s^*_{i,g,l}=s^*_{i,g,l}(z,\epsilon_i)$ and $e^*_{i,g,l}=e^*_{i,g,l}(z,\epsilon_i)$. We suppress these arguments for readability, but they are not constant across $(z,\epsilon_i)$ in the spatial model. The closed forms in Appendix A.4 are constant only in the single-location limit, where the $\sum_{l'}\pi_{l'\mid l}$ collapses; with $L=2$ the FOCs aggregate returns across locations using $\pi_{l'\mid l}$ weights that themselves depend on $h_{i,g,l}(z,\epsilon_i)$.
 
@@ -378,6 +378,153 @@ $$
 \int\Phi_{l,t+1}(dz') \;=\; \sum_{l_0}\int \bar\pi_{l_0\to l}(z)\,\Phi_{l_0,t}(dz),
 $$
 which gives the population law $M_{l,t+1} = \sum_{l_0}M_{l_0,t}\bar\Pi_{l_0,l,t}$ via $M_l = 2\int\Phi_l$. In a stationary equilibrium the joint mass $\Phi_l(\cdot)$ is the dominant left eigenfunction (eigenvalue 1) of the joint kernel $K_{(l_0,z)\to(l,z')} = \pi_z(z'\mid z)\,\bar\pi_{l_0\to l}(z)$ on $\{1,\ldots,L\}\times\mathbb{R}_+$.
+
+### A.6 The special case $\varepsilon = 0$: simplifications and a closed form for $s$
+
+The main text carries the parental cost share $\varepsilon \in (0,1)$ throughout. This appendix records what the model collapses to when $\varepsilon = 0$ — parents finance none of their child's education and each agent pays the full cost of her own schooling out of future labor income. The upshot: the optimal time share $s$ admits a closed form for *every* $(i,g,l,z,\vec\epsilon)$, regardless of $L$, the location-specific wedges, or the altruism strength $\lambda$; the goods margin $e$ and the spatial objects do not collapse.
+
+**Consumption decouples from the child.** With $\varepsilon = 0$ the parental-finance term in the consumption identity of §5 vanishes, and old-age consumption conditional on the work location $l'$ is
+$$
+C_{l'} \;=\; (1-t_{l'})(1-\tau^{\omega}_{i,g})\,\omega_{i,l'}(h_{i,g,l}) \;-\; (1+\tau^{e}_{i,g})\,e_{i,g,l},
+$$
+which is **deterministic** given the parent's own state and $(s,e)$: it no longer depends on the child's realized $(z',\vec\epsilon',g')$. The Stage-2 location value therefore separates additively,
+$$
+V_{l'}(h;i,g,l,z) \;=\; \mu \ln C_{l'}(h) \;+\; \Lambda_{l'}(z),
+\qquad
+\Lambda_{l'}(z) \equiv \tfrac{1}{2}\sum_{g'}\mathbb{E}_{z'\mid z}\,\mathbb{E}_{\vec\epsilon'}\!\left[\lambda\, f\!\big(h'(z',\vec\epsilon',l',g')\big)\right],
+$$
+where the warm-glow term $\Lambda_{l'}(z)$ depends on the child's birth location $l'$ and (through the AR(1)) on the parent's $z$, but **not** on the parent's $(s,e)$. Consequently $\Lambda_{l'}$ differentiates to zero in the $(s,e)$ first-order conditions: altruism affects investment only indirectly, through the choice probabilities $\pi_{l'\mid l}$ that embed $\Lambda_{l'}$ via $V_{l'}$. Setting $\varepsilon=0$ in (A.7)–(A.8) and dropping the $\tfrac12\sum_{g'}\mathbb{E}_{z'}\mathbb{E}_{\vec\epsilon'}$ averaging (the summand no longer depends on the child), the non-teaching FOCs reduce to
+$$
+\sum_{l'}\pi_{l'\mid l}\;\frac{(1-t_{l'})(1-\tau^{\omega}_{i,g})A_i\,\eta\, h/e \;-\; (1+\tau^{e}_{i,g})}{C_{l'}} \;=\; 0,
+\qquad
+\frac{1}{1-s} \;=\; \mu\,\phi\,(1-\tau^{\omega}_{i,g})A_i\,\frac{h}{s}\sum_{l'}\pi_{l'\mid l}\,\frac{1-t_{l'}}{C_{l'}}.
+$$
+
+**Setup for the closed form.** Fix a state $(i,g,l,z,\vec\epsilon)$ and write $C_{l'} = g_{l'} - (1+\tau^e_{i,g})e$, where the after-tax gross income is
+$$
+g_{l'} \equiv (1-t_{l'})(1-\tau^{\omega}_{i,g})\,\omega_{i,l'}(h),
+\qquad h = Q_l\,(z\epsilon_i)^\alpha s^\phi e^\eta .
+$$
+For non-teaching $\omega_{i,l'}(h)=A_i h$, so $g_{l'}$ varies across $l'$ only through $1-t_{l'}$; for teaching $\omega_{T,l'}=\kappa_{l'}h^\gamma$, it varies through both $1-t_{l'}$ and $\kappa_{l'}$.
+
+**Step 1 — collapse the $e$-FOC.** Take non-teaching first. The marginal product of $e$ in income is $\partial g_{l'}/\partial e = \eta\,g_{l'}/e$ (since $h\propto e^\eta$). The $e$-FOC is
+$$
+\sum_{l'}\pi_{l'\mid l}\,\frac{\eta\,g_{l'}/e - (1+\tau^e_{i,g})}{C_{l'}} \;=\; 0 .
+$$
+Write $g_{l'} = C_{l'} + (1+\tau^e_{i,g})e$, so $\eta g_{l'}/e = \eta C_{l'}/e + \eta(1+\tau^e_{i,g})$ and the numerator becomes $\eta C_{l'}/e - (1-\eta)(1+\tau^e_{i,g})$. Dividing by $C_{l'}$ and summing with $\sum_{l'}\pi_{l'\mid l}=1$,
+$$
+\frac{\eta}{e} \;=\; (1-\eta)(1+\tau^e_{i,g})\sum_{l'}\pi_{l'\mid l}\,\frac{1}{C_{l'}}
+\quad\Longrightarrow\quad
+\sum_{l'}\pi_{l'\mid l}\,\frac{1}{C_{l'}} \;=\; \frac{\eta}{(1-\eta)(1+\tau^e_{i,g})\,e}. \tag{$\star$}
+$$
+
+**Step 2 — substitute into the $s$-FOC.** The marginal product of $s$ gives $\partial g_{l'}/\partial s = \phi\,g_{l'}/s$, so the $s$-FOC is
+$$
+\frac{1}{1-s} \;=\; \mu\phi\,\frac{1}{s}\sum_{l'}\pi_{l'\mid l}\,\frac{g_{l'}}{C_{l'}} .
+$$
+Now $g_{l'}/C_{l'} = 1 + (1+\tau^e_{i,g})e/C_{l'}$, so by $(\star)$,
+$$
+\sum_{l'}\pi_{l'\mid l}\,\frac{g_{l'}}{C_{l'}}
+= 1 + (1+\tau^e_{i,g})e\sum_{l'}\pi_{l'\mid l}\frac{1}{C_{l'}}
+= 1 + \frac{\eta}{1-\eta}
+= \frac{1}{1-\eta}.
+$$
+Every location-specific quantity ($t_{l'},\,\pi_{l'\mid l},\,\tau$, the level $h$) has cancelled. The $s$-FOC is $\tfrac{1}{1-s} = \tfrac{\mu\phi}{s(1-\eta)}$, i.e. $s(1-\eta)=\mu\phi(1-s)$, giving
+$$
+\boxed{\;s_O^{*} \;=\; \frac{\mu\phi}{\mu\phi + 1 - \eta}\;}.
+$$
+
+**Teaching.** Identical steps with $\omega_{T,l'}=\kappa_{l'}h^\gamma$, for which $\partial\omega/\partial e = \gamma\eta\,\omega/e$ and $\partial\omega/\partial s=\gamma\phi\,\omega/s$ (so $\eta\to\gamma\eta$ in $(\star)$ and an extra $\gamma$ multiplies the $s$-FOC). $(\star)$ becomes $\sum_{l'}\pi_{l'\mid l}/C_{l'} = \gamma\eta/[(1-\gamma\eta)(1+\tau^e_{T,g})e]$, $\sum_{l'}\pi_{l'\mid l}\,g_{l'}/C_{l'} = 1/(1-\gamma\eta)$, and
+$$
+\frac{1}{1-s} = \frac{\mu\phi\gamma}{s(1-\gamma\eta)}
+\quad\Longrightarrow\quad
+\boxed{\;s_T^{*} \;=\; \frac{\mu\phi\gamma}{(\mu\phi-\eta)\gamma + 1}\;}.
+$$
+These coincide with the single-location, no-altruism constants of A.4, but here they hold for the full spatial model with any $L$, asymmetric $(t_{l'},\kappa_{l'},B_{l'},\tau_{l,l'})$, and any $\lambda$. The time share is thus constant across $(z,\vec\epsilon)$, across birth locations $l$, and across destinations, so the entire policy array $S$ collapses to the $I$ numbers $\{s_i^*\}$.
+
+**Why $e$ stays implicit.** The cancellation that pins down $s$ used only $\sum_{l'}\pi_{l'\mid l}=1$ and the homogeneity of $g_{l'}$ in $(s,e)$; it never required solving $(\star)$ for $e$. But $(\star)$ itself is $\sum_{l'}\pi_{l'\mid l}/(G_{l'}e^\eta - (1+\tau^e)e) = \eta/[(1-\eta)(1+\tau^e)e]$ with $G_{l'}=(1-t_{l'})(1-\tau^\omega)A_i Q_l(z\epsilon_i)^\alpha (s^*)^\phi$ — a $\pi$-weighted sum of reciprocals with heterogeneous $G_{l'}$, which does not invert to a single power of $e$. It is closed-form only when the $C_{l'}$ are common across $l'$ (symmetric destinations, or degenerate $\pi$ as $\sigma_\nu\to0$, where $(\star)$ reduces to a single location's condition $C = (1-\eta)(1+\tau^e)e/\eta$). Hence $s$ is analytic but $e$ remains a scalar fixed point coupled to $\pi$. The altruistic sorting term $\Lambda_{l'}(z)$, the endogenous $\Phi_l$, the migration matrix, and the aggregates of §8–§9 are likewise unaffected by $\varepsilon$ and must still be solved numerically as in §10.
+
+### A.7 Gumbel taste shocks on occupational choice
+
+In the main text the occupation is chosen by a hard argmax (§7); the numerical implementation instead adds iid Gumbel taste shocks $\{\eta_i\}_{i=1}^{I}$ (scale $\theta_o>0$) to each occupation's value, paralleling the location-choice shocks of §6. With the occupational value
+$$
+W_{i,g,l}(z,\vec\epsilon) \;\equiv\; \ln\!\big(1-s^*_{i,g,l}\big) \;+\; \bar V\!\big(h^*_{i,g,l}(z,\epsilon_i);\,i,g,l,z\big),
+$$
+choosing $\arg\max_i\{W_{i,g,l}+\theta_o\eta_i\}$ yields the closed-form choice probabilities
+$$
+\boxed{\;\;
+\rho_{i\mid g,l}(z,\vec\epsilon) \;=\; \frac{\exp\!\big[W_{i,g,l}(z,\vec\epsilon)/\theta_o\big]}{\sum_{i'=1}^{I}\exp\!\big[W_{i',g,l}(z,\vec\epsilon)/\theta_o\big]}.
+\;\;}
+$$
+As $\theta_o\to 0$ these collapse to the hard Roy indicator $\mathbb 1_{i,g,l}(z,\vec\epsilon)$ of §8 (the code uses $\theta_o=0.05$); everywhere §8–§9 integrates against $\mathbb 1_{i,g,l}$, it is replaced by the smooth weight $\rho_{i\mid g,l}$.
+
+**Why this matters for computation.** The household block solves the fixed point $V \mapsto h' \mapsto \Lambda \mapsto V$ by successive approximation. Under a hard argmax, $h'$ — and hence the altruism term $\Lambda$ and the value $V$ — is *piecewise-constant and discontinuous* in $V$ on the discretized $\vec\epsilon$ grid: any child cell near teacher/non-teacher indifference flips occupation every sweep, so $V$ hops between two branches in a period-2 limit cycle whose residual floor exceeds both the household and GE tolerances, exhausting the iteration budget and capping GE convergence. The Gumbel smoothing makes $h'$ continuous in $V$, restores the contraction, and reaches machine tolerance in a few sweeps — at a distortion shrinkable to zero with $\theta_o$. The occupational argmax was the lone remaining discontinuity in the map.
+
+### A.8 Occupational thresholds: when are they closed form?
+
+Write the occupational value with investments folded in,
+$$
+W_{i,g,l}(z,\vec\epsilon) \;\equiv\; \ln(1-s^*_{i,g,l}) \;+\; \bar V\!\big(h^*_{i,g,l}(z,\epsilon_i);\,i,g,l,z\big),
+$$
+so $i^*=\arg\max_i W_{i,g,l}$ and the threshold between occupations $i,j$ is the locus $W_{i,g,l}=W_{j,g,l}$ (the baseline teacher/other cutoff $a^*_{T,g}(a_O)$ of the draft is the $I=2$ instance).
+
+**General spatial model ($\varepsilon>0$): no closed form.** $W_{i,g,l}$ inherits the coupled $(s,e,\pi)$ fixed point of §7 — both investment margins are state-dependent (A.6), $C$ averages over the child's $(z',\vec\epsilon',g')$, and $\bar V$ is a destination log-sum whose weights $\pi_{l'\mid l}$ depend on $h$. The threshold is only an implicit locus.
+
+**$\varepsilon=0$ alone: still implicit.** Setting $\varepsilon=0$ collapses the time share to the constants $s^*_O,s^*_T$ of A.6 and decouples $C_{l'}$ from the child, so $W_{i,g,l}$ becomes a function of the single scalar $h_i$ (hence of $z\epsilon_i$). But the goods margin $e$ remains a $\pi$-weighted scalar fixed point and the log-sum $\bar V$ does not collapse, so $W_{i,g,l}$ is not an explicit function of $z\epsilon_i$ and the threshold stays implicit.
+
+**$\varepsilon=0$ with destination-homogeneous net returns: closed form.** Add the condition that the active destinations deliver a common consumption level $C_{l'}\equiv C$ — single location $L=1$; or degenerate migration $\sigma_\nu\to0$; or symmetric net returns. Then the log-sum factors,
+$$
+\bar V(h_i;i,g,l,z) \;=\; \mu\ln C(h_i) \;+\; D(z,l),
+\qquad
+D(z,l)\equiv \sigma_\nu\ln\!\sum_{l'}\exp\!\big[(\Lambda_{l'}(z)+B_{l'}-\tau_{l,l'})/\sigma_\nu\big],
+$$
+and the additive term $D(z,l)$ is **occupation-independent** (the child's human capital does not depend on the parent's occupation), so it cancels in every pairwise comparison $W_i-W_j$. The two margins then solve in closed form (A.6 algebra with $C_{l'}=C$): for non-teaching $C^{(i)}=(1-\eta)(1-t)(1-\tau^\omega_{i,g})A_i\,h_i$ and for teaching $C^{(T)}=(1-\gamma\eta)(1-t)(1-\tau^\omega_{T,g})\kappa_l\,h_T^{\gamma}$, with
+$$
+h_i \;\propto\; (z\epsilon_i)^{\frac{\alpha}{1-\eta}}\quad(i\neq T),
+\qquad
+h_T \;\propto\; (z\epsilon_T)^{\frac{\alpha}{1-\gamma\eta}} .
+$$
+Hence $\ln C^{(i)}$ is affine in $\ln(z\epsilon_i)$:
+$$
+\ln C^{(i)} = \tfrac{\alpha}{1-\eta}\ln(z\epsilon_i)+\Theta_i\ (i\neq T),
+\qquad
+\ln C^{(T)} = \tfrac{\gamma\alpha}{1-\gamma\eta}\ln(z\epsilon_T)+\Theta_T,
+$$
+with intercepts
+$$
+\Theta_i=\frac{\ln[(1-\tau^\omega_{i,g})A_i]+\ln Q_l}{1-\eta}-\frac{\eta\ln(1+\tau^e_{i,g})}{1-\eta}+c_O,
+\qquad
+\Theta_T=\frac{\ln[(1-\tau^\omega_{T,g})\kappa_l]+\gamma\ln Q_l}{1-\gamma\eta}-\frac{\gamma\eta\ln(1+\tau^e_{T,g})}{1-\gamma\eta}+c_T,
+$$
+where $c_O,c_T$ collect pure parameter constants ($\eta,\gamma,t,s^*$). Two cases follow.
+
+*Non-teaching vs. non-teaching — comparative advantage.* $s^*_O$ is common, so $W_i=W_j\iff \ln C^{(i)}=\ln C^{(j)}$, a cutoff in **relative** ability only:
+$$
+\boxed{\;\;
+\ln\frac{\epsilon_i}{\epsilon_j}
+\;=\;
+\frac{1}{\alpha}\ln\frac{(1-\tau^\omega_{j,g})A_j}{(1-\tau^\omega_{i,g})A_i}
+\;-\;
+\frac{\eta}{\alpha}\ln\frac{1+\tau^e_{j,g}}{1+\tau^e_{i,g}}.
+\;\;}
+$$
+It is independent of $z$, of the teacher aggregate $\widetilde H_{T,l}$ (the shifter $Q_l$ cancels), and of every spatial wedge $(t_{l'},B_{l'},\tau_{l,l'})$.
+
+*Teaching vs. non-teaching — absolute advantage.* The ability exponents differ ($\tfrac{\gamma\alpha}{1-\gamma\eta}\neq\tfrac{\alpha}{1-\eta}$), so $z$ no longer cancels and $W_T=W_O$ solves explicitly for the cutoff $\epsilon_T^*$:
+$$
+\boxed{\;\;
+\frac{\gamma\alpha}{1-\gamma\eta}\,\ln(z\epsilon_T^{*})
+\;=\;
+\frac{\alpha}{1-\eta}\,\ln(z\epsilon_O)
+\;+\;
+\frac{1}{\mu}\ln\frac{1-s^*_O}{1-s^*_T}
+\;+\;
+\Theta_O-\Theta_T.
+\;\;}
+$$
+The cutoff $\epsilon_T^*(\epsilon_O,z)$ rises with the persistent level $z$ — the absolute-advantage channel — and, through $Q_l$ in $\Theta_O-\Theta_T$, depends on $\widetilde H_{T,l}$ except in the linear-wage knife-edge $\gamma=1$, where the $Q_l$ terms cancel and the teaching threshold too becomes independent of $\widetilde H_{T,l}$ (the spatial analogue of the baseline's $\beta=\sigma$ / Proposition 3).
+
+Away from destination homogeneity these are the leading-order cutoffs; the exact spatial threshold adds the destination-mixing correction $\bar V(h_i)-\mu\ln C(h_i)-D(z,l)$, which is occupation-specific and must be computed numerically.
 
 
 

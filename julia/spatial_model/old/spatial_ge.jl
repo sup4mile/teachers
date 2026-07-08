@@ -54,6 +54,12 @@ using Optim
 # silences this during intermediate iterations; only the final solution prints it.
 const INFEASIBLE_VERBOSE = Ref(true)
 
+# Smooth log barrier: log(Y) for Y > δ, then a linear extension below δ.
+# The linear part has slope 1/δ, so LBFGS always sees a nonzero gradient
+# pointing away from infeasibility (unlike log(max(Y, 1e-30)) which is flat
+# for any Y ≤ 1e-30 and leaves LBFGS with no information).
+@inline smooth_log(Y, δ = 1e-6) = Y > δ ? log(Y) : log(δ) + (Y - δ) / δ
+
 # -----------------------------------------------------------------------------
 # 1. Parameters.  Occupation T (default 1) = Teacher; all other occupations
 #    1..I share the same linear wage ω_i(h) = A[i] h (A[T] unused).
@@ -75,9 +81,15 @@ Base.@kwdef struct Params
     μ::Float64 = 1.00                            # weight on log consumption
     λ::Float64 = 0.50                            # altruism strength, f(h') = log h'
     ε::Float64 = 0.0                            # parental share of child's education
+    # Logit scale for the occupation (Roy) choice.  0.0 = exact hard argmax (the
+    # original model); >0 makes the child's occupation a softmax over occupation
+    # values, mirroring the Gumbel location choice. A small scale removes the
+    # argmax discontinuity that otherwise creates period-2 limit cycles in the
+    # household fixed point (see HOUSEHOLD_CONVERGENCE_FINDINGS.md).
+    occ_θ::Float64 = 0.05
     # Locations: amenity, Gumbel scale, utility moving-cost matrix τ[l,l']
-    B::Vector{Float64}      = [0.0, 0.15]        # length L
-    σν::Float64             = 0.50
+    B::Vector{Float64}      = [0.0, 0.2]        # length L
+    σν::Float64             = 0.25
     τmove::Matrix{Float64}  = [0.0 0.30; 0.30 0.0]  # L×L, symmetric, zero diagonal
     # Gender-/occupation-specific distortions ([occupation, gender], I×2)
     τω::Matrix{Float64} = [0.0 0.00; 0.0 0.1]   # labor-income wedge  (1-τω)
@@ -189,7 +201,22 @@ function build_grids(p::Params; H̃T, M, t, Nz = 3, Nϵ = 5)
     z, Πz     = rouwenhorst(Nz, p.ρz, p.σξ)
     ϵgrid, ϵw = lognormal_grid(Nϵ, p.σϵ)
     Q = (2 .* H̃T ./ M) .^ p.σ
-    return (; z, Πz, ϵgrid, ϵw, Nz, Nϵ, Q, t, I, L)
+    # Flatten the I-dimensional shock grid to a single concrete index sflat ∈ 1:Sϵ.
+    # Edecode[sflat, i] = shock-grid index for occupation i at flat index sflat.
+    # Wflat[sflat]      = ∏_i ϵw[Edecode[sflat,i]], the joint quadrature weight.
+    # This removes the runtime-rank CartesianIndex / abstract-typed prod() in the hot loop.
+    Sϵ      = Nϵ^I
+    Edecode = Matrix{Int}(undef, Sϵ, I)
+    Wflat   = Vector{Float64}(undef, Sϵ)
+    for (sflat, ci) in enumerate(CartesianIndices(ntuple(_ -> Nϵ, I)))
+        w = 1.0
+        for m in 1:I
+            Edecode[sflat, m] = ci[m]
+            w *= ϵw[ci[m]]
+        end
+        Wflat[sflat] = w
+    end
+    return (; z, Πz, ϵgrid, ϵw, Nz, Nϵ, Q, t, I, L, Sϵ, Edecode, Wflat)
 end
 
 # -----------------------------------------------------------------------------
@@ -198,20 +225,57 @@ end
 
 # Occupation choice (shared helper).
 #
-# With I occupations, each draws its OWN shock ϵ_i; ϵidx is an I-tuple
-# (CartesianIndex) of grid indices, one per occupation. Returns (i*, eᵢ*),
-# where eᵢ* = ϵidx[i*] is the grid index of the chosen occupation's own shock.
+# sflat is the flat shock index ∈ 1:Sϵ; Edecode[sflat, i] is the shock-grid
+# index for occupation i at that flat index. Returns (i*, ei*) where ei* is
+# the own-shock grid index of the chosen occupation.
 # Ties favour the lower-index occupation (occupation 1 = Teacher by default).
-@inline function choose_occupation(V, g, l, zi, ϵidx)
+@inline function choose_occupation(V, g, l, zi, sflat, Edecode)
     Iocc = size(V, 1)
-    i★, best = 1, V[1, g, l, zi, ϵidx[1]]
+    i★, best = 1, V[1, g, l, zi, Edecode[sflat, 1]]
     for i in 2:Iocc
-        v = V[i, g, l, zi, ϵidx[i]]
+        v = V[i, g, l, zi, Edecode[sflat, i]]
         if v > best
             i★, best = i, v
         end
     end
-    return i★, ϵidx[i★]
+    return i★, Edecode[sflat, i★]
+end
+
+# Occupation-choice WEIGHTS over the I occupations at flat shock sflat, written
+# into the preallocated buffer `w` (length I). With θ == 0 this is a one-hot at
+# the Roy argmax (ties → lower index), i.e. EXACTLY `choose_occupation`, so the
+# hard-choice model is the nested θ = 0 case. With θ > 0 it is a softmax with
+# temperature θ over the occupation values V[i,g,l,zi,Edecode[sflat,i]] — a logit
+# occupation choice that is continuous in V and removes the discontinuity behind
+# the household limit cycle. The own-shock index for occupation i is
+# Edecode[sflat, i] at every i, so callers index H/E/Pi with that.
+@inline function occupation_weights!(w, V, g, l, zi, sflat, Edecode, θ)
+    Iocc = size(V, 1)
+    if θ == 0.0
+        i★, best = 1, V[1, g, l, zi, Edecode[sflat, 1]]
+        for i in 2:Iocc
+            v = V[i, g, l, zi, Edecode[sflat, i]]
+            v > best && ((i★, best) = (i, v))
+        end
+        @inbounds for i in 1:Iocc
+            w[i] = (i == i★) ? 1.0 : 0.0
+        end
+    else
+        m = -Inf
+        for i in 1:Iocc
+            v = V[i, g, l, zi, Edecode[sflat, i]]
+            v > m && (m = v)
+        end
+        den = 0.0
+        @inbounds for i in 1:Iocc
+            w[i] = exp((V[i, g, l, zi, Edecode[sflat, i]] - m) / θ)
+            den += w[i]
+        end
+        @inbounds for i in 1:Iocc
+            w[i] /= den
+        end
+    end
+    return w
 end
 
 # Child-side objects entering a parent's consumption: for a child born in `l`
@@ -220,66 +284,95 @@ end
 # we store its education outlay D=(1+τe)e' and its human capital h'. Built from
 # the current policy guess (E, H, V).
 function child_objects(E, H, V, p::Params, grids)
-    (; Nz, Nϵ, I, L) = grids
+    (; Nz, L, Sϵ, Edecode, I) = grids
     # Dc = child's GROSS education outlay (1+τe)e';  Hc = child's human capital h'.
-    # Both are indexed [birth-loc, gender, z', ϵ_1, ..., ϵ_I] (I trailing shock dims).
-    shock_dims = ntuple(_ -> Nϵ, I)
-    Dc = zeros(L, 2, Nz, shock_dims...)
-    Hc = zeros(L, 2, Nz, shock_dims...)
-    for l in 1:L, g in 1:2, zi in 1:Nz, ϵidx in CartesianIndices(shock_dims)
-        # Child picks the occupation with the higher value; each occupation draws
-        # its OWN shock. i′ = chosen occupation, ei = its own shock's grid index.
-        i′, ei = choose_occupation(V, g, l, zi, ϵidx)
-        Dc[l, g, zi, ϵidx] = (1 + p.τe[i′, g]) * E[i′, g, l, zi, ei]   # what parent co-funds
-        Hc[l, g, zi, ϵidx] = H[i′, g, l, zi, ei]                      # what parent's altruism values
+    # Flat shock index sflat ∈ 1:Sϵ replaces the I trailing CartesianIndex dims.
+    # The occupation is chosen with weights `wocc` (θ = 0 ⇒ hard argmax).
+    Dc = zeros(L, 2, Nz, Sϵ)
+    Hc = zeros(L, 2, Nz, Sϵ)
+    wocc = Vector{Float64}(undef, I)
+    for l in 1:L, g in 1:2, zi in 1:Nz, sflat in 1:Sϵ
+        occupation_weights!(wocc, V, g, l, zi, sflat, Edecode, p.occ_θ)
+        for i in 1:I
+            wocc[i] == 0.0 && continue
+            ei = Edecode[sflat, i]
+            Dc[l, g, zi, sflat] += wocc[i] * (1 + p.τe[i, g]) * E[i, g, l, zi, ei]
+            Hc[l, g, zi, sflat] += wocc[i] * H[i, g, l, zi, ei]
+        end
     end
     return Dc, Hc
 end
 
+# Precompute the (s,e)-independent altruism term Λ[zi, lp] once per HH sweep.
+# Λ[zi, lp] = Σ_{gp, zpi, sflat} 0.5·Πz[zi,zpi]·Wflat[sflat]·λ·log(Hc[lp,gp,zpi,sflat])
+# When ε=0 the full EV collapses to μ·log(Y) + Λ[zi,lp], eliminating the Sϵ inner loop.
+function precompute_lambda(Hc, p::Params, grids)
+    (; Πz, Nz, Sϵ, Wflat, L) = grids
+    Λ = zeros(Nz, L)
+    for zi in 1:Nz, lp in 1:L
+        acc = 0.0
+        for gp in 1:2, zpi in 1:Nz
+            pz = Πz[zi, zpi]
+            pz == 0.0 && continue
+            for sflat in 1:Sϵ
+                acc += pz * Wflat[sflat] * 0.5 * p.λ * log(Hc[lp, gp, zpi, sflat])
+            end
+        end
+        Λ[zi, lp] = acc
+    end
+    return Λ
+end
+
 # Expected value W_l' of working in each location, given the parent's own
 # (occupation i, gender g, birth loc l, ability zi, shock ei) and choice (s,e).
+# Λ[zi, lp] = precomputed altruism integral (child-HC term, independent of (s,e)).
 # Returns the length-L vector W and the parent's human capital h.
-function location_values(i, g, l, zi, ei, s, e, Dc, Hc, p::Params, grids)
-    (; z, ϵgrid, ϵw, Πz, Nz, Nϵ, Q, t, I, L) = grids
-    # Parent's own human capital from the reduced-form schooling tech.
+function location_values(i, g, l, zi, ei, s, e, Dc, Λ, p::Params, grids)
+    (; z, ϵgrid, Πz, Nz, Q, t, L, Sϵ, Wflat) = grids
     h = Q[l] * (z[zi] * ϵgrid[ei])^p.α * s^p.φ * e^p.η
-    W = fill(-Inf, L)
-    shock_dims = ntuple(_ -> Nϵ, I)
-    for lp in 1:L                                    # lp = candidate WORK location
-        # Wage: teachers earn κ·h^γ; others earn linear A·h.
-        wage = i == p.T ? p.κ[lp] * h^p.γ : p.A[i] * h
-        # Y = disposable resources after tax, income wedge, and the parent's OWN
-        #     share (1-ε) of this period's education spending e.
-        Y = (1 - t[lp]) * (1 - p.τω[i, g]) * wage - (1 - p.ε) * (1 + p.τe[i, g]) * e
-        # EV = expected continuation value, integrating over the child's gender gp,
-        #      next-period ability z', and the joint shock vector ϵidx. The 0.5 is
-        #      the gender probability; ∏ ϵw[ϵidx[m]] are the remaining quadrature weights.
-        EV = 0.0; feasible = true
-        for gp in 1:2, zpi in 1:Nz
-            pz = Πz[zi, zpi]                          # ability transition prob z -> z'
-            pz == 0.0 && continue
-            for ϵidx in CartesianIndices(shock_dims)
-                # Old-age consumption: resources Y less the parent's share ε of the
-                # child's education outlay. C ≤ 0 means this (s,e) is infeasible.
-                C = Y - p.ε * Dc[lp, gp, zpi, ϵidx]
-                if C ≤ 0
-                    INFEASIBLE_VERBOSE[] && println("  infeasible (s,e) = ($s, $e) for parent state (i=$i, g=$g, l=$l, z=$zi, ϵ=$ei) and child state (gp=$gp, zpi=$zpi, ϵ=$(Tuple(ϵidx)))")
-                    feasible = false; break
-                end
-                w = prod(ϵw[ϵidx[m]] for m in 1:I)
-                # Flow utility: μ·log(consumption) + λ·log(child's human capital).
-                EV += pz * w * 0.5 *
-                      (p.μ * log(C) + p.λ * log(Hc[lp, gp, zpi, ϵidx]))
-            end
-            feasible || break
+    W = Vector{Float64}(undef, L)
+    if p.ε == 0.0
+        # Fast path: C = Y independent of child shocks; weights sum to 1 so
+        # EV = μ·log(Y) + Λ[zi, lp].  Eliminates the entire Sϵ inner loop.
+        # log(max(Y, 1e-30)) keeps the objective smooth across the Y=0 boundary so
+        # LBFGS's line search never encounters a hard discontinuity.
+        for lp in 1:L
+            wage = i == p.T ? p.κ[lp] * h^p.γ : p.A[i] * h
+            Y = (1 - t[lp]) * (1 - p.τω[i, g]) * wage - (1 + p.τe[i, g]) * e
+            W[lp] = p.μ * smooth_log(Y) + Λ[zi, lp]
         end
-        W[lp] = feasible ? EV : -Inf                 # value of working in lp
+    else
+        for lp in 1:L
+            wage = i == p.T ? p.κ[lp] * h^p.γ : p.A[i] * h
+            Y = (1 - t[lp]) * (1 - p.τω[i, g]) * wage - (1 - p.ε) * (1 + p.τe[i, g]) * e
+            EV = Λ[zi, lp]
+            for gp in 1:2, zpi in 1:Nz
+                pz = Πz[zi, zpi]
+                pz == 0.0 && continue
+                for sflat in 1:Sϵ
+                    C = Y - p.ε * Dc[lp, gp, zpi, sflat]
+                    EV += pz * Wflat[sflat] * 0.5 * p.μ * smooth_log(C)
+                end
+            end
+            W[lp] = EV
+        end
     end
     return W, h
 end
 
 # Gumbel log-sum over locations (folds in amenity B and moving cost τ) and the
 # associated choice probabilities π_{l'|l}.
+#
+# Given the stage-2 values W[lp] (the expected utility of working in lp, already
+# integrated over child shocks), the location-specific amenities B[lp], and the
+# utility moving costs τmove[l, lp], the net payoff of choosing destination lp is
+#     u(lp) = W[lp] + B[lp] − τmove[l, lp] + σν · ν_{lp},
+# where ν_{lp} ~ i.i.d. Gumbel(0,1). The standard Gumbel extreme-value result gives
+# the expected maximum (= expected utility from optimal location choice):
+#     EV = σν · log Σ_{lp} exp( u(lp) / σν )
+# and the choice probabilities (softmax):
+#     π_{lp|l} = exp( u(lp)/σν ) / Σ_{lp'} exp( u(lp')/σν ).
+# A larger σν increases both location-choice dispersion and the option value of moving.
 function logsum_probs(W, l, p::Params)
     L = length(W)
     # Scaled net payoff of each work location lp: value + amenity B − moving cost τ,
@@ -287,8 +380,9 @@ function logsum_probs(W, l, p::Params)
     x   = ((W[lp] + p.B[lp] - p.τmove[l, lp]) / p.σν for lp in 1:L)
     x   = collect(x)
     m   = maximum(x)                                  # max-subtract for numerical stability
-    den = sum(exp.(x .- m))
-    # Returns (expected value = σν·log-sum-exp,  softmax choice probabilities π_{l'|l}).
+    den = sum(exp.(x .- m))                           # Σ exp(x - m); equals Σ exp(x) / exp(m)
+    # σν·(m + log(den)) = σν·log(exp(m)·den) = σν·log(Σ exp(x)), the log-sum-exp EV.
+    # The softmax probabilities are exp(x-m)/den, cancelling exp(m) from numerator and denominator.
     return p.σν * (m + log(den)), exp.(x .- m) ./ den
 end
 
@@ -296,10 +390,10 @@ end
 # 4. Inner problem: maximize  log(1-s) + V̄(h(s,e))  over (s,e) for one state.
 #    Unconstrained via transforms  s = logistic(x1) ∈ (0,1),  e = exp(x2) > 0.
 # -----------------------------------------------------------------------------
-function neg_objective(x, i, g, l, zi, ei, Dc, Hc, p::Params, grids)
+function neg_objective(x, i, g, l, zi, ei, Dc, Λ, p::Params, grids)
     s = 1 / (1 + exp(-x[1]))
     e = exp(x[2])
-    W, _ = location_values(i, g, l, zi, ei, s, e, Dc, Hc, p, grids)
+    W, _ = location_values(i, g, l, zi, ei, s, e, Dc, Λ, p, grids)
     all(==(-Inf), W) && return 1e10
     V̄, _ = logsum_probs(W, l, p)
     return -(log(1 - s) + V̄)
@@ -308,13 +402,20 @@ end
 # One sweep: re-optimize (s,e) at every state given the current child objects.
 function update_policy!(S, E, H, V, Dc, Hc, p::Params, grids)
     (; z, ϵgrid, Nz, Nϵ, Q, I, L) = grids
+    Λ = precompute_lambda(Hc, p, grids)
     for i in 1:I, g in 1:2, l in 1:L, zi in 1:Nz, ei in 1:Nϵ
         # Warm start from the current policy, mapped to the unconstrained space
         # (x1 = logit(s), x2 = log(e)) the optimizer works in.
         s0, e0 = S[i, g, l, zi, ei], E[i, g, l, zi, ei]
         x0  = [log(s0 / (1 - s0)), log(e0)]
-        res = optimize(x -> neg_objective(x, i, g, l, zi, ei, Dc, Hc, p, grids),
-                       x0, LBFGS())
+        # Fallback: if the warm-start objective is already terrible (e.g. the GE
+        # aggregates shifted so that (s0,e0) now yields Y < 0), reset to a safe
+        # default rather than handing LBFGS a zero-gradient starting point.
+        if neg_objective(x0, i, g, l, zi, ei, Dc, Λ, p, grids) > 50.0
+            x0 = [log(0.4 / 0.6), log(0.05)]
+        end
+        res = optimize(x -> neg_objective(x, i, g, l, zi, ei, Dc, Λ, p, grids),
+                       x0, LBFGS(), Optim.Options(iterations = 200, g_tol = 1e-6))
         # Map the optimizer's solution back to (s,e) and store the updated policy,
         # the implied human capital H, and the value V (= −minimised objective).
         x = Optim.minimizer(res)
@@ -335,10 +436,11 @@ end
 function location_probs(S, E, H, V, p::Params, grids)
     (; Nz, Nϵ, I, L) = grids
     Dc, Hc = child_objects(E, H, V, p, grids)
+    Λ = precompute_lambda(Hc, p, grids)
     Pi = zeros(I, 2, L, Nz, Nϵ, L)
     for i in 1:I, g in 1:2, l in 1:L, zi in 1:Nz, ei in 1:Nϵ
         s, e = S[i, g, l, zi, ei], E[i, g, l, zi, ei]
-        W, _ = location_values(i, g, l, zi, ei, s, e, Dc, Hc, p, grids)
+        W, _ = location_values(i, g, l, zi, ei, s, e, Dc, Λ, p, grids)
         _, πi = logsum_probs(W, l, p)
         @views Pi[i, g, l, zi, ei, :] .= πi
     end
@@ -360,19 +462,23 @@ end
 #    πbar[l₀, z, l'].
 # -----------------------------------------------------------------------------
 function stationary_phi(Pi, V, p::Params, grids)
-    (; Nz, Nϵ, ϵw, Πz, I, L) = grids
-    shock_dims = ntuple(_ -> Nϵ, I)
+    (; Nz, Πz, L, Sϵ, Wflat, Edecode, I) = grids
 
     # πbar[l0, z, l'] = gender- and shock-averaged probability that a parent born in
     # (l0, z) ends up raising a child in l'. Integrate the location probabilities Pi
-    # over gender (the 0.5) and the joint shock vector (the ϵw quadrature weights),
-    # using each state's optimally chosen occupation i★.
+    # over gender (the 0.5), the flat joint shock index (Wflat quadrature weights),
+    # and the occupation choice (weights wocc; θ = 0 ⇒ hard argmax).
     πbar = zeros(L, Nz, L)
-    for l0 in 1:L, zi in 1:Nz, g in 1:2, ϵidx in CartesianIndices(shock_dims)
-        i★, ei = choose_occupation(V, g, l0, zi, ϵidx)
-        w = 0.5 * prod(ϵw[ϵidx[m]] for m in 1:I)
-        for lp in 1:L
-            πbar[l0, zi, lp] += w * Pi[i★, g, l0, zi, ei, lp]
+    wocc = Vector{Float64}(undef, I)
+    for l0 in 1:L, zi in 1:Nz, g in 1:2, sflat in 1:Sϵ
+        occupation_weights!(wocc, V, g, l0, zi, sflat, Edecode, p.occ_θ)
+        w = 0.5 * Wflat[sflat]
+        for i in 1:I
+            wocc[i] == 0.0 && continue
+            ei = Edecode[sflat, i]
+            for lp in 1:L
+                πbar[l0, zi, lp] += w * wocc[i] * Pi[i, g, l0, zi, ei, lp]
+            end
         end
     end
 
@@ -397,39 +503,63 @@ end
 # 7. Aggregates implied by the policies and the endogenous distribution Φ.
 # -----------------------------------------------------------------------------
 function aggregates(Φ, Pi, H, V, p::Params, grids)
-    (; Nz, Nϵ, ϵw, I, L) = grids
-    shock_dims = ntuple(_ -> Nϵ, I)
-    expo  = p.β / p.σ                                 # exponent in the H̃_T aggregator
-    HT    = zeros(L)                                  # teacher-HC aggregator, per location
-    Inc   = zeros(L)                                  # taxable labor income, per location
-    Wbill = zeros(L)                                  # teacher wage bill, per location
+    (; Nz, L, Sϵ, Wflat, Edecode, I) = grids
+    # expo = β/σ is the exponent in the teacher-HC aggregator
+    #   H̃_{T,l} = Σ_g ∫ h^{β/σ} dF_{T,l,g}
+    # (see notes A.1 and header comment). β < σ means the aggregator is concave
+    # in teacher HC, so doubling teacher quality raises Q less than proportionally.
+    expo  = p.β / p.σ
+    HT    = zeros(L)                                  # accumulates H̃_{T,l} = Σ∫ h^{β/σ} for teachers
+    Inc   = zeros(L)                                  # taxable labor income Σ∫ (1−τω)·wage dΦ, per work location
+    Wbill = zeros(L)                                  # teacher wage bill Σ∫ wage·1_T dΦ, per work location
 
     # Integrate policies against the ENDOGENOUS distribution Φ (not the ergodic z law).
-    # Outer loops sum over birth state (l0, z); inner loops over gender and the
-    # joint shock vector.
+    # Φ[zi, l0] is the mass of agents born in location l0 with ability z[zi]; it is
+    # determined jointly with migration (see stationary_phi). Using Φ rather than the
+    # ergodic G* matters because high-amenity locations attract high-ability parents,
+    # so the local ability distribution is endogenously skewed (header, §key subtlety).
+    #
+    # Outer loops sum over birth state (l0, z); inner loops over gender and the flat
+    # shock index sflat (concrete Int, avoids abstract CartesianIndex overhead).
+    wocc = Vector{Float64}(undef, I)
     for l0 in 1:L, zi in 1:Nz
-        wbase = 0.5 * Φ[zi, l0]                       # mass at (l0,z), split by gender
+        wbase = 0.5 * Φ[zi, l0]                       # mass at (l0,z), halved because each gender gets equal weight
         wbase == 0.0 && continue
-        for g in 1:2, ϵidx in CartesianIndices(shock_dims)
-            i★, ei = choose_occupation(V, g, l0, zi, ϵidx)
-            wjk = wbase * prod(ϵw[ϵidx[m]] for m in 1:I)  # full quadrature weight for this draw
-            h   = H[i★, g, l0, zi, ei]
-            for lp in 1:L                             # spread mass over WORK locations via Pi
-                pij = Pi[i★, g, l0, zi, ei, lp]
-                pij == 0.0 && continue
-                wage = i★ == p.T ? p.κ[lp] * h^p.γ : p.A[i★] * h
-                Inc[lp] += wjk * pij * (1 - p.τω[i★, g]) * wage
-                if i★ == p.T                          # only teachers feed H̃_T and the wage bill
-                    Wbill[lp] += wjk * pij * wage
-                    HT[lp]    += wjk * pij * h^expo
+        for g in 1:2, sflat in 1:Sϵ
+            # Occupation choice weights (θ = 0 ⇒ one-hot at the Roy argmax).
+            occupation_weights!(wocc, V, g, l0, zi, sflat, Edecode, p.occ_θ)
+            # wjk = mass element for this (l0, zi, g, shock) cell; Wflat[sflat] is
+            # the joint quadrature weight ∏_i ϵw[Edecode[sflat,i]] for the I-shock draw.
+            wjk = wbase * Wflat[sflat]
+            for i in 1:I
+                wocc[i] == 0.0 && continue
+                ei = Edecode[sflat, i]
+                h  = H[i, g, l0, zi, ei]
+                # Agents born in (l0, z) choose a work location lp with probability Pi[...].
+                # Pi already integrates the Gumbel shocks, so this spreads each birth-state
+                # mass cell across all potential work destinations.
+                for lp in 1:L
+                    pij = Pi[i, g, l0, zi, ei, lp]
+                    pij == 0.0 && continue
+                    # After-distortion wage: teacher earns κ_lp h^γ, non-teacher earns A_i h.
+                    # The labor-income wedge τω reduces the income subject to taxation.
+                    wage = i == p.T ? p.κ[lp] * h^p.γ : p.A[i] * h
+                    Inc[lp] += wjk * wocc[i] * pij * (1 - p.τω[i, g]) * wage
+                    if i == p.T                          # only teachers feed H̃_T and the wage bill
+                        Wbill[lp] += wjk * wocc[i] * pij * wage     # gross (pre-tax) teacher wage for budget
+                        HT[lp]    += wjk * wocc[i] * pij * h^expo   # teacher-HC aggregator contribution
+                    end
                 end
             end
         end
     end
 
-    # Headcount M_l = 2·(mass in l); tax rate t_l balances the local budget
-    # (teacher wage bill / taxable income), clamped to a sane [0, 0.9] range.
+    # M_l = 2 × (total mass of parents born in l), because each parent-child pair
+    # contributes one young agent and one old agent to the headcount.
     M = [2 * sum(@view Φ[:, l]) for l in 1:L]
+    # Local balanced-budget tax rate: t_l = Wbill_l / Inc_l (teacher wages financed
+    # entirely by a proportional tax on local labor income). Clamped to [0, 0.9]
+    # to keep consumption positive even at extreme calibrations.
     t = [Inc[lp] > 0 ? clamp(Wbill[lp] / Inc[lp], 0.0, 0.9) : 0.0 for lp in 1:L]
     return HT, M, t
 end
@@ -471,8 +601,8 @@ end
 fmtvec(v) = "(" * join((@sprintf("%.4f", x) for x in v), ", ") * ")"
 
 function solve_ge(p::Params = Params();
-                  Nz = 5, Nϵ = 7, damping = 0.5, tol = 1e-4, maxit = 100,
-                  hh_tol = 1e-6, hh_maxit = 2000, verbose = true)
+                  Nz = 5, Nϵ = 7, damping = 0.5, tol = 1e-5, maxit = 1000,
+                  hh_tol = 1e-6, hh_maxit = 1000, verbose = true)
     prev_verbose = INFEASIBLE_VERBOSE[]
     INFEASIBLE_VERBOSE[] = false
 
@@ -556,15 +686,15 @@ end
 
 "Gender-pooled teaching share among young born in l, weighted by the *endogenous* G_l(z)."
 function teaching_share_endo(V, l, Φ, grids, p::Params)
-    (; Nz, Nϵ, ϵw, I) = grids
-    shock_dims = ntuple(_ -> Nϵ, I)
+    (; Nz, Sϵ, Wflat, Edecode, I) = grids
     mass = sum(@view Φ[:, l])
     s = 0.0
+    wocc = Vector{Float64}(undef, I)
     for zi in 1:Nz
         gz = Φ[zi, l] / mass
-        for g in 1:2, ϵidx in CartesianIndices(shock_dims)
-            i★, _ = choose_occupation(V, g, l, zi, ϵidx)
-            i★ == p.T && (s += 0.5 * gz * prod(ϵw[ϵidx[m]] for m in 1:I))
+        for g in 1:2, sflat in 1:Sϵ
+            occupation_weights!(wocc, V, g, l, zi, sflat, Edecode, p.occ_θ)
+            s += 0.5 * gz * Wflat[sflat] * wocc[p.T]   # probability mass on teaching
         end
     end
     return s
@@ -624,10 +754,14 @@ end
 # -----------------------------------------------------------------------------
 function main()
     println("Solving spatial model in general equilibrium ...")
-    sol = solve_ge(Params(); Nz = 3, Nϵ = 7, damping = 0.5, tol = 1e-5)
+    sol = solve_ge(Params(); Nz = 3, Nϵ = 11, damping = 0.5, tol = 1e-5)
     report_ge(sol)
     return sol
 end
 
 
-@time main()
+# Only auto-run the headline solve when this file is executed as a script
+# (`julia spatial_ge.jl`), NOT when it is `include`d by a test/diagnostic file.
+if abspath(PROGRAM_FILE) == @__FILE__
+    @time main()
+end

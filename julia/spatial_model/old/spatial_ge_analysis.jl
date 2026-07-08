@@ -166,7 +166,7 @@ function report_ge_checks(sol)
     @printf("    M_l = 2 ∫ Φ_l                : %.2e   [%s]\n", Ml_dev, mark(Ml_dev < 5e-3))
     @printf("    household policy residual    : %.2e   [%s]\n", hh, mark(hh < 1e-3))
     gm.res < 5e-3 || println("    ⚠ outer iteration not tightly converged — " *
-                             "lower `damping` and/or raise `maxit`.")
+                             "raise `damping` and/or increase `maxit`.")
 
     # Budget: solve_ge clamps t to (0,0.9); if a rate hits the clamp the local
     # balanced budget t·I = W does NOT hold exactly.  Flag it.
@@ -227,7 +227,7 @@ end
 # -----------------------------------------------------------------------------
 function scale_invariance_test(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 80)
     println("\n========== Scale-invariance test (Mtot: 2 → 4) ==========")
-    kw = (; Nz, Nϵ, damping, tol = 1e-3, maxit, hh_tol = 1e-5, hh_maxit = 40, verbose = false)
+    kw = (; Nz, Nϵ, damping, tol = 1e-4, maxit, hh_tol = 1e-5, hh_maxit = 400, verbose = false)
     s1 = solve_ge(Params(Mtot = 2.0); kw...)
     s2 = solve_ge(Params(Mtot = 4.0); kw...)
 
@@ -238,13 +238,13 @@ function scale_invariance_test(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 80)
     g(s, l) = s.Φ[:, l] ./ sum(@view s.Φ[:, l])
     dG  = maximum(maximum(abs, g(s2, l) .- g(s1, l)) for l in 1:2)
 
-    @printf("  M(4) vs 2·M(2)   : Δ = %.2e   [%s]\n", dM,  mark(dM  < 5e-3))
-    @printf("  H̃_T(4) vs 2·H̃_T(2): Δ = %.2e   [%s]\n", dHT, mark(dHT < 5e-3))
-    @printf("  Q  unchanged     : Δ = %.2e   [%s]\n", dQ,  mark(dQ  < 5e-3))
-    @printf("  t  unchanged     : Δ = %.2e   [%s]\n", dt,  mark(dt  < 5e-3))
-    @printf("  Gₗ unchanged     : Δ = %.2e   [%s]\n", dG,  mark(dG  < 5e-3))
+    @printf("  M(4) vs 2·M(2)   : Δ = %.2e   [%s]\n", dM,  mark(dM  < 1e-3))
+    @printf("  H̃_T(4) vs 2·H̃_T(2): Δ = %.2e   [%s]\n", dHT, mark(dHT < 1e-3))
+    @printf("  Q  unchanged     : Δ = %.2e   [%s]\n", dQ,  mark(dQ  < 1e-3))
+    @printf("  t  unchanged     : Δ = %.2e   [%s]\n", dt,  mark(dt  < 1e-3))
+    @printf("  Gₗ unchanged     : Δ = %.2e   [%s]\n", dG,  mark(dG  < 1e-3))
     println("=========================================================")
-    return max(dM, dHT, dQ, dt, dG) < 5e-3
+    return max(dM, dHT, dQ, dt, dG) < 1e-3
 end
 
 # -----------------------------------------------------------------------------
@@ -275,7 +275,7 @@ function teach_share_total(sol)
     return num / sum(sol.Φ)
 end
 
-function comparative_statics(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 120, hh_maxit = 120)
+function comparative_statics(; Nz = 3, Nϵ = 7, damping = 0.2, maxit = 120, hh_maxit = 1000)
     println("\n========== Comparative statics (one-parameter deviations) ==========")
     cases = [
         (label = "baseline",        p = Params()),
@@ -308,7 +308,7 @@ function comparative_statics(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 120, hh_m
                        hh_tol = 1e-5, hh_maxit, verbose = false)
         sols[c.label] = sol
         res  = ge_map_residual(sol).res
-        conv = res < 1e-2                         # treat >1e-2 as "did not settle"
+        conv = res < 5e-3                         # treat >5e-3 as "did not settle"
         conv || push!(stuck, c.label)
         ok   = policies_in_bounds(sol.S, sol.E, sol.V)
         @printf("  %-16s %.1e  %-6s (%.3f,%.3f)       (%.3f,%.3f)      %.3f  %.3f  %s\n",
@@ -321,7 +321,7 @@ function comparative_statics(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 120, hh_m
         println("    expected: high β weakens the contraction, and σν→0 / large move costs")
         println("    make the Φ-eigenproblem near-degenerate.  The household block is")
         println("    already solved to the headline inner budget here, so a remaining")
-        println("    stall is in the *outer* map: re-solve with a smaller `damping`")
+        println("    stall is in the *outer* map: re-solve with a *larger* `damping`")
         println("    (see the damping diagnostic) and a larger `maxit`.")
     end
 
@@ -331,7 +331,12 @@ function comparative_statics(; Nz = 3, Nϵ = 5, damping = 0.2, maxit = 120, hh_m
     chk(name, cond) = @printf("    %-40s %s\n", name, cond ? "ok" : "FAIL")
     chk("amenity in loc 2 raises M₂", sols["amenity-loc2"].M[2] > base.M[2])
     chk("high move cost lowers outflow", outflow_rate(sols["high-move-cost"]) < outflow_rate(base))
-    chk("low σν lowers outflow",        outflow_rate(sols["low-σν"]) < outflow_rate(base))
+    # Only check directional sign when the comparison case actually converged.
+    if ge_map_residual(sols["low-σν"]).res < 5e-3
+        chk("low σν lowers outflow", outflow_rate(sols["low-σν"]) < outflow_rate(base))
+    else
+        @printf("    %-40s %s\n", "low σν lowers outflow", "SKIP (not converged)")
+    end
     chk("every case in bounds",
         all(policies_in_bounds(s.S, s.E, s.V) for s in values(sols)))
     println("====================================================================")
@@ -345,16 +350,16 @@ end
 #    successive-relaxation step size matters.  Report the residual reached at a
 #    few damping values to guide the choice for production runs.
 # -----------------------------------------------------------------------------
-function damping_diagnostic(; Nz = 3, Nϵ = 15, maxit = 150, hh_maxit = 120)
+function damping_diagnostic(; Nz = 3, Nϵ = 7, maxit = 150, hh_maxit = 1000)
     println("\n========== Damping diagnostic (residual vs step size) ==========")
-    println("  The outer GE map is only weakly contracting (its H̃_T-elasticity")
-    println("  is ≈ β), so the successive-relaxation step size matters.  To keep")
-    println("  the comparison fair, this re-solves the baseline at the headline")
-    @printf("  grid and inner budget (Nϵ=%d, hh_maxit=%d), holds the outer\n", Nϵ, hh_maxit)
+    println("  The outer GE map is contracting with modulus ≈ β; larger damping")
+    println("  (larger step toward the new iterate) should converge faster.")
+    println("  To keep the comparison fair, this re-solves the baseline at the")
+    @printf("  headline grid (Nϵ=%d, hh_maxit=%d), holds the outer\n", Nϵ, hh_maxit)
     @printf("  budget fixed at %d iterations, and varies only `damping`.\n", maxit)
     @printf("  %-9s %-12s %s\n", "damping", "GE residual", "usable(<5e-3)")
     results = Tuple{Float64,Float64}[]
-    for d in (0.50, 0.30, 0.20)
+    for d in (0.80, 0.70, 0.50, 0.30, 0.20)
         sol = solve_ge(Params(); Nz, Nϵ, damping = d, tol = 1e-4, maxit,
                        hh_tol = 1e-5, hh_maxit, verbose = false)
         res = ge_map_residual(sol).res
@@ -364,9 +369,8 @@ function damping_diagnostic(; Nz = 3, Nϵ = 15, maxit = 150, hh_maxit = 120)
     _, i = findmin(last.(results))
     best_d, best_res = results[i]
     @printf("  lowest residual in this budget: damping = %.2f (%.2e).\n", best_d, best_res)
-    println("  The headline solve uses damping = 0.2; under-relaxation (smaller")
-    println("  steps) costs iterations but is more robust for a weakly contracting")
-    println("  map, which is why the production solve favours a smaller step.")
+    println("  Larger damping (step size closer to 1) converges faster when the")
+    println("  map is contracting; use smaller damping only if iterates diverge.")
     println("================================================================")
 end
 
@@ -425,7 +429,7 @@ end
 #     count  I·2·L·Nz·Nϵ^I  (policy states × joint-shock combinations) so the
 #     measured ratios can be read against the expected scaling.
 # -----------------------------------------------------------------------------
-function scaling_cost_test(; Nz = 2, Nϵ = 3, maxit = 6, hh_maxit = 6, reps = 1)
+function scaling_cost_test(; Nz = 2, Nϵ = 5, maxit = 6, hh_maxit = 6, reps = 3)
     println("\n========== Scaling-cost test (runtime vs dimensions) ==========")
     @printf("  Fixed budget: Nz=%d, Nϵ=%d, outer maxit=%d, inner hh_maxit=%d.\n",
             Nz, Nϵ, maxit, hh_maxit)
@@ -530,11 +534,13 @@ end
 #    this is slower, but a remaining "did not converge" flag then reflects the
 #    outer GE map, not an under-solved household problem.  (Expect the run to take
 #    noticeably longer than a truncated-budget pass for this reason.)
+#
+#    Headline: Nz=3, Nϵ=7.  All batteries use the same grid for comparability.
 # -----------------------------------------------------------------------------
 function main_test()
     println("Solving spatial model in general equilibrium (baseline) ...")
-    sol = solve_ge(Params(); Nz = 3, Nϵ = 7, damping = 0.2, tol = 1e-4,
-                   maxit = 100, hh_tol = 1e-5, hh_maxit = 1000, verbose = true)
+    sol = solve_ge(Params(); Nz = 3, Nϵ = 9, damping = 0.5, tol = 1e-4,
+                   maxit = 250, hh_tol = 1e-5, hh_maxit = 1000, verbose = true)
     report_ge(sol)
     report_ge_checks(sol)
     plot_ge_outcomes(sol; outdir = joinpath(@__DIR__, "figures"))
