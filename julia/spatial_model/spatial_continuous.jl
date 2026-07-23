@@ -65,19 +65,19 @@ Base.@kwdef struct Params
     η::Float64 = 0.20                            # goods-investment (e) elasticity of human capital
     σ::Float64 = 0.25                            # teacher-spillover curvature (enters the quality index Q)
     γ::Float64 = 0.80                            # human-capital elasticity of the teaching wage
-    κ::Vector{Float64} = [0.85, 1.0]             # length L; local teaching-wage shifter per location
+    κ::Vector{Float64} = [0.75, 0.9]             # length L; local teaching-wage shifter per location
     μ::Float64 = 1.00                            # weight on log consumption in flow utility
-    λ::Float64 = 0.50                            # altruism strength on child log-human-capital, f(h') = log h'
+    λ::Float64 = 0.70                            # altruism strength on child log-human-capital, f(h') = log h'
     occ_θ::Float64 = 0.0                         # occupation-choice tremble scale — ignored in continuous solver
-    B::Vector{Float64}      = [0.0, 0.2]         # length L; location amenity value
-    σν::Float64             = 0.25               # scale of the Gumbel location-taste shock
-    τmove::Matrix{Float64}  = [0.0 0.30; 0.30 0.0]  # L×L; utility cost of moving born-location → work-location
+    B::Vector{Float64}      = [0.0, 0.1]         # length L; location amenity value
+    σν::Float64             = 0.20               # scale of the Gumbel location-taste shock
+    τmove::Matrix{Float64}  = [0.0 0.20; 0.20 0.0]  # L×L; utility cost of moving born-location → work-location
     τω::Matrix{Float64} = [0.0 0.00; 0.0 0.1]    # I×2; labor-income wedge by (occupation, gender), income keeps (1−τω)
     τe::Matrix{Float64} = [0.0 0.00; 0.0 0.00]   # I×2; education barrier by (occupation, gender), cost scales as (1+τe)
-    ρz::Float64 = 0.70                           # AR(1) persistence of log ability z
+    ρz::Float64 = 0.9                            # AR(1) persistence of log ability z
     σξ::Float64 = 0.20                           # std of the AR(1) innovation to log z
     σϵ::Float64 = 0.30                           # std of the iid log idiosyncratic shock ε
-    β::Float64 = 0.10                            # exponent linking human capital to the teacher aggregator H̃_T
+    β::Float64 = 0.15                            # exponent linking human capital to the teacher aggregator H̃_T
     Mtot::Float64 = 2.0                          # total population mass (both genders, all locations)
 end
 
@@ -93,9 +93,9 @@ overridden by keyword via `kwargs...`.
 function Params(I::Int, L::Int;
                  T::Int = 1,
                  A_other::Float64 = 1.5,
-                 κ_base::Float64 = 0.85, κ_other::Float64 = 1.0,
-                 B_base::Float64 = 0.0,  B_other::Float64 = 0.15,
-                 τmove_off::Float64 = 0.30,
+                 κ_base::Float64 = 0.75, κ_other::Float64 = 0.9,
+                 B_base::Float64 = 0.0,  B_other::Float64 = 0.1,
+                 τmove_off::Float64 = 0.20,
                  τω_other::Float64 = 0.1,
                  kwargs...)
     A = fill(A_other, I)
@@ -187,7 +187,9 @@ function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
                      q_lo = 1e-5, q_hi = 1 - 1e-6)
     I = length(p.A); L = length(p.B)
     z, Πz = rouwenhorst(Nz, p.ρz, p.σξ)        # ability nodes z and their transition matrix Πz
-    Q = (2 .* H̃T ./ M) .^ p.σ                  # per-location teacher quality index Q_l (from H̃_T and mass M)
+    Mfloor = 1e-8
+    # Floor population mass in Q to avoid 0/0 -> NaN when a location collapses.
+    Q = (2 .* H̃T ./ max.(M, Mfloor)) .^ p.σ    # per-location teacher quality index Q_l (from H̃_T and mass M)
 
     # Teaching shock ε_T: unit-mean lognormal (mean of log is −σϵ²/2). ϵTgrid is a
     # quantile grid spanning (q_lo, q_hi) on which all teaching policies are stored.
@@ -718,11 +720,12 @@ end
 # 11. Outer general-equilibrium fixed point over (H̃_T, M, t).
 # -----------------------------------------------------------------------------
 fmtvec(v) = "(" * join((@sprintf("%.4f", x) for x in v), ", ") * ")"
+reldiff(nw, od; fl = 1e-3) = maximum(abs.(nw .- od) ./ max.(abs.(od), fl))
 
 function solve_ge(p::Params = Params();
                   Nz = 5, nϵT = 64, nXO = 64, damping = 0.3, tol = 1e-5,
                   maxit = 1000, hh_tol = 1e-6, hh_maxit = 1000, verbose = true,
-                  init = nothing)
+                  init = nothing, q_lo = 1e-5, q_hi = 1 - 1e-6)
     I = length(p.A); L = length(p.B)
     @assert length(p.κ) == L && size(p.τmove) == (L, L) &&
             size(p.τω) == (I, 2) && size(p.τe) == (I, 2) && 1 <= p.T <= I "Params dims inconsistent"
@@ -751,11 +754,12 @@ function solve_ge(p::Params = Params();
         end
     end
     local hh, Pi_T, Pi_O, Φ, πbar
+    Mfloor = 1e-8
     for it in 1:maxit
         # One GE iteration: rebuild grids at the current (H̃_T, M, t), solve the
         # household problem, derive location choices, the stationary distribution,
         # and the implied aggregates.  @elapsed times each stage for the log line.
-        gr = build_grids(p; H̃T = HT, M = M, t = t, Nz, nϵT, nXO)
+        gr = build_grids(p; H̃T = HT, M = M, t = t, Nz, nϵT, nXO, q_lo, q_hi)
         t_hh  = @elapsed (hh = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit,
                                                verbose = verbose && it == 1, Λ0, eT0, eO0))
         Λ0 = hh.Λ                              # carry Λ forward to warm-start the next iteration's household solve
@@ -764,10 +768,13 @@ function solve_ge(p::Params = Params();
         t_phi = @elapsed ((Φ, πbar) = stationary_phi(Pi_T, Pi_O, hh, p, gr))
         t_agg = @elapsed ((HTn, Mn, tn) = aggregates(Φ, Pi_T, Pi_O, hh, p, gr))
 
+        collapsed = Mn .< Mfloor
+        # A collapsed location has no meaningful balanced-budget tax; hold its tax
+        # fixed so a 0/undefined tax-base ratio does not create spurious oscillation.
+        tn[collapsed] .= t[collapsed]
+        t_err = any(.!collapsed) ? maximum(abs, tn[.!collapsed] .- t[.!collapsed]) : 0.0
         # Convergence = max relative change in H̃_T and M, and absolute change in t.
-        err = max(maximum(abs, (HTn .- HT) ./ HT),
-                  maximum(abs, (Mn  .- M ) ./ M ),
-                  maximum(abs,  tn  .- t))
+        err = max(reldiff(HTn, HT), reldiff(Mn, M), t_err)
         # Damped update: move a fraction `damping` toward the new guess for stability.
         @. HT = (1 - damping) * HT + damping * HTn
         @. M  = (1 - damping) * M  + damping * Mn
@@ -784,7 +791,7 @@ function solve_ge(p::Params = Params();
         end
     end
 
-    gr = build_grids(p; H̃T = HT, M = M, t = t, Nz, nϵT, nXO)
+    gr = build_grids(p; H̃T = HT, M = M, t = t, Nz, nϵT, nXO, q_lo, q_hi)
     # Final clean solve at the converged (H̃_T, M, t) so the returned policies,
     # location probabilities, and distribution are all mutually consistent.
     hh = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit, Λ0, eT0, eO0)
@@ -921,7 +928,7 @@ function main()
     # Solve at the default parameters with a moderately fine shock grid.
     # damping = 0.5 blends each GE update halfway toward the new fixed-point guess;
     # tol = 1e-6 is the convergence threshold on the (H̃_T, M, t) residual.
-    sol = solve_ge(Params(); Nz = 3, nϵT = 48, nXO = 48, damping = 0.9,
+    sol = solve_ge(Params(); Nz = 3, nϵT = 48, nXO = 48, damping = 0.75,
                    tol = 1e-6, hh_tol = 1e-6, maxit = 500, hh_maxit = 1000,
                    verbose = true)
     report_ge(sol)

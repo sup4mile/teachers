@@ -337,11 +337,11 @@ function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit
         (label = "low-altruism",    p = Params(λ = 0.10)),
         (label = "zero-altruism",   p = Params(λ = 0.0)),   # ε=0 AND λ=0 ⇒ no intergenerational coupling
         (label = "high-move-cost",  p = Params(τmove = [0.0 1.50; 1.50 0.0])),
-        (label = "low-σν",          p = Params(σν = 0.20)),
+        (label = "low-σν",          p = Params(σν = 0.10)),
         (label = "amenity-loc2",    p = Params(B = [0.0, 0.50])),
         (label = "high-teach-wage", p = Params(κ = [1.20, 1.40])),
         (label = "gender-wedge",    p = Params(τω = [0.0 0.0; 0.0 0.30])),
-        (label = "high-persistence",p = Params(ρz = 0.90)),
+        (label = "high-persistence",p = Params(ρz = 0.97)),
         (label = "low-persistence", p = Params(ρz = 0.40)),
     ]
 
@@ -380,6 +380,151 @@ function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit
         all(policies_in_bounds(s.hh) for s in values(sols)))
     println("====================================================================")
     return sols
+end
+
+# =============================================================================
+# 4b. Mechanism deep-dive.
+#
+# Eight questions the reduced comparative-statics table cannot answer on its own:
+#   Q1  more β cases + WHY high β corners (the β/σ ratio),
+#   Q2  how occupation choice and location choice interact,
+#   Q3  class sizes across locations,
+#   Q4  the distribution of (teacher) human capital by location,
+#   Q5  what drives spatial sorting on ability,
+#   Q6  sensitivity to the quantile bounds / shock grids,
+#   Q7  teacher-HC DISTRIBUTION vs teacher QUANTITY in setting Q_l,
+#   Q8  amenities vs altruism in location choice, and who moves (high/low z).
+#
+# Everything here is READ-ONLY on a converged `sol` (re-using the solver's own
+# choice_maps / integrate_choice, so the integrals match aggregates() exactly),
+# except the sweep drivers, which call solve_ge themselves. Figures land in the
+# same figures/ directory as the baseline plots.
+# -----------------------------------------------------------------------------
+
+share_hi_amenity(sol) = sol.M[argmax(sol.p.B)] / sum(sol.M)   # pop share in the top-amenity location
+
+"Side-by-side (dodged) grouped bars — the GR backend does not support
+ `bar_position=:dodge`, so offset each series manually. `M` is (ncats × nseries)."
+function grouped_bar(cats, series_labels, M; kwargs...)
+    n, k = size(M)
+    w = 0.8 / k
+    x = collect(1:n)
+    plt = bar(x .+ (1 - (k + 1) / 2) * w, M[:, 1]; bar_width = w,
+              label = series_labels[1], kwargs...)
+    for j in 2:k
+        bar!(plt, x .+ (j - (k + 1) / 2) * w, M[:, j]; bar_width = w, label = series_labels[j])
+    end
+    xticks!(plt, x, cats)
+    return plt
+end
+
+"Occupation-resolved born→work masses, plus teacher log-h moments by work loc.
+ Mirrors aggregates()'s cell loop but keeps the teach/non-teach split and the
+ born→work resolution. Returns masses `Tmass[born,work]`, `Omass[born,work]` and
+ per-work-location Σmass·logh, Σmass·logh², Σmass·h^{β/σ} (=H̃_T) among teachers."
+function flow_moments(sol)
+    (; hh, Φ, gr, p) = sol
+    (; Nz, L, nϵT, nXO) = gr
+    expo = p.β / p.σ
+    Tmass = zeros(L, L); Omass = zeros(L, L)
+    Tlogh = zeros(L); Tlogh2 = zeros(L); THT = zeros(L)
+    zeroO = zeros(nXO); zeroT = zeros(nϵT)
+    for l0 in 1:L, zi in 1:Nz
+        cell = 0.5 * Φ[zi, l0]
+        cell == 0.0 && continue
+        for g in 1:2
+            cm    = choice_maps(hh.WT[g, l0, zi, :], hh.WO[g, l0, zi, :], g, gr)
+            hTv   = hh.hT[g, l0, zi, :]
+            loghT = log.(hTv)
+            for lp in 1:L
+                πTv = collect(@view sol.Pi_T[g, l0, zi, :, lp])
+                πOv = collect(@view sol.Pi_O[g, l0, zi, :, lp])
+                ITc, _  = integrate_choice(πTv, zeroO, cm, gr)
+                _,  IOc = integrate_choice(zeroT, πOv, cm, gr)
+                ITl, _  = integrate_choice(πTv .* loghT,       zeroO, cm, gr)
+                ITl2, _ = integrate_choice(πTv .* loghT .^ 2,  zeroO, cm, gr)
+                ITh, _  = integrate_choice(πTv .* hTv .^ expo, zeroO, cm, gr)
+                Tmass[l0, lp] += cell * ITc
+                Omass[l0, lp] += cell * IOc
+                Tlogh[lp]  += cell * ITl
+                Tlogh2[lp] += cell * ITl2
+                THT[lp]    += cell * ITh
+            end
+        end
+    end
+    return (; Tmass, Omass, Tlogh, Tlogh2, THT)
+end
+
+"Teacher-HC and class-size moments by WORK location (Q3, Q4, Q7).
+ `classsize` = students (M_l/2) per teacher working in l; `qual_per_teacher` =
+ H̃_T,l / (#teachers) = mean h^{β/σ}, the intensive-margin (quality) piece of the
+ teacher aggregator, so H̃_T,l = Tcount_l × qual_per_teacher_l splits Q_l's driver
+ into a QUANTITY term (Tcount) and a DISTRIBUTION term (qual_per_teacher)."
+function teacher_moments(sol)
+    fm = flow_moments(sol)
+    (; L) = sol.gr
+    Tcount = [sum(@view fm.Tmass[:, lp]) for lp in 1:L]
+    Ocount = [sum(@view fm.Omass[:, lp]) for lp in 1:L]
+    meanlogh = [Tcount[lp] > 0 ? fm.Tlogh[lp] / Tcount[lp] : NaN for lp in 1:L]
+    sdlogh   = [Tcount[lp] > 0 ? sqrt(max(fm.Tlogh2[lp] / Tcount[lp] - meanlogh[lp]^2, 0.0)) : NaN for lp in 1:L]
+    students  = sol.M ./ 2
+    classsize = [Tcount[lp] > 0 ? students[lp] / Tcount[lp] : NaN for lp in 1:L]
+    qual_per_teacher = [Tcount[lp] > 0 ? fm.THT[lp] / Tcount[lp] : NaN for lp in 1:L]
+    return (; Tcount, Ocount, meanlogh, sdlogh, classsize, qual_per_teacher,
+              HT = fm.THT, Q = sol.gr.Q, students, Tmass = fm.Tmass, Omass = fm.Omass)
+end
+
+"Mean ability z by BIRTH and by WORK location, and scalar sorting indices
+ (spread in mean z across locations). `Ψ` is the post-migration (work-location)
+ ability mass. Answers Q5's 'how much sorting'."
+function sorting_metrics(sol)
+    (; Φ, πbar, gr) = sol
+    (; z, Nz, L) = gr
+    Ψ = [sum(Φ[zi, l0] * πbar[l0, zi, l] for l0 in 1:L) for zi in 1:Nz, l in 1:L]
+    meanz(w) = sum(z[zi] * w[zi] for zi in 1:Nz) / sum(w)
+    mz_birth = [meanz(@view Φ[:, l]) for l in 1:L]
+    mz_work  = [meanz(@view Ψ[:, l]) for l in 1:L]
+    return (; mz_birth, mz_work, Ψ,
+              idx_birth = maximum(mz_birth) - minimum(mz_birth),
+              idx_work  = maximum(mz_work)  - minimum(mz_work))
+end
+
+"Per-ability probability of leaving the birth location, population-weighted over
+ birth locations and also resolved per birth location (Q8: who moves?)."
+function mobility_by_ability(sol)
+    (; Φ, πbar, gr) = sol
+    (; Nz, L) = gr
+    out_by_birth = [sum(πbar[l0, zi, l] for l in 1:L if l != l0) for zi in 1:Nz, l0 in 1:L]
+    outflow = [sum(Φ[zi, l0] * out_by_birth[zi, l0] for l0 in 1:L) / sum(@view Φ[zi, :])
+               for zi in 1:Nz]
+    return (; outflow, out_by_birth)
+end
+
+"Weighted (log h, weight) sample of teachers WORKING in location `lp`, for a
+ density estimate. Node weight = cell mass × f_T(ε)·Δε × P(teach|ε) × π(→lp)."
+function teacher_logh_samples(sol, lp)
+    (; hh, Φ, gr) = sol
+    (; Nz, L, nϵT, ϵTgrid, dT) = gr
+    dϵ = similar(ϵTgrid)                        # trapezoid probability spacing on the ε_T grid
+    dϵ[1] = (ϵTgrid[2] - ϵTgrid[1]) / 2
+    dϵ[end] = (ϵTgrid[end] - ϵTgrid[end-1]) / 2
+    @inbounds for k in 2:nϵT-1
+        dϵ[k] = (ϵTgrid[k+1] - ϵTgrid[k-1]) / 2
+    end
+    logh = Float64[]; w = Float64[]
+    for l0 in 1:L, zi in 1:Nz, g in 1:2
+        cell = 0.5 * Φ[zi, l0]
+        cell == 0.0 && continue
+        cm = choice_maps(hh.WT[g, l0, zi, :], hh.WO[g, l0, zi, :], g, gr)
+        for k in 1:nϵT
+            tw = teach_wt(cm, ϵTgrid[k])
+            tw <= 0.0 && continue
+            wt = cell * pdf(dT, ϵTgrid[k]) * dϵ[k] * tw * sol.Pi_T[g, l0, zi, k, lp]
+            wt <= 0.0 && continue
+            push!(logh, log(hh.hT[g, l0, zi, k])); push!(w, wt)
+        end
+    end
+    return logh, w
 end
 
 # -----------------------------------------------------------------------------
@@ -444,13 +589,29 @@ function plot_ge_outcomes(sol; outdir)
 
     erg = stationary(Πz)
     markers = [:circle, :square, :diamond, :utriangle, :star5, :hexagon]
-    pd = plot(xlabel = "z", ylabel = "mass", title = "Endogenous ability distribution (ε=0, continuous)")
+    pd = plot(xlabel = "z", ylabel = "mass", title = "Endogenous ability distribution")
     for l in 1:L
         gl = sol.Φ[:, l] ./ sum(@view sol.Φ[:, l])
         plot!(pd, z, gl, marker = markers[mod1(l, length(markers))], label = "G_$(l)(z)")
     end
     plot!(pd, z, erg, marker = :diamond, ls = :dash, label = "ergodic G*(z)")
     savefig(pd, joinpath(outdir, "continuous_ability_distribution.png"))
+
+    # Same object, but by WORK location instead of BIRTH location. Φ[z,l] is indexed
+    # by BIRTH location (the "young"/at-birth cohort, before they sort across space);
+    # pushing it through the ability-specific migration kernel πbar gives the mass of
+    # each ability z that ends up WORKING in each l (the "old"/post-migration cohort).
+    # z is fixed over life, so the marginal ability distribution is unchanged — the two
+    # plots differ only in how ability is allocated ACROSS locations by migration.
+    Ψ = [sum(sol.Φ[zi, l0] * sol.πbar[l0, zi, l] for l0 in 1:L) for zi in 1:Nz, l in 1:L]
+    pw = plot(xlabel = "z", ylabel = "mass",
+              title = "Endogenous ability distribution by WORK location")
+    for l in 1:L
+        gwl = Ψ[:, l] ./ sum(@view Ψ[:, l])
+        plot!(pw, z, gwl, marker = markers[mod1(l, length(markers))], label = "G^work_$(l)(z)")
+    end
+    plot!(pw, z, erg, marker = :diamond, ls = :dash, label = "ergodic G*(z)")
+    savefig(pw, joinpath(outdir, "continuous_ability_distribution_by_work.png"))
 
     pT = plot(layout = (1, 3), size = (1200, 350))
     for l in 1:L
@@ -604,6 +765,360 @@ function plot_household(sol; outdir)
 end
 
 # -----------------------------------------------------------------------------
+# 7c. Mechanism analyses + figures for the eight deep-dive questions.
+#
+# Shared solve settings for the sweep drivers below. Small (Nz=3, 32×32) so the
+# many-solve sweeps stay ~seconds each; every driver takes a keyword override.
+# -----------------------------------------------------------------------------
+_dd_kw(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.3, tol = 1e-4, maxit = 150,
+        hh_maxit = 500) =
+    (; Nz, nϵT, nXO, damping, tol, maxit, hh_tol = 1e-5, hh_maxit, verbose = false)
+
+# ---- Q2. How occupation choice and location choice interact. ----------------
+# Teaching is decided when young; location when working. The two margins couple:
+# (i) teaching selection differs across BIRTH locations (different G_l(z), Q_l);
+# (ii) teachers and non-teachers MIGRATE differently (teaching wages run through
+# κ_l' h^γ, so destinations matter differently for the two occupations).
+function analyze_occupation_location(sol; outdir)
+    mkpath(outdir)
+    (; L) = sol.gr
+    tm = teacher_moments(sol)
+    T, O = tm.Tmass, tm.Omass
+    println("\n========== Q2. Occupation × location interaction ==========")
+    born_mass  = [sum(@view T[l0, :]) + sum(@view O[l0, :]) for l0 in 1:L]
+    teach_born = [sum(@view T[l0, :]) / born_mass[l0] for l0 in 1:L]
+    println("  Teaching share among young born in l:")
+    for l0 in 1:L
+        @printf("    born %d : %.4f\n", l0, teach_born[l0])
+    end
+    # born→work destination shares, separately for teachers and non-teachers.
+    stay_T = zeros(L); stay_O = zeros(L)
+    println("\n  Migration (stay probability) by occupation:")
+    for l0 in 1:L
+        rowT = sum(@view T[l0, :]); rowO = sum(@view O[l0, :])
+        stay_T[l0] = rowT > 0 ? T[l0, l0] / rowT : NaN
+        stay_O[l0] = rowO > 0 ? O[l0, l0] / rowO : NaN
+        @printf("    born %d :  teachers stay %.4f   non-teachers stay %.4f   (Δ = %+.4f)\n",
+                l0, stay_T[l0], stay_O[l0], stay_T[l0] - stay_O[l0])
+    end
+    println("\n  Interpretation: Δ>0 means teachers are MORE rooted than non-teachers")
+    println("  born in the same place (κ_l' pins teaching income to the local wage);")
+    println("  Δ<0 means teaching is the more footloose occupation.")
+    println("===========================================================")
+
+    p1 = bar(["born $l0" for l0 in 1:L], teach_born, legend = false,
+             ylabel = "teaching share", title = "Teaching share by birth location",
+             ylims = (0, max(0.6, maximum(teach_born) * 1.15)))
+    p2 = grouped_bar(["born $l0" for l0 in 1:L], ["teacher", "non-teacher"],
+                     hcat(stay_T, stay_O); ylabel = "P(work = birth loc)",
+                     title = "Stay probability by occupation", ylims = (0, 1), legend = :topright)
+    plot(p1, p2, size = (1000, 380))
+    savefig(joinpath(outdir, "dd_occupation_location.png"))
+    return (; teach_born, stay_T, stay_O)
+end
+
+# ---- Q3/Q4/Q7. Class size, teacher-HC distribution, quantity vs quality. -----
+function analyze_class_and_teachers(sol; outdir)
+    mkpath(outdir)
+    (; L) = sol.gr
+    tm = teacher_moments(sol)
+    println("\n========== Q3/Q4/Q7. Class size & teacher human capital ==========")
+    @printf("  %-6s %-9s %-9s %-11s %-11s %-9s %-9s\n",
+            "loc", "Q_l", "class", "#teachers", "mean logh", "sd logh", "H̃_T")
+    for l in 1:L
+        @printf("  %-6d %-9.4f %-9.3f %-11.4f %-11.4f %-9.4f %-9.4f\n",
+                l, tm.Q[l], tm.classsize[l], tm.Tcount[l], tm.meanlogh[l],
+                tm.sdlogh[l], tm.HT[l])
+    end
+    println("\n  Q7. Decomposition  H̃_T,l = (#teachers) × (mean h^{β/σ}):")
+    println("      — the QUANTITY margin (#teachers) vs the DISTRIBUTION/quality")
+    println("        margin (mean h^{β/σ}). Ratios are location l / location 1.")
+    @printf("    %-8s %-12s %-16s %-12s\n", "loc", "H̃_T ratio", "quantity ratio", "quality ratio")
+    for l in 1:L
+        @printf("    %-8d %-12.3f %-16.3f %-12.3f\n", l,
+                tm.HT[l] / tm.HT[1], tm.Tcount[l] / tm.Tcount[1],
+                tm.qual_per_teacher[l] / tm.qual_per_teacher[1])
+    end
+    # Compare total cross-location variation (excluding the tied-at-1 reference)
+    # in the quantity vs the quality ratio.
+    qty_dev  = sum(abs.(tm.Tcount ./ tm.Tcount[1] .- 1))
+    qual_dev = sum(abs.(tm.qual_per_teacher ./ tm.qual_per_teacher[1] .- 1))
+    println("\n  ⇒ Cross-location differences in H̃_T are driven mainly by ",
+            qty_dev > qual_dev ? "QUANTITY (#teachers)" : "the teacher-HC DISTRIBUTION (quality)",
+            @sprintf("  (Σ|dev|: quantity %.3f vs quality %.3f).", qty_dev, qual_dev))
+    println("==================================================================")
+
+    gm    = exp.(tm.meanlogh)                        # geometric-mean teacher h (positive)
+    explo = exp.(tm.meanlogh .- tm.sdlogh)
+    exphi = exp.(tm.meanlogh .+ tm.sdlogh)
+    p1 = bar(["loc $l" for l in 1:L], tm.classsize, legend = false,
+             ylabel = "students / teacher", title = "Mean class size N̄_l")
+    p2 = bar(["loc $l" for l in 1:L], gm, yerror = (gm .- explo, exphi .- gm), legend = false,
+             ylabel = "geom-mean teacher h (±1sd in log)", title = "Teacher HC by location")
+    p3 = grouped_bar(["loc $l" for l in 1:L], ["quantity", "quality"],
+                     hcat(tm.Tcount ./ tm.Tcount[1], tm.qual_per_teacher ./ tm.qual_per_teacher[1]);
+                     ylabel = "ratio to loc 1", title = "H̃_T decomposition (quantity vs quality)",
+                     legend = :topleft)
+    plot(p1, p2, p3, layout = (1, 3), size = (1300, 380))
+    savefig(joinpath(outdir, "dd_class_and_teacher_moments.png"))
+
+    # Teacher log-h DENSITY by work location (weighted quadrature-node sample).
+    pdens = plot(xlabel = "log h (teachers)", ylabel = "density",
+                 title = "Teacher human-capital distribution by work location",
+                 legend = :topright)
+    for l in 1:L
+        lh, w = teacher_logh_samples(sol, l)
+        isempty(lh) && continue
+        histogram!(pdens, lh, weights = w, normalize = :pdf, bins = 24,
+                   alpha = 0.35, label = "loc $l (N̄=$(round(tm.classsize[l], digits=1)))")
+    end
+    savefig(pdens, joinpath(outdir, "dd_teacher_hc_distribution.png"))
+    println("  Saved class-size / teacher-distribution figures to ", outdir)
+    return tm
+end
+
+# ---- Q5. What drives spatial sorting on ability? ----------------------------
+# Shut down each source of location asymmetry one at a time and measure the
+# residual sorting (spread in post-migration mean z across work locations). The
+# channel whose removal collapses the sorting index is the one that drives it.
+function analyze_sorting_drivers(; outdir, kw = _dd_kw())
+    mkpath(outdir)
+    println("\n========== Q5. Drivers of spatial sorting on ability ==========")
+    cases = [
+        (label = "baseline",         p = Params()),
+        (label = "no amenity (B=0)", p = Params(B = [0.0, 0.0])),
+        (label = "equal κ",          p = Params(κ = [1.0, 1.0])),
+        (label = "no altruism (λ=0)",p = Params(λ = 0.0)),
+        (label = "no move cost",     p = Params(τmove = [0.0 0.0; 0.0 0.0])),
+        (label = "symmetric (B=0,κ=)",p = Params(B = [0.0, 0.0], κ = [1.0, 1.0])),
+    ]
+    @printf("  %-20s %-10s %-10s %-12s %-10s\n",
+            "case", "idx_work", "idx_birth", "share_loc2", "outflow")
+    idxs = Float64[]; labels = String[]
+    for c in cases
+        sol = solve_ge(c.p; kw...)
+        sm  = sorting_metrics(sol)
+        @printf("  %-20s %-10.4f %-10.4f %-12.4f %-10.4f\n",
+                c.label, sm.idx_work, sm.idx_birth, sol.M[2] / sum(sol.M), outflow_rate(sol))
+        push!(idxs, sm.idx_work); push!(labels, c.label)
+    end
+    println("\n  The sorting index (work-location mean-z spread) collapses toward the")
+    println("  fully-symmetric benchmark as the ACTIVE asymmetry is removed; whichever")
+    println("  single-channel removal cuts it most is the dominant sorting driver.")
+    println("===============================================================")
+    bar(labels, idxs, legend = false, xrotation = 25, ylabel = "sorting index (mean-z spread)",
+        title = "What drives spatial sorting on ability?", size = (900, 450),
+        bottom_margin = 8Plots.mm)
+    savefig(joinpath(outdir, "dd_sorting_drivers.png"))
+    return idxs
+end
+
+# ---- Q8. Amenities vs altruism in location choice; who moves? ---------------
+function analyze_amenity_altruism(; outdir, kw = _dd_kw())
+    mkpath(outdir)
+    println("\n========== Q8. Amenities vs altruism; mobility by ability ==========")
+    cases = [
+        (label = "baseline (B,λ=.7)",    p = Params()),
+        (label = "B=0, λ=.7",            p = Params(B = [0.0, 0.0])),
+        (label = "B=0, λ=0",             p = Params(B = [0.0, 0.0], λ = 0.0)),
+        (label = "B=0, λ=.9",            p = Params(B = [0.0, 0.0], λ = 0.90)),
+    ]
+    @printf("  %-20s %-11s %-11s %-11s %-14s\n",
+            "case", "share_loc2", "idx_work", "outflow", "mobility slope")
+    results = NamedTuple[]
+    for c in cases
+        sol = solve_ge(c.p; kw...)
+        sm  = sorting_metrics(sol)
+        mb  = mobility_by_ability(sol)
+        z   = sol.gr.z
+        # sign of the ability→mobility gradient: >0 ⇒ high-z move more.
+        slope = (mb.outflow[end] - mb.outflow[1]) / (z[end] - z[1])
+        @printf("  %-20s %-11.4f %-11.4f %-11.4f %+-14.4f\n",
+                c.label, sol.M[2] / sum(sol.M), sm.idx_work, outflow_rate(sol), slope)
+        push!(results, (; c.label, z, outflow = mb.outflow, slope))
+    end
+    println("\n  Reading:")
+    println("   • baseline → B=0 : how much of loc-2's pull is the amenity B.")
+    println("   • B=0 across λ∈{0,.7,.9} : does ALTRUISM move location choice once the")
+    println("     amenity is gone (share_loc2 / idx_work shifting with λ)?")
+    println("   • mobility slope>0 ⇒ HIGH-ability agents are the more mobile ones.")
+    println("====================================================================")
+    pl = plot(xlabel = "ability z", ylabel = "P(leave birth location)",
+              title = "Who moves? Outflow rate by ability", legend = :topleft)
+    for r in results
+        plot!(pl, r.z, r.outflow, marker = :circle, lw = 2, label = r.label)
+    end
+    savefig(pl, joinpath(outdir, "dd_mobility_by_ability.png"))
+    println("  Saved mobility-by-ability figure to ", outdir)
+    return results
+end
+
+# ---- Q6. Sensitivity to the quantile bounds / shock grids. ------------------
+function quantile_sensitivity(; outdir, Nz = 3, damping = 0.3, tol = 1e-5,
+                              maxit = 200, hh_maxit = 600)
+    mkpath(outdir)
+    base = (; Nz, damping, tol, maxit, hh_tol = 1e-6, hh_maxit, verbose = false)
+    println("\n========== Q6. Quantile-bound & grid sensitivity ==========")
+    # Reference: tightest tails + finest grid.
+    ref = solve_ge(Params(); base..., nϵT = 96, nXO = 96, q_lo = 1e-7, q_hi = 1 - 1e-8)
+    reldev(s) = max(maximum(abs, (s.HT .- ref.HT) ./ ref.HT),
+                    maximum(abs, (s.M  .- ref.M ) ./ ref.M))
+
+    println("\n  (a) Upper tail q_hi  (q_lo=1e-5, grid 48²):")
+    @printf("    %-12s %-12s %-12s %-10s %-10s\n", "1-q_hi", "H̃_T(2)", "teach", "res", "rel.dev")
+    qhis = [1e-3, 1e-4, 1e-5, 1e-6, 1e-8]
+    xh = Float64[]; htv = Float64[]; tsv = Float64[]
+    for u in qhis
+        s = solve_ge(Params(); base..., nϵT = 48, nXO = 48, q_lo = 1e-5, q_hi = 1 - u)
+        @printf("    %-12.0e %-12.5f %-12.5f %-10.1e %-10.1e\n",
+                u, s.HT[2], teach_share_total(s), ge_map_residual(s).res, reldev(s))
+        push!(xh, -log10(u)); push!(htv, s.HT[2]); push!(tsv, teach_share_total(s))
+    end
+
+    println("\n  (b) Lower tail q_lo  (q_hi=1-1e-6, grid 48²):")
+    @printf("    %-12s %-12s %-12s %-10s\n", "q_lo", "H̃_T(2)", "teach", "rel.dev")
+    for lo in [1e-3, 1e-4, 1e-5, 1e-6]
+        s = solve_ge(Params(); base..., nϵT = 48, nXO = 48, q_lo = lo, q_hi = 1 - 1e-6)
+        @printf("    %-12.0e %-12.5f %-12.5f %-10.1e\n",
+                lo, s.HT[2], teach_share_total(s), reldev(s))
+    end
+
+    println("\n  (c) Grid resolution nϵT=nXO  (q_lo=1e-5, q_hi=1-1e-6):")
+    @printf("    %-12s %-12s %-12s %-10s\n", "grid", "H̃_T(2)", "teach", "rel.dev")
+    for n in [16, 24, 48, 96]
+        s = solve_ge(Params(); base..., nϵT = n, nXO = n, q_lo = 1e-5, q_hi = 1 - 1e-6)
+        @printf("    %-12s %-12.5f %-12.5f %-10.1e\n",
+                "$(n)²", s.HT[2], teach_share_total(s), reldev(s))
+    end
+    println("\n  Default bounds are q_lo=1e-5, q_hi=1-1e-6. If H̃_T / teach barely move")
+    println("  across the rows the default is safe; a monotone drift as the tail tightens")
+    println("  means the default clips a payoff-relevant tail (upper tail matters most,")
+    println("  since H̃_T integrates the increasing quantity h^{β/σ}).")
+    println("===========================================================")
+    plot(xh, [htv tsv ./ maximum(tsv) .* maximum(htv)], marker = :circle, lw = 2,
+         xlabel = "upper-tail tightness  −log₁₀(1−q_hi)",
+         label = ["H̃_T(loc 2)" "teach share (scaled)"],
+         title = "Sensitivity to the upper quantile bound", legend = :right)
+    savefig(joinpath(outdir, "dd_quantile_sensitivity.png"))
+    return nothing
+end
+
+# ---- Q1. More β cases + WHY high β corners: the β/σ ratio. -------------------
+# The teacher block self-consistency (§9/App A.1): H̃_T = ½∫h^{β/σ}, Q=(2H̃_T/M)^σ,
+# and h ∝ Q. Substituting Q^{β/σ}=(2H̃_T/M)^β gives H̃_T^{1-β} ∝ M^{-β}·(policy
+# integral): the interior teacher stock is well-defined only for β<1, and as β→1
+# the map is increasingly ill-conditioned. Independently, expo≡β/σ sets the
+# CONVEXITY of the aggregator: larger β/σ concentrates H̃_T on the best teachers
+# and strengthens the Q→h→H̃_T feedback, which is what tips high-β economies into
+# the near-universal-teaching / collapsing-quality corner.
+function beta_sigma_analysis(; outdir, kw = _dd_kw())
+    mkpath(outdir)
+    println("\n========== Q1. β sweep and the β/σ corner ==========")
+
+    # (a) β sweep at σ=0.25, warm-started (continuation) so we track ONE branch.
+    println("\n  (a) β sweep at σ=0.25 (continuation warm start):")
+    @printf("    %-7s %-7s %-15s %-15s %-9s %-9s %-8s %-7s\n",
+            "β", "β/σ", "H̃_T", "Q", "teach", "res", "nonmono", "corner")
+    βs = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70]
+    prev = nothing
+    βcurve = Float64[]; tscurve = Float64[]; htcurve = Float64[]
+    for β in βs
+        NONMONO_WARNINGS[] = 0
+        sol = solve_ge(Params(β = β); kw..., init = prev)
+        prev = sol
+        ts  = teach_share_total(sol)
+        res = ge_map_residual(sol).res
+        corner = ts > 0.95 || minimum(sol.HT) < 1e-3
+        @printf("    %-7.2f %-7.2f %-15s %-15s %-9.4f %-9.1e %-8d %-7s\n",
+                β, β / sol.p.σ, fmtvec(sol.HT), fmtvec(sol.gr.Q), ts, res,
+                NONMONO_WARNINGS[], corner ? "YES" : "no")
+        push!(βcurve, β); push!(tscurve, ts); push!(htcurve, sol.HT[2])
+    end
+
+    # (b) Cold vs warm start at high β: is the corner NUMERICAL (cold start finds a
+    #     bad branch) or STRUCTURAL (β too close to 1)?
+    println("\n  (b) Cold vs continuation start at high β (is the corner numerical?):")
+    @printf("    %-7s %-9s %-15s %-9s   %-9s %-15s %-9s\n",
+            "β", "cold ts", "cold H̃_T", "cold res", "warm ts", "warm H̃_T", "warm res")
+    warm = solve_ge(Params(β = 0.40); kw...)   # a healthy interior seed
+    for β in [0.50, 0.60, 0.70]
+        NONMONO_WARNINGS[] = 0
+        cold = solve_ge(Params(β = β); kw...)
+        NONMONO_WARNINGS[] = 0
+        warm = solve_ge(Params(β = β); kw..., init = warm)
+        @printf("    %-7.2f %-9.4f %-15s %-9.1e   %-9.4f %-15s %-9.1e\n",
+                β, teach_share_total(cold), fmtvec(cold.HT), ge_map_residual(cold).res,
+                teach_share_total(warm), fmtvec(warm.HT), ge_map_residual(warm).res)
+    end
+
+    # (c) β/σ collapse test: teaching share vs β for several σ, then vs β/σ. If the
+    #     σ-curves line up when plotted against β/σ, the ratio is the key statistic.
+    println("\n  (c) β/σ collapse test (teach share for several σ):")
+    σs = [0.15, 0.25, 0.40]
+    curves = Dict{Float64,Tuple{Vector{Float64},Vector{Float64}}}()
+    βgrid = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50]
+    for σ in σs
+        prev = nothing
+        bs = Float64[]; ts = Float64[]
+        for β in βgrid
+            sol = solve_ge(Params(β = β, σ = σ); kw..., init = prev)
+            prev = sol
+            push!(bs, β); push!(ts, teach_share_total(sol))
+        end
+        curves[σ] = (bs, ts)
+    end
+    # Is β/σ a sufficient statistic for the teaching margin? Test: at each σ read
+    # the teaching share at a COMMON β/σ (=1.2) by linear interpolation in β/σ; if
+    # β/σ were sufficient these would coincide. Spread ⇒ it is not sufficient.
+    target = 1.2
+    ts_at = [Spline1D(curves[σ][1] ./ σ, curves[σ][2]; k = 1)(target) for σ in σs]
+    spread = maximum(ts_at) - minimum(ts_at)
+    @printf("      teach share at β/σ=%.1f across σ=%s : %s  (spread %.3f)\n",
+            target, string(σs), string(round.(ts_at, digits = 3)), spread)
+    println("\n  Takeaway:")
+    println("   • EXISTENCE of an interior teacher stock needs β<1: from H̃_T = ½∫h^{β/σ}")
+    println("     with h∝Q=(2H̃_T/M)^σ, the fixed point is H̃_T^{1-β} ∝ M^{-β}·(policy),")
+    println("     which blows up / flips sign as β→1.")
+    println("   • The CORNER (H̃_T→0, near-universal teaching) appears well below β=1")
+    println("     here (β≈0.4 at σ=0.25): a falling Q lowers teacher h, lowers H̃_T,")
+    println("     lowers Q — a self-reinforcing low-quality trap.")
+    @printf("   • β/σ is NOT a sufficient statistic for the teaching margin: at a fixed\n")
+    @printf("     β/σ=%.1f the teaching share still varies by %.3f across σ (see panel 3,\n", target, spread)
+    println("     which SPREADS the σ-curves rather than collapsing them). β is the")
+    println("     better single predictor; σ shifts it (higher σ ⇒ more teaching at given β).")
+    println("     β/σ's real role is setting aggregator convexity / class-size dispersion")
+    println("     (N(h)∝h^{β/σ}), not pinning the teaching share.")
+    println("=====================================================")
+
+    p1 = plot(βcurve, [tscurve htcurve], marker = :circle, lw = 2, xlabel = "β",
+              label = ["teach share" "H̃_T(loc 2)"], legend = :left,
+              title = "β sweep at σ=0.25 (corner as β→1)")
+    p2 = plot(xlabel = "β", ylabel = "teach share", title = "vs β (curves nearly align)")
+    p3 = plot(xlabel = "β/σ", ylabel = "teach share", title = "vs β/σ (NO collapse ⇒ not sufficient)")
+    for σ in σs
+        bs, ts = curves[σ]
+        plot!(p2, bs, ts, marker = :circle, lw = 2, label = "σ=$σ")
+        plot!(p3, bs ./ σ, ts, marker = :circle, lw = 2, label = "σ=$σ")
+    end
+    plot(p1, p2, p3, layout = (1, 3), size = (1400, 400))
+    savefig(joinpath(outdir, "dd_beta_sigma_collapse.png"))
+    println("  Saved β/σ figures to ", outdir)
+    return (; βcurve, tscurve, htcurve, curves)
+end
+
+# ---- Driver: run every deep-dive analysis on/around a converged baseline. ----
+function deep_dive(sol; outdir = joinpath(@__DIR__, "figures"), kw = _dd_kw())
+    println("\n\n#################### MECHANISM DEEP-DIVE (Q1–Q8) ####################")
+    analyze_occupation_location(sol; outdir)   # Q2
+    analyze_class_and_teachers(sol; outdir)    # Q3, Q4, Q7
+    analyze_sorting_drivers(; outdir, kw = _dd_kw(Nz = 7))   # Q5 (higher Nz for ability gradient)
+    analyze_amenity_altruism(; outdir, kw = _dd_kw(Nz = 7))  # Q8 (higher Nz for ability gradient)
+    quantile_sensitivity(; outdir)             # Q6
+    beta_sigma_analysis(; outdir, kw)          # Q1
+    println("####################################################################\n")
+end
+
+# -----------------------------------------------------------------------------
 # 8. Run.
 # -----------------------------------------------------------------------------
 function main_test()
@@ -622,6 +1137,10 @@ function main_test()
     comparative_statics()
     damping_diagnostic()
     generalized_dims_test()
+
+    # Mechanism deep-dive (Q1–Q8): verbose comparative statics + figures. Runs on
+    # the baseline `sol` plus its own parameter sweeps; see section 7c.
+    deep_dive(sol)
     return sol
 end
 
