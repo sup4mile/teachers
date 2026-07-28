@@ -21,6 +21,20 @@
 #     occupation threshold if these are not increasing, so this check guards
 #     the assumption spatial_continuous.jl's own warn_nonmonotone also probes.
 #
+# TWO PARAMETERIZATIONS run through this file, and every test states which it
+# uses:
+#   `Params()`         — the BASELINE. Both sorting mechanisms on: the moving
+#                        cost is denominated in goods (`mcost = MCOST_BENCH`,
+#                        `τmove = 0`) and the warm glow is the power kernel at
+#                        ψ = 0. Post-migration ability sorting is POSITIVE and
+#                        mostly within-branch.
+#   `nesting_params()` — the PRE-SORTING regression baseline the two mechanisms
+#                        nest at (utility `τmove = 0.20`, log warm glow ψ = 1).
+#                        Sorting here is negative and purely compositional, and
+#                        this is the point the frozen normalizations
+#                        HBAR_BENCH / CBAR_BENCH are measured at.
+# Diagnostics whose EXPECTED reading differs between the two say so in place.
+#
 # Run:  julia --project=.. spatial_continuous_script.jl
 # =============================================================================
 
@@ -56,6 +70,41 @@ policies_in_bounds(hh) =
     all(isfinite, hh.WT) && all(isfinite, hh.WO)
 
 mark(ok) = ok ? "ok" : "FAIL"
+
+"""
+    node_mass(x, F)
+
+Probability mass carried by each node of a quadrature grid under the CDF `F`:
+node k gets the mass of the midpoint cell around it, with the two end cells
+extended to the tails, so the masses sum to EXACTLY 1. This is what turns a shock
+grid into a weighted node sample (see `teacher_logh_samples`).
+
+Use this rather than a trapezoid rule on the density: the shock grids are
+QUANTILE grids, so their spacing is wildly non-uniform and the trapezoid rule
+overstates the sparse upper tail badly (at nϵT = 32 it inflates the total mass by
+~7 % and the teaching share — which lives in that tail — by ~35 %).
+"""
+function node_mass(x, F)
+    n = length(x)
+    m = zeros(n)
+    lo = 0.0
+    for k in 1:n
+        hi = k == n ? 1.0 : F((x[k] + x[k+1]) / 2)
+        m[k] = max(hi - lo, 0.0)
+        lo = hi
+    end
+    return m
+end
+
+"Cumulative trapezoid integral of `f` sampled on the grid `x` (∫ from x[1]),
+ same length as `x`. Turns a density into a CDF for range-trimming."
+function cumtrapz(x, f)
+    F = zeros(length(x))
+    @inbounds for k in 2:length(x)
+        F[k] = F[k-1] + (f[k] + f[k-1]) * (x[k] - x[k-1]) / 2
+    end
+    return F
+end
 
 # -----------------------------------------------------------------------------
 # 1. Equilibrium-consistency residuals.
@@ -142,6 +191,30 @@ function choice_value_monotonicity(sol)
     return worst
 end
 
+"""
+    ability_neutrality_dev(sol)
+
+Proposition A: with NO goods-denominated moving cost (`p.mcost ≡ 0`) the location
+probabilities π_{l'|l} are invariant to the idiosyncratic shock index k — the
+shock scales income multiplicatively, so it shifts every location's log
+consumption by the same amount and cancels out of the logit.  This is exactly the
+homogeneity that makes sorting a pure OCCUPATIONAL-COMPOSITION effect with no
+within-branch ability gradient.
+
+Reported, not asserted, and the sign of the reading flips with the
+parameterization:
+  • `nesting_params()` (and any `mcost = 0` variant, including a pure ψ sweep —
+    that mechanism works through `zi`, not `k`): ~1e-12.
+  • the BASELINE, where `mcost = MCOST_BENCH ≠ 0`: ≈ 0.4. Large is the PASS
+    condition here — it is the headline evidence the §3.1 mechanism is live.
+"""
+function ability_neutrality_dev(sol)
+    (; Pi_T, Pi_O) = sol
+    dT = maximum(abs, Pi_T .- Pi_T[:, :, :, 1:1, :])
+    dO = maximum(abs, Pi_O .- Pi_O[:, :, :, 1:1, :])
+    return max(dT, dO)
+end
+
 function report_checks(sol)
     println("\n========== Equilibrium-consistency checks (ε = 0, continuous) ==========")
 
@@ -184,6 +257,16 @@ function report_checks(sol)
     clamp_hit = any(sol.t .>= 0.9 - 1e-9) || any(sol.t .<= 1e-9)
     @printf("  budget clamp inactive          : %s   (t = %s)\n",
             mark(!clamp_hit), fmtvec(sol.t))
+
+    # Reported, NOT a pass/fail: ≈0 means location choice is ability-neutral
+    # within a branch (nesting_params(), or any pure ψ variant); a large value
+    # means the goods moving cost has broken that homogeneity, which is the §3.1
+    # mechanism working as designed and the BASELINE reading. See
+    # ability_neutrality_dev.
+    and = ability_neutrality_dev(sol)
+    @printf("\n  Prop. A: max_k |π_{l'|l}(k) − π_{l'|l}(k=1)| : %.2e   (%s)\n", and,
+            maximum(sol.p.mcost) > 0 ? "mcost ≠ 0 (baseline) ⇒ expected to be LARGE" :
+                                       "mcost = 0 ⇒ expected ≈ 0")
 
     println("\n  Policy bounds / finiteness:")
     ok_bounds = policies_in_bounds(sol.hh)
@@ -329,6 +412,15 @@ end
 
 function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit = 120, hh_maxit = 600)
     println("\n========== Comparative statics (one-parameter deviations) ==========")
+    # Deviations are from the BASELINE (both sorting mechanisms on). The last
+    # three rows turn the mechanisms off — one at a time, then both — so the
+    # table also reads as a mechanism ablation.
+    #
+    # high-move-cost scales the GOODS cost rather than reinstating a utility one:
+    # 1.5× MCOST_BENCH is the ceiling the smooth_log barrier allows (2× drives
+    # mover consumption negative — see verify_solution's docstring), so this case
+    # is a milder bump than the old τmove = 1.50 and moves outflow less.
+    τb = TAUMOVE_BENCH
     cases = [
         (label = "baseline",        p = Params()),
         (label = "high-β",          p = Params(β = 0.50)),
@@ -336,16 +428,22 @@ function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit
         (label = "high-altruism",   p = Params(λ = 0.90)),
         (label = "low-altruism",    p = Params(λ = 0.10)),
         (label = "zero-altruism",   p = Params(λ = 0.0)),   # ε=0 AND λ=0 ⇒ no intergenerational coupling
-        (label = "high-move-cost",  p = Params(τmove = [0.0 1.50; 1.50 0.0])),
+        (label = "high-move-cost",  p = Params(mcost = 1.5 .* Params().mcost)),
+        (label = "no-move-cost",    p = Params(mcost = zeros(2, 2))),
         (label = "low-σν",          p = Params(σν = 0.10)),
         (label = "amenity-loc2",    p = Params(B = [0.0, 0.50])),
         (label = "high-teach-wage", p = Params(κ = [1.20, 1.40])),
         (label = "gender-wedge",    p = Params(τω = [0.0 0.0; 0.0 0.30])),
         (label = "high-persistence",p = Params(ρz = 0.97)),
         (label = "low-persistence", p = Params(ρz = 0.40)),
+        # --- mechanism ablations (see nesting_params) ---
+        (label = "log-warm-glow",   p = Params(ψ = 1.0, href = 1.0)),                    # §3.2 off
+        (label = "utility-move-cost", p = Params(τmove = [0.0 τb; τb 0.0],
+                                                 mcost = zeros(2, 2))),                  # §3.1 off
+        (label = "nesting (both off)", p = nesting_params()),
     ]
 
-    @printf("  %-16s %-9s %-6s %-19s %-19s %-7s %-7s %s\n",
+    @printf("  %-19s %-9s %-6s %-19s %-19s %-7s %-7s %s\n",
             "case", "res", "conv?", "H̃_T", "M", "out", "teach", "bounds")
     sols  = Dict{String,Any}()
     stuck = String[]
@@ -357,7 +455,7 @@ function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit
         conv = res < 5e-3
         conv || push!(stuck, c.label)
         ok   = policies_in_bounds(sol.hh)
-        @printf("  %-16s %.1e  %-6s (%.3f,%.3f)       (%.3f,%.3f)      %.3f  %.3f  %s\n",
+        @printf("  %-19s %.1e  %-6s (%.3f,%.3f)       (%.3f,%.3f)      %.3f  %.3f  %s\n",
                 c.label, res, conv ? "yes" : "NO", sol.HT[1], sol.HT[2],
                 sol.M[1], sol.M[2], outflow_rate(sol), teach_share_total(sol), mark(ok))
     end
@@ -368,14 +466,39 @@ function comparative_statics(; Nz = 3, nϵT = 32, nXO = 32, damping = 0.2, maxit
 
     println("\n  Sign checks:")
     base = sols["baseline"]
-    chk(name, cond) = @printf("    %-40s %s\n", name, cond ? "ok" : "FAIL")
+    chk(name, cond) = @printf("    %-44s %s\n", name, cond ? "ok" : "FAIL")
     chk("amenity in loc 2 raises M₂", sols["amenity-loc2"].M[2] > base.M[2])
     chk("high move cost lowers outflow", outflow_rate(sols["high-move-cost"]) < outflow_rate(base))
+    chk("no move cost raises outflow", outflow_rate(sols["no-move-cost"]) > outflow_rate(base))
     if ge_map_residual(sols["low-σν"]).res < 5e-3
         chk("low σν lowers outflow", outflow_rate(sols["low-σν"]) < outflow_rate(base))
     else
-        @printf("    %-40s %s\n", "low σν lowers outflow", "SKIP (not converged)")
+        @printf("    %-44s %s\n", "low σν lowers outflow", "SKIP (not converged)")
     end
+
+    # The mechanism ablation. The baseline must sort POSITIVELY on ability and
+    # the nesting parameterization negatively, with each single-mechanism case
+    # between them — the property the baseline was re-parameterized for, so it is
+    # a hard sign check, not just a reported number. The within-branch gradient is
+    # printed alongside because it is the cleaner statistic (no composition noise)
+    # and it shows the two mechanisms are additive to first order:
+    # g(§3.1 only) + g(§3.2 only) ≈ g(baseline).
+    println("\n  Mechanism ablation (sorting on ability):")
+    @printf("    %-26s %-12s %-11s %-11s\n", "case", "idx_work±", "g_T", "g_O")
+    abl = ["nesting (both off)", "log-warm-glow", "utility-move-cost", "baseline"]
+    idxs = Dict{String,Float64}()
+    for lab in abl
+        sm = sorting_metrics(sols[lab]); wg = within_branch_gradient(sols[lab])
+        idxs[lab] = sm.idx_work_signed
+        @printf("    %-26s %+-12.5f %+-11.5f %+-11.5f\n",
+                lab, sm.idx_work_signed, wg.gT[1], wg.gO[1])
+    end
+    ib, inest = idxs["baseline"], idxs["nesting (both off)"]
+    chk("baseline sorts POSITIVELY on ability", ib > 0)
+    chk("nesting sorts negatively on ability", inest < 0)
+    chk("each single mechanism sits between the two",
+        all(inest < idxs[lab] < ib for lab in ("log-warm-glow", "utility-move-cost")))
+
     chk("every case in bounds",
         all(policies_in_bounds(s.hh) for s in values(sols)))
     println("====================================================================")
@@ -476,7 +599,16 @@ end
 
 "Mean ability z by BIRTH and by WORK location, and scalar sorting indices
  (spread in mean z across locations). `Ψ` is the post-migration (work-location)
- ability mass. Answers Q5's 'how much sorting'."
+ ability mass. Answers Q5's 'how much sorting'.
+
+ `idx_work` is the |max − min| SPREAD, which hides the sign, and the sign is the
+ whole point. At `nesting_params()` sorting is NEGATIVE (≈ −0.041: the
+ high-amenity, high-κ location attracts LOW-z agents, because location choice is
+ ability-neutral within a branch and teaching — the branch that moves — selects on
+ low z). At the BASELINE the two mechanisms flip it POSITIVE (≈ +0.077); neither
+ alone suffices to flip it (§3.2 alone ≈ +0.050, §3.1 alone ≈ −0.011).
+ `idx_work_signed` = mz_work[L] − mz_work[1] keeps the sign and is the headline
+ number."
 function sorting_metrics(sol)
     (; Φ, πbar, gr) = sol
     (; z, Nz, L) = gr
@@ -486,7 +618,165 @@ function sorting_metrics(sol)
     mz_work  = [meanz(@view Ψ[:, l]) for l in 1:L]
     return (; mz_birth, mz_work, Ψ,
               idx_birth = maximum(mz_birth) - minimum(mz_birth),
-              idx_work  = maximum(mz_work)  - minimum(mz_work))
+              idx_work  = maximum(mz_work)  - minimum(mz_work),
+              idx_birth_signed = mz_birth[L] - mz_birth[1],
+              idx_work_signed  = mz_work[L]  - mz_work[1])
+end
+
+"Unweighted mean of `f` over an index range."
+mean_over(f, rng) = sum(f, rng) / length(rng)
+
+"Weighted covariance and OLS slope of y on x under weights w."
+function _wcov(x, y, w)
+    sw = sum(w)
+    mx = sum(w .* x) / sw
+    my = sum(w .* y) / sw
+    return sum(w .* (x .- mx) .* (y .- my)) / sw
+end
+_wslope(x, y, w) = _wcov(x, y, w) / max(_wcov(x, x, w), 1e-300)
+
+"""
+    within_branch_gradient(sol; lo = 1, hi = L)
+
+The within-branch ability gradient of Proposition 4(b),
+
+    g_b = σν · ∂ log( π^b_{hi|l}(z) / π^b_{lo|l}(z) ) / ∂ log z ,   b ∈ {T, O},
+
+i.e. how much the UTILITY gap between working in `hi` and in `lo` rises with the
+agent's own ability, holding the occupational branch fixed. Estimated as the
+Φ-weighted OLS slope of log(π_hi/π_lo) on log z over the `gr.z` grid, averaged
+over shock nodes and genders (by Prop. A every shock node gives the same answer
+whenever `mcost = 0`; with the baseline's `mcost ≠ 0` they genuinely differ and
+the average is the summary).
+
+This is the statistic that separates the two sorting channels. At
+`nesting_params()` g ≈ 0 in BOTH branches and all of `idx_work` comes from
+occupational composition. Turning the mechanisms on, one at a time and then both
+(the `comparative_statics` ablation), gives
+
+    parameterization              g_T      g_O
+    nesting (both off)            0.0006   0.0006
+    §3.2 only (ψ = 0, τmove)      0.059    0.060     ← plan §1.6 predicted 0.062
+    §3.1 only (mcost, ψ = 1)      0.115    0.144     ← plan §2.2 predicted 0.068
+    BASELINE (both)               0.171    0.200
+
+so the per-mechanism target of 0.06–0.10 is met by §3.2 almost exactly, overshot
+by §3.1, and the two are additive to first order (0.059 + 0.115 ≈ 0.171).
+
+Returns per-birth-location vectors `(; gT, gO)`.
+"""
+function within_branch_gradient(sol; lo = 1, hi = sol.gr.L)
+    (; Φ, gr, p) = sol
+    (; z, Nz, L, nϵT, nXO) = gr
+    L < 2 && return (; gT = fill(NaN, L), gO = fill(NaN, L))
+    logz = log.(z)
+    gT = zeros(L); gO = zeros(L)
+    for l in 1:L
+        w = collect(@view Φ[:, l])
+        yT = [mean_over(g -> mean_over(k -> log(sol.Pi_T[g, l, zi, k, hi] /
+                                                sol.Pi_T[g, l, zi, k, lo]), 1:nϵT), 1:2)
+              for zi in 1:Nz]
+        yO = [mean_over(g -> mean_over(k -> log(sol.Pi_O[g, l, zi, k, hi] /
+                                                sol.Pi_O[g, l, zi, k, lo]), 1:nXO), 1:2)
+              for zi in 1:Nz]
+        gT[l] = p.σν * _wslope(logz, yT, w)
+        gO[l] = p.σν * _wslope(logz, yO, w)
+    end
+    return (; gT, gO)
+end
+
+"""
+    sorting_decomposition(sol; lo = 1, hi = L)
+
+Split the ability sorting into a WITHIN-BRANCH and a COMPOSITION term:
+
+    Cov_z(z, π_hi(z)) = Σ_b θ̄_b Cov_z(z, π^b_hi(z))   (within-branch gradient)
+                      + Σ_b π̄^b_hi Cov_z(z, θ_b(z))   (occupational composition)
+                      + interaction
+
+with θ_b(z) the branch share at ability z and π^b_hi(z) the branch-conditional
+probability of working in `hi`. All covariances are Φ-weighted over the z grid at
+a fixed birth location; the aggregate row weights birth locations by their mass.
+
+This decomposition, not `idx_work` itself, is the result. At `nesting_params()`
+term 1 ≈ 0 and term 2 (negative) carries essentially all of `idx_work`. At the
+BASELINE term 1 is ≈ +0.014 and term 2 is still ≈ −0.005, so the within-branch
+share of the total reads ≈ 150 %: the mechanisms did not merely add sorting, they
+overturned a composition effect that still points the other way.
+Returns per-birth-location vectors plus mass-weighted totals.
+"""
+function sorting_decomposition(sol; lo = 1, hi = sol.gr.L)
+    (; hh, Φ, gr) = sol
+    (; z, Nz, L, nϵT, nXO) = gr
+    within = zeros(L); comp = zeros(L); inter = zeros(L); tot = zeros(L)
+    zeroT = zeros(nϵT); zeroO = zeros(nXO)
+    for l0 in 1:L
+        θT = zeros(Nz); θO = zeros(Nz); pT = zeros(Nz); pO = zeros(Nz)
+        for zi in 1:Nz
+            mT = mO = qT = qO = 0.0
+            for g in 1:2
+                cm = choice_maps(hh.WT[g, l0, zi, :], hh.WO[g, l0, zi, :], g, gr)
+                iT, iO = integrate_choice(ones(nϵT), ones(nXO), cm, gr)   # branch masses
+                jT, _  = integrate_choice(collect(@view sol.Pi_T[g, l0, zi, :, hi]), zeroO, cm, gr)
+                _,  jO = integrate_choice(zeroT, collect(@view sol.Pi_O[g, l0, zi, :, hi]), cm, gr)
+                mT += 0.5 * iT; mO += 0.5 * iO; qT += 0.5 * jT; qO += 0.5 * jO
+            end
+            θT[zi] = mT; θO[zi] = mO
+            pT[zi] = mT > 0 ? qT / mT : 0.0        # π_hi conditional on the branch
+            pO[zi] = mO > 0 ? qO / mO : 0.0
+        end
+        w = collect(@view Φ[:, l0]); sw = sum(w)
+        wmean(v) = sum(w .* v) / sw
+        θTb, θOb = wmean(θT), wmean(θO)
+        pTb, pOb = wmean(pT), wmean(pO)
+        π_hi = θT .* pT .+ θO .* pO
+        tot[l0]    = _wcov(z, π_hi, w)
+        within[l0] = θTb * _wcov(z, pT, w) + θOb * _wcov(z, pO, w)
+        comp[l0]   = pTb * _wcov(z, θT, w) + pOb * _wcov(z, θO, w)
+        inter[l0]  = tot[l0] - within[l0] - comp[l0]
+    end
+    mass = [sum(@view Φ[:, l0]) for l0 in 1:L]; mass ./= sum(mass)
+    return (; within, comp, inter, tot,
+              within_tot = sum(mass .* within), comp_tot = sum(mass .* comp),
+              inter_tot  = sum(mass .* inter),  tot_tot  = sum(mass .* tot))
+end
+
+"""
+    report_sorting(sol)
+
+The Stage-0 sorting battery in one block: Prop. A deviation, the signed sorting
+index, the within-branch gradient per branch and birth location, and the
+within-vs-composition decomposition. This is the read-out both sorting
+mechanisms are judged against.
+"""
+function report_sorting(sol)
+    (; L) = sol.gr
+    sm = sorting_metrics(sol)
+    wg = within_branch_gradient(sol)
+    dc = sorting_decomposition(sol)
+    println("\n========== Sorting diagnostics ==========")
+    @printf("  Prop. A deviation (π invariant to shock node) : %.3e\n", ability_neutrality_dev(sol))
+    @printf("  mean z by work location : %s\n", fmtvec(sm.mz_work))
+    @printf("  idx_work (spread) = %+.5f    idx_work_signed (loc %d − loc 1) = %+.5f\n",
+            sm.idx_work, L, sm.idx_work_signed)
+    println("\n  Within-branch ability gradient  g_b = σν·dlog(π_L/π_1)/dlog z")
+    println("  (≈0 at nesting_params(); per-mechanism target 0.06–0.10; baseline runs both ⇒ ≈0.17/0.20):")
+    @printf("    %-14s %-12s %-12s\n", "birth loc", "g_T", "g_O")
+    for l in 1:L
+        @printf("    %-14d %+-12.5f %+-12.5f\n", l, wg.gT[l], wg.gO[l])
+    end
+    println("\n  Cov_z(z, π_L(z)) decomposition  (within-branch | composition | interaction):")
+    @printf("    %-14s %-14s %-14s %-14s %-14s\n", "birth loc", "within", "composition", "interaction", "total")
+    for l in 1:L
+        @printf("    %-14d %+-14.6f %+-14.6f %+-14.6f %+-14.6f\n",
+                l, dc.within[l], dc.comp[l], dc.inter[l], dc.tot[l])
+    end
+    @printf("    %-14s %+-14.6f %+-14.6f %+-14.6f %+-14.6f\n",
+            "mass-wtd", dc.within_tot, dc.comp_tot, dc.inter_tot, dc.tot_tot)
+    share_within = abs(dc.tot_tot) > 1e-12 ? dc.within_tot / dc.tot_tot : NaN
+    @printf("  ⇒ within-branch share of total sorting : %.1f%%\n", 100 * share_within)
+    println("=========================================")
+    return (; sm, wg, dc)
 end
 
 "Per-ability probability of leaving the birth location, population-weighted over
@@ -501,16 +791,12 @@ function mobility_by_ability(sol)
 end
 
 "Weighted (log h, weight) sample of teachers WORKING in location `lp`, for a
- density estimate. Node weight = cell mass × f_T(ε)·Δε × P(teach|ε) × π(→lp)."
+ density estimate. Node weight = cell mass × P(ε in the node's cell) × P(teach|ε)
+ × π(→lp)."
 function teacher_logh_samples(sol, lp)
     (; hh, Φ, gr) = sol
     (; Nz, L, nϵT, ϵTgrid, dT) = gr
-    dϵ = similar(ϵTgrid)                        # trapezoid probability spacing on the ε_T grid
-    dϵ[1] = (ϵTgrid[2] - ϵTgrid[1]) / 2
-    dϵ[end] = (ϵTgrid[end] - ϵTgrid[end-1]) / 2
-    @inbounds for k in 2:nϵT-1
-        dϵ[k] = (ϵTgrid[k+1] - ϵTgrid[k-1]) / 2
-    end
+    dϵ = node_mass(ϵTgrid, ε -> cdf(dT, ε))     # exact per-node probability mass on the ε_T grid
     logh = Float64[]; w = Float64[]
     for l0 in 1:L, zi in 1:Nz, g in 1:2
         cell = 0.5 * Φ[zi, l0]
@@ -519,7 +805,7 @@ function teacher_logh_samples(sol, lp)
         for k in 1:nϵT
             tw = teach_wt(cm, ϵTgrid[k])
             tw <= 0.0 && continue
-            wt = cell * pdf(dT, ϵTgrid[k]) * dϵ[k] * tw * sol.Pi_T[g, l0, zi, k, lp]
+            wt = cell * dϵ[k] * tw * sol.Pi_T[g, l0, zi, k, lp]
             wt <= 0.0 && continue
             push!(logh, log(hh.hT[g, l0, zi, k])); push!(w, wt)
         end
@@ -552,13 +838,37 @@ end
 #
 # The X_O* collapse requires a common τe across non-teaching occupations
 # (spatial_continuous.jl asserts this); Params(3,3;...)'s default τe = 0
-# everywhere satisfies it.
+# everywhere satisfies it. With I = 3 there are TWO non-teaching occupations, so
+# the baseline's ψ ≠ 1 also exercises the `EΘpow` branch of `child_Ef` (the
+# Jensen-correct E[Θ_{i*}^{−(1−ψ)} | X_O*]), which the 2-occupation baseline never
+# reaches — that coverage is the main reason to run this at the baseline ψ.
+#
+# The goods moving cost is RE-DERIVED for this economy rather than inherited.
+# `mcost` is an absolute goods amount and the I=3,L=3 economy sits at a much lower
+# consumption level (C̄₃ ≈ 0.116 vs the benchmark 0.162), so handing it
+# MCOST_BENCH drives mover consumption negative and the smooth_log barrier binds.
+# Solving once with the utility cost, reading that economy's own C̄ and h̄, then
+# re-denominating is exactly the procedure that produced the baseline's constants,
+# and it is what any new parameterization at a different scale should do.
 # -----------------------------------------------------------------------------
-function generalized_dims_test(; Nz = 2, nϵT = 48, nXO = 48, damping = 0.3, maxit = 40)
+function generalized_dims_test(; Nz = 2, nϵT = 48, nXO = 48, damping = 0.3, maxit = 60)
     println("\n========== Generalized-dimensions test (I=3, L=3) ==========")
-    p = Params(3, 3; A = [NaN, 1.5, 2.0])
-    sol = solve_ge(p; Nz, nϵT, nXO, damping, tol = 1e-3, maxit,
-                   hh_tol = 1e-5, hh_maxit = 200, verbose = false)
+    kw = (; Nz, nϵT, nXO, damping, tol = 1e-3, maxit, hh_tol = 1e-5,
+            hh_maxit = 200, verbose = false)
+
+    # Pass 1: utility moving cost, log warm glow — the nesting parameterization
+    # at these dimensions, used only to read off this economy's own scale.
+    p_nest = Params(3, 3; A = [NaN, 1.5, 2.0], τmove_off = TAUMOVE_BENCH,
+                    mcost_off = 0.0, ψ = 1.0, href = 1.0)
+    s_nest = solve_ge(p_nest; kw...)
+    href3, Cbar3 = mean_child_h(s_nest), mean_consumption(s_nest)
+    @printf("  own-scale normalizations at I=3, L=3: h̄₃ = %.6f   C̄₃ = %.6f\n", href3, Cbar3)
+
+    # Pass 2: the baseline structure (goods cost + power kernel) at this scale.
+    p = redenominate_move_cost(with_params(p_nest; ψ = Params().ψ, href = href3), Cbar3)
+    @printf("  re-denominated m₃ = %.6f  (vs MCOST_BENCH = %.6f, which would bind the barrier)\n",
+            p.mcost[1, 2], MCOST_BENCH)
+    sol = solve_ge(p; kw...)
     report_ge(sol)
 
     ph  = phi_stationarity_residual(sol)
@@ -566,15 +876,325 @@ function generalized_dims_test(; Nz = 2, nϵT = 48, nXO = 48, damping = 0.3, max
     pbr = pibar_rowsum_dev(sol)
     qd  = q_consistency_dev(sol)
     Mtot_dev = abs(sum(sol.M) - sol.p.Mtot)
+    feas = verify_solution(sol)
     # ph.eig_res, ph.row_dev, pbr are quadrature-accuracy (not exact) — see
     # report_checks; pir, qd, Mtot_dev are exact structural identities.
     ok = ph.eig_res < 1e-3 && ph.row_dev < 1e-3 && pir < 1e-6 &&
          pbr < 1e-3 && qd < 1e-10 && Mtot_dev < 1e-8 &&
-         policies_in_bounds(sol.hh)
+         policies_in_bounds(sol.hh) && feas
     @printf("  I=%d, L=%d   Φ eig-res=%.2e   Σπ_{l'|l}=1 dev=%.2e   Σ_l M_l=Mtot dev=%.2e   [%s]\n",
             sol.gr.I, sol.gr.L, ph.eig_res, pir, Mtot_dev, mark(ok))
     println("=============================================================")
     return ok
+end
+
+# -----------------------------------------------------------------------------
+# 6b. Sorting-mechanism tests (Stages 1–3 of sorting_implementation_plan.md).
+#
+# Two mechanisms, BOTH ON at the baseline, each nesting the original model exactly:
+#   §3.2  power warm-glow kernel  f(h') = ((h'/h̄)^{1−ψ} − 1)/(1−ψ)   [ψ = 1 nests]
+#   §3.1  goods-denominated moving cost  m_{l,l'}                    [m = 0 nests]
+# `nesting_params()` turns both off at once and is the regression point; each test
+# below either asserts something about that nesting or reads out the sorting
+# diagnostics (§0.1–0.4) as a mechanism is switched back on.
+# -----------------------------------------------------------------------------
+
+"Solve-settings for the mechanism tests. Nz = 5 so the within-branch gradient has
+ enough z nodes to fit a slope; grids stay small so a sweep is ~seconds a point."
+_mech_kw(; Nz = 5, nϵT = 32, nXO = 32, damping = 0.3, tol = 1e-5, maxit = 200,
+          hh_maxit = 800) =
+    (; Nz, nϵT, nXO, damping, tol, maxit, hh_tol = 1e-6, hh_maxit, verbose = false)
+
+"""
+    href_invariance_test(sol; href = 0.25, nsweep = 60, atol = 1e-9)
+
+At ψ = 1 the kernel is log(h'/href), so href only shifts f by the CONSTANT
+−log href. That constant propagates into Λ as exactly −λ·log href, uniform across
+(z, l'), hence cancels out of every choice probability and every FOC. Changing
+href must therefore leave the policies e, h and the whole altruism GRADIENT
+Λ − mean(Λ) alone, and shift Λ itself by −λ log href.
+
+Run at the HOUSEHOLD level on `sol`'s grids, with a fixed sweep count: the
+household and GE stopping rules compare successive W's, which are not invariant
+to a level shift, so two GE solves would stop at slightly different points and
+mask the identity behind solver tolerance.
+
+The identity is exact in exact arithmetic but only holds up to the QUADRATURE
+MASS DEFECT here: Λ integrates f against the choice density, and that density
+integrates to 1 − O(1e-3) at these grid sizes (see `report_checks`'s
+quadrature-accuracy block), so a constant c in f comes back as c·(1 − defect).
+The tolerance is therefore scaled by the measured defect; the test still catches
+any *first-order* leak of href into behaviour, which is the Stage-1 bug it exists
+to rule out.
+"""
+function href_invariance_test(sol; href = 0.25, nsweep = 60)
+    println("\n========== href-invariance test (ψ = 1) ==========")
+    (; gr) = sol
+    p1 = with_params(sol.p; ψ = 1.0, href = 1.0)
+    p2 = with_params(sol.p; ψ = 1.0, href = href)
+    h1 = solve_household(p1, gr; tol = 0.0, maxit = nsweep)
+    h2 = solve_household(p2, gr; tol = 0.0, maxit = nsweep)
+    # Measured mass defect of the choice quadrature, at h1's policies.
+    defect = 0.0
+    for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz
+        cm = choice_maps(h1.WT[g, l, zi, :], h1.WO[g, l, zi, :], g, gr)
+        iT, iO = integrate_choice(ones(gr.nϵT), ones(gr.nXO), cm, gr)
+        defect = max(defect, abs(iT + iO - 1))
+    end
+    shift = sol.p.λ * abs(log(href))
+    tolΛ = max(5 * shift * defect, 1e-12)
+    tolp = 1e-5                       # policy response is second order in the defect
+    dev(a, b) = maximum(abs, a .- b)
+    dΛ = maximum(abs, (h2.Λ .- h1.Λ) .+ sol.p.λ * log(href))
+    dp = max(dev(h1.eT, h2.eT), dev(h1.eO, h2.eO), dev(h1.hT, h2.hT),
+             dev(h1.sT, h2.sT), dev(h1.sO, h2.sO))
+    @printf("  quadrature mass defect               : %.2e  (⇒ Λ tolerance %.1e)\n", defect, tolΛ)
+    @printf("  policies (e, h, s) unchanged by href : %.2e   [%s]\n", dp, mark(dp < tolp))
+    @printf("  Λ shifted by −λ log href             : %.2e   [%s]\n", dΛ, mark(dΛ < tolΛ))
+    println("==================================================")
+    return dp < tolp && dΛ < tolΛ
+end
+
+"""
+    prop2prime_test(sol; nsample = 6, atol = 1e-5)
+
+Independent check of Proposition 2′ (the explicit s policy). At a sample of
+household states, maximise the true objective
+
+    F(s, e) = log(1 − s) + V̄( W(e, s) )
+
+JOINTLY in (s, e) by 2-D numerical search, and compare the optimum to the stored
+(`hh.sT`/`hh.eT`, `hh.sO`/`hh.eO`) policy. This is the one place the s analytics
+could be wrong in a way no other test would catch: every other diagnostic takes
+the FOC as given.
+
+The search is deliberately started AWAY from the stored policy (`pert`): started
+at it, a derivative-free method would report the start point back and the test
+would be vacuous.
+"""
+function prop2prime_test(sol; nsample = 6, atol = 1e-5, pert = 0.25)
+    (; hh, gr, p) = sol
+    println("\n========== Proposition 2′ test (joint (s,e) optimum) ==========")
+    sig(x) = 1 / (1 + exp(-x))
+    logit(s) = log(s / (1 - s))
+    opts = Optim.Options(g_tol = 1e-14, x_abstol = 1e-14, f_abstol = 1e-16,
+                         iterations = 100_000)
+    worst_s = 0.0; worst_e = 0.0; ncheck = 0
+    # Objective: the true (s, e) problem, log(1−s) plus the location log-sum.
+    obj(Wof, l) = v -> -(log(1 - sig(v[1])) +
+                         logsum_probs(Wof(exp(v[2]), sig(v[1])), l, p)[1])
+    states = [(g, l, zi) for g in 1:2 for l in 1:gr.L for zi in 1:gr.Nz]
+    for (g, l, zi) in states[1:min(nsample, length(states))]
+        for k in (1, max(1, gr.nϵT ÷ 2), gr.nϵT)
+            s★, e★ = hh.sT[g, l, zi, k], hh.eT[g, l, zi, k]
+            WofT = (e, s) -> W_teach(gr.ϵTgrid[k], zi, l, g, e, s, hh.Λ, p, gr)[1]
+            v = Optim.minimizer(optimize(obj(WofT, l),
+                                         [logit(s★ * (1 - pert)), log(e★ * (1 + pert))],
+                                         NelderMead(), opts))
+            worst_s = max(worst_s, abs(sig(v[1]) - s★))
+            worst_e = max(worst_e, abs(exp(v[2]) - e★) / e★)
+            ncheck += 1
+        end
+        for k in (1, max(1, gr.nXO ÷ 2), gr.nXO)
+            s★, e★ = hh.sO[g, l, zi, k], hh.eO[g, l, zi, k]
+            WofO = (e, s) -> W_nonteach(gr.XOgrid[k, g], zi, l, g, e, s, hh.Λ, p, gr)[1]
+            v = Optim.minimizer(optimize(obj(WofO, l),
+                                         [logit(s★ * (1 - pert)), log(e★ * (1 + pert))],
+                                         NelderMead(), opts))
+            worst_s = max(worst_s, abs(sig(v[1]) - s★))
+            worst_e = max(worst_e, abs(exp(v[2]) - e★) / e★)
+            ncheck += 1
+        end
+    end
+    ok = worst_s < atol && worst_e < 1e-3
+    @printf("  states checked (started %.0f%% off the policy) : %d\n", 100 * pert, ncheck)
+    @printf("  worst |Δs| vs 2-D optimum      : %.2e   [%s]\n", worst_s, mark(worst_s < atol))
+    @printf("  worst rel |Δe| vs 2-D optimum  : %.2e   [%s]\n", worst_e, mark(worst_e < 1e-3))
+    println("==============================================================")
+    return ok
+end
+
+"""
+    psi_sweep(; href, ψs, kw)
+
+Sweep the warm-glow curvature ψ as a CONTINUATION, reporting the sorting
+diagnostics at each point. Everything else is held at the BASELINE, so the goods
+moving cost is on throughout and this sweep traces the §3.2 mechanism's marginal
+contribution ON TOP of §3.1. ψ = 1 is the §3.2-off ablation; `Params().ψ = 0` is
+the baseline and the far end of the sweep.
+
+`href` must be frozen at the benchmark mean child human capital (see
+`mean_child_h`) or ψ silently rescales the whole altruism term instead of only
+bending it — hence the default, the baseline's own frozen `HBAR_BENCH`.
+
+Expected: g rises monotonically as ψ falls; `idx_work_signed` crosses zero between
+ψ = 1 (≈ −0.011) and ψ = 0.5 (≈ +0.035), reaching ≈ +0.077 at the baseline ψ = 0;
+and the ψ > 1 point pushes it further negative — the cleanest falsification of the
+mechanism.
+"""
+function psi_sweep(; href = Params().href, ψs = [1.5, 1.0, 0.75, 0.5, 0.25, 0.0],
+                     kw = _mech_kw(), outdir = nothing)
+    println("\n========== warm-glow curvature ψ sweep (baseline ψ = $(Params().ψ)) ==========")
+    @printf("  href (frozen h̄) = %.6f\n", href)
+    @printf("  %-6s %-11s %-11s %-13s %-11s %-11s %-9s\n",
+            "ψ", "g_T(loc1)", "g_O(loc1)", "idx_work±", "within", "composition", "PropA")
+    rows = NamedTuple[]
+    prev = nothing
+    for ψ in ψs
+        NONMONO_WARNINGS[] = 0
+        sol = solve_ge(Params(ψ = ψ, href = href); kw..., init = prev)
+        prev = sol
+        wg = within_branch_gradient(sol); sm = sorting_metrics(sol)
+        dc = sorting_decomposition(sol)
+        @printf("  %-6.2f %+-11.5f %+-11.5f %+-13.5f %+-11.6f %+-11.6f %-9.1e\n",
+                ψ, wg.gT[1], wg.gO[1], sm.idx_work_signed, dc.within_tot, dc.comp_tot,
+                ability_neutrality_dev(sol))
+        push!(rows, (; ψ, gT = wg.gT[1], gO = wg.gO[1], idx = sm.idx_work_signed,
+                       within = dc.within_tot, comp = dc.comp_tot,
+                       nonmono = NONMONO_WARNINGS[]))
+    end
+    nm = sum(r.nonmono for r in rows)
+    @printf("  NONMONO_WARNINGS across the sweep : %d   [%s]\n", nm, mark(nm == 0))
+    println("  ψ works through `zi`, not the shock index k, so it does not move Prop. A:")
+    println("  the level here (≈0.4) is set by the baseline's goods moving cost and is")
+    println("  flat across the sweep. It is ≈0 only when mcost is also switched off.")
+    println("==========================================================")
+    if outdir !== nothing
+        mkpath(outdir)
+        ψv = [r.ψ for r in rows]
+        p1 = plot(ψv, [[r.gT for r in rows] [r.gO for r in rows]], marker = :circle, lw = 2,
+                  xlabel = "ψ", ylabel = "within-branch gradient g",
+                  label = ["g_T" "g_O"], title = "Ability gradient vs warm-glow curvature")
+        hline!(p1, [0.0], ls = :dash, color = :black, label = "")
+        p2 = plot(ψv, [[r.idx for r in rows] [r.within for r in rows] [r.comp for r in rows]],
+                  marker = :circle, lw = 2, xlabel = "ψ",
+                  label = ["idx_work (signed)" "within-branch" "composition"],
+                  title = "Sorting and its decomposition")
+        hline!(p2, [0.0], ls = :dash, color = :black, label = "")
+        plot(p1, p2, layout = (1, 2), size = (1100, 400))
+        savefig(joinpath(outdir, "dd_psi_sweep.png"))
+    end
+    return rows
+end
+
+"""
+    mcost_test(; Cbar = Params().Cbar, kw)
+
+The §3.1 mechanism in isolation: hold the warm glow at the baseline ψ and compare
+the moving cost denominated in UTILITY (`τmove = TAUMOVE_BENCH`, `mcost = 0`)
+against the same cost denominated in GOODS — which is what the baseline ships.
+
+Two things are checked. First a CALIBRATION assertion: the baseline's `mcost` must
+be exactly the re-denomination m = (1 − e^{−τmove/μ})·C̄ of the old utility cost at
+the frozen `Cbar`, so the switch really did cost no new free parameter and
+`MCOST_BENCH` has not drifted from the formula that defines it. Then the
+behavioural read-out: the s policy spreads by a few points, the s inner loop stays
+cheap, Prop. A breaks (that is the mechanism), the gradient appears in BOTH
+branches, and the feasibility audit still passes.
+"""
+function mcost_test(; Cbar = Params().Cbar, kw = _mech_kw())
+    println("\n========== §3.1: goods- vs utility-denominated moving cost ==========")
+    τb   = TAUMOVE_BENCH
+    base = Params()                                             # goods cost — the baseline
+    putil = Params(τmove = [0.0 τb; τb 0.0], mcost = zeros(2, 2))  # same cost, utility units
+
+    # Calibration assertion: the shipped mcost IS the re-denominated τmove.
+    m_expect = redenominate_move_cost(putil, Cbar).mcost
+    ok_cal = isapprox(m_expect, base.mcost; atol = 1e-12)
+    @printf("  C̄ (frozen) = %.6f   τmove_off = %.3f  ⇒  m = %.6f   (m/C̄ = %.3f)\n",
+            Cbar, τb, base.mcost[1, 2], base.mcost[1, 2] / Cbar)
+    @printf("  baseline mcost == redenominate(τmove, C̄)  : %s   (max dev %.2e)\n",
+            mark(ok_cal), maximum(abs, m_expect .- base.mcost))
+
+    sols = (("utility cost τmove (§3.1 off)", solve_ge(putil; kw...)),
+            ("goods cost mcost  (BASELINE)",  solve_ge(base;  kw...)))
+    for (lab, s) in sols
+        wg = within_branch_gradient(s); sm = sorting_metrics(s); dc = sorting_decomposition(s)
+        ss = s_summary(s)
+        println("\n  ", lab, ":")
+        @printf("    g_T = %+.5f   g_O = %+.5f   idx_work± = %+.5f\n",
+                wg.gT[1], wg.gO[1], sm.idx_work_signed)
+        @printf("    decomposition: within %+.6f | composition %+.6f | interaction %+.6f\n",
+                dc.within_tot, dc.comp_tot, dc.inter_tot)
+        @printf("    Prop. A deviation = %.2e\n", ability_neutrality_dev(s))
+        @printf("    s_T ∈ [%.4f, %.4f]   s_O ∈ [%.4f, %.4f]\n", ss.rangeT..., ss.rangeO...)
+        verify_solution(s)
+    end
+    println("  (s is constant across states in the first block and spreads in the")
+    println("   second: that spread IS the Proposition-2′ Ξ correction switching on.)")
+    println("====================================================================")
+    return (; util = sols[1][2], base = sols[2][2], ok_cal)
+end
+
+"""
+    sorting_mechanism_tests(; outdir)
+
+The sorting battery end to end, in four stages:
+
+  0. `nesting_params()` — the pre-sorting regression point. Read out its sorting
+     diagnostics (they should be the "no sorting" case: g ≈ 0, `idx_work_signed`
+     negative, ~100 % compositional) and RE-DERIVE the two frozen normalizations
+     h̄ and C̄ from it, asserting they still equal the `HBAR_BENCH` / `CBAR_BENCH`
+     the baseline ships. That assertion is what keeps `Params()`'s hard-coded
+     constants honest: if the model changes underneath them, this fails rather
+     than silently shifting the baseline's calibration.
+  1. ψ sweep (the §3.2 mechanism, on top of §3.1).
+  2. `mcost_test` (the §3.1 mechanism, on top of §3.2), plus the calibration
+     assertion that `Params().mcost` is the re-denominated `τmove`.
+  3. the BASELINE itself, with both mechanisms on — the headline read-out.
+
+Proposition 2′ is checked twice: at `nesting_params()`, where `s` is constant and
+the test is a regression, and at the baseline, where `s` is genuinely
+state-dependent and the test is the real one.
+"""
+function sorting_mechanism_tests(; outdir = joinpath(@__DIR__, "figures"), kw = _mech_kw())
+    println("\n\n############ SORTING MECHANISMS (Stages 0–3) ############")
+
+    # ---- Stage 0: the pre-sorting regression point + the frozen normalizations.
+    println("\n---- Stage 0: nesting_params() read-out (mechanisms OFF) ----")
+    nest = solve_ge(nesting_params(); kw...)
+    ok_href = href_invariance_test(nest)
+    report_sorting(nest)
+    ok_p2 = prop2prime_test(nest)
+
+    href = mean_child_h(nest)
+    Cbar = mean_consumption(nest)
+    dh, dc = abs(href - HBAR_BENCH), abs(Cbar - CBAR_BENCH)
+    # Loose tolerance: these are re-derived at the caller's grids/tolerances, not
+    # at the Nz=5, 48² solve the constants were minted from, so a few 1e-4 of
+    # quadrature drift is expected. A shift big enough to matter for the
+    # calibration would be orders of magnitude larger.
+    atol_norm = 1e-3
+    ok_norm = dh < atol_norm && dc < atol_norm
+    println("\n  Frozen normalizations re-derived at nesting_params():")
+    @printf("    h̄ = %.6f  vs HBAR_BENCH = %.6f   (dev %.2e)  [%s]\n",
+            href, HBAR_BENCH, dh, mark(dh < atol_norm))
+    @printf("    C̄ = %.6f  vs CBAR_BENCH = %.6f   (dev %.2e)  [%s]\n",
+            Cbar, CBAR_BENCH, dc, mark(dc < atol_norm))
+    ok_norm || println("    ⚠ the baseline's frozen constants no longer match the model — " *
+                       "re-mint HBAR_BENCH/CBAR_BENCH in spatial_continuous.jl.")
+
+    # ---- Stages 1–2: each mechanism's marginal contribution.
+    rows = psi_sweep(; href = Params().href, kw, outdir)
+    mt   = mcost_test(; Cbar = Params().Cbar, kw)
+
+    # ---- Stage 3: the baseline, both mechanisms on. Gradients additive to 1st order.
+    # `mcost_test` already solved `Params()` at these settings — reuse it rather
+    # than paying for an identical solve.
+    println("\n---- Stage 3: the BASELINE (ψ = $(Params().ψ), goods mcost) ----")
+    base = mt.base
+    report_sorting(base)
+    ok_p2b = prop2prime_test(base)            # s is state-dependent here — the real test
+    verify_solution(base)
+
+    sm_n, sm_b = sorting_metrics(nest), sorting_metrics(base)
+    @printf("\n  idx_work_signed:  nesting %+.5f  →  baseline %+.5f   [%s]\n",
+            sm_n.idx_work_signed, sm_b.idx_work_signed,
+            mark(sm_n.idx_work_signed < 0 < sm_b.idx_work_signed))
+    println("########################################################\n")
+    return (; nest, base, rows, mt,
+              ok = ok_href && ok_p2 && ok_p2b && ok_norm && mt.ok_cal &&
+                   sm_n.idx_work_signed < 0 < sm_b.idx_work_signed)
 end
 
 # -----------------------------------------------------------------------------
@@ -638,6 +1258,105 @@ function plot_ge_outcomes(sol; outdir)
     savefig(pm, joinpath(outdir, "continuous_migration_matrix.png"))
 
     println("\nSaved continuous GE figures to ", outdir)
+end
+
+"""
+    plot_student_ability(sol; outdir, na = 400, trim = 0.005)
+
+The ability distribution of STUDENTS (the young) in each location, in both
+ability concepts, with the occupational choice folded in.
+
+Students are educated where they are born, so the relevant location index is the
+BIRTH location — `Φ[z, l]` — not the work location the `_by_work` figure uses.
+Four panels:
+
+  (1) density of a = z·ε in the CHOSEN occupation, one curve per birth location
+      (`student_ability_density`). This is the distribution the occupation margin
+      actually operates on, and it sits to the right of z: both branches select
+      on their own ε, so E[a] > E[z] even though ε is unit-mean unconditionally.
+  (2) the same density split into teachers and non-teachers, each carrying its
+      branch mass so the two curves ADD UP to panel (1)'s — the visual form of
+      "taking the occupational choice into account".
+  (3) the persistent component: G_l(z) overall (solid), among teachers (dashed)
+      and among non-teachers (dotted), against the ergodic G*(z). z is discrete
+      (Rouwenhorst), so these are mass points, not a density.
+  (4) mean ability a by location, overall and by branch — the numbers
+      `student_ability_moments` returns and `report_ge` prints.
+
+`a` is evaluated on `na` log-spaced points and the axis is trimmed to the central
+1 − 2·`trim` of the pooled distribution (the ability support runs out to z_max·ε
+at the far tail of ε, where there is no visible mass).
+"""
+function plot_student_ability(sol; outdir, na = 400, trim = 0.005)
+    mkpath(outdir)
+    (; z, L, Πz, dT) = sol.gr
+    sa  = student_ability_moments(sol)
+    erg = stationary(Πz)
+    markers = [:circle, :square, :diamond, :utriangle, :star5, :hexagon]
+    lcolors = palette(:tab10, max(L, 3))
+
+    # One common a-grid for every location, spanning the full (z, ε) support.
+    agrid = exp.(range(log(z[1] * quantile(dT, 1e-4)),
+                       log(z[end] * quantile(dT, 1 - 1e-4)), na))
+    dens  = [student_ability_density(sol, l, agrid) for l in 1:L]
+    # Trim the axis to the bulk, pooling locations by their population mass.
+    wl    = sa.mass ./ sum(sa.mass)
+    fpool = sum(wl[l] .* (dens[l][1] .+ dens[l][2]) for l in 1:L)
+    Fpool = cumtrapz(agrid, fpool)
+    Fpool ./= Fpool[end]
+    alo = agrid[max(searchsortedfirst(Fpool, trim), 1)]
+    ahi = agrid[min(searchsortedfirst(Fpool, 1 - trim), na)]
+
+    pa = plot(xlabel = "ability a = z·ε (chosen occupation)", ylabel = "density",
+              title = "Student ability by birth location", legend = :topright,
+              xlims = (alo, ahi))
+    pb = plot(xlabel = "ability a = z·ε (chosen occupation)", ylabel = "density",
+              title = "… split by occupation (areas = branch shares)",
+              legend = :topright, xlims = (alo, ahi))
+    for l in 1:L
+        fT, fO = dens[l]
+        c = lcolors[mod1(l, L)]
+        plot!(pa, agrid, fT .+ fO, lw = 2, color = c,
+              label = @sprintf("loc %d  (mean a = %.3f)", l, sa.mean_a[l]))
+        plot!(pb, agrid, fT, lw = 2, color = c, ls = :dash,
+              label = @sprintf("loc %d teach (%.0f%%)", l, 100 * sa.teach_share[l]))
+        plot!(pb, agrid, fO, lw = 2, color = c, ls = :dot,
+              label = @sprintf("loc %d nonteach (%.0f%%)", l, 100 - 100 * sa.teach_share[l]))
+    end
+
+    pz = plot(xlabel = "persistent ability z", ylabel = "mass",
+              title = "G_l(z) overall and by occupation", legend = :topright)
+    for l in 1:L
+        c = lcolors[mod1(l, L)]
+        plot!(pz, z, sol.Φ[:, l] ./ sum(@view sol.Φ[:, l]), lw = 2, color = c,
+              marker = markers[mod1(l, length(markers))], label = "loc $l")
+        sum(@view sa.ΦT[:, l]) > 0 && plot!(pz, z, sa.ΦT[:, l] ./ sum(@view sa.ΦT[:, l]),
+              lw = 2, color = c, ls = :dash, label = "loc $l | teach")
+        sum(@view sa.ΦO[:, l]) > 0 && plot!(pz, z, sa.ΦO[:, l] ./ sum(@view sa.ΦO[:, l]),
+              lw = 2, color = c, ls = :dot, label = "loc $l | nonteach")
+    end
+    plot!(pz, z, erg, lw = 2, color = :gray, ls = :dashdot, label = "ergodic G*(z)")
+
+    # Means as a DOT plot, not bars: the cross-location differences are a few
+    # percent, so a zero-baseline bar chart hides exactly what is being compared.
+    # mean z is on the same axis on purpose — the gap a − z is the SELECTION
+    # premium the occupational choice creates out of a unit-mean ε.
+    pm = plot(xlabel = "birth location", ylabel = "mean ability",
+              title = @sprintf("Mean ability by location (pooled a = %.3f)", sa.mean_a_all),
+              legend = :outertopright, xticks = (1:L, ["loc $l" for l in 1:L]),
+              xlims = (0.5, L + 0.5))
+    for (lab, v, mk, c) in (("mean z",          sa.mean_z,       :diamond,   :gray),
+                            ("mean a (all)",    sa.mean_a,       :circle,    1),
+                            ("a | teachers",    sa.mean_a_teach, :utriangle, 2),
+                            ("a | non-teach",   sa.mean_a_non,   :square,    3))
+        plot!(pm, 1:L, v, lw = 2, marker = mk, ms = 7, color = c, label = lab)
+    end
+
+    plot(pa, pb, pz, pm, layout = (2, 2), size = (1200, 800),
+         left_margin = 6Plots.mm, bottom_margin = 6Plots.mm)
+    savefig(joinpath(outdir, "continuous_student_ability.png"))
+    println("Saved student-ability figures to ", outdir)
+    return sa
 end
 
 # -----------------------------------------------------------------------------
@@ -889,24 +1608,37 @@ function analyze_sorting_drivers(; outdir, kw = _dd_kw())
         (label = "no amenity (B=0)", p = Params(B = [0.0, 0.0])),
         (label = "equal κ",          p = Params(κ = [1.0, 1.0])),
         (label = "no altruism (λ=0)",p = Params(λ = 0.0)),
-        (label = "no move cost",     p = Params(τmove = [0.0 0.0; 0.0 0.0])),
+        (label = "no move cost",     p = Params(mcost = zeros(2, 2))),
+        (label = "log warm glow ψ=1",p = Params(ψ = 1.0, href = 1.0)),
+        (label = "nesting (both off)",p = nesting_params()),
         (label = "symmetric (B=0,κ=)",p = Params(B = [0.0, 0.0], κ = [1.0, 1.0])),
     ]
-    @printf("  %-20s %-10s %-10s %-12s %-10s\n",
-            "case", "idx_work", "idx_birth", "share_loc2", "outflow")
+    # The SIGNED index is what is plotted and returned: the sign is the result
+    # (baseline sorting is negative), and the |max−min| spread would hide it.
+    @printf("  %-20s %-12s %-10s %-10s %-12s %-10s\n",
+            "case", "idx_work±", "idx_work", "idx_birth", "share_loc2", "outflow")
     idxs = Float64[]; labels = String[]
     for c in cases
         sol = solve_ge(c.p; kw...)
         sm  = sorting_metrics(sol)
-        @printf("  %-20s %-10.4f %-10.4f %-12.4f %-10.4f\n",
-                c.label, sm.idx_work, sm.idx_birth, sol.M[2] / sum(sol.M), outflow_rate(sol))
-        push!(idxs, sm.idx_work); push!(labels, c.label)
+        @printf("  %-20s %+-12.5f %-10.4f %-10.4f %-12.4f %-10.4f\n",
+                c.label, sm.idx_work_signed, sm.idx_work, sm.idx_birth,
+                sol.M[2] / sum(sol.M), outflow_rate(sol))
+        push!(idxs, sm.idx_work_signed); push!(labels, c.label)
     end
-    println("\n  The sorting index (work-location mean-z spread) collapses toward the")
-    println("  fully-symmetric benchmark as the ACTIVE asymmetry is removed; whichever")
-    println("  single-channel removal cuts it most is the dominant sorting driver.")
+    println("\n  The sorting index (work-location mean-z gap, loc L − loc 1) collapses")
+    println("  toward the fully-symmetric benchmark as the ACTIVE asymmetry is removed;")
+    println("  whichever single-channel removal cuts it most is the dominant driver.")
+    println("  The baseline value is POSITIVE — the attractive location draws HIGH-z")
+    println("  agents. The 'no move cost' / 'log warm glow' / 'nesting' rows are the")
+    println("  mechanism ablation: dropping either sorting mechanism shrinks the index,")
+    println("  and dropping both ('nesting') drives it NEGATIVE, back to the pre-sorting")
+    println("  regime where the attractive location drew LOW-z agents through")
+    println("  occupational composition alone. Note κ remains the dominant LOCATION")
+    println("  asymmetry: 'equal κ' collapses the index further than either ablation.")
     println("===============================================================")
-    bar(labels, idxs, legend = false, xrotation = 25, ylabel = "sorting index (mean-z spread)",
+    bar(labels, idxs, legend = false, xrotation = 25,
+        ylabel = "signed sorting index (mean-z gap, loc L − loc 1)",
         title = "What drives spatial sorting on ability?", size = (900, 450),
         bottom_margin = 8Plots.mm)
     savefig(joinpath(outdir, "dd_sorting_drivers.png"))
@@ -1128,7 +1860,9 @@ function main_test()
     report_ge(sol)
     verify_solution(sol)
     report_checks(sol)
+    report_sorting(sol)
     plot_ge_outcomes(sol; outdir = joinpath(@__DIR__, "figures"))
+    plot_student_ability(sol; outdir = joinpath(@__DIR__, "figures"))
     plot_household(sol; outdir = joinpath(@__DIR__, "figures"))
 
     symmetry_test()
@@ -1138,10 +1872,18 @@ function main_test()
     damping_diagnostic()
     generalized_dims_test()
 
-    # Mechanism deep-dive (Q1–Q8): verbose comparative statics + figures. Runs on
+    # Sorting mechanisms (Stages 0–3): nesting assertions, the ψ sweep and the
+    # goods moving cost; see section 6b.
+    sorting_mechanism_tests()
+
+    # Mechanism deep-dive: verbose comparative statics + figures. Runs on
     # the baseline `sol` plus its own parameter sweeps; see section 7c.
     deep_dive(sol)
     return sol
 end
 
-@time sol = main_test()
+# Running the file as a script executes the whole battery; `include`ing it from a
+# REPL or another script just brings the diagnostics into scope.
+if abspath(PROGRAM_FILE) == @__FILE__
+    @time sol = main_test()
+end
