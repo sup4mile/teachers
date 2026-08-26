@@ -2139,8 +2139,7 @@ function main_test()
     return sol
 end
 
-# Running the file as a script executes the whole battery; `include`ing it from a
-# REPL or another script just brings the diagnostics into scope.
-if abspath(PROGRAM_FILE) == @__FILE__
-    @time sol = main_test()
-end
+
+
+@time sol = main_test()
+
