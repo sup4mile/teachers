@@ -58,10 +58,12 @@ using Distributions
 # href is a fixed normalisation (see `mean_child_h`):
 # h'^{1-ψ} is not scale-free the way log h' is, so href must be set to the
 # benchmark mean h̄ or ψ silently rescales the whole altruism term.
-# The isapprox guard is not cosmetic: (x^(1-ψ) − 1)/(1−ψ) loses all precision to
-# cancellation for ψ near (but not equal to) 1.
+# The isapprox guard handles ψ EXACTLY 1 (the 0/0); `expm1` handles the band
+# just below it, where (x^(1-ψ) − 1) is a cancelling difference of two numbers
+# both ≈ 1 — expm1 of the combined exponent keeps full precision there.  Same
+# treatment in `child_Ef`'s power branch, which evaluates the same kernel.
 @inline warm(h, ψ, href) = isapprox(ψ, 1.0; atol = 1e-10) ? log(h / href) :
-                           ((h / href)^(1 - ψ) - 1) / (1 - ψ)
+                           expm1((1 - ψ) * log(h / href)) / (1 - ψ)
 
 # -----------------------------------------------------------------------------
 # 1. Parameters.  All structural constants of the model live in this immutable
@@ -512,7 +514,11 @@ end
 #
 # S_PASSES_MAX reports the COST (pass count, dominated by the cold first sweep);
 # S_RESID_MAX reports the ACCURACY (|s_{n+1} − s_n| at exit) and is what
-# verify_solution actually audits.  Both are reset per solve_ge.
+# verify_solution actually audits.  They are running maxima over every cell, so
+# solve_ge zeroes them a SECOND time just before the final clean solve and
+# stores the result in the returned sol as (s_resid, s_passes): the audit then
+# describes the policies it is handed, not the worst of the GE path, and stays
+# correct when several solutions are verified after all of them have solved.
 const S_PASSES_MAX = Ref(0)
 const S_RESID_MAX  = Ref(0.0)
 const S_MAXIT = 12
@@ -738,8 +744,13 @@ function child_Ef(l, g, zi, hh, p, gr)
                      loga = base0 + p.φ * log(hh.sO[g, l, zi, k]) +
                             p.η * log(hh.eO[g, l, zi, k]) +
                             log(gr.XOgrid[k, g]) - log(p.href)
-                     (exp((1 - p.ψ) * loga) * EΘpow(gr, g, gr.XOgrid[k, g], p.ψ) - 1) /
-                     (1 - p.ψ)
+                     # exp(u) = (h_O/href)^{1−ψ}·E[Θ^{−(1−ψ)}]; expm1 on the
+                     # COMBINED exponent avoids the cancellation as ψ → 1, and
+                     # makes the limit u/(1−ψ) → loga − E[logΘ] visibly the
+                     # ψ = 1 branch above.  EΘpow is a positive weighted mean,
+                     # so its log is always well defined.
+                     u = (1 - p.ψ) * loga + log(EΘpow(gr, g, gr.XOgrid[k, g], p.ψ))
+                     expm1(u) / (1 - p.ψ)
                  end
                  for k in 1:gr.nXO]
     end
@@ -952,7 +963,7 @@ function solve_ge(p::Params = Params();
     @assert length(p.κ) == L && size(p.τmove) == (L, L) && size(p.mcost) == (L, L) &&
             size(p.τω) == (I, 2) && size(p.τe) == (I, 2) && 1 <= p.T <= I "Params dims inconsistent"
     @assert all(p.mcost[l, l] == 0.0 for l in 1:L) "mcost must have a zero diagonal (staying put is free)"
-    S_PASSES_MAX[] = 0            # per-solve; read back by verify_solution
+    S_PASSES_MAX[] = 0            # zeroed again before the final clean solve below
     S_RESID_MAX[]  = 0.0
 
     if verbose
@@ -1023,12 +1034,19 @@ function solve_ge(p::Params = Params();
     gr = build_grids(p; H̃T = HT, M = M, t = t, Nz, nϵT, nXO, q_lo, q_hi)
     # Final clean solve at the converged (H̃_T, M, t) so the returned policies,
     # location probabilities, and distribution are all mutually consistent.
+    # Zero the s diagnostics so they measure THIS solve only: warm-started off the
+    # converged Λ, it is the tightest sweep of the run and the only one whose
+    # residual describes the returned policies.
+    S_PASSES_MAX[] = 0
+    S_RESID_MAX[]  = 0.0
     hh = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit, Λ0, eT0, eO0, sT0, sO0)
     Pi_T, Pi_O = location_probs(hh, p, gr)
     Φ, πbar = stationary_phi(Pi_T, Pi_O, hh, p, gr)
     # The solution bundle `sol`: household policies hh, location probs Pi_T/Pi_O,
-    # spatial distribution Φ, migration matrix πbar, aggregates HT/M/t, grids gr, params p.
-    return (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, gr, p)
+    # spatial distribution Φ, migration matrix πbar, aggregates HT/M/t, grids gr, params p,
+    # and the s-fixed-point diagnostics of the clean solve (audited by verify_solution).
+    return (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, gr, p,
+              s_resid = S_RESID_MAX[], s_passes = S_PASSES_MAX[])
 end
 
 # -----------------------------------------------------------------------------
@@ -1042,9 +1060,13 @@ Post-solve audit that the numerical safeguards are SLACK at the solution:
 (i) no (state, work-location) cell has consumption Y ≤ δ, i.e. the smooth_log
 barrier never binds and every stored value is the true log; (ii) no local tax
 rate sits on the clamp [0, tclamp]; (iii) the s fixed point of Proposition 2′
-converged (residual below `s_atol`).  Returns true if clean.  The pass count is
-reported for cost, not audited: only the very first (cold) household sweep of a
-solve needs more than 2 passes.
+converged (residual below `s_atol`).  Returns true if clean.  The s diagnostics
+come from `sol` itself (`sol.s_resid`, `sol.s_passes`, recorded by `solve_ge` on
+the final clean solve), so verifying several solutions after all of them have
+solved reports each one's own residual; a `sol` predating those fields falls
+back to the globals.  The pass count is reported for cost, not audited: it is a
+max over cells and is set by the first (cold) sweep of the clean solve; a
+warm-started sweep converges in 2.
 
 The goods moving cost `mcost` subtracts a FIXED amount from a mover's
 consumption, so it is the low-ability movers that push the barrier first — check
@@ -1055,6 +1077,10 @@ the largest clean bump; 2× already drives cells negative.  That is why
 """
 function verify_solution(sol; δ = 1e-6, tclamp = 0.9, s_atol = 1e-8)
     (; hh, t, gr, p) = sol
+    # Prefer the per-solve diagnostics stored in `sol`; fall back to the globals
+    # for solutions saved before solve_ge started attaching them.
+    s_resid  = hasproperty(sol, :s_resid)  ? sol.s_resid  : S_RESID_MAX[]
+    s_passes = hasproperty(sol, :s_passes) ? sol.s_passes : S_PASSES_MAX[]
     i0 = gr.nonteach[1]
     minY = Inf
     n_binding = 0
@@ -1078,9 +1104,9 @@ function verify_solution(sol; δ = 1e-6, tclamp = 0.9, s_atol = 1e-8)
         end
     end
     ok = true
-    if S_RESID_MAX[] > s_atol
+    if s_resid > s_atol
         @printf("  ⚠ the s fixed point left a residual of %.2e (> %.1e) after %d passes: the Ξ iteration did not converge\n",
-                S_RESID_MAX[], s_atol, S_MAXIT)
+                s_resid, s_atol, s_passes)
         ok = false
     end
     if n_binding > 0
@@ -1096,7 +1122,7 @@ function verify_solution(sol; δ = 1e-6, tclamp = 0.9, s_atol = 1e-8)
         end
     end
     ok && @printf("  ✓ feasibility audit passed: min C = %.4e > δ = %.1e; taxes interior t = %s; s residual %.1e (≤ %d passes)\n",
-                  minY, δ, fmtvec(t), S_RESID_MAX[], S_PASSES_MAX[])
+                  minY, δ, fmtvec(t), s_resid, s_passes)
     return ok
 end
 
