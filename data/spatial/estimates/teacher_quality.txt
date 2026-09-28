@@ -1,0 +1,183 @@
+Teacher quality in SEDA -- 2018 CCD x SEDA 6.0 pooled 2009-19
+panel: 13,613 districts, 11,797 with a SEDA learning rate, 738 commuting zones
+
+==============================================================================
+A. RELIABILITY -- is the district growth measure precise enough to use?
+==============================================================================
+   SEDA suppresses any estimate whose OLS reliability is below 0.7, so
+   this is a selected sample: the imprecise districts are already gone.
+
+   measure                            weight                      sd  noise sd  reliab.       n
+   level  mn_avg (cs)                 enrol-wtd   national    0.3407    0.0094    0.999   12355
+   level  mn_avg (cs)                 enrol-wtd   within CZ   0.2984    0.0094    0.999   12339
+   level  mn_avg (cs)                 unweighted  national    0.3404    0.0255    0.994   12366
+   level  mn_avg (cs)                 unweighted  within CZ   0.2695    0.0254    0.991   12350
+   growth mn_lrn (cs)                 enrol-wtd   national    0.0348    0.0046    0.983   11732
+   growth mn_lrn (cs)                 enrol-wtd   within CZ   0.0282    0.0046    0.974   11723
+   growth mn_lrn (cs)                 unweighted  national    0.0447    0.0100    0.950   11741
+   growth mn_lrn (cs)                 unweighted  within CZ   0.0396    0.0100    0.937   11732
+   growth mn_lrn (cs, adj. se)        enrol-wtd   national    0.0347    0.0082    0.944   11788
+   growth mn_lrn (cs, adj. se)        enrol-wtd   within CZ   0.0282    0.0082    0.915   11778
+   growth mn_lrn (cs, adj. se)        unweighted  national    0.0447    0.0121    0.927   11797
+   growth mn_lrn (cs, adj. se)        unweighted  within CZ   0.0396    0.0121    0.907   11787
+   growth mn_lrn (gys, grade eq.)     enrol-wtd   national    0.1257    0.0156    0.985   11732
+   growth mn_lrn (gys, grade eq.)     enrol-wtd   within CZ   0.1054    0.0156    0.978   11723
+   growth mn_lrn (gys, grade eq.)     unweighted  national    0.1562    0.0338    0.953   11741
+   growth mn_lrn (gys, grade eq.)     unweighted  within CZ   0.1390    0.0338    0.941   11732
+
+   Read: sampling noise is not what is keeping the quality gap small.
+
+==============================================================================
+B. COMPOSITION -- how much of each measure is just who enrolls?
+==============================================================================
+   within-CZ WLS, enrolment weights, CZ-clustered SEs
+
+   outcome          on                         R2 within    b(SES)       se       n
+   cs_mn_avg_ol     seda_ses                       0.768   +0.3443   0.0081   12225
+   cs_mn_avg_ol     seda_ses+pov_rate_5_17         0.769   +0.3104   0.0173   12224
+   cs_mn_lrn_ol     seda_ses                       0.075   +0.0102   0.0014   11695
+   cs_mn_lrn_ol     seda_ses+pov_rate_5_17         0.078   +0.0109   0.0024   11694
+   gys_mn_lrn_ol    seda_ses                       0.205   +0.0630   0.0048   11695
+   gys_mn_lrn_ol    seda_ses+pov_rate_5_17         0.209   +0.0622   0.0085   11694
+
+   Read: the level is composition; the growth rate mostly is not.
+   That is the case for using the learning rate as the Q_l analogue --
+   and the reason it cannot also stand in for teacher quality.
+
+==============================================================================
+C. INPUTS -- do observable teacher inputs explain district growth?
+==============================================================================
+
+   outcome: cs_mn_lrn_ol
+     teacher inputs only  R2w=0.0216 n= 10758  teachers_pp=+0.0427(0.0084)  salary_real=+0.0342(0.0063)  exp_pp=-0.0396(0.0079)
+     SES only             R2w=0.0783 n= 11694  
+     both                 R2w=0.0948 n= 10682  teachers_pp=+0.0121(0.0084)  salary_real=+0.0145(0.0061)  exp_pp=-0.0061(0.0091)
+
+   outcome: cs_mn_avg_ol
+     teacher inputs only  R2w=0.1792 n= 11325  teachers_pp=+1.0675(0.1663)  salary_real=+0.9152(0.1656)  exp_pp=-1.2923(0.0998)
+     SES only             R2w=0.7690 n= 12224  
+     both                 R2w=0.7765 n= 11170  teachers_pp=+0.0893(0.0553)  salary_real=+0.2713(0.0485)  exp_pp=-0.1859(0.0456)
+
+   Read: teacher inputs the CCD and F-33 can see move district growth
+   hardly at all.  Whatever separates districts, it is not measured by
+   headcount, salary or spending -- which is the Chetty-Friedman-Rockoff
+   finding one aggregation level up.
+
+==============================================================================
+D. GAPS -- the within-CZ growth gap, raw and net of composition
+==============================================================================
+
+   scheme   variable             loc 1     loc 2       gap       se      t   CZs
+   locale   cs_mn_lrn_ol       -0.0011    0.0020   +0.0031   0.0030   1.01   187
+   locale   gys_mn_lrn_ol       1.0233    1.0569   +0.0336   0.0108   3.10   187
+   locale   cs_mn_avg_ol       -0.1660    0.1227   +0.2887   0.0335   8.62   187
+   locale   log_teachers_pp    -2.8139   -2.8271   -0.0132   0.0135  -0.98   187
+
+   revenue  cs_mn_lrn_ol       -0.0068    0.0004   +0.0071   0.0014   4.92   613
+   revenue  gys_mn_lrn_ol       1.0093    1.0496   +0.0403   0.0052   7.70   613
+   revenue  cs_mn_avg_ol       -0.0917    0.1077   +0.1994   0.0226   8.84   615
+   revenue  log_teachers_pp    -2.8141   -2.7784   +0.0357   0.0059   6.08   619
+
+   ses      cs_mn_lrn_ol       -0.0110    0.0035   +0.0145   0.0017   8.35   617
+   ses      gys_mn_lrn_ol       0.9861    1.0686   +0.0825   0.0063  13.10   617
+   ses      cs_mn_avg_ol       -0.1976    0.2071   +0.4047   0.0198  20.47   619
+   ses      log_teachers_pp    -2.7913   -2.7949   -0.0035   0.0064  -0.55   616
+
+   The same gap as a coefficient on a location-2 dummy, so that student
+   composition can be controlled for (CZ FE, enrolment-weighted):
+
+   scheme   specification                gap       se      t       n
+   locale   raw gap                  +0.0046   0.0022   2.08    3037
+   locale   + SES                    -0.0042   0.0022  -1.92    3033
+   locale   + SES + poverty          -0.0036   0.0023  -1.55    3032
+   locale   + SES + inputs           -0.0040   0.0025  -1.62    2989
+
+   revenue  raw gap                  +0.0073   0.0014   5.07    8825
+   revenue  + SES                    +0.0016   0.0014   1.14    8813
+   revenue  + SES + poverty          +0.0015   0.0014   1.07    8812
+   revenue  + SES + inputs           +0.0018   0.0014   1.32    8736
+
+   ses      raw gap                  +0.0146   0.0018   8.23    8824
+   ses      + SES                    +0.0064   0.0019   3.45    8824
+   ses      + SES + poverty          +0.0059   0.0018   3.24    8823
+   ses      + SES + inputs           +0.0061   0.0019   3.26    8739
+
+   Read: on the paper's preferred (city/suburb) split the growth
+   advantage of the good location does not survive controlling for who
+   enrols -- it changes sign.  Q_2/Q_1 is 1.03 raw and about 1.00 net.
+
+==============================================================================
+E. RESIDUAL -- what the model must then attribute to teacher quality
+==============================================================================
+   Q_l = (2 H_T,l / M_l)^sigma  and  H_T,l = N_T,l * E_l[h^beta], so
+       dlog E[h^beta] = dlog Q / sigma - dlog(teachers per pupil).
+   dlog Q comes from the grade-equivalent learning rate, which is a
+   genuine ratio; the CS learning rate is a deviation around the
+   national average and has no level to take a ratio of.
+
+   scheme       dlogQ  dlog(N_T/M)   sigma=0.3   sigma=0.5   sigma=0.7
+   locale     +0.0322      -0.0133     +0.1207     +0.0777     +0.0593
+   revenue    +0.0392      +0.0356     +0.0951     +0.0428     +0.0204
+   ses        +0.0804      -0.0035     +0.2715     +0.1643     +0.1184
+   (columns: the implied within-CZ log gap in beta-weighted teacher quality)
+
+   Is that gap big or small?  Convert the growth gap into the units the
+   teacher value-added literature reports -- SDs of student achievement
+   gained from one teacher in one year -- and compare:
+
+   scheme    growth gap/grade   as share of VA sd   vs FRL access gap
+   locale             +0.0031               0.03x               0.13x
+   revenue            +0.0071               0.06x               0.30x
+   ses                +0.0145               0.13x               0.61x
+
+   VA sd = 0.116 (CFR I, elementary math, shrunk);
+   FRL access gap = 0.024 SD math (Isenberg et al. 2013, 29 districts).
+   Read: even attributing the ENTIRE within-CZ growth gap to teachers,
+   the district-mean teacher-quality gap the model needs is a few percent
+   of a teacher-VA standard deviation on the city/suburb split.
+
+==============================================================================
+F. AGGREGATION -- why no district series can identify teacher VA
+==============================================================================
+   teachers per district, unweighted: p10=19, p25=39, p50=87, p75=209, p90=476
+   enrolment-weighted median = 718, mean = 2,431
+
+   observed within-CZ sd of the district learning rate = 0.0278 SD/grade (noise removed)
+   85% of teacher-VA variance is within school, not between (CFR I),
+   and a district mean averages over hundreds of teachers:
+
+    sd of teacher VA  teachers  sd of district mean  observed / that
+               0.080        50               0.0113             2.5x
+               0.080       200               0.0057             4.9x
+               0.080      1000               0.0025            11.0x
+               0.116        50               0.0164             1.7x
+               0.116       200               0.0082             3.4x
+               0.116      1000               0.0037             7.6x
+               0.163        50               0.0231             1.2x
+               0.163       200               0.0115             2.4x
+               0.163      1000               0.0052             5.4x
+
+   Read: district growth varies several times more than random
+   allocation of teachers would produce, so there IS systematic sorting
+   in it -- but what survives aggregation is teacher sorting bundled
+   with curriculum, leadership, peers and everything else the district
+   does.  No district-level series separates the bundle.
+
+   Two regressions the main report runs on the locale partition only.
+   The sample, not the data, is what makes the kappa gradient look dead:
+
+         sample                 controls                 b       se      t       n
+   kappa full within-CZ panel   none               +0.0670   0.0135   4.97   10846
+   kappa full within-CZ panel   str + poverty      +0.0464   0.0164   2.83   10793
+   kappa locale partition       none               +0.0820   0.0186   4.41    2746
+   kappa locale partition       str + poverty      +0.0404   0.0245   1.65    2721
+   sigma full within-CZ panel   none               -0.0087   0.0290  -0.30   11700
+   sigma full within-CZ panel   SES + poverty      -0.0088   0.0207  -0.43   11623
+   sigma locale partition       none               -0.0088   0.0529  -0.17    3006
+   sigma locale partition       SES + poverty      -0.0378   0.0361  -1.05    3002
+
+   Errors-in-variables: the learning rate's within-CZ reliability is
+   0.974, so putting it on the right-hand side attenuates a
+   coefficient by only 2.7%.  Measurement error is not the
+   story; sigma is genuinely not identified in this cross-section, and
+   the kappa gradient is genuinely positive once all districts are used.

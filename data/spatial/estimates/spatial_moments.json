@@ -1,0 +1,1834 @@
+{
+  "generated": "2026-08-31T11:17:39",
+  "base_year": 2018,
+  "scheme": "all",
+  "geo_unit": "czone (Dorn 1990 commuting zones)",
+  "years": [
+    1994,
+    2000,
+    2006,
+    2010,
+    2014,
+    2018
+  ],
+  "inputs": {
+    "urban_ccd_directory": {
+      "status": "ok",
+      "path": "urban_ccd_directory.parquet",
+      "n_cols": 69
+    },
+    "urban_ccd_finance": {
+      "status": "ok",
+      "path": "urban_ccd_finance.parquet",
+      "n_cols": 163
+    },
+    "urban_ccd_enrollment": {
+      "status": "ok",
+      "path": "urban_ccd_enrollment.parquet",
+      "n_cols": 7
+    },
+    "urban_saipe": {
+      "status": "ok",
+      "path": "urban_saipe.parquet",
+      "n_cols": 10
+    },
+    "urban_edfacts_assessments": {
+      "status": "ok",
+      "path": "urban_edfacts_assessments.parquet",
+      "n_cols": 23
+    },
+    "urban_edfacts_grad_rates": {
+      "status": "ok",
+      "path": "urban_edfacts_grad_rates.parquet",
+      "n_cols": 15
+    },
+    "seda_*": {
+      "status": "ok",
+      "n_tables": 98,
+      "tables": [
+        "seda_commzone_annual_cs_6_0",
+        "seda_commzone_annual_gcs_6_0",
+        "seda_commzone_annual_gys_6_0",
+        "seda_commzone_annual_ys_6_0",
+        "..."
+      ]
+    },
+    "edge_cwift": {
+      "status": "ok",
+      "path": "edge_cwift.parquet",
+      "n_cols": 15
+    },
+    "edge_geocode_lea": {
+      "status": "ok",
+      "path": "edge_geocode_lea.csv",
+      "n_cols": 65
+    },
+    "czone_crosswalk": {
+      "status": "ok",
+      "path": "czone_crosswalk.parquet",
+      "n_cols": 2
+    },
+    "acs_school_districts": {
+      "status": "ok",
+      "path": "acs_school_districts.parquet",
+      "n_cols": 15
+    }
+  },
+  "sample": {
+    "agency_types": [
+      1.0,
+      2.0
+    ],
+    "min_pupils": 500,
+    "min_group_share": 0.1,
+    "ratio_trim_tail": 0.005
+  },
+  "panel": {
+    "district_years": 85497,
+    "districts": 16477,
+    "czones": 738,
+    "cz_years_partitioned": 621
+  },
+  "assumptions": {
+    "sd_score_to_log_earnings": 0.13
+  },
+  "estimates": [
+    {
+      "key": "gap_pupils_locale",
+      "label": "within-CZ gap, enrollment, group total (location 2 - location 1)",
+      "model_object": "M_2/M_1",
+      "value": 0.3763546672825929,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "M_2/M_1, the enrollment split. B_l is the residual backed out to match it, so this is a target, never a check.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.9690728686052983,
+        "p25": -0.21346296220511363,
+        "p50": 0.35864266031587994,
+        "p75": 1.000279555543822,
+        "ratio_2_over_1": 1.4569637795315191,
+        "level_1": 287854.75002868474,
+        "level_2": 396962.61332453106,
+        "within_cz_var_share": 0.577271008792844
+      }
+    },
+    {
+      "key": "gap_teachers_locale",
+      "label": "within-CZ gap, FTE teachers, group total (location 2 - location 1)",
+      "model_object": "H\u0303_T,2/H\u0303_T,1 (before the \u03b2 weighting)",
+      "value": 0.36315112356731544,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The teacher stock by location. Together with the enrollment gap it says whether the good location's advantage is more teachers or better ones -- the model's answer is 'better', through \u03b2.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.9701321721449199,
+        "p25": -0.2734648121316291,
+        "p50": 0.33592444511812,
+        "p75": 0.9292043643695636,
+        "ratio_2_over_1": 1.4378531363181886,
+        "level_1": 15765.765479965077,
+        "level_2": 23284.577421014983,
+        "within_cz_var_share": 0.5883517761331928
+      }
+    },
+    {
+      "key": "gap_teachers_pp_locale",
+      "label": "within-CZ gap, FTE teachers per pupil (location 2 - location 1)",
+      "model_object": "H\u0303_T,l / M_l",
+      "value": -0.012164380555830152,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "This is H\u0303_T,l/M_l up to the \u03b2-weighting of teacher human capital, so it maps into Q_l = (2H\u0303_T,l/M_l)^\u03c3 directly. If it is near zero while the score gap is not, the quality gap is composition, not class size.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.13056715320849194,
+        "p25": -0.0719908013879806,
+        "p50": -0.00972386207632186,
+        "p75": 0.0461001647721983,
+        "ratio_2_over_1": 0.9879093064331654,
+        "level_1": 0.06105366616232104,
+        "level_2": 0.06053500088596161,
+        "within_cz_var_share": 0.17947868839953357
+      }
+    },
+    {
+      "key": "gap_str_ratio_locale",
+      "label": "within-CZ gap, student-teacher ratio (location 2 - location 1)",
+      "model_object": "class size N(h)",
+      "value": 0.012164380555830153,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "Class size. Prop. 1 has better teachers take LARGER classes, which is not what districts do -- check the mapping (notes \u00a75.3) before targeting this.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.13056715320849194,
+        "p25": -0.04610016477219821,
+        "p50": 0.00972386207632192,
+        "p75": 0.07199080138798057,
+        "ratio_2_over_1": 1.012238667545797,
+        "level_1": 16.98927348580168,
+        "level_2": 17.260160278355972,
+        "within_cz_var_share": 0.17947868839953363
+      }
+    },
+    {
+      "key": "gap_salary_per_teacher_locale",
+      "label": "within-CZ gap, teacher salary per FTE, nominal (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1 (undeflated)",
+      "value": -0.01705078057948998,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "Compare with the deflated version: the wedge between the two is how much of the raw salary gap is cost of living rather than pay.",
+      "status": "ok",
+      "se": null,
+      "n": 177,
+      "extra": {
+        "sd": 0.10602724181113954,
+        "p25": -0.04701098515490818,
+        "p50": -0.0093995989530318,
+        "p75": 0.040906309208430074,
+        "ratio_2_over_1": 0.9830937612964608,
+        "level_1": 74526.84739215692,
+        "level_2": 72115.15585319845,
+        "within_cz_var_share": 0.13364614842695657
+      }
+    },
+    {
+      "key": "gap_salary_real_locale",
+      "label": "within-CZ gap, teacher salary per FTE, CWIFT-deflated (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1",
+      "value": 0.01622596475826441,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The direct target for \u03ba_2/\u03ba_1; CWIFT-deflated, so it is a teaching-wage gap rather than a local price level.",
+      "status": "ok",
+      "se": null,
+      "n": 176,
+      "extra": {
+        "sd": 0.101973622750976,
+        "p25": -0.01917639451034099,
+        "p50": 0.008504678609491499,
+        "p75": 0.05236900918453632,
+        "ratio_2_over_1": 1.016358320622614,
+        "level_1": 68189.02588191359,
+        "level_2": 71372.70455524586,
+        "within_cz_var_share": 0.2067674205838683
+      }
+    },
+    {
+      "key": "gap_exp_pp_locale",
+      "label": "within-CZ gap, current expenditure per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": -0.09563897857090076,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The resource gap the budget constraint has to deliver.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.14122640909883896,
+        "p25": -0.1664995142199121,
+        "p50": -0.08834469596549366,
+        "p75": -0.03725285092917194,
+        "ratio_2_over_1": 0.9087920502561951,
+        "level_1": 14668.259119569535,
+        "level_2": 13367.459604429147,
+        "within_cz_var_share": 0.20462654654372317
+      }
+    },
+    {
+      "key": "gap_rev_pp_local_locale",
+      "label": "within-CZ gap, local revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l I_l / M_l",
+      "value": -0.07082143369778832,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The local half of the budget; with the state half it pins how far pure local finance is from the data.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.45198766697122833,
+        "p25": -0.2771444322235763,
+        "p50": -0.167092175686925,
+        "p75": 0.10809566761788336,
+        "ratio_2_over_1": 0.9316282346844661,
+        "level_1": 8834.244031691513,
+        "level_2": 8065.869433227736,
+        "within_cz_var_share": 0.4406757214662389
+      }
+    },
+    {
+      "key": "gap_rev_pp_state_locale",
+      "label": "within-CZ gap, state revenue per pupil (location 2 - location 1)",
+      "model_object": "G_l (notes \u00a75.2)",
+      "value": -0.0003101120994336066,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "Motivates the exogenous transfer G_l of notes \u00a75.2 -- state aid is compensatory, so expect this gap to be NEGATIVE even where the local gap is positive.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.33863997738496576,
+        "p25": -0.14776239933162633,
+        "p50": -0.02541722093384715,
+        "p75": 0.19086571585136367,
+        "ratio_2_over_1": 0.9996899359803534,
+        "level_1": 7816.027851053408,
+        "level_2": 7044.093825170125,
+        "within_cz_var_share": 0.4407781217676307
+      }
+    },
+    {
+      "key": "gap_rev_pp_total_locale",
+      "label": "within-CZ gap, total revenue per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": -0.12114047704976098,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "Local plus state plus federal. If this gap has the opposite sign to the local one, redistribution is doing more than local finance, and a pure local budget gets the sign of the resource gap wrong.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.1493786222412034,
+        "p25": -0.198943270118228,
+        "p50": -0.10523950967335417,
+        "p75": -0.077813719156732,
+        "ratio_2_over_1": 0.8859095008982437,
+        "level_1": 18169.031562044915,
+        "level_2": 15985.42800059221,
+        "within_cz_var_share": 0.24977955709243876
+      }
+    },
+    {
+      "key": "gap_proptax_pp_locale",
+      "label": "within-CZ gap, property-tax revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": -0.10412293413088361,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The property-tax base per pupil, the closest thing to t_l I_l in the data.",
+      "status": "ok",
+      "se": null,
+      "n": 166,
+      "extra": {
+        "sd": 0.4408951544024937,
+        "p25": -0.3413051795258819,
+        "p50": -0.21071297126976188,
+        "p75": 0.13551709185479716,
+        "ratio_2_over_1": 0.901114512882276,
+        "level_1": 6670.0298124764,
+        "level_2": 6245.808974861823,
+        "within_cz_var_share": 0.3800093315035104
+      }
+    },
+    {
+      "key": "gap_t_eff_locale",
+      "label": "within-CZ gap, local revenue / local income base (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": 0.0006031950384155524,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The effective local tax rate. Keep it endogenous from the budget and use this as an untargeted check.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.0074815577776326655,
+        "p25": -0.0016223795375114437,
+        "p50": -0.00016908552198669708,
+        "p75": 0.0026222447220244503,
+        "ratio_2_over_1": null,
+        "level_1": 0.030656398648151322,
+        "level_2": 0.031259593686566875,
+        "within_cz_var_share": 0.3810153570233231
+      }
+    },
+    {
+      "key": "gap_share_local_locale",
+      "label": "within-CZ gap, local share of revenue (location 2 - location 1)",
+      "model_object": "the pure local budget of \u00a710",
+      "value": 0.010546537996526278,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "If this is far below 1 the pure local-finance budget in \u00a710 is counterfactual -- see G_l.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.14407317677624826,
+        "p25": -0.0889743860311208,
+        "p50": -0.021699032572838506,
+        "p75": 0.055633955755003954,
+        "ratio_2_over_1": null,
+        "level_1": 0.47328691886346747,
+        "level_2": 0.48383345685999374,
+        "within_cz_var_share": 0.5242432576241376
+      }
+    },
+    {
+      "key": "gap_share_state_locale",
+      "label": "within-CZ gap, state share of revenue (location 2 - location 1)",
+      "model_object": "G_l",
+      "value": 0.019633714006556467,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The size of the transfer the model is currently missing.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.13193762477628682,
+        "p25": -0.022291412052292906,
+        "p50": 0.03621482385325217,
+        "p75": 0.1185719241809997,
+        "ratio_2_over_1": null,
+        "level_1": 0.43704873805198613,
+        "level_2": 0.4566824520585426,
+        "within_cz_var_share": 0.49238738617401856
+      }
+    },
+    {
+      "key": "gap_pov_rate_5_17_locale",
+      "label": "within-CZ gap, child poverty rate 5-17 (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": -0.08877912700255307,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The observable counterpart of sorting on z: how much richer the good location's families are.",
+      "status": "ok",
+      "se": null,
+      "n": 188,
+      "extra": {
+        "sd": 0.08396541471741671,
+        "p25": -0.11995656266773493,
+        "p50": -0.08194629782287827,
+        "p75": -0.03269244757970428,
+        "ratio_2_over_1": null,
+        "level_1": 0.20959646933306628,
+        "level_2": 0.12081734233051322,
+        "within_cz_var_share": 0.7019994582754793
+      }
+    },
+    {
+      "key": "gap_learn_rate_locale",
+      "label": "within-CZ gap, SEDA learning rate (location 2 - location 1)",
+      "model_object": "Q_2/Q_1",
+      "value": 0.003072254589934042,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The closest public analogue to Q_2/Q_1; growth rather than levels, so it nets out the SES composition the model is supposed to generate endogenously.",
+      "status": "ok",
+      "se": null,
+      "n": 187,
+      "extra": {
+        "sd": 0.029227701462836285,
+        "p25": -0.008159295980629307,
+        "p50": 0.0023645693069749836,
+        "p75": 0.010559928043449133,
+        "ratio_2_over_1": null,
+        "level_1": -0.0011106047618155948,
+        "level_2": 0.0019616498281184477,
+        "within_cz_var_share": 0.6672625341887574
+      }
+    },
+    {
+      "key": "gap_score_mean_locale",
+      "label": "within-CZ gap, SEDA mean score (location 2 - location 1)",
+      "model_object": "Q level (composition-laden)",
+      "value": 0.2887304108046367,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "NOT a Q target -- it mixes school quality with who enrolls. Useful as the untargeted check that the model's sorting reproduces a level gap it did not fit.",
+      "status": "ok",
+      "se": null,
+      "n": 187,
+      "extra": {
+        "sd": 0.30810751801060793,
+        "p25": 0.09549739432276312,
+        "p50": 0.26220790286408957,
+        "p75": 0.4380163028471917,
+        "ratio_2_over_1": null,
+        "level_1": -0.1659863482855545,
+        "level_2": 0.12274406251908222,
+        "within_cz_var_share": 0.8151423732034119
+      }
+    },
+    {
+      "key": "gap_seda_ses_locale",
+      "label": "within-CZ gap, SEDA composite SES (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": 0.8299069578258926,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "Same as the poverty gap, on SEDA's composite. Reported in SEDA index units, whose cross-district SD is about 0.9 -- divide by that before setting it beside the model's mean-ability gap (`idx_work_signed`, \u2248 +0.08 at the baseline), which is in units of z. The sign is the part that compares directly.",
+      "status": "ok",
+      "se": null,
+      "n": 187,
+      "extra": {
+        "sd": 0.787910958762051,
+        "p25": 0.2162519855321879,
+        "p50": 0.7118051341893962,
+        "p75": 1.1518069221702658,
+        "ratio_2_over_1": null,
+        "level_1": -0.1403568174917796,
+        "level_2": 0.689550140334113,
+        "within_cz_var_share": 0.7775627566896948
+      }
+    },
+    {
+      "key": "gap_seda_lninc_locale",
+      "label": "within-CZ gap, log median household income (location 2 - location 1)",
+      "model_object": "I_2/I_1 (the income base)",
+      "value": 0.2708014474605399,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (locale split), enrollment-weighted across 188 CZs",
+      "note": "The income base I_l, in logs. This is what t_l is levied on, so together with the local-revenue gap it says whether the advantaged location raises more because it is richer or because it taxes itself harder.",
+      "status": "ok",
+      "se": null,
+      "n": 187,
+      "extra": {
+        "sd": 0.20571827157709602,
+        "p25": 0.14608602202676887,
+        "p50": 0.259453712188055,
+        "p75": 0.3500017881097113,
+        "ratio_2_over_1": null,
+        "level_1": 10.859098175168027,
+        "level_2": 11.129899622628567,
+        "within_cz_var_share": 0.6699848301572147
+      }
+    },
+    {
+      "key": "trend_gap_salary_real_locale",
+      "label": "change in the within-CZ salary_real gap, 2014->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.026965508499973444,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, locale split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2014,
+        "last_year": 2018,
+        "first": -0.010739543741709037,
+        "last": 0.01622596475826441
+      }
+    },
+    {
+      "key": "trend_gap_rev_pp_local_locale",
+      "label": "change in the within-CZ rev_pp_local gap, 2006->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.046940148414646096,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, locale split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2006,
+        "last_year": 2018,
+        "first": -0.023881285283142217,
+        "last": -0.07082143369778832
+      }
+    },
+    {
+      "key": "trend_gap_exp_pp_locale",
+      "label": "change in the within-CZ exp_pp gap, 2006->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.03923795727226381,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, locale split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2006,
+        "last_year": 2018,
+        "first": -0.13487693584316457,
+        "last": -0.09563897857090076
+      }
+    },
+    {
+      "key": "trend_gap_pupils_locale",
+      "label": "change in the within-CZ pupils gap, 2006->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.08806189455772168,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, locale split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2006,
+        "last_year": 2018,
+        "first": 0.28829277272487125,
+        "last": 0.3763546672825929
+      }
+    },
+    {
+      "key": "trend_gap_share_local_locale",
+      "label": "change in the within-CZ share_local gap, 2006->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.03157332536190386,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, locale split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2006,
+        "last_year": 2018,
+        "first": 0.04211986335843014,
+        "last": 0.010546537996526278
+      }
+    },
+    {
+      "key": "sigma_congestion",
+      "label": "class-size / congestion elasticity \u03c3",
+      "model_object": "\u03c3 in Q_l = (2 H\u0303_T,l / M_l)^\u03c3",
+      "value": -0.0022357543180994885,
+      "units": "elasticity of log Q w.r.t. teachers per pupil",
+      "source": "SEDA learning rates x CCD teachers per pupil, 2018, district level, CZ fixed effects, 187 CZ clusters",
+      "note": "The slope is NOT distinguishable from zero (t = -0.29), so this is an upper bound on how much the cross-section knows. \u03c3 is a free 0.25 in the code. This converts the raw slope (-0.017 SD of achievement gained over grades 3-8 per log point of teachers per pupil) into log-h units with 1 SD \u2248 0.13 log earnings -- the conversion is an assumption, and OLS here is a correlation, not a class-size experiment. Use as a prior, then discipline with STAR / Angrist-Lavy.",
+      "status": "assumption",
+      "se": 0.00782325245523334,
+      "n": 3006,
+      "extra": {
+        "raw_slope": -0.017198110139226834,
+        "raw_se": 0.060178865040256456,
+        "conversion": 0.13,
+        "grade_span": 5.0,
+        "r2_within": 0.00011216586652518235
+      }
+    },
+    {
+      "key": "sigma_nu",
+      "label": "location-taste dispersion \u03c3_\u03bd",
+      "model_object": "\u03c3\u03bd (Gumbel scale on the location choice)",
+      "value": null,
+      "units": "consumption-equivalent utils",
+      "source": "CCD enrollment shares x SEDA learning rates, 2018, district within CZ, CZ fixed effects",
+      "note": "Slope -2.203 = 1/\u03c3_\u03bd under the logit, and it is NOT distinguishable from zero (t = -0.62), so this is an upper bound on how much the cross-section knows; a non-positive slope has no \u03c3_\u03bd behind it, hence the blank value. OLS is biased here -- quality is jointly determined with the share through congestion -- so treat it as an upper bound on 1/\u03c3_\u03bd and keep Eckert-Kleineberg's 0.2 as the prior. Needs an instrument (boundary discontinuities, state-aid formula kinks).",
+      "status": "assumption",
+      "se": null,
+      "n": 3037,
+      "extra": {
+        "slope": -2.202718762466143,
+        "se": 3.5422354161834013,
+        "literature_prior": 0.2
+      }
+    },
+    {
+      "key": "kappa_quality_gradient",
+      "label": "log real teacher salary on district learning rate, within CZ",
+      "model_object": "\u03ba_l alongside Q_l",
+      "value": 0.04032820472343429,
+      "units": "log points per SD of cumulative achievement growth",
+      "source": "F-33 teacher salaries / CCD FTE, CWIFT-deflated, x SEDA, 2018, CZ fixed effects",
+      "note": "The gradient is NOT distinguishable from zero (t = +1.67), so this is an upper bound on how much the cross-section knows. Sign tells you whether \u03ba_l and Q_l co-move (agglomeration of advantage) or offset (compensating differentials). The model sets both exogenously; if they co-move strongly in the data, \u03ba_2 > \u03ba_1 is doing the sorting work the paper attributes to the spillover, and the two need separating.",
+      "status": "ok",
+      "se": 0.024136484679236982,
+      "n": 2721,
+      "extra": {
+        "controls": [
+          "learn_gain",
+          "log_str_ratio",
+          "pov_rate_5_17"
+        ],
+        "coefs": {
+          "learn_gain": 0.04032820472343429,
+          "log_str_ratio": 0.1414487883749069,
+          "pov_rate_5_17": -0.2226925962189847
+        },
+        "ses": {
+          "learn_gain": 0.024136484679236982,
+          "log_str_ratio": 0.04822688160354241,
+          "pov_rate_5_17": 0.08057093767949818
+        }
+      }
+    },
+    {
+      "key": "revenue_to_salary_passthrough",
+      "label": "elasticity of teacher salary to local revenue per pupil",
+      "model_object": "the balanced budget t_l I_l = W_l",
+      "value": 0.05598168126367249,
+      "units": "elasticity",
+      "source": "F-33 2018, district within CZ, CZ fixed effects",
+      "note": "The elasticity is significant (t = +4.20). The model spends the whole local budget on teachers, i.e. an elasticity of 1. Anything well below 1 says the budget also buys class-size reduction, facilities and non-teaching staff, and that the mapping from t_l to \u03ba_l needs a wedge.",
+      "status": "ok",
+      "se": 0.01334024738621132,
+      "n": 2885,
+      "extra": {
+        "r2_within": 0.0591878548033159
+      }
+    },
+    {
+      "key": "local_revenue_share",
+      "label": "local share of district revenue (enrollment-weighted mean)",
+      "model_object": "the pure local budget of \u00a710 vs. the G_l extension",
+      "value": 0.4725912677896511,
+      "units": "share",
+      "source": "F-33 2018, all sample districts, enrollment-weighted",
+      "note": "Benchmark: NCES reports 0.44 nationally. A pure local budget describes no year in the sample, which is the case for adding the exogenous transfer G_l (notes \u00a75.2) and makes finance equalization the natural counterfactual.",
+      "status": "ok",
+      "se": null,
+      "n": 3249,
+      "extra": {
+        "share_state": 0.4564871300715781,
+        "share_fed": 0.07092160213877088,
+        "nces_national": 0.44
+      }
+    },
+    {
+      "key": "gap_pupils_revenue",
+      "label": "within-CZ gap, enrollment, group total (location 2 - location 1)",
+      "model_object": "M_2/M_1",
+      "value": -0.024739008373202975,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "M_2/M_1, the enrollment split. B_l is the residual backed out to match it, so this is a target, never a check.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.5678231207274277,
+        "p25": -0.045780224723022137,
+        "p50": -0.002948412110698251,
+        "p75": 0.05409179470352433,
+        "ratio_2_over_1": 0.9755644929692061,
+        "level_1": 251137.00805299295,
+        "level_2": 248065.9681562363,
+        "within_cz_var_share": 0.47550352186181755
+      }
+    },
+    {
+      "key": "gap_teachers_revenue",
+      "label": "within-CZ gap, FTE teachers, group total (location 2 - location 1)",
+      "model_object": "H\u0303_T,2/H\u0303_T,1 (before the \u03b2 weighting)",
+      "value": 0.013133958455974662,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The teacher stock by location. Together with the enrollment gap it says whether the good location's advantage is more teachers or better ones -- the model's answer is 'better', through \u03b2.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.5523130220147777,
+        "p25": -0.04696470157110861,
+        "p50": 0.03206592422223815,
+        "p75": 0.12889426295251605,
+        "ratio_2_over_1": 1.013220587734655,
+        "level_1": 13939.556534094809,
+        "level_2": 14430.62601157857,
+        "within_cz_var_share": 0.4916518628210143
+      }
+    },
+    {
+      "key": "gap_teachers_pp_revenue",
+      "label": "within-CZ gap, FTE teachers per pupil (location 2 - location 1)",
+      "model_object": "H\u0303_T,l / M_l",
+      "value": 0.03661241299923859,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "This is H\u0303_T,l/M_l up to the \u03b2-weighting of teacher human capital, so it maps into Q_l = (2H\u0303_T,l/M_l)^\u03c3 directly. If it is near zero while the score gap is not, the quality gap is composition, not class size.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.11131740435379177,
+        "p25": -0.009880216035672252,
+        "p50": 0.02681131697040653,
+        "p75": 0.08229689037334262,
+        "ratio_2_over_1": 1.0372909024454642,
+        "level_1": 0.060986663188588,
+        "level_2": 0.0633693850831462,
+        "within_cz_var_share": 0.19956034766164016
+      }
+    },
+    {
+      "key": "gap_str_ratio_revenue",
+      "label": "within-CZ gap, student-teacher ratio (location 2 - location 1)",
+      "model_object": "class size N(h)",
+      "value": -0.036612412999238605,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "Class size. Prop. 1 has better teachers take LARGER classes, which is not what districts do -- check the mapping (notes \u00a75.3) before targeting this.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.11131740435379177,
+        "p25": -0.08229689037334267,
+        "p50": -0.026811316970406493,
+        "p75": 0.009880216035672188,
+        "ratio_2_over_1": 0.9640497160849004,
+        "level_1": 16.948753570525973,
+        "level_2": 16.365120777147315,
+        "within_cz_var_share": 0.19956034766164016
+      }
+    },
+    {
+      "key": "gap_salary_per_teacher_revenue",
+      "label": "within-CZ gap, teacher salary per FTE, nominal (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1 (undeflated)",
+      "value": 0.04257994691306753,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "Compare with the deflated version: the wedge between the two is how much of the raw salary gap is cost of living rather than pay.",
+      "status": "ok",
+      "se": null,
+      "n": 594,
+      "extra": {
+        "sd": 0.14678243056746443,
+        "p25": -0.02252508221586451,
+        "p50": 0.03902088837442823,
+        "p75": 0.093302519706458,
+        "ratio_2_over_1": 1.0434994776010207,
+        "level_1": 63305.94340590495,
+        "level_2": 66153.88616183514,
+        "within_cz_var_share": 0.16145109570932809
+      }
+    },
+    {
+      "key": "gap_salary_real_revenue",
+      "label": "within-CZ gap, teacher salary per FTE, CWIFT-deflated (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1",
+      "value": 0.01542750779811441,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The direct target for \u03ba_2/\u03ba_1; CWIFT-deflated, so it is a teaching-wage gap rather than a local price level.",
+      "status": "ok",
+      "se": null,
+      "n": 593,
+      "extra": {
+        "sd": 0.14363346073338842,
+        "p25": -0.043836431715077645,
+        "p50": 0.01744786993631467,
+        "p75": 0.057988906910908265,
+        "ratio_2_over_1": 1.0155471261425428,
+        "level_1": 66849.3412464329,
+        "level_2": 67976.6186423179,
+        "within_cz_var_share": 0.2624309688593144
+      }
+    },
+    {
+      "key": "gap_exp_pp_revenue",
+      "label": "within-CZ gap, current expenditure per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": 0.0758926982877686,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The resource gap the budget constraint has to deliver.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.12826862027853703,
+        "p25": 0.008597167564883662,
+        "p50": 0.0683015435660932,
+        "p75": 0.1393532782401842,
+        "ratio_2_over_1": 1.0788468058368237,
+        "level_1": 12057.043056562177,
+        "level_2": 13111.38214607654,
+        "within_cz_var_share": 0.20201115867570357
+      }
+    },
+    {
+      "key": "gap_rev_pp_local_revenue",
+      "label": "within-CZ gap, local revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l I_l / M_l",
+      "value": 0.5636480255974631,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The local half of the budget; with the state half it pins how far pure local finance is from the data.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.3009951493304791,
+        "p25": 0.4306004009146449,
+        "p50": 0.5490480363344089,
+        "p75": 0.7024186919180188,
+        "ratio_2_over_1": 1.7570706616224958,
+        "level_1": 5049.719841759583,
+        "level_2": 9009.531419911451,
+        "within_cz_var_share": 0.4146389785502808
+      }
+    },
+    {
+      "key": "gap_rev_pp_state_revenue",
+      "label": "within-CZ gap, state revenue per pupil (location 2 - location 1)",
+      "model_object": "G_l (notes \u00a75.2)",
+      "value": -0.31925883871184774,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "Motivates the exogenous transfer G_l of notes \u00a75.2 -- state aid is compensatory, so expect this gap to be NEGATIVE even where the local gap is positive.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.30753920842109683,
+        "p25": -0.4777824841628523,
+        "p50": -0.2096979929540938,
+        "p75": -0.10176240637487638,
+        "ratio_2_over_1": 0.726687430122796,
+        "level_1": 7952.78315144209,
+        "level_2": 5963.599528785958,
+        "within_cz_var_share": 0.4369885683248127
+      }
+    },
+    {
+      "key": "gap_rev_pp_total_revenue",
+      "label": "within-CZ gap, total revenue per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": 0.11432393350575874,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "Local plus state plus federal. If this gap has the opposite sign to the local one, redistribution is doing more than local finance, and a pure local budget gets the sign of the resource gap wrong.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.16350804027984212,
+        "p25": 0.0525665508699352,
+        "p50": 0.11495541966418202,
+        "p75": 0.18733320682158194,
+        "ratio_2_over_1": 1.1211152328572975,
+        "level_1": 14211.078163722472,
+        "level_2": 15958.146843339076,
+        "within_cz_var_share": 0.23852168030178242
+      }
+    },
+    {
+      "key": "gap_proptax_pp_revenue",
+      "label": "within-CZ gap, property-tax revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": 0.6012497907874178,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The property-tax base per pupil, the closest thing to t_l I_l in the data.",
+      "status": "ok",
+      "se": null,
+      "n": 556,
+      "extra": {
+        "sd": 0.3536245212821449,
+        "p25": 0.4777481955311122,
+        "p50": 0.6186683005435083,
+        "p75": 0.7169193360824151,
+        "ratio_2_over_1": 1.8243974913276828,
+        "level_1": 3736.535977128527,
+        "level_2": 6859.34019553793,
+        "within_cz_var_share": 0.368487332538524
+      }
+    },
+    {
+      "key": "gap_t_eff_revenue",
+      "label": "within-CZ gap, local revenue / local income base (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": 0.005521246884247798,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The effective local tax rate. Keep it endogenous from the budget and use this as an untargeted check.",
+      "status": "ok",
+      "se": null,
+      "n": 620,
+      "extra": {
+        "sd": 0.02506384011371048,
+        "p25": 0.0004686272541113925,
+        "p50": 0.005051834635840543,
+        "p75": 0.008722472636195975,
+        "ratio_2_over_1": null,
+        "level_1": 0.02720482197360742,
+        "level_2": 0.03272720586982706,
+        "within_cz_var_share": 0.4522840173569787
+      }
+    },
+    {
+      "key": "gap_share_local_revenue",
+      "label": "within-CZ gap, local share of revenue (location 2 - location 1)",
+      "model_object": "the pure local budget of \u00a710",
+      "value": 0.1925699471491754,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "If this is far below 1 the pure local-finance budget in \u00a710 is counterfactual -- see G_l.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.10348403275935267,
+        "p25": 0.12907989072110143,
+        "p50": 0.18806054771251465,
+        "p75": 0.24187905505512552,
+        "ratio_2_over_1": null,
+        "level_1": 0.35228268514534455,
+        "level_2": 0.54485263229452,
+        "within_cz_var_share": 0.49998534275606454
+      }
+    },
+    {
+      "key": "gap_share_state_revenue",
+      "label": "within-CZ gap, state share of revenue (location 2 - location 1)",
+      "model_object": "G_l",
+      "value": -0.17107399726546857,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The size of the transfer the model is currently missing.",
+      "status": "ok",
+      "se": null,
+      "n": 621,
+      "extra": {
+        "sd": 0.09731018424982063,
+        "p25": -0.22063772213549399,
+        "p50": -0.1630696301520326,
+        "p75": -0.11583973429110754,
+        "ratio_2_over_1": null,
+        "level_1": 0.5584694163155811,
+        "level_2": 0.3873954190501124,
+        "within_cz_var_share": 0.48164161439668096
+      }
+    },
+    {
+      "key": "gap_pov_rate_5_17_revenue",
+      "label": "within-CZ gap, child poverty rate 5-17 (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": -0.03599230172473134,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The observable counterpart of sorting on z: how much richer the good location's families are.",
+      "status": "ok",
+      "se": null,
+      "n": 620,
+      "extra": {
+        "sd": 0.06097907047036493,
+        "p25": -0.07341873971010424,
+        "p50": -0.02391445462933825,
+        "p75": 0.00506169625099619,
+        "ratio_2_over_1": null,
+        "level_1": 0.18220835669190108,
+        "level_2": 0.14622360696832368,
+        "within_cz_var_share": 0.6130268198894427
+      }
+    },
+    {
+      "key": "gap_learn_rate_revenue",
+      "label": "within-CZ gap, SEDA learning rate (location 2 - location 1)",
+      "model_object": "Q_2/Q_1",
+      "value": 0.007128106812746778,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The closest public analogue to Q_2/Q_1; growth rather than levels, so it nets out the SES composition the model is supposed to generate endogenously.",
+      "status": "ok",
+      "se": null,
+      "n": 613,
+      "extra": {
+        "sd": 0.033152579280760465,
+        "p25": -0.0029952388063380145,
+        "p50": 0.004282274474498478,
+        "p75": 0.019115797586209987,
+        "ratio_2_over_1": null,
+        "level_1": -0.006768339894730533,
+        "level_2": 0.0003450127951348741,
+        "within_cz_var_share": 0.6525515761348578
+      }
+    },
+    {
+      "key": "gap_score_mean_revenue",
+      "label": "within-CZ gap, SEDA mean score (location 2 - location 1)",
+      "model_object": "Q level (composition-laden)",
+      "value": 0.19944824340273123,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "NOT a Q target -- it mixes school quality with who enrolls. Useful as the untargeted check that the model's sorting reproduces a level gap it did not fit.",
+      "status": "ok",
+      "se": null,
+      "n": 615,
+      "extra": {
+        "sd": 0.22969740937690433,
+        "p25": 0.04439892593540687,
+        "p50": 0.2156691491535472,
+        "p75": 0.3055240241797057,
+        "ratio_2_over_1": null,
+        "level_1": -0.09167129170440055,
+        "level_2": 0.10769086881349851,
+        "within_cz_var_share": 0.7712243538985565
+      }
+    },
+    {
+      "key": "gap_seda_ses_revenue",
+      "label": "within-CZ gap, SEDA composite SES (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": 0.5734570464467998,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "Same as the poverty gap, on SEDA's composite. Reported in SEDA index units, whose cross-district SD is about 0.9 -- divide by that before setting it beside the model's mean-ability gap (`idx_work_signed`, \u2248 +0.08 at the baseline), which is in units of z. The sign is the part that compares directly.",
+      "status": "ok",
+      "se": null,
+      "n": 615,
+      "extra": {
+        "sd": 0.5944209276854115,
+        "p25": 0.19523484551323672,
+        "p50": 0.5623384963262239,
+        "p75": 0.9015121754309194,
+        "ratio_2_over_1": null,
+        "level_1": -0.01879920656385594,
+        "level_2": 0.5544790922427322,
+        "within_cz_var_share": 0.6926584922911659
+      }
+    },
+    {
+      "key": "gap_seda_lninc_revenue",
+      "label": "within-CZ gap, log median household income (location 2 - location 1)",
+      "model_object": "I_2/I_1 (the income base)",
+      "value": 0.15725658158108238,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (revenue split), enrollment-weighted across 621 CZs",
+      "note": "The income base I_l, in logs. This is what t_l is levied on, so together with the local-revenue gap it says whether the advantaged location raises more because it is richer or because it taxes itself harder.",
+      "status": "ok",
+      "se": null,
+      "n": 615,
+      "extra": {
+        "sd": 0.16581133470819515,
+        "p25": 0.03762581493453063,
+        "p50": 0.133274887531909,
+        "p75": 0.26714317868730575,
+        "ratio_2_over_1": null,
+        "level_1": 10.866335293071508,
+        "level_2": 11.023511221306926,
+        "within_cz_var_share": 0.5522788082089864
+      }
+    },
+    {
+      "key": "trend_gap_salary_real_revenue",
+      "label": "change in the within-CZ salary_real gap, 2014->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.007311164540023245,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, revenue split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2014,
+        "last_year": 2018,
+        "first": 0.022738672338137655,
+        "last": 0.01542750779811441
+      }
+    },
+    {
+      "key": "trend_gap_rev_pp_local_revenue",
+      "label": "change in the within-CZ rev_pp_local gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.014979355042068154,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, revenue split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.5486686705553949,
+        "last": 0.5636480255974631
+      }
+    },
+    {
+      "key": "trend_gap_exp_pp_revenue",
+      "label": "change in the within-CZ exp_pp gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.030621885533399354,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, revenue split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.10651458382116795,
+        "last": 0.0758926982877686
+      }
+    },
+    {
+      "key": "trend_gap_pupils_revenue",
+      "label": "change in the within-CZ pupils gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.056513031898602295,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, revenue split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.03177402352539932,
+        "last": -0.024739008373202975
+      }
+    },
+    {
+      "key": "trend_gap_share_local_revenue",
+      "label": "change in the within-CZ share_local gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.009807137230179896,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, revenue split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.18276280991899552,
+        "last": 0.1925699471491754
+      }
+    },
+    {
+      "key": "gap_pupils_ses",
+      "label": "within-CZ gap, enrollment, group total (location 2 - location 1)",
+      "model_object": "M_2/M_1",
+      "value": -0.0012870826932678279,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "M_2/M_1, the enrollment split. B_l is the residual backed out to match it, so this is a target, never a check.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.5728550223886597,
+        "p25": -0.027122212941804752,
+        "p50": -0.001914459403260158,
+        "p75": 0.05651635537630899,
+        "ratio_2_over_1": 0.9987137452424165,
+        "level_1": 231835.78084900274,
+        "level_2": 231067.43484141183,
+        "within_cz_var_share": 0.4704971853809823
+      }
+    },
+    {
+      "key": "gap_teachers_ses",
+      "label": "within-CZ gap, FTE teachers, group total (location 2 - location 1)",
+      "model_object": "H\u0303_T,2/H\u0303_T,1 (before the \u03b2 weighting)",
+      "value": -0.006129795414433963,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The teacher stock by location. Together with the enrollment gap it says whether the good location's advantage is more teachers or better ones -- the model's answer is 'better', through \u03b2.",
+      "status": "ok",
+      "se": null,
+      "n": 618,
+      "extra": {
+        "sd": 0.5461466921825314,
+        "p25": -0.08911499657960749,
+        "p50": 0.0003950076760699053,
+        "p75": 0.09388299009345716,
+        "ratio_2_over_1": 0.9938889534530094,
+        "level_1": 13265.03085103753,
+        "level_2": 13308.444508074117,
+        "within_cz_var_share": 0.485714234657921
+      }
+    },
+    {
+      "key": "gap_teachers_pp_ses",
+      "label": "within-CZ gap, FTE teachers per pupil (location 2 - location 1)",
+      "model_object": "H\u0303_T,l / M_l",
+      "value": -0.0036107163019313366,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "This is H\u0303_T,l/M_l up to the \u03b2-weighting of teacher human capital, so it maps into Q_l = (2H\u0303_T,l/M_l)^\u03c3 directly. If it is near zero while the score gap is not, the quality gap is composition, not class size.",
+      "status": "ok",
+      "se": null,
+      "n": 618,
+      "extra": {
+        "sd": 0.125649730180714,
+        "p25": -0.054041928382661246,
+        "p50": -0.016844940984481662,
+        "p75": 0.03381143266831868,
+        "ratio_2_over_1": 0.9963957944956037,
+        "level_1": 0.06235086074489781,
+        "level_2": 0.06232021515592215,
+        "within_cz_var_share": 0.2004821688156832
+      }
+    },
+    {
+      "key": "gap_str_ratio_ses",
+      "label": "within-CZ gap, student-teacher ratio (location 2 - location 1)",
+      "model_object": "class size N(h)",
+      "value": 0.00361071630193133,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "Class size. Prop. 1 has better teachers take LARGER classes, which is not what districts do -- check the mapping (notes \u00a75.3) before targeting this.",
+      "status": "ok",
+      "se": null,
+      "n": 618,
+      "extra": {
+        "sd": 0.125649730180714,
+        "p25": -0.03381143266831879,
+        "p50": 0.016844940984481718,
+        "p75": 0.05404192838266146,
+        "ratio_2_over_1": 1.0036172427907737,
+        "level_1": 16.5457236263006,
+        "level_2": 16.65516824696113,
+        "within_cz_var_share": 0.20048216881568315
+      }
+    },
+    {
+      "key": "gap_salary_per_teacher_ses",
+      "label": "within-CZ gap, teacher salary per FTE, nominal (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1 (undeflated)",
+      "value": 0.029586026366232334,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "Compare with the deflated version: the wedge between the two is how much of the raw salary gap is cost of living rather than pay.",
+      "status": "ok",
+      "se": null,
+      "n": 592,
+      "extra": {
+        "sd": 0.16774520881210284,
+        "p25": -0.007761682135045134,
+        "p50": 0.028741935570732836,
+        "p75": 0.06924227245590171,
+        "ratio_2_over_1": 1.0300280412301257,
+        "level_1": 63435.5002240979,
+        "level_2": 65537.08019741281,
+        "within_cz_var_share": 0.16412523131774379
+      }
+    },
+    {
+      "key": "gap_salary_real_ses",
+      "label": "within-CZ gap, teacher salary per FTE, CWIFT-deflated (location 2 - location 1)",
+      "model_object": "\u03ba_2/\u03ba_1",
+      "value": 0.01874954507777681,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The direct target for \u03ba_2/\u03ba_1; CWIFT-deflated, so it is a teaching-wage gap rather than a local price level.",
+      "status": "ok",
+      "se": null,
+      "n": 591,
+      "extra": {
+        "sd": 0.16341259929796495,
+        "p25": -0.016343207196828514,
+        "p50": 0.026062669221454834,
+        "p75": 0.06789308446639088,
+        "ratio_2_over_1": 1.0189264215196479,
+        "level_1": 66688.54399123279,
+        "level_2": 67990.52718018298,
+        "within_cz_var_share": 0.26480211878325904
+      }
+    },
+    {
+      "key": "gap_exp_pp_ses",
+      "label": "within-CZ gap, current expenditure per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": -0.050910257948489565,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The resource gap the budget constraint has to deliver.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.1354041449200248,
+        "p25": -0.12535577361914382,
+        "p50": -0.0567747285510606,
+        "p75": 0.0007529692425306247,
+        "ratio_2_over_1": 0.9503639543165407,
+        "level_1": 12727.767632739055,
+        "level_2": 12207.03417958005,
+        "within_cz_var_share": 0.19221440416733312
+      }
+    },
+    {
+      "key": "gap_rev_pp_local_ses",
+      "label": "within-CZ gap, local revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l I_l / M_l",
+      "value": 0.23205522577875884,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The local half of the budget; with the state half it pins how far pure local finance is from the data.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.4335475638558326,
+        "p25": 0.031437089677522144,
+        "p50": 0.26942476105756363,
+        "p75": 0.38387134145384466,
+        "ratio_2_over_1": 1.2611893770706337,
+        "level_1": 6001.958082050455,
+        "level_2": 7825.993114620715,
+        "within_cz_var_share": 0.4070528927511355
+      }
+    },
+    {
+      "key": "gap_rev_pp_state_ses",
+      "label": "within-CZ gap, state revenue per pupil (location 2 - location 1)",
+      "model_object": "G_l (notes \u00a75.2)",
+      "value": -0.2572819707338779,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "Motivates the exogenous transfer G_l of notes \u00a75.2 -- state aid is compensatory, so expect this gap to be NEGATIVE even where the local gap is positive.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.30774832678185493,
+        "p25": -0.3986747685926105,
+        "p50": -0.18841631785687354,
+        "p75": -0.05865162687006376,
+        "ratio_2_over_1": 0.773150177304051,
+        "level_1": 7815.039905535978,
+        "level_2": 6003.375697510944,
+        "within_cz_var_share": 0.43337696771487305
+      }
+    },
+    {
+      "key": "gap_rev_pp_total_ses",
+      "label": "within-CZ gap, total revenue per pupil (location 2 - location 1)",
+      "model_object": "W_l / M_l",
+      "value": -0.04549708079204045,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "Local plus state plus federal. If this gap has the opposite sign to the local one, redistribution is doing more than local finance, and a pure local budget gets the sign of the resource gap wrong.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.180962194389764,
+        "p25": -0.11439364575660604,
+        "p50": -0.05440026737089729,
+        "p75": 0.029072366617372235,
+        "ratio_2_over_1": 0.9555223919364552,
+        "level_1": 15242.151891519341,
+        "level_2": 14599.93532245534,
+        "within_cz_var_share": 0.22751037279802314
+      }
+    },
+    {
+      "key": "gap_proptax_pp_ses",
+      "label": "within-CZ gap, property-tax revenue per pupil (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": 0.23263082285055234,
+      "units": "log points",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The property-tax base per pupil, the closest thing to t_l I_l in the data.",
+      "status": "ok",
+      "se": null,
+      "n": 553,
+      "extra": {
+        "sd": 0.4635318405692617,
+        "p25": 0.021190939983316465,
+        "p50": 0.2956610023595412,
+        "p75": 0.41918544875673225,
+        "ratio_2_over_1": 1.261915522946724,
+        "level_1": 4561.074499977512,
+        "level_2": 5976.7850442702875,
+        "within_cz_var_share": 0.36809855702294303
+      }
+    },
+    {
+      "key": "gap_t_eff_ses",
+      "label": "within-CZ gap, local revenue / local income base (location 2 - location 1)",
+      "model_object": "t_l",
+      "value": 0.001293475541864344,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The effective local tax rate. Keep it endogenous from the budget and use this as an untargeted check.",
+      "status": "ok",
+      "se": null,
+      "n": 618,
+      "extra": {
+        "sd": 0.02616298856062357,
+        "p25": -0.0018205699150179175,
+        "p50": 0.0005056665801400546,
+        "p75": 0.00496955034940666,
+        "ratio_2_over_1": null,
+        "level_1": 0.03023128495262066,
+        "level_2": 0.031524389855453895,
+        "within_cz_var_share": 0.44273844367090853
+      }
+    },
+    {
+      "key": "gap_share_local_ses",
+      "label": "within-CZ gap, local share of revenue (location 2 - location 1)",
+      "model_object": "the pure local budget of \u00a710",
+      "value": 0.12116806684538772,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "If this is far below 1 the pure local-finance budget in \u00a710 is counterfactual -- see G_l.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.13217551631161115,
+        "p25": 0.04341525926842313,
+        "p50": 0.11859936431704729,
+        "p75": 0.1749704000426261,
+        "ratio_2_over_1": null,
+        "level_1": 0.39094624444234743,
+        "level_2": 0.5121143112877351,
+        "within_cz_var_share": 0.4970590773670323
+      }
+    },
+    {
+      "key": "gap_share_state_ses",
+      "label": "within-CZ gap, state share of revenue (location 2 - location 1)",
+      "model_object": "G_l",
+      "value": -0.08084591156723582,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The size of the transfer the model is currently missing.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.1226061284811133,
+        "p25": -0.13724367808040733,
+        "p50": -0.06920285084548018,
+        "p75": -0.01135347202327756,
+        "ratio_2_over_1": null,
+        "level_1": 0.5104341561416661,
+        "level_2": 0.4295882445744303,
+        "within_cz_var_share": 0.4774857723422057
+      }
+    },
+    {
+      "key": "gap_pov_rate_5_17_ses",
+      "label": "within-CZ gap, child poverty rate 5-17 (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": -0.10176060205867934,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The observable counterpart of sorting on z: how much richer the good location's families are.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.05435083130420564,
+        "p25": -0.14373240839664836,
+        "p50": -0.10228238680939214,
+        "p75": -0.0623370215931579,
+        "ratio_2_over_1": null,
+        "level_1": 0.2150522369944299,
+        "level_2": 0.11329163493575058,
+        "within_cz_var_share": 0.6126006941527907
+      }
+    },
+    {
+      "key": "gap_learn_rate_ses",
+      "label": "within-CZ gap, SEDA learning rate (location 2 - location 1)",
+      "model_object": "Q_2/Q_1",
+      "value": 0.014547365243837145,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The closest public analogue to Q_2/Q_1; growth rather than levels, so it nets out the SES composition the model is supposed to generate endogenously.",
+      "status": "ok",
+      "se": null,
+      "n": 617,
+      "extra": {
+        "sd": 0.03280137262740763,
+        "p25": 0.0021927226678974195,
+        "p50": 0.016037600929710072,
+        "p75": 0.028129662120472618,
+        "ratio_2_over_1": null,
+        "level_1": -0.011034642091108797,
+        "level_2": 0.0035129212475944337,
+        "within_cz_var_share": 0.653102033361783
+      }
+    },
+    {
+      "key": "gap_score_mean_ses",
+      "label": "within-CZ gap, SEDA mean score (location 2 - location 1)",
+      "model_object": "Q level (composition-laden)",
+      "value": 0.4047374143379264,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "NOT a Q target -- it mixes school quality with who enrolls. Useful as the untargeted check that the model's sorting reproduces a level gap it did not fit.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.2220890784891968,
+        "p25": 0.2465792583533708,
+        "p50": 0.43152905455337853,
+        "p75": 0.5411560373633288,
+        "ratio_2_over_1": null,
+        "level_1": -0.19758928005936013,
+        "level_2": 0.20714813427856624,
+        "within_cz_var_share": 0.7690330254174063
+      }
+    },
+    {
+      "key": "gap_seda_ses_ses",
+      "label": "within-CZ gap, SEDA composite SES (location 2 - location 1)",
+      "model_object": "ability/income sorting",
+      "value": 1.1353064823327186,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "Same as the poverty gap, on SEDA's composite. Reported in SEDA index units, whose cross-district SD is about 0.9 -- divide by that before setting it beside the model's mean-ability gap (`idx_work_signed`, \u2248 +0.08 at the baseline), which is in units of z. The sign is the part that compares directly.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.4812613293589879,
+        "p25": 0.7638831434871025,
+        "p50": 1.0501899028788602,
+        "p75": 1.4704215059290324,
+        "ratio_2_over_1": null,
+        "level_1": -0.31286396713945286,
+        "level_2": 0.8224425151932656,
+        "within_cz_var_share": 0.6923283008822736
+      }
+    },
+    {
+      "key": "gap_seda_lninc_ses",
+      "label": "within-CZ gap, log median household income (location 2 - location 1)",
+      "model_object": "I_2/I_1 (the income base)",
+      "value": 0.3541832221828005,
+      "units": "levels",
+      "source": "CCD directory + F-33 + SAIPE + CWIFT + SEDA, 2018; district x CZ (ses split), enrollment-weighted across 619 CZs",
+      "note": "The income base I_l, in logs. This is what t_l is levied on, so together with the local-revenue gap it says whether the advantaged location raises more because it is richer or because it taxes itself harder.",
+      "status": "ok",
+      "se": null,
+      "n": 619,
+      "extra": {
+        "sd": 0.14759544440436084,
+        "p25": 0.2342262061475804,
+        "p50": 0.35004993470192436,
+        "p75": 0.4869915650636972,
+        "ratio_2_over_1": null,
+        "level_1": 10.762086166630054,
+        "level_2": 11.116269388812853,
+        "within_cz_var_share": 0.5524606232305961
+      }
+    },
+    {
+      "key": "trend_gap_salary_real_ses",
+      "label": "change in the within-CZ salary_real gap, 2014->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.01080502704496844,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, ses split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 2014,
+        "last_year": 2018,
+        "first": 0.007944518032808368,
+        "last": 0.01874954507777681
+      }
+    },
+    {
+      "key": "trend_gap_rev_pp_local_ses",
+      "label": "change in the within-CZ rev_pp_local gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.005593453270599041,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, ses split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.2264617725081598,
+        "last": 0.23205522577875884
+      }
+    },
+    {
+      "key": "trend_gap_exp_pp_ses",
+      "label": "change in the within-CZ exp_pp gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": -0.023648290714618887,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, ses split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": -0.027261967233870678,
+        "last": -0.050910257948489565
+      }
+    },
+    {
+      "key": "trend_gap_pupils_ses",
+      "label": "change in the within-CZ pupils gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.034782730754400415,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, ses split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": -0.03606981344766824,
+        "last": -0.0012870826932678279
+      }
+    },
+    {
+      "key": "trend_gap_share_local_ses",
+      "label": "change in the within-CZ share_local gap, 1994->2018",
+      "model_object": "comparative statics across steady states",
+      "value": 0.014824259533665562,
+      "units": "log points (or levels)",
+      "source": "F-33 / CCD panel, ses split, CZ-years",
+      "note": "Whether the spatial gaps widened tells you whether a single calibrated steady state is enough or the spatial block needs its own time series. See notes \u00a77: F-33 is thin before 1990.",
+      "status": "ok",
+      "se": null,
+      "n": null,
+      "extra": {
+        "first_year": 1994,
+        "last_year": 2018,
+        "first": 0.10634380731172216,
+        "last": 0.12116806684538772
+      }
+    },
+    {
+      "key": "lambda_wtp_level",
+      "label": "average WTP for school quality",
+      "model_object": "\u03bb (altruism strength)",
+      "value": null,
+      "units": "$/month, 1990",
+      "source": "Bayer, Ferreira & McMillan (2007), NBER 13236, Tables 5-7",
+      "note": "~$33/month per SD of test score with boundary fixed effects, ~$17 once neighborhood sociodemographics are controlled -- 1-2% of monthly housing user cost. This pins the LEVEL of \u03bb; \u03c8 is pinned by how WTP varies with parental income (BFM Table 7). Target them separately or they fight for the same moment (notes \u00a74).",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    },
+    {
+      "key": "psi_wtp_gradient",
+      "label": "income gradient in WTP for school quality",
+      "model_object": "\u03c8 (warm-glow curvature)",
+      "value": null,
+      "units": "elasticity",
+      "source": "Bayer, Ferreira & McMillan (2007) Table 7; ACS district composition by income",
+      "note": "The baseline sets \u03c8 = 0 (linear in h'), which is the strongest sorting the power kernel allows. The gradient in BFM says how much of that is real. This is the single most valuable number still missing from the empirical section.",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    },
+    {
+      "key": "moving_cost_m",
+      "label": "school-quality capitalization at district borders",
+      "model_object": "mcost / \u03c4move (the goods cost of moving)",
+      "value": null,
+      "units": "share of consumption, annualized",
+      "source": "Black (1999, QJE); Bayer, Ferreira & McMillan (2007)",
+      "note": "The boundary-discontinuity house-price premium is the observed price of moving between locations, so `mcost` stops being a free normalization (currently MCOST_BENCH \u2248 0.0294, reverse-engineered from a 0.20 utility cost) and becomes a measured object.",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    },
+    {
+      "key": "rho_z_sigma_xi",
+      "label": "parent-child ability persistence",
+      "model_object": "\u03c1z, \u03c3\u03be",
+      "value": null,
+      "units": "AR(1) coefficient",
+      "source": "CNLSY (NLSY79 mothers x Child/Young Adult PIAT and AFQT)",
+      "note": "Must be the parent-child COGNITIVE correlation, not the income IGE: z is ability. Currently \u03c1z = 0.9, \u03c3\u03be = 0.20 by assumption. Cross-check against the stationary AFQT dispersion already matched in the aspatial calibration.",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    },
+    {
+      "key": "sigma_nu_prior",
+      "label": "spatial taste dispersion, literature prior",
+      "model_object": "\u03c3\u03bd",
+      "value": 0.2,
+      "units": "consumption-equivalent utils",
+      "source": "Eckert & Kleineberg, 'Saving the American Dream?', spatial GE with education policy",
+      "note": "Equals the code's current \u03c3\u03bd = 0.20 exactly. Reassuring, but it means \u03c3\u03bd is presently an import rather than an estimate -- the within-CZ share regression above is the way to earn it.",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    },
+    {
+      "key": "exposure_effect",
+      "label": "neighborhood exposure effect on adult income rank",
+      "model_object": "untargeted validation of the Q_l mechanism",
+      "value": 0.04,
+      "units": "convergence per year of childhood exposure",
+      "source": "Chetty & Hendren (2018), NBER 23001; Opportunity Atlas",
+      "note": "The single best untargeted test available. Simulate a child moved from location 1 to location 2 at each age and read off the implied convergence rate; ~4%/year without having targeted it would validate the whole Q_l channel (notes \u00a76).",
+      "status": "literature",
+      "se": null,
+      "n": null,
+      "extra": {}
+    }
+  ],
+  "data_gaps": [
+    {
+      "what": "Residence-workplace split for teachers",
+      "why": "Stage 2 gives one Gumbel draw for where you live, pay tax and teach. Within a metro that is the binding assumption: city teachers commonly live in the suburbs. Two independent logits plus a commuting cost buy two independent moment sets (family sorting AND teacher flows).",
+      "source": "SASS/NTPS restricted-use; state administrative files (WI via Biasi-Fu-Stromme, NC, TX); Bates-Dinerstein-Johnston-Sorkin on commute as the dominant teacher preference",
+      "blocks": "notes \u00a75.1"
+    },
+    {
+      "what": "Teacher ability composition by location",
+      "why": "The paper's distinctive claim is about WHO teaches, but every moment above is a quantity or a dollar. Nothing here measures teacher ability, so \u03b2 and \u03b3 are untouched by the data.",
+      "source": "NLSY79/97 restricted geocode files (county/MSA of residence) crossed with the AFQT-by-occupation moments already in hand",
+      "blocks": "\u03b2, \u03b3, the H\u0303_T aggregator"
+    },
+    {
+      "what": "An instrument for the quality-share relationship",
+      "why": "\u03c3_\u03bd and \u03c3 are both estimated off an equilibrium relationship between school quality and enrollment that the model says is simultaneous.",
+      "source": "district-boundary discontinuities; state-aid formula kinks (Lafortune-Rothstein-Schanzenbach); court-ordered finance reforms",
+      "blocks": "\u03c3, \u03c3\u03bd"
+    },
+    {
+      "what": "A pre-1990 cross-section",
+      "why": "The aspatial calibration has 1970/1990/2010. F-33 is thin before 1990 and SEDA starts in 2009, so the spatial block realistically calibrates to one date.",
+      "source": "Census of Governments school district finances (published back to 1957); Digest of Education Statistics",
+      "blocks": "notes \u00a77"
+    },
+    {
+      "what": "Tract -> school district crosswalk for the Opportunity Atlas",
+      "why": "OI is tract/county/CZ, never district. The crosswalk is what turns the exposure-effect validation from a hand-wave into a number.",
+      "source": "NCES EDGE district boundaries, population-weighted onto tracts",
+      "blocks": "the untargeted validation in notes \u00a76"
+    },
+    {
+      "what": "Class size vs. teacher quality within districts",
+      "why": "Prop. 1 implies N(h) = h^(\u03b2/\u03c3) Q^(-1/\u03c3): better teachers get BIGGER classes. If districts do the opposite, the model's class sizes cannot be read as observed student-teacher ratios.",
+      "source": "CRDC school-level teacher experience/certification (--urban-topics crdc_teachers); state admin data",
+      "blocks": "notes \u00a75.3, and whether gap_str_ratio is a legitimate target"
+    }
+  ]
+}
