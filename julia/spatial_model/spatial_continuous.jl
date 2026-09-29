@@ -223,7 +223,8 @@ Grids and shock laws at aggregates (H̃_T, M, t):
 - `z`, `Πz`: Rouwenhorst ability nodes and transitions;
 - `Q`: teacher-quality index Q_l = (2H̃_T/M)^σ;
 - `dT`, `ϵTgrid`: law of ϵ_T ~ LogNormal(−σϵ²/2, σϵ) and its quantile grid;
-- `dO[i,g]`: law of X_{O,i} = Θ_{i,g} ϵ_i^α; `XOgrid[:,g]`: log-spaced grid for X_O*;
+- `dO[i,g]`: law of X_{O,i} = Θ_{i,g} ϵ_i^α; `XOgrid[:,g]`: log-spaced grid between the
+  `q_lo` and `q_hi` quantiles of X_O*;
 - `logΘ[i,g]`: log Θ_{i,g}, to recover h_O from X_O*.
 """
 function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
@@ -245,26 +246,47 @@ function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
 
     XOgrid = Matrix{Float64}(undef, nXO, 2)
     for g in 1:2
-        lo = minimum(quantile(dO[i, g], q_lo) for i in nonteach)
-        hi = maximum(quantile(dO[i, g], q_hi) for i in nonteach)
+        lo = quantile_xo(dO, nonteach, g, q_lo)
+        hi = quantile_xo(dO, nonteach, g, q_hi)
         XOgrid[:, g] = exp.(range(log(lo), log(hi), nXO))
     end
     return (; z, Πz, Nz, Q, t, I, L, dT, ϵTgrid, dO, XOgrid, logΘ, nonteach, nϵT, nXO)
 end
 
+"""
+    quantile_xo(dO, nonteach, g, q)
+
+q-quantile of X_O* = max_{i≠T} X_{O,i}, by bisection in log x. F* ≤ min_i F_i puts
+it above every occupation's own q-quantile, and F* ≥ 1 − Σ_i(1 − F_i) puts it below
+their (1 − (1−q)/n)-quantiles. With several occupations the lower tail of X_O* is far
+above the lowest occupation's, so bounding the grid by individual quantiles would
+leave many nodes where X_O* has no mass. Exact with one non-teaching occupation.
+"""
+function quantile_xo(dO, nonteach, g, q)
+    isone(length(nonteach)) && return quantile(dO[nonteach[1], g], q)
+    n = length(nonteach)
+    a = log(maximum(quantile(dO[i, g], q) for i in nonteach))
+    b = log(maximum(quantile(dO[i, g], 1 - (1 - q) / n) for i in nonteach))
+    while b - a > 1e-12 * max(1.0, abs(a))
+        c = (a + b) / 2
+        prod(cdf(dO[i, g], exp(c)) for i in nonteach) < q ? (a = c) : (b = c)
+    end
+    return exp((a + b) / 2)
+end
+
 "CDF of X_O* = max_{i≠T} X_{O,i}: the product of independent lognormal CDFs."
 @inline Fxo(gr, g, x) = prod(cdf(gr.dO[i, g], x) for i in gr.nonteach)
 
-"Density of X_O*: f = F · Σ_i f_i/F_i."
+"Density of X_O*: f = F · Σ_i f_i/F_i, in one pass over the occupations."
 function fxo(gr, g, x)
-    F = Fxo(gr, g, x)
-    F <= 0.0 && return 0.0
+    F = 1.0
     ratio_sum = 0.0
     for i in gr.nonteach
         Fi = cdf(gr.dO[i, g], x)
+        F *= Fi
         Fi > 0.0 && (ratio_sum += pdf(gr.dO[i, g], x) / Fi)
     end
-    return F * ratio_sum
+    return F <= 0.0 ? 0.0 : F * ratio_sum
 end
 
 """

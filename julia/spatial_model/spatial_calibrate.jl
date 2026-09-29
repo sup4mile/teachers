@@ -4,10 +4,11 @@
 # The internal parameters ϑ = (log κ̄, δκ, ΔB, β, λ, r_m) are fitted to the seven
 # moments of §2, conditional on the external block of §1:
 #     κ = (κ̄, κ̄ e^{δκ}),  B = (0, ΔB),  m₁₂ = m₂₁ = r_m C̄,
-# with C̄ and h̄ frozen at a reference solution (§1, "Units and reference levels").
+# with C̄ and h̄ frozen at a reference solution (§1, "Units"). The external block
+# has 21 occupations: 19 market occupations, home production and K–12 teaching.
 #
 # Layout
-#   1  External inputs (§1) and the intermediate calculations behind them
+#   1  External inputs (§1), the occupational block (Table 2) and the calculations behind them
 #   2  Frozen reference levels C̄, h̄
 #   3  Targets (§2)
 #   4  The internal parameter vector ϑ
@@ -26,39 +27,144 @@ using SHA
 # -----------------------------------------------------------------------------
 # 1. External inputs
 #
-# Values marked * are provisional in §1 (old-draft fits used as starting values).
-# The ability and occupational rows keep the code's values until Table 2 (T2)
-# delivers estimates; they are placeholders, not calibrated inputs.
+# Table 1 values; * marks those still provisional in §1. The ability rows (σϵ, ρz,
+# s_z) and the occupational block are placeholders until Table 2 (T2) delivers
+# estimates. ωf is internal in Table 3 but not yet part of ϑ.
 # -----------------------------------------------------------------------------
+
+"""
+Occupations of the calibration (§1, Table 2): the 19 market occupations of the ACS
+file in its order, home production (`HP_OCC`) and K–12 teaching (`T_OCC`).
+`men`/`women` are ACS 2009–13 weighted counts, ages 25–34, from
+data/LaborMarketData/wages_occ_shares_v2.xlsx, sheet `moments_shares`. Military
+and unemployed are dropped; 15–29-hour workers are split equally between home
+production and their occupation.
+"""
+const ACS_OCCUPATIONS = (;
+    names = ["Executives, Administrative, and Managerial", "Management Related",
+             "Architects, Engineers, Math, and Computer Science",
+             "Natural and Social Scientists, Recreation, Religious, Arts, Athletes",
+             "Doctors and Lawyers", "Nurses, Therapists, and Other Health Service",
+             "Teachers, Postsecondary", "Teachers, Non-Postsecondary and Librarians",
+             "Health and Science Technicians", "Sales, All", "Administrative Support, Clerks, Record",
+             "Fire, Police, and Guards", "Food, Cleaning, and Personal Services and Private Household",
+             "Farm, Related Agriculture, Logging, and Extraction", "Mechanics and Construction",
+             "Precision Manufacturing", "Manufacturing Operators",
+             "Fabricators, Inspectors, and Material Handlers", "Vehicle Operators",
+             "Home Production", "Kindergarten - Secondary Teachers"],
+    men   = [54751, 24884, 36021.5, 24503, 10932, 12358, 6059, 3596, 30792, 61715.5, 48822,
+             25086, 45172, 23031, 93691, 12867, 20492.5, 33825.5, 32518, 178848.5, 15468.5],
+    women = [49517.5, 31581, 10938, 29176, 10617, 73932, 6163.5, 12179, 26232.5, 53598, 110723,
+             6224.5, 58229.5, 3666, 2554, 4041.5, 6063.5, 8800, 2926, 279887, 50120.5])
+
+const N_OCC  = length(ACS_OCCUPATIONS.names)
+const HP_OCC = N_OCC - 1
+const T_OCC  = N_OCC
+
+"ACS counts of gender g (1 = men, 2 = women), all 21 occupations."
+acs_counts(g) = g == 1 ? ACS_OCCUPATIONS.men : ACS_OCCUPATIONS.women
+
+"Shares over the 20 non-teaching occupations: the Table 2 share targets."
+function occ_shares(g)
+    c = acs_counts(g)[1:N_OCC .!= T_OCC]
+    return c ./ sum(c)
+end
+
+"K–12 teaching share over all 25–34-year-olds of gender g, home production included (Table 3)."
+teach_share_data(g) = acs_counts(g)[T_OCC] / sum(acs_counts(g))
+
+"""
+    roy_shares(logΘ, s)
+
+Occupation shares when X_i = Θ_i ϵ_i^α and log X_i ~ N(log Θ_i + c, s²) iid, s = ασϵ:
+P_i = ∫ φ(u) ∏_{j≠i} Φ(u + (log Θ_i − log Θ_j)/s) du.
+"""
+function roy_shares(logΘ, s)
+    n = length(logΘ)
+    share(i) = quadgk(u -> pdf(Normal(), u) *
+                           prod((cdf(Normal(), u + (logΘ[i] - logΘ[j]) / s) for j in 1:n if j != i); init = 1.0),
+                      -10.0, 10.0; rtol = 1e-10)[1]
+    return [share(i) for i in 1:n]
+end
+
+"""
+    invert_roy_shares(shares, s; ref = length(shares), tol = 1e-10, maxit = 10_000)
+
+log Θ reproducing `shares` in `roy_shares`, normalized to log Θ_ref = 0, by the damped
+fixed point log Θ ← log Θ + 0.7 s (log shares − log model shares).
+"""
+function invert_roy_shares(shares, s; ref = length(shares), tol = 1e-10, maxit = 10_000)
+    logΘ = zeros(length(shares))
+    for _ in 1:maxit
+        d = log.(shares) .- log.(roy_shares(logΘ, s))
+        maximum(abs, d) < tol && return logΘ
+        logΘ .+= 0.7 * s .* d
+        logΘ .-= logΘ[ref]
+    end
+    error("share inversion did not converge in $maxit iterations at s = $s")
+end
+
+"""
+    occupation_block(; σϵ, α) -> (; A, r)
+
+Provisional Table 2 values at ability dispersion ασϵ, by inverting the static Roy
+model over the 20 non-teaching occupations with teaching ignored:
+- `A`: A_i/A_HP from men's shares (length `N_OCC`, A_HP = 1, A[T] = NaN);
+- `r`: relative female wedges r_i = Θ_{i,f}/(ωf A_i) from women's shares, r_HP = 1,
+  so that 1 − τω_{i,f} = ωf r_i (`female_wedges`).
+Placeholders until T2 fits σϵ jointly with the ability block and corrects women's
+shares for selection into teaching (§1, Table 2).
+"""
+function occupation_block(; σϵ, α)
+    s  = α * σϵ
+    lm = invert_roy_shares(occ_shares(1), s; ref = HP_OCC)
+    lf = invert_roy_shares(occ_shares(2), s; ref = HP_OCC)
+    return (; A = vcat(exp.(lm), NaN), r = vcat(exp.(lf .- lm), NaN))
+end
+
+"τω with no male or teaching wedges and 1 − τω_{i,f} = ωf r_i for i ≠ T."
+function female_wedges(r, ωf)
+    τω = zeros(N_OCC, 2)
+    for i in 1:N_OCC
+        i == T_OCC || (τω[i, 2] = 1 - ωf * r[i])
+    end
+    return τω
+end
+
 const EXTERNAL = (;
-    σ        = 0.25,    # class-size curvature: rounded FOO (2013) wage mapping
-    θν       = 0.25,    # relative location-taste scale σν/μ: Eckert–Kleineberg (2024)
-    ψ        = 0.0,     # warm-glow curvature: linear child human capital
-    η        = 0.103,   # * goods elasticity: education spending/GDP ÷ labour share
-    φ        = 2.745,   # * time elasticity: old Mincer fit (T1)
-    μ        = 0.714,   # * weight on log consumption: old schooling fit (T1)
-    γ        = 0.83,    # * teacher wage curvature: old Fréchet inversion; internal (§2) once T2 exists
-    α        = 0.30,    # code value; §1 proposes α = 1 with rescaled ability (T2)
-    σϵ       = 0.30,    # code value; ability dispersion pending (T2)
-    ρz       = 0.9,     # code value; transmission pending (T2)
-    σξ       = 0.20,    # code value; link to s_z with `innovation_sd`
-    A_other  = 1.5,     # code value; occupational block pending (T2)
-    τω_other = 0.1)     # code value; female wedge pending (T2)
+    σ   = 0.56,     # * class-size curvature: FOO (2013) wage mapping at η = 0.080, K = 12
+    θν  = 0.25,     # * relative location-taste scale σν/μ: Eckert–Kleineberg (2024)
+    ψ   = 0.0,      # warm-glow curvature: linear warm glow
+    η   = 0.080,    # goods elasticity: 2018 spending net of teacher pay (`eta_2018`)
+    φ   = 1.12,     # * time elasticity: s_O = 0.55 at μ = 1 (placeholder years, T2)
+    μ   = 1.0,      # weight on log consumption: normalization
+    γ   = 0.83,     # teacher wage curvature: starting value; internal (Table 3)
+    α   = 1.0,      # ability elasticity: normalization
+    σϵ  = 0.46,     # placeholder (T2): pooled 90/10 net of s_z, no selection (`sigma_eps_placeholder`)
+    ρz  = 0.9,      # placeholder (T2): old code value
+    s_z = 0.104,    # placeholder (T2): stationary log-z SD at b s_z = χ, i.e. χ(1 − η)
+    ωf  = 0.934)    # placeholder (Table 3, internal): female level, 6.0% female teaching share at ϑ₀
 
 """
     external_params(; kwargs...) -> Params
 
-The fixed block of §1 as a two-occupation, two-location `Params`. Keywords
-override entries of `EXTERNAL` or any other `Params` field. The internal fields
-(κ, B, β, λ, mcost) are placeholders that `theta_to_params` overwrites, and
-`Cbar`/`href` are replaced by the frozen reference levels (`calibration_base`).
-The location-taste scale enters as the relative scale θν, so σν = θν μ.
+The fixed block of §1 as a 21-occupation, two-location `Params`: 19 market
+occupations, home production (A_HP = 1) and K–12 teaching (`T_OCC`). Keywords
+override entries of `EXTERNAL` or any other `Params` field. Unless `A` or `τω` is
+passed, the occupational block comes from `occupation_block` at the given σϵ and α,
+with female wedges scaled by the level ωf. The internal fields (κ, B, β, λ, mcost)
+are placeholders that `theta_to_params` overwrites, and `Cbar`/`href` are replaced
+by the frozen reference levels (`calibration_base`). The location-taste scale
+enters as θν, so σν = θν μ, and ability as its stationary SD s_z, so σξ = s_z √(1 − ρz²).
 """
 function external_params(; kwargs...)
     x = merge(EXTERNAL, NamedTuple(kwargs))
-    rest = Base.structdiff(x, NamedTuple{(:θν, :A_other, :τω_other)})
-    return Params(2, 2; A_other = x.A_other, τω_other = x.τω_other,
-                  τmove_off = 0.0, mcost_off = 0.0, rest..., σν = taste_scale(x.μ, x.θν))
+    occ = haskey(x, :A) && haskey(x, :τω) ? nothing : occupation_block(; x.σϵ, x.α)
+    A  = haskey(x, :A)  ? x.A  : occ.A
+    τω = haskey(x, :τω) ? x.τω : female_wedges(occ.r, x.ωf)
+    rest = Base.structdiff(x, NamedTuple{(:θν, :s_z, :ωf, :A, :τω)})
+    return Params(N_OCC, 2; T = T_OCC, A, τω, τmove_off = 0.0, mcost_off = 0.0, rest...,
+                  σν = taste_scale(x.μ, x.θν), σξ = innovation_sd(x.s_z, x.ρz))
 end
 
 "Location-taste scale σν = θν μ for the relative scale θν = σν/μ."
@@ -68,32 +174,68 @@ taste_scale(μ, θν = 0.25) = θν * μ
 innovation_sd(s_z, ρz) = s_z * sqrt(1 - ρz^2)
 
 """
+    eta_2018(; spend_gdp, labshare, teachers, salary, benefits, gdp) -> (; S, t, η)
+
+§1 goods elasticity from 2018 aggregates. Spending over labour income is
+S = η(1 − t) + t, where t is the teacher-payroll tax, so η = (S − t)/(1 − t).
+- `spend_gdp`: education institutions, all levels, 6.0% of GDP (Digest 2021, Table 605.20);
+- `labshare`: PWT 11 labour share, 0.5906 (FRED LABSHPUSA156NRUG);
+- `teachers`: 3.2 million public FTE teachers, fall 2018 (Digest 2018);
+- `salary`: average public teacher salary 2017–18, \$60,483 (Digest 2018, Table 211.60);
+- `benefits`: instruction benefits over salaries 2017–18, 103.8/241.5 (Digest 2020, Table 236.20);
+- `gdp`: nominal GDP, \$20,656.5 billion (BEA, FRED GDPA).
+Pass `payroll` to replace teachers × salary × (1 + benefits), e.g. all instruction
+salaries and benefits.
+"""
+function eta_2018(; spend_gdp = 0.060, labshare = 0.5906, teachers = 3.2e6, salary = 60_483.0,
+                  benefits = 103.821 / 241.516, gdp = 20_656.516e9,
+                  payroll = teachers * salary * (1 + benefits))
+    S = spend_gdp / labshare
+    t = payroll / (labshare * gdp)
+    return (; S, t, η = (S - t) / (1 - t))
+end
+
+"""
+    sigma_eps_placeholder(; p9010, η, s_z) -> σϵ
+
+Placeholder ability dispersion: the pooled within-occupation 90/10 of hourly wages
+(3.737, non-teachers, ACS 2009–13) read as lognormal with log-wage SD
+√(σϵ² + s_z²)/(1 − η) at α = 1, ignoring selection within occupations. Selection
+lowers within-occupation dispersion, so this is a lower bound; T2 replaces it.
+"""
+sigma_eps_placeholder(; p9010 = 3.7374, η = 0.080, s_z = 0.104) =
+    sqrt((log(p9010) * (1 - η) / (2 * quantile(Normal(), 0.9)))^2 - s_z^2)
+
+"""
     sigma_from_wages(; η, K, d, N̄, b, se_b) -> (σ, se)
 
 FOO (2013) direct-wage mapping σ = (1−η)(K/d) N̄ b for a log-wage effect −b per
-pupil over d school years at mean class size N̄ (audit §1).
+pupil over d school years at mean class size N̄ (§3).
 """
-function sigma_from_wages(; η = 0.103, K = 5.0, d = 3.0, N̄ = 24.357, b = 0.0063, se_b = 0.0033)
+function sigma_from_wages(; η = 0.080, K = 12.0, d = 3.0, N̄ = 24.357, b = 0.0063, se_b = 0.0033)
     factor = (1 - η) * K / d * N̄
     return (σ = factor * b, se = factor * se_b)
 end
 
 "STAR first-year cross-check σ = (1−η) χ d_S K / (d log(N₀/N₁)) (§3)."
-sigma_from_star(; η = 0.103, χ = 0.13, K = 5.0, dS = 0.20, N0 = 22.4, N1 = 15.1, d = 1.0) =
+sigma_from_star(; η = 0.080, χ = log(1.12), K = 12.0, dS = 0.20, N0 = 22.4, N1 = 15.1, d = 1.0) =
     (1 - η) * χ * dS * K / (d * log(N0 / N1))
 
-"Zero-goods-cost time shares (s_O, s_T) and s_T/s_O (§1 feasibility check, T1)."
+"Zero-goods-cost time shares (s_O, s_T) and s_T/s_O (§1)."
 function schooling_shares(; μ, φ, η, γ)
     sO = μ * φ / (μ * φ + 1 - η)
     sT = μ * φ * γ / (μ * φ * γ + 1 - γ * η)
     return (; sO, sT, ratio = sT / sO)
 end
 
+"Time elasticity φ matching the non-teacher time share s_O at zero goods cost (§1)."
+phi_from_schooling(sO; μ = 1.0, η = 0.080) = sO * (1 - η) / (μ * (1 - sO))
+
 "Analytic CFR mapping (§3): Δlog y ≈ β sd / (K(1−η)) for non-teachers without goods costs."
-cfr_analytic(β, sd; K = 5.0, η = 0.103) = β * sd / (K * (1 - η))
+cfr_analytic(β, sd; K = 12.0, η = 0.080) = β * sd / (K * (1 - η))
 
 "Invert `cfr_analytic` for β: an initialization, not an estimate."
-beta_from_cfr(effect, sd; K = 5.0, η = 0.103) = effect * K * (1 - η) / sd
+beta_from_cfr(effect, sd; K = 12.0, η = 0.080) = effect * K * (1 - η) / sd
 
 "Move probability at equal attributes and gross consumption, goods ratio r_m = m/C (audit §3)."
 move_probability(r_m, θν = 0.25) = 1 / (1 + exp(-log1p(-r_m) / θν))
@@ -102,33 +244,45 @@ move_probability(r_m, θν = 0.25) = 1 / (1 + exp(-log1p(-r_m) / θν))
 wtp_share_target(wtp_month, consumption_month) = wtp_month / consumption_month
 
 """
-    external_report(io = stdout; x = EXTERNAL, K = 5.0)
+    external_report(io = stdout; x = EXTERNAL, K = 12.0, χ = log(1.12))
 
-Print the intermediate calculations behind §1 and external_parameter_audit.md at
-the external block `x`. The note's values are in brackets.
+Print the intermediate calculations behind §1 at the external block `x`. The
+note's values are in brackets.
 """
-function external_report(io::IO = stdout; x = EXTERNAL, K = 5.0)
+function external_report(io::IO = stdout; x = EXTERNAL, K = 12.0, χ = log(1.12))
+    e  = eta_2018()
+    ea = eta_2018(; payroll = (241.516 + 103.821) * 1e9)
     w  = sigma_from_wages(; η = x.η, K)
     sh = schooling_shares(; x.μ, x.φ, x.η, x.γ)
+    occ = occupation_block(; x.σϵ, x.α)
+    mkt = [i for i in 1:N_OCC if i ∉ (HP_OCC, T_OCC)]
     println(io, "\n===== External inputs: intermediate calculations =====")
-    @printf(io, "  η  = 0.066/0.641                         = %.4f   [0.103]\n", 0.066 / 0.641)
-    @printf(io, "  σ  FOO wage mapping (η=%.3f, K=%g)       = %.4f (SE %.4f)   [0.2294 (0.1202)]\n",
-            x.η, K, w.σ, w.se)
-    @printf(io, "     σ/K = %.5f;  σ at K = 3, 12: %.4f, %.4f;  at η = 0.20: %.4f   [0.04588; 0.1376, 0.5506; 0.2046]\n",
-            w.σ / K, sigma_from_wages(; η = x.η, K = 3.0).σ, sigma_from_wages(; η = x.η, K = 12.0).σ,
-            sigma_from_wages(; η = 0.20, K).σ)
-    @printf(io, "  σ  STAR first-year check, χ = 0.13, 0.12 = %.4f, %.4f   [0.2957, 0.2729]\n",
-            sigma_from_star(; η = x.η, χ = 0.13, K), sigma_from_star(; η = x.η, χ = 0.12, K))
-    @printf(io, "  σν = θν μ = %.2f × %.3f                  = %.4f   [0.1785]\n", x.θν, x.μ, taste_scale(x.μ, x.θν))
-    @printf(io, "  s_O, s_T at zero goods cost              = %.4f, %.4f;  s_T/s_O = %.4f   [0.933 vs. historical 1.23]\n",
+    @printf(io, "  η  2018: S = 0.060/0.5906 = %.4f, t = %.4f, (S − t)/(1 − t) = %.4f   [0.102, 0.023, 0.080]\n",
+            e.S, e.t, e.η)
+    @printf(io, "     all instruction salaries and benefits: t = %.4f, η = %.4f   [0.030, 0.073]\n", ea.t, ea.η)
+    @printf(io, "  σ  FOO wage mapping (η=%.3f, K=%g)       = %.4f (SE %.4f), 95%% [%.3f, %.3f]   [0.565; −0.015, 1.144]\n",
+            x.η, K, w.σ, w.se, w.σ - 1.96 * w.se, w.σ + 1.96 * w.se)
+    @printf(io, "     σ at K = 5: %.4f   [0.235];  STAR first-year check at χ = %.4f: %.4f   [0.687]\n",
+            sigma_from_wages(; η = x.η, K = 5.0).σ, χ, sigma_from_star(; η = x.η, χ, K))
+    @printf(io, "  σν = θν μ = %.2f × %.3f                  = %.4f\n", x.θν, x.μ, taste_scale(x.μ, x.θν))
+    @printf(io, "  φ  matching s_O = 13.75/25 at μ = %.2f   = %.4f   [1.12]\n", x.μ,
+            phi_from_schooling(13.75 / 25; x.μ, x.η))
+    @printf(io, "  s_O, s_T at zero goods cost              = %.4f, %.4f;  s_T/s_O = %.4f   [0.55, 0.50; 0.91 vs. 1.23]\n",
             sh.sO, sh.sT, sh.ratio)
-    @printf(io, "  stationary log-z SD at (ρz, σξ) = (%.2f, %.2f) = %.4f\n", x.ρz, x.σξ, x.σξ / sqrt(1 - x.ρz^2))
-    @printf(io, "  χ from CFR's 12%% per score SD: slope 0.12, finite log(1.12) = %.4f   [0.13 in use]\n", log(1.12))
+    @printf(io, "  χ = log(1.12) = %.4f;  s_z = χ(1 − η) = %.4f;  σξ at ρz = %.2f: %.4f\n",
+            χ, χ * (1 - x.η), x.ρz, innovation_sd(x.s_z, x.ρz))
+    @printf(io, "  σϵ placeholder from the pooled 90/10 (3.737) at s_z = %.3f: %.4f\n",
+            x.s_z, sigma_eps_placeholder(; η = x.η, x.s_z))
     @printf(io, "  CFR target log(1.013) = %.5f;  β ≈ %.4f / sd(log h_T) by the analytic map\n",
             log(1.013), beta_from_cfr(log(1.013), 1.0; K, η = x.η))
+    @printf(io, "  occupations: %d (%d market, home production = %d, K–12 teaching = %d)\n",
+            N_OCC, length(mkt), HP_OCC, T_OCC)
+    @printf(io, "     teaching shares: men %.4f, women %.4f   [1.9%%, 6.0%%];  home production: men %.4f, women %.4f\n",
+            teach_share_data(1), teach_share_data(2), occ_shares(1)[HP_OCC], occ_shares(2)[HP_OCC])
+    @printf(io, "     at ασϵ = %.3f: log A_i/A_HP ∈ [%.3f, %.3f];  log r_i ∈ [%.3f, %.3f];  female level ωf = %.4f\n",
+            x.α * x.σϵ, extrema(log.(occ.A[mkt]))..., extrema(log.(occ.r[mkt]))..., x.ωf)
     print(io, "  move probability at θν = $(x.θν), r_m ∈ {0, .05, .10, .1813, .30}: ")
-    println(io, join((@sprintf("%.3f", move_probability(r, x.θν)) for r in (0.0, 0.05, 0.10, 0.1813, 0.30)), ", "),
-            "   [0.500, 0.449, 0.396, 0.310, 0.194]")
+    println(io, join((@sprintf("%.3f", move_probability(r, x.θν)) for r in (0.0, 0.05, 0.10, 0.1813, 0.30)), ", "))
     println(io, "======================================================")
 end
 
@@ -170,9 +324,11 @@ end
 
 "The external block and solver settings a reference is measured at, as stored in its TOML file."
 function reference_config(ext::Params, solver)
-    scalars = (:α, :φ, :η, :σ, :γ, :μ, :ψ, :σν, :ρz, :σξ, :σϵ, :Mtot)
+    scalars  = (:α, :φ, :η, :σ, :γ, :μ, :ψ, :σν, :ρz, :σξ, :σϵ, :Mtot)
+    nonteach = [i for i in eachindex(ext.A) if i != ext.T]
     external = merge(Dict{String,Any}(string(k) => getfield(ext, k) for k in scalars),
-                     Dict{String,Any}("A_other" => ext.A[2], "tau_omega_female" => ext.τω[2, 2]))
+                     Dict{String,Any}("T" => ext.T, "A" => ext.A[nonteach],
+                                      "tau_omega_female" => ext.τω[nonteach, 2]))
     return (; external, solver = Dict{String,Any}(string(k) => v for (k, v) in pairs(solver)))
 end
 
@@ -200,15 +356,19 @@ end
 """
 Entries where a loaded reference was measured at a configuration other than
 (`ext`, `solver`). Iteration caps and damping are skipped: they do not move a
-converged solution.
+converged solution. Numbers and vectors match to a relative 1e-10, since the
+occupational block is itself computed by quadrature.
 """
 function reference_mismatch(ref, ext::Params, solver)
     cfg = reference_config(ext, solver)
+    numeric(x) = x isa Real || (x isa AbstractVector && all(y -> y isa Real, x))
+    same(a, b) = a == b || (numeric(a) && numeric(b) && length(a) == length(b) &&
+                            isapprox(Float64.(a), Float64.(b); rtol = 1e-10))
     out = String[]
     for (section, now) in (("external", cfg.external), ("solver", cfg.solver)), (k, v) in now
         k in ("maxit", "hh_maxit", "damping") && continue
         saved = get(get(ref.meta, section, Dict()), k, nothing)
-        saved == v || push!(out, "$section.$k = $saved (now $v)")
+        same(saved, v) || push!(out, v isa AbstractVector ? "$section.$k differs" : "$section.$k = $saved (now $v)")
     end
     return sort!(out)
 end
@@ -244,8 +404,9 @@ end
 function default_targets()
     cfr = log(1.013)
     return [
-        Target(:male_teach_share, 0.019, 0.0019, :logκ, "Census/ACS, 2010 historical reference",
-               "PROVISIONAL value: update to the 2018 benchmark sample (T2); scale = 10% of value"),
+        Target(:male_teach_share, teach_share_data(1), 0.1 * teach_share_data(1), :logκ,
+               "ACS 2009–13, men 25–34 (wages_occ_shares_v2.xlsx: moments_shares)",
+               "K–12 teachers over all men, home production included; scale = 10% of value"),
         Target(:gap_salary, 0.01623, 0.1020 / sqrt(176), :δκ, "spatial_moments.json: gap_salary_real_locale",
                "CWIFT-deflated salary per FTE, 176 CZs; scale = cross-CZ SD/√n pending bootstrap (T5)"),
         Target(:gap_pupils, 0.3764, 0.9691 / sqrt(188), :ΔB, "spatial_moments.json: gap_pupils_locale",
@@ -282,17 +443,22 @@ active_targets(targets) = filter(t -> isfinite(t.value) && isfinite(t.se) && t.s
 # -----------------------------------------------------------------------------
 const THETA_NAMES = (:logκ, :δκ, :ΔB, :β, :λ, :r_m)
 
-"Starting values: the code's κ = (0.75, 0.9), B = (0, 0.1), β = 0.15, λ = 0.70, and r_m = 0.1813 (§2)."
-const THETA0 = [log(0.75), log(0.9 / 0.75), 0.1, 0.15, 0.70, 0.1813]
+"""
+Starting values. κ̄ = 0.2365 gives the 1.9% male teaching share and β = 0.387 the
+analytic CFR map at the reference sd(log h_T) = 0.368 (K = 12), jointly with ωf in
+`EXTERNAL` for the 6.0% female share. The rest are the code's κ₂/κ₁ = 1.2,
+B = (0, 0.1), λ = 0.70 and r_m = 0.1813 (§2).
+"""
+const THETA0 = [log(0.2365), log(0.9 / 0.75), 0.1, 0.387, 0.70, 0.1813]
 
 """
 Search box for ϑ. §4 imposes β ∈ (0, 1), λ ≥ 0 and r_m ≥ 0; the other limits
 bound the Sobol screening region. Zero is included for r_m as the mechanism-off
-boundary. Near ϑ₀ the male teaching share falls from 9% at κ̄ = 0.75 to 0.06% at
-0.55, GE fails to converge by κ̄ ≈ 0.35, and taxes hit their clamp by κ̄ ≈ 1.2.
+boundary. Near ϑ₀ the male teaching share is 0.3% at κ̄ = 0.15 and 9.6% at 0.40;
+both limits solve.
 Widen a limit if estimates pile up against it.
 """
-const THETA_BOUNDS = [(log(0.5), log(1.0)),   # log κ̄
+const THETA_BOUNDS = [(log(0.15), log(0.40)), # log κ̄
                       (-0.5, 0.5),            # δκ
                       (-0.5, 0.5),            # ΔB
                       (0.0, 0.6),             # β
@@ -337,9 +503,9 @@ end
 Base.showerror(io::IO, e::CalibrationFailure) = print(io, "CalibrationFailure: ", e.msg)
 
 """
-GE solver settings for estimation. Converged solves near ϑ₀ take 16–28 GE
-iterations (5–10 s); `maxit` caps the time a failing point, typically a
-location-emptying corner, can take.
+GE solver settings for estimation. With 21 occupations a converged solve near ϑ₀,
+moments included, takes 15–30 s; `maxit` caps the time a failing point, typically
+a location-emptying corner, can take.
 """
 const SOLVER = (; Nz = 5, nϵT = 48, nXO = 48, damping = 0.75, tol = 1e-6, maxit = 120,
                   hh_tol = 1e-7, hh_maxit = 1000)

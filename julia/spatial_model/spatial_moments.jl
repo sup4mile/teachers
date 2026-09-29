@@ -30,8 +30,9 @@ isdefined(@__MODULE__, :solve_ge) || include(joinpath(@__DIR__, "spatial_continu
 
 Assumptions that map model objects into the units of the data. None of these is
 estimated; each is a documented choice (§1 and §3 of the calibration note).
-- `χ = 0.13`: log adult earnings per student SD of achievement (the CFR bridge).
-- `K = 5`: effective school years, used for the teacher intervention and SEDA.
+- `χ = log(1.12)`: log adult earnings per student SD of achievement (the CFR bridge).
+- `K = 12`: school years of exposure (grades 1–12), used for the teacher
+  intervention and SEDA.
 - `teacher_sd = :within`: SD of teacher log h within work locations (`:pooled`
   uses the economy-wide SD).
 - `wtp_score_sd = 1.0`: BFM's score unit in student SDs. Placeholder until the
@@ -40,8 +41,8 @@ estimated; each is a documented choice (§1 and §3 of the calibration note).
   log E[y]). y is pre-tax labour income; the district proxy is a log median (T3).
 """
 Base.@kwdef struct Measurement
-    χ::Float64            = 0.13
-    K::Float64            = 5.0
+    χ::Float64            = log(1.12)
+    K::Float64            = 12.0
     teacher_sd::Symbol    = :within
     wtp_score_sd::Float64 = 1.0
     income::Symbol        = :mean_log
@@ -92,6 +93,44 @@ function location_stats(sol)
         end
     end
     return (; nT, nO, pay, logh, logh2, logy, y, S = vec(sum(Φ; dims = 1)))
+end
+
+"P(i* = i | X_O* = x): the chance that non-teaching occupation `i` attains the max."
+function argmax_prob(gr, g, x, i)
+    w(j) = pdf(gr.dO[j, g], x) / max(cdf(gr.dO[j, g], x), 1e-300)
+    den = sum(w, gr.nonteach)
+    return den > 0.0 ? w(i) / den : 0.0
+end
+
+"""
+    home_production_stats(sol, hp)
+
+Occupation `hp` (home production in the calibration) integrated over non-teachers
+with P(i* = hp | X_O*). The solver taxes home-production output like market
+income, so the solved `t` is not comparable to the §1 t ≈ 0.023, which is teacher
+compensation over market labour income. Returns
+- `share[g]`: home-production share of gender g;
+- `income_share`: its share of pre-tax income;
+- `t_all`: teacher wage bill over all income (the solved tax base);
+- `t_market`: teacher wage bill over market income (the §1 counterpart).
+"""
+function home_production_stats(sol, hp::Int)
+    (; hh, Φ, gr) = sol
+    (; Nz, L, nXO) = gr
+    hp in gr.nonteach || throw(ArgumentError("occupation $hp is not a non-teaching occupation"))
+    st  = location_stats(sol)
+    pHP = [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:nXO] for g in 1:2]
+    nHP = zeros(2); yHP = 0.0
+    for l in 1:L, zi in 1:Nz, g in 1:2
+        mass = Φ[zi, l] / 2
+        iszero(mass) && continue
+        cm = choice_maps(hh, g, l, zi, gr)
+        nHP[g] += mass * integrate_nonteach(pHP[g], cm, gr)
+        yHP    += mass * integrate_nonteach(pHP[g] .* hh.capO[g, l, zi, :], cm, gr)
+    end
+    pay, y = sum(st.pay), sum(st.y)
+    return (; share = nHP ./ vec(sum(st.nT .+ st.nO; dims = 2)), income_share = yHP / y,
+              t_all = pay / y, t_market = pay / (y - yHP))
 end
 
 "SD of teacher log h: `:within` work locations (mass-weighted) or `:pooled`."

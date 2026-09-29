@@ -123,7 +123,7 @@ NLSY_TAGSET_EXT = {"nlsy79": ".NLSY79", "nlscya": ".CHILDYA", "nlsy97": ".NLSY97
 # test scores alone cannot separate common ability from comparative advantage.
 NLSY_BLOCKS: dict[str, dict[str, str]] = {
     "nlsy79": {
-        "id": r"CASEID|SAMPLE_ID|SAMPLE_RACE|SAMPLE_SEX|Q1-3_A~[MY]",
+        "id": r"CASEID|HHID|SAMPLE_ID|SAMPLE_RACE|SAMPLE_SEX|Q1-3_A~[MY]",
         "weights": r"SAMPWEIGHT|SAMPWEIGHT_ASVAB",
         # 1980 ASVAB, published 1981: section raw/scale/standard scores and
         # standard errors (ASVAB-1..43), AFQT (1980, 1989, 2006 norms), and the
@@ -136,16 +136,26 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         "family": r"HGC-(MOTHER|FATHER)|FAMOCC-(19|26)",
         "schooling": r"HGCREV\d\d|HGC_EVER",
         "work": r"CPSOCC(70|80)|OCCALL-EMP\.01|CPSHRP|HRP1",
+        # past-calendar-year wage income, weeks and hours, for an ACS-style
+        # hourly wage (income over hours) on full-year, full-time workers;
+        # ESR_COL flags the armed forces at the interview date
+        "earnings": r"Q13-5(_TRUNC(_REVISED)?)?|WKSWK-PCY|HRSWK-PCY|ESR_COL",
     },
     "nlscya": {
         "id": r"CPUBID|MPUBID|CRACE|CSEX|CMOB|CYRB|BTHORDR",
         "weights": r"CSAMWT\d{4}(_REV)?",
-        "assess_age": r"MSAGE\d{4}",          # age in months at assessment
+        # age in months at assessment: the child supplement (CSAGE) is where
+        # PIAT/PPVT are given; the mother supplement (MSAGE) is the fallback
+        "assess_age": r"(CS|MS)AGE\d{4}",
         # PIAT math, reading recognition and comprehension, PPVT and digit span:
         # raw, percentile (P) and standard (Z) scores, 1986-2014
         "scores": r"(MATH|RECOG|COMP|PPVT)[PZ]?\d{4}|DIGITZ?\d{4}",
         "family": r"HGCREV\d{4}",             # the mother's schooling, by round
         "schooling": r"HGC\d{4}",             # the young adult's own schooling
+        # young-adult earnings, for the mother-child and sibling earnings checks
+        "ya_weights": r"YA\d\dWEIGHT(_REVISED)?",
+        "ya_age": r"AGEINT(\d\d|\d{4})",
+        "ya_earnings": r"Q15-5(-TOP)?",       # wage and salary income, past year
     },
     "nlsy97": {
         "id": r"PUBID|KEY!SEX|KEY!BDATE_[MY]|KEY!RACE_ETHNICITY|CV_SAMPLE_TYPE",
@@ -158,6 +168,9 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         "family": r"CV_HGC_(BIO|RES)_(MOM|DAD)",
         "schooling": r"CV_HGC_EVER_EDT|CV_HIGHEST_DEGREE_EVER_EDT",
         "work": r"YEMP_OCCODE-2002\.01|CV_HRLY_PAY\.01",
+        # calendar-year wage income, weeks and hours: the ACS-vintage check on
+        # the NLSY79 log-wage slope
+        "earnings": r"YINC-1700|CVC_(HOURS_WK|WKSWK)_YR_ALL\.\d\d|CV_AGE_INT_DATE",
     },
 }
 

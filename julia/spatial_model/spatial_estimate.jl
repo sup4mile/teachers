@@ -38,7 +38,9 @@
 #   --verbose              log every model evaluation
 #   --smoke                coarse grid, tiny budget, temporary directory: a pipeline check
 # Names accept ASCII aliases: logkappa dkappa dB beta lambda r_m sigma theta_nu psi eta
-# phi mu gamma alpha sigma_eps rho_z sigma_xi chi.
+# phi mu gamma alpha sigma_eps rho_z s_z omega_f chi. The external block has 21
+# occupations (spatial_calibrate.jl §1); --external sigma_eps=… re-inverts the
+# occupational shares at the new dispersion.
 #
 # SLURM. One node: request --cpus-per-task=N and let --workers default to N − 1.
 # Several nodes: replace `addprocs(n; ...)` below with ClusterManagers.SlurmManager
@@ -61,7 +63,7 @@ Base.find_package("TikTak") === nothing &&
 const ALIASES = Dict("logkappa" => "logκ", "dkappa" => "δκ", "dB" => "ΔB", "beta" => "β",
                      "lambda" => "λ", "sigma" => "σ", "theta_nu" => "θν", "psi" => "ψ",
                      "eta" => "η", "phi" => "φ", "mu" => "μ", "gamma" => "γ", "alpha" => "α",
-                     "sigma_eps" => "σϵ", "rho_z" => "ρz", "sigma_xi" => "σξ", "chi" => "χ")
+                     "sigma_eps" => "σϵ", "rho_z" => "ρz", "omega_f" => "ωf", "chi" => "χ")
 
 "`name=value` → Symbol => value; the value is a Float64 when it parses as one, else a Symbol."
 function parse_assignment(s)

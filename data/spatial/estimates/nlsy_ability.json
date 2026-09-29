@@ -1,0 +1,1908 @@
+{
+  "generated": "2026-09-28T18:15:41",
+  "script": "data/spatial/nlsy_ability.py",
+  "inputs": {
+    "nlsy79_ability": {
+      "rows": 12686,
+      "cols": 493
+    },
+    "nlscya_ability": {
+      "rows": 11551,
+      "cols": 354
+    },
+    "nlsy97_ability": {
+      "rows": 8984,
+      "cols": 340
+    }
+  },
+  "samples": {
+    "n.A": 9033,
+    "n.A_alpha": {
+      "AR": 9060,
+      "WK": 9049,
+      "PC": 9040,
+      "MK": 9043
+    },
+    "n.A4": 9013,
+    "n.py_pooled": 34118,
+    "n.pers_pooled": 6904,
+    "n.py_male": 19245,
+    "n.pers_male": 3667,
+    "n.py_female": 14873,
+    "n.pers_female": 3237,
+    "n.C5_pooled": 68243,
+    "n.C5_male": 32263,
+    "n.C5_female": 35980,
+    "n.B_main": [
+      3480,
+      8137
+    ],
+    "n.B_a": [
+      2140,
+      4796
+    ],
+    "n.B_b": [
+      3480,
+      8137
+    ],
+    "n.B_c": [
+      3480,
+      8137
+    ],
+    "n.B_d": [
+      3180,
+      6436
+    ],
+    "n.B_e": [
+      3480,
+      3480
+    ],
+    "n.B_f": [
+      3258,
+      7393
+    ],
+    "n.B_g": [
+      3480,
+      8137
+    ],
+    "n.B_h": [
+      3480,
+      8137
+    ],
+    "n.B_i": [
+      3480,
+      8137
+    ],
+    "n.B_j": [
+      3480,
+      8137
+    ],
+    "n.B": [
+      3480,
+      8137
+    ],
+    "n.S": [
+      2688,
+      7720
+    ],
+    "B.mean_assess": 3.861005284502888,
+    "B.share_ppvt": 0.9326533120314612,
+    "B.mean_scores": [
+      3.8359346196386874,
+      3.8219245422145756,
+      3.181762320265454,
+      1.6615460243332925
+    ],
+    "B.share_female_child": 0.4882634877719061,
+    "n.kids_all": 11551,
+    "n.assess_all": 115486,
+    "n.comp_all": 33038,
+    "n.imputed_comp": 5131,
+    "n.age_fallback_msage": 0,
+    "n.E1": [
+      2828,
+      5529
+    ],
+    "n.E1_male": 2769,
+    "n.E1_female": 2760,
+    "n.E_mothers": 4231,
+    "n.E_py_mothers": 28093,
+    "n.E_py_ya": 15372,
+    "n.E2": [
+      1958,
+      4319
+    ],
+    "n.V.py_pooled": 17543,
+    "n.V.pers_pooled": 4874,
+    "n.V.py_male": 9660,
+    "n.V.pers_male": 2539,
+    "n.V.py_female": 7883,
+    "n.V.pers_female": 2335,
+    "n.V_persons": 7093,
+    "n.V_persons_all": 8984
+  },
+  "assumptions": {
+    "eta": 0.0807,
+    "chi": 0.11332868530700327,
+    "B": 200,
+    "seed": 20260928,
+    "failed_draws": 0,
+    "age_window": [
+      25,
+      34
+    ],
+    "min_hgc": 9,
+    "fy_weeks": 50,
+    "ft_hours_per_week": 35,
+    "trim": [
+      0.01,
+      0.99
+    ],
+    "weights": {
+      "nlsy79": "1979 SAMPWEIGHT/100",
+      "cnlsy_dyad": "mother's weight / n_c",
+      "nlsy97": "1997 SAMPLING_WEIGHT_CC/100"
+    },
+    "clusters": {
+      "nlsy79_cnlsy": "HHID (multinomial household multiplicities)",
+      "nlsy97": "PUBID (no household id in extract; sibling clustering ignored)"
+    },
+    "norming": {
+      "nlsy79_irt": "NLS four-month age groups, as delivered",
+      "children": "rank-normal within 3-month age cells, window (60, 179) months, fixed across draws",
+      "nlsy97": "rank-normal within birth year x quarter, fixed across draws"
+    },
+    "child_window_months": [
+      60,
+      179
+    ],
+    "bootstrap_flags": {
+      "A.heywood": 0.0,
+      "B.heywood": 0.0,
+      "V.heywood": 0.0
+    },
+    "nonconverged_fits": {
+      "point_estimate": 0,
+      "n_fits_per_draw": 16,
+      "draws_with_any": 0,
+      "total_over_draws": 0
+    },
+    "mother_sample_ids": [
+      5,
+      6,
+      7,
+      8,
+      13,
+      14
+    ],
+    "population_sample_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      13,
+      14
+    ]
+  },
+  "estimates": [
+    {
+      "key": "rho_pc_latent",
+      "label": "Latent mother-child ability correlation (two-factor ULS)",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5766299079601815,
+      "se": 0.014023593002952637,
+      "ci_lo": 0.5482038653982296,
+      "ci_hi": 0.6011893179901012,
+      "n": 8137,
+      "units": "correlation",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Primary moment for rho_z. Mother factor: AR, WK, PC, MK (IRT z). Child factor: PIAT math, recognition, comprehension, PPVT, age-normed.",
+      "extra": {
+        "lam": {
+          "AR": {
+            "value": 0.8757511810154264,
+            "se": 0.006949628192425449,
+            "ci_lo": 0.860825106456869,
+            "ci_hi": 0.8866109452245629
+          },
+          "WK": {
+            "value": 0.8772488676214625,
+            "se": 0.00666329840211278,
+            "ci_lo": 0.8643416548764549,
+            "ci_hi": 0.8892146533227959
+          },
+          "PC": {
+            "value": 0.8016018672877748,
+            "se": 0.008543694094677107,
+            "ci_lo": 0.7826897145214091,
+            "ci_hi": 0.8183188831227032
+          },
+          "MK": {
+            "value": 0.8600796624059377,
+            "se": 0.007047799503021008,
+            "ci_lo": 0.8457155641871122,
+            "ci_hi": 0.8726461533595621
+          },
+          "MATH": {
+            "value": 0.8317238646845305,
+            "se": 0.008383310743117716,
+            "ci_lo": 0.8166401482484928,
+            "ci_hi": 0.8487431192940337
+          },
+          "RECOG": {
+            "value": 0.8260966257673459,
+            "se": 0.0072033617297492004,
+            "ci_lo": 0.8119158294153366,
+            "ci_hi": 0.840902528004875
+          },
+          "COMP": {
+            "value": 0.8599716481146066,
+            "se": 0.007255660984405144,
+            "ci_lo": 0.8444477132863515,
+            "ci_hi": 0.8746337277987531
+          },
+          "PPVT": {
+            "value": 0.7890821468831212,
+            "se": 0.01008884943081509,
+            "ci_lo": 0.7720397231929651,
+            "ci_hi": 0.8062967413540125
+          }
+        },
+        "comm": {
+          "AR": {
+            "value": 0.7669401310499141,
+            "se": 0.012143383432578595,
+            "ci_lo": 0.7410198682885613,
+            "ci_hi": 0.7860789748886691
+          },
+          "WK": {
+            "value": 0.7695655757431382,
+            "se": 0.011686121340439292,
+            "ci_lo": 0.7470865283860728,
+            "ci_hi": 0.7907027398642777
+          },
+          "PC": {
+            "value": 0.6425655536392474,
+            "se": 0.01367837693792994,
+            "ci_lo": 0.6126031894599866,
+            "ci_hi": 0.6696457950308994
+          },
+          "MK": {
+            "value": 0.7397370256843118,
+            "se": 0.012106277463754403,
+            "ci_lo": 0.7152348155558644,
+            "ci_hi": 0.7615113482001729
+          },
+          "MATH": {
+            "value": 0.6917645870857713,
+            "se": 0.013945146292661251,
+            "ci_lo": 0.6669011321948495,
+            "ci_hi": 0.7203648825713763
+          },
+          "RECOG": {
+            "value": 0.6824356351041944,
+            "se": 0.011894400592769687,
+            "ci_lo": 0.6592073276087949,
+            "ci_hi": 0.7071170644009048
+          },
+          "COMP": {
+            "value": 0.7395512355609527,
+            "se": 0.012462816922002427,
+            "ci_lo": 0.713091942962933,
+            "ci_hi": 0.7649841650633549
+          },
+          "PPVT": {
+            "value": 0.6226506345296756,
+            "se": 0.015933834294363083,
+            "ci_lo": 0.5960453425247306,
+            "ci_hi": 0.6501144507629222
+          }
+        },
+        "rmsr": {
+          "value": 0.04175913742155615,
+          "se": 0.0023011806502621023,
+          "ci_lo": 0.03778382416376858,
+          "ci_hi": 0.04653921836179702
+        },
+        "n_mothers": 3480,
+        "n_children": 8137,
+        "heywood": false,
+        "converged": true
+      }
+    },
+    {
+      "key": "R_comp_mother",
+      "label": "Reliability of the equal-weight mother composite (4 IRT z)",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9150429366810151,
+      "se": 0.002431423567811151,
+      "ci_lo": 0.9099226440597399,
+      "ci_hi": 0.9188987746890777,
+      "n": 3480,
+      "units": "share",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "(\u03a3\u03bb)\u00b2/(1'S1), S = sample correlations, dyad sample.",
+      "extra": {
+        "omega": {
+          "value": 0.915142360981414,
+          "se": 0.002428446856630383,
+          "ci_lo": 0.9100383242474579,
+          "ci_hi": 0.9192399214809697
+        }
+      }
+    },
+    {
+      "key": "R_comp_child",
+      "label": "Reliability of the child composite actually used (mean of available tests)",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8924504121975453,
+      "se": 0.002923761111019223,
+      "ci_lo": 0.8863059985465834,
+      "ci_hi": 0.8977413612927739,
+      "n": 8137,
+      "units": "share",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "(\u03a3\u03bb)\u00b2/(1'S1), S = sample correlations of the child-level scores.",
+      "extra": {
+        "omega": {
+          "value": 0.8964180418363449,
+          "se": 0.0028323833501948535,
+          "ci_lo": 0.8904301777698884,
+          "ci_hi": 0.9015631099986666
+        },
+        "R_comp_child_all4": {
+          "value": 0.8974853431258424,
+          "se": 0.0027862480169347768,
+          "ci_lo": 0.8917698717776457,
+          "ci_hi": 0.9025138344807244
+        }
+      }
+    },
+    {
+      "key": "r_pc_composite",
+      "label": "Weighted correlation of the two equal-weight composites",
+      "model_object": "check",
+      "value": 0.5158037194718448,
+      "se": 0.013347683731476706,
+      "ci_lo": 0.48455239538211387,
+      "ci_hi": 0.5380971030306164,
+      "n": 8137,
+      "units": "correlation",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Observed mother-child score correlation.",
+      "extra": {
+        "check_r_over_sqrt_RMRC": {
+          "value": 0.5707838621974095,
+          "se": 0.014348764006947002,
+          "ci_lo": 0.5384981350703543,
+          "ci_hi": 0.5950580909136499
+        }
+      }
+    },
+    {
+      "key": "B4.stab_MATH",
+      "label": "Two-year stability of age-normed MATH",
+      "model_object": "check",
+      "value": 0.6611168248084386,
+      "se": 0.007458420859478161,
+      "ci_lo": 0.644331905006694,
+      "ci_hi": 0.6733437809733381,
+      "n": null,
+      "units": "correlation",
+      "source": "CNLSY, rounds y and y+2, ages 5-14",
+      "note": "Lower bound on single-assessment reliability (not used).",
+      "extra": {}
+    },
+    {
+      "key": "B4.stab_RECOG",
+      "label": "Two-year stability of age-normed RECOG",
+      "model_object": "check",
+      "value": 0.7395337553971937,
+      "se": 0.006223386401785708,
+      "ci_lo": 0.7277481562141045,
+      "ci_hi": 0.7518958583742588,
+      "n": null,
+      "units": "correlation",
+      "source": "CNLSY, rounds y and y+2, ages 5-14",
+      "note": "Lower bound on single-assessment reliability (not used).",
+      "extra": {}
+    },
+    {
+      "key": "B4.stab_COMP",
+      "label": "Two-year stability of age-normed COMP",
+      "model_object": "check",
+      "value": 0.6347449537561723,
+      "se": 0.007975909069894507,
+      "ci_lo": 0.6192315757299787,
+      "ci_hi": 0.6528038327800205,
+      "n": null,
+      "units": "correlation",
+      "source": "CNLSY, rounds y and y+2, ages 5-14",
+      "note": "Lower bound on single-assessment reliability (not used).",
+      "extra": {}
+    },
+    {
+      "key": "B4.stab_PPVT",
+      "label": "Two-year stability of age-normed PPVT",
+      "model_object": "check",
+      "value": 0.7496545800790464,
+      "se": 0.015079542695985817,
+      "ci_lo": 0.7194056808610805,
+      "ci_hi": 0.7782461169566417,
+      "n": null,
+      "units": "correlation",
+      "source": "CNLSY, rounds y and y+2, ages 5-14",
+      "note": "Lower bound on single-assessment reliability (not used).",
+      "extra": {}
+    },
+    {
+      "key": "R_comp_pop",
+      "label": "Reliability of the 4-subtest AFQT composite, NLSY79 population",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9158442647007558,
+      "se": 0.0016120675458863795,
+      "ci_lo": 0.912355817316187,
+      "ci_hi": 0.9188699211343153,
+      "n": 9033,
+      "units": "share",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT",
+      "note": "One-factor ULS on the four IRT z-scores; equal-weight composite.",
+      "extra": {
+        "lam": {
+          "AR": {
+            "value": 0.8820894567573079,
+            "se": 0.003538449483986991,
+            "ci_lo": 0.8746819092093568,
+            "ci_hi": 0.8880971859559553
+          },
+          "WK": {
+            "value": 0.8565168114433792,
+            "se": 0.0040663604543108535,
+            "ci_lo": 0.8491904915876729,
+            "ci_hi": 0.8633849600372638
+          },
+          "PC": {
+            "value": 0.8045661673657862,
+            "se": 0.005023662961974323,
+            "ci_lo": 0.7957793232381385,
+            "ci_hi": 0.8146211706560099
+          },
+          "MK": {
+            "value": 0.8758263945937366,
+            "se": 0.003637859484599287,
+            "ci_lo": 0.8692009040266295,
+            "ci_hi": 0.882133496190251
+          }
+        },
+        "comm": {
+          "AR": {
+            "value": 0.7780818097224025,
+            "se": 0.0062398570349970275,
+            "ci_lo": 0.7650684423410485,
+            "ci_hi": 0.7887166124619359
+          },
+          "WK": {
+            "value": 0.7336210482851332,
+            "se": 0.006963442174993454,
+            "ci_lo": 0.7211244976072566,
+            "ci_hi": 0.7454335919459645
+          },
+          "PC": {
+            "value": 0.6473267176696703,
+            "se": 0.008089184739166439,
+            "ci_lo": 0.6332647313411871,
+            "ci_hi": 0.6636076549831592
+          },
+          "MK": {
+            "value": 0.7670718734670635,
+            "se": 0.006370415042632191,
+            "ci_lo": 0.7555102242551766,
+            "ci_hi": 0.7781595051058477
+          }
+        },
+        "omega": {
+          "value": 0.9158614308580076,
+          "se": 0.0016108786583621283,
+          "ci_lo": 0.9123785572770998,
+          "ci_hi": 0.9188810869914885
+        },
+        "rmsr": {
+          "value": 0.037257513962493154,
+          "se": 0.001857827600410748,
+          "ci_lo": 0.03363473429159463,
+          "ci_hi": 0.040737982002754344
+        },
+        "kr20": {
+          "AR": {
+            "value": 0.9079100137763216,
+            "se": 0.0015794131919905834,
+            "ci_lo": 0.904758499372278,
+            "ci_hi": 0.910477057450138
+          },
+          "WK": {
+            "value": 0.9241100065330761,
+            "se": 0.0012817127193414254,
+            "ci_lo": 0.9212254135134527,
+            "ci_hi": 0.9266343532367228
+          },
+          "PC": {
+            "value": 0.8090507229809615,
+            "se": 0.00364248744160411,
+            "ci_lo": 0.8014061119282361,
+            "ci_hi": 0.8160835831817743
+          },
+          "MK": {
+            "value": 0.8952161994370924,
+            "se": 0.0018659778560816563,
+            "ci_lo": 0.8920670864756357,
+            "ci_hi": 0.8986200322800871
+          }
+        },
+        "heywood": false
+      }
+    },
+    {
+      "key": "wage_slope_obs_pooled",
+      "label": "Log-wage slope on observed afqt_c (pooled)",
+      "model_object": "check",
+      "value": 0.18799763810653639,
+      "se": 0.006916449783191012,
+      "ci_lo": 0.1769034738366309,
+      "ci_hi": 0.20345602293434928,
+      "n": 34118,
+      "units": "log points per SD of afqt_c",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Weighted OLS with age and year dummies (+ female when pooled); trimmed 1/99 within year.",
+      "extra": {
+        "n_persons": 6904
+      }
+    },
+    {
+      "key": "wage_slope_latent_pooled",
+      "label": "Log-wage slope per SD of latent ability (pooled)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.1964452707620226,
+      "se": 0.007199640206621383,
+      "ci_lo": 0.18499882514605503,
+      "ci_hi": 0.21254120247603694,
+      "n": 34118,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "slope_obs / sqrt(R_comp_pop). Primary moment for b\u00b7s_z.",
+      "extra": {}
+    },
+    {
+      "key": "wage_slope_obs_male",
+      "label": "Log-wage slope on observed afqt_c (male)",
+      "model_object": "check",
+      "value": 0.17119149100061984,
+      "se": 0.008939019377138266,
+      "ci_lo": 0.1552576284236047,
+      "ci_hi": 0.18913479357773774,
+      "n": 19245,
+      "units": "log points per SD of afqt_c",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Weighted OLS with age and year dummies (+ female when pooled); trimmed 1/99 within year.",
+      "extra": {
+        "n_persons": 3667
+      }
+    },
+    {
+      "key": "wage_slope_latent_male",
+      "label": "Log-wage slope per SD of latent ability (male)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.17888394312014425,
+      "se": 0.009317067883989028,
+      "ci_lo": 0.1621738273692599,
+      "ci_hi": 0.19764080441358903,
+      "n": 19245,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "slope_obs / sqrt(R_comp_pop).",
+      "extra": {}
+    },
+    {
+      "key": "wage_slope_obs_female",
+      "label": "Log-wage slope on observed afqt_c (female)",
+      "model_object": "check",
+      "value": 0.21462207476560397,
+      "se": 0.009028576261962679,
+      "ci_lo": 0.19948813677641455,
+      "ci_hi": 0.23283624037515516,
+      "n": 14873,
+      "units": "log points per SD of afqt_c",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Weighted OLS with age and year dummies (+ female when pooled); trimmed 1/99 within year.",
+      "extra": {
+        "n_persons": 3237
+      }
+    },
+    {
+      "key": "wage_slope_latent_female",
+      "label": "Log-wage slope per SD of latent ability (female)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.22426607064575793,
+      "se": 0.009418570261969066,
+      "ci_lo": 0.20856483818565716,
+      "ci_hi": 0.24350469574761746,
+      "n": 14873,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "slope_obs / sqrt(R_comp_pop).",
+      "extra": {}
+    },
+    {
+      "key": "implied_s_z",
+      "label": "Implied stationary SD of log ability, s_z = slope_latent (1\u2212\u03b7)",
+      "model_object": "s_z",
+      "value": 0.18059213741152735,
+      "se": 0.006618629241947038,
+      "ci_lo": 0.1700694199567684,
+      "ci_hi": 0.19538912743622078,
+      "n": 34118,
+      "units": "log points",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "\u03b7 = 0.0807.",
+      "extra": {}
+    },
+    {
+      "key": "gap_to_chi",
+      "label": "Pooled latent slope minus \u03c7 = log 1.12",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.08311658545501932,
+      "se": 0.007199640206621383,
+      "ci_lo": 0.07167013983905178,
+      "ci_hi": 0.09921251716903368,
+      "n": 34118,
+      "units": "log points",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "\u03c7 = 0.11333. Positive: scores predict wages more than the CFR bridge.",
+      "extra": {}
+    },
+    {
+      "key": "C.p9010_pooled",
+      "label": "Weighted 90/10 of year-demeaned hourly wage (pooled)",
+      "model_object": "check",
+      "value": 3.3976599234384692,
+      "se": 0.055312584218581866,
+      "ci_lo": 3.3041993658223157,
+      "ci_hi": 3.5264505441727536,
+      "n": 34118,
+      "units": "ratio",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Trimmed sample; ACS 2009-13 pooled is 3.74 (different vintage).",
+      "extra": {}
+    },
+    {
+      "key": "C.p9010_male",
+      "label": "Weighted 90/10 of year-demeaned hourly wage (male)",
+      "model_object": "check",
+      "value": 3.432638819762122,
+      "se": 0.08037910178822572,
+      "ci_lo": 3.302391509246658,
+      "ci_hi": 3.6180630691649283,
+      "n": 19245,
+      "units": "ratio",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Trimmed sample; ACS 2009-13 pooled is 3.74 (different vintage).",
+      "extra": {}
+    },
+    {
+      "key": "C.p9010_female",
+      "label": "Weighted 90/10 of year-demeaned hourly wage (female)",
+      "model_object": "check",
+      "value": 3.2043151577041566,
+      "se": 0.054129770047832274,
+      "ci_lo": 3.0993123605317563,
+      "ci_hi": 3.314918508156018,
+      "n": 14873,
+      "units": "ratio",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Trimmed sample; ACS 2009-13 pooled is 3.74 (different vintage).",
+      "extra": {}
+    },
+    {
+      "key": "C5.fyft_pooled",
+      "label": "LPM slope of 1{full-year full-time wage worker} on afqt_c (pooled)",
+      "model_object": "check",
+      "value": 0.07867672173021127,
+      "se": 0.004579759927040458,
+      "ci_lo": 0.06965063959441871,
+      "ci_hi": 0.0866425012898133,
+      "n": 68243,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "C5.fyft_male",
+      "label": "LPM slope of 1{full-year full-time wage worker} on afqt_c (male)",
+      "model_object": "check",
+      "value": 0.07686075595737125,
+      "se": 0.005492806871858601,
+      "ci_lo": 0.06676701699319805,
+      "ci_hi": 0.08603580835826344,
+      "n": 32263,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "C5.fyft_female",
+      "label": "LPM slope of 1{full-year full-time wage worker} on afqt_c (female)",
+      "model_object": "check",
+      "value": 0.08017466542299215,
+      "se": 0.006294935204182787,
+      "ci_lo": 0.06776522721797329,
+      "ci_hi": 0.09113840226067135,
+      "n": 35980,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "C5.hp_pooled",
+      "label": "LPM slope of 1{annual hours < 780} on afqt_c (pooled)",
+      "model_object": "check",
+      "value": -0.06311994508742848,
+      "se": 0.003765336764807641,
+      "ci_lo": -0.06943243010784086,
+      "ci_hi": -0.05539624149100469,
+      "n": 68243,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "C5.hp_male",
+      "label": "LPM slope of 1{annual hours < 780} on afqt_c (male)",
+      "model_object": "check",
+      "value": -0.04285942913469792,
+      "se": 0.0039400849342253125,
+      "ci_lo": -0.05018681007137662,
+      "ci_hi": -0.03559712769735432,
+      "n": 32263,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "C5.hp_female",
+      "label": "LPM slope of 1{annual hours < 780} on afqt_c (female)",
+      "model_object": "check",
+      "value": -0.08445007998138848,
+      "se": 0.006194268291020713,
+      "ci_lo": -0.09605573919854894,
+      "ci_hi": -0.07175801136143041,
+      "n": 35980,
+      "units": "probability per SD",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT, ages 25-34, hgc >= 9",
+      "note": "Model makes work independent of z; a nonzero slope is a caveat.",
+      "extra": {}
+    },
+    {
+      "key": "rho_sib_latent",
+      "label": "Latent sibling correlation (off-diagonal cross-test)",
+      "model_object": "check",
+      "value": 0.6062739952268316,
+      "se": 0.016531908660971692,
+      "ci_lo": 0.5730404894773956,
+      "ci_hi": 0.6351459405083775,
+      "n": 7720,
+      "units": "correlation",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "\u03a3_{k\u2260l} C_kl \u03bb_k \u03bb_l / \u03a3_{k\u2260l} (\u03bb_k \u03bb_l)\u00b2 with child loadings from B2.",
+      "extra": {
+        "including_k_eq_l": {
+          "value": 0.6309397842857926,
+          "se": 0.016418632235505718,
+          "ci_lo": 0.5976395385357789,
+          "ci_hi": 0.6583006545093925
+        },
+        "n_families": 2688,
+        "n_pairs": 7720
+      }
+    },
+    {
+      "key": "S.sib_comp_corr",
+      "label": "Raw sibling correlation of the child composite",
+      "model_object": "check",
+      "value": 0.5470090932370099,
+      "se": 0.015925690429492288,
+      "ci_lo": 0.514634240804676,
+      "ci_hi": 0.5761707135834796,
+      "n": 7720,
+      "units": "correlation",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Ordered sibling pairs.",
+      "extra": {}
+    },
+    {
+      "key": "implied_rho_from_sib",
+      "label": "Implied rho = rho_sib_latent / rho_pc_latent",
+      "model_object": "check",
+      "value": 1.051409208675137,
+      "se": 0.030547396978332093,
+      "ci_lo": 0.9943213043953552,
+      "ci_hi": 1.1117113847337146,
+      "n": 7720,
+      "units": "ratio",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "AR(1): siblings correlate \u03c1\u00b2, mother-child \u03c1. Expected \u2265 1 (shared family inputs).",
+      "extra": {}
+    },
+    {
+      "key": "wage_slope_latent97_pooled",
+      "label": "NLSY97 latent log-wage slope (pooled)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.17544259775749382,
+      "se": 0.008730792091702518,
+      "ci_lo": 0.160531860972087,
+      "ci_hi": 0.19307062984969886,
+      "n": 17543,
+      "units": "log points per SD of f",
+      "source": "NLSY97 CAT-ASVAB; rounds with ages 25-34",
+      "note": "Same definition as block C; slope_obs / sqrt(R_comp_97).",
+      "extra": {
+        "obs": {
+          "value": 0.1675783475716637,
+          "se": 0.008329241980850242,
+          "ci_lo": 0.15321828782899566,
+          "ci_hi": 0.1843202411080597
+        }
+      }
+    },
+    {
+      "key": "wage_slope_latent97_male",
+      "label": "NLSY97 latent log-wage slope (male)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.15870554982365492,
+      "se": 0.011055276362327346,
+      "ci_lo": 0.13728003872889527,
+      "ci_hi": 0.17975956741302032,
+      "n": 9660,
+      "units": "log points per SD of f",
+      "source": "NLSY97 CAT-ASVAB; rounds with ages 25-34",
+      "note": "Same definition as block C; slope_obs / sqrt(R_comp_97).",
+      "extra": {
+        "obs": {
+          "value": 0.15159154122114815,
+          "se": 0.010552427911590098,
+          "ci_lo": 0.13134451349046936,
+          "ci_hi": 0.17149452445408211
+        }
+      }
+    },
+    {
+      "key": "wage_slope_latent97_female",
+      "label": "NLSY97 latent log-wage slope (female)",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.20289456425301705,
+      "se": 0.014426393131161097,
+      "ci_lo": 0.17647283179368728,
+      "ci_hi": 0.23151229582459448,
+      "n": 7883,
+      "units": "log points per SD of f",
+      "source": "NLSY97 CAT-ASVAB; rounds with ages 25-34",
+      "note": "Same definition as block C; slope_obs / sqrt(R_comp_97).",
+      "extra": {
+        "obs": {
+          "value": 0.19379977407648163,
+          "se": 0.01377066503645504,
+          "ci_lo": 0.16846614580267272,
+          "ci_hi": 0.2209169325447933
+        }
+      }
+    },
+    {
+      "key": "R_comp_97",
+      "label": "Reliability of the NLSY97 4-subtest composite",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9123588914465313,
+      "se": 0.001563530546255107,
+      "ci_lo": 0.9091387743178875,
+      "ci_hi": 0.9151976620025319,
+      "n": 7093,
+      "units": "share",
+      "source": "NLSY97 CAT-ASVAB; rounds with ages 25-34",
+      "note": "One-factor ULS on age-normed CAT-ASVAB thetas.",
+      "extra": {
+        "lam": {
+          "AR": {
+            "value": 0.8781048350815074,
+            "se": 0.003795490829658901,
+            "ci_lo": 0.8706648644297313,
+            "ci_hi": 0.8847269279318376
+          },
+          "WK": {
+            "value": 0.8116830900597666,
+            "se": 0.005076410595560946,
+            "ci_lo": 0.8020817374215388,
+            "ci_hi": 0.8212363158877012
+          },
+          "PC": {
+            "value": 0.8530160115440835,
+            "se": 0.0041600582103151085,
+            "ci_lo": 0.8446754417625926,
+            "ci_hi": 0.8591716658980331
+          },
+          "MK": {
+            "value": 0.8560614934575652,
+            "se": 0.003926193231860586,
+            "ci_lo": 0.8486864547850598,
+            "ci_hi": 0.8631926866910142
+          }
+        },
+        "postvar_reliability": {
+          "AR": {
+            "value": 0.7684139943234957,
+            "se": 0.002979854063156349,
+            "ci_lo": 0.7621176040369224,
+            "ci_hi": 0.7734347716585931
+          },
+          "WK": {
+            "value": 0.7510692309147775,
+            "se": 0.002732707385474435,
+            "ci_lo": 0.7458585143877307,
+            "ci_hi": 0.756397701046961
+          },
+          "PC": {
+            "value": 0.7132030706618291,
+            "se": 0.0025832842708732864,
+            "ci_lo": 0.7084761680869548,
+            "ci_hi": 0.717868543438936
+          },
+          "MK": {
+            "value": 0.7767762633187031,
+            "se": 0.00243709685385031,
+            "ci_lo": 0.7725958628382656,
+            "ci_hi": 0.7819932145029157
+          }
+        },
+        "omega": {
+          "value": 0.9123651353448665,
+          "se": 0.0015629812551853873,
+          "ci_lo": 0.9091444681267674,
+          "ci_hi": 0.9152046552130765
+        }
+      }
+    },
+    {
+      "key": "E1.corr",
+      "label": "Mother-child correlation of permanent log earnings",
+      "model_object": "check",
+      "value": 0.13465020995248062,
+      "se": 0.017822697136130692,
+      "ci_lo": 0.09207780694704443,
+      "ci_hi": 0.15995389912636412,
+      "n": 5529,
+      "units": "correlation",
+      "source": "NLSY79 mothers x CNLSY young adults, ages 25-34",
+      "note": "Check, not a target.",
+      "extra": {
+        "cov": {
+          "value": 0.09817872066466253,
+          "se": 0.013649236899730691,
+          "ci_lo": 0.0694656990092895,
+          "ci_hi": 0.1208860404453093
+        },
+        "slope": {
+          "value": 0.1072294647467937,
+          "se": 0.014497052209469086,
+          "ci_lo": 0.07528902200526316,
+          "ci_hi": 0.13214005324803632
+        },
+        "male_children": {
+          "value": 0.1133100837379851,
+          "se": 0.025484240331211813,
+          "ci_lo": 0.05588646435035378,
+          "ci_hi": 0.15128379396388564
+        },
+        "female_children": {
+          "value": 0.1553884312345991,
+          "se": 0.02370560415063197,
+          "ci_lo": 0.10509529215422023,
+          "ci_hi": 0.1982767391168202
+        },
+        "slope_male": {
+          "value": 0.08889527003667394,
+          "se": 0.020626195000571914,
+          "ci_lo": 0.044087120735778765,
+          "ci_hi": 0.12470844405993772
+        },
+        "slope_female": {
+          "value": 0.12549489844978656,
+          "se": 0.018896431848577103,
+          "ci_lo": 0.08598422234624105,
+          "ci_hi": 0.15763343221699072
+        },
+        "at_least_2_years": {
+          "corr": {
+            "value": 0.12892134191964985,
+            "se": 0.022097203735787888,
+            "ci_lo": 0.08300759445989472,
+            "ci_hi": 0.16870277270323314
+          },
+          "slope": {
+            "value": 0.10314087221579828,
+            "se": 0.018117939418138072,
+            "ci_lo": 0.06453238348059379,
+            "ci_hi": 0.1361113340875539
+          },
+          "cov": {
+            "value": 0.07897725502584678,
+            "se": 0.013513099289957387,
+            "ci_lo": 0.0510098337974618,
+            "ci_hi": 0.10332435833886412
+          }
+        }
+      }
+    },
+    {
+      "key": "E2.corr_sib",
+      "label": "Sibling correlation of permanent log earnings",
+      "model_object": "check",
+      "value": 0.28138606436329716,
+      "se": 0.022543530453768564,
+      "ci_lo": 0.23119512309617132,
+      "ci_hi": 0.32109736261696026,
+      "n": 4319,
+      "units": "correlation",
+      "source": "CNLSY young adults, ages 25-34",
+      "note": "Check, not a target.",
+      "extra": {}
+    },
+    {
+      "key": "E3.implied_rho",
+      "label": "Earnings-implied rho = sibling / mother-child correlation",
+      "model_object": "check",
+      "value": 2.08975585305512,
+      "se": 0.3929327574546989,
+      "ci_lo": 1.5922417921521685,
+      "ci_hi": 3.1242172389564957,
+      "n": 5529,
+      "units": "ratio",
+      "source": "NLSY79 x CNLSY",
+      "note": "Check.",
+      "extra": {}
+    },
+    {
+      "key": "A4.corr_afqt",
+      "label": "Correlation of afqt_c (NLS age-normed) with own-normed afqt_c",
+      "model_object": "check",
+      "value": 0.9928742701724393,
+      "se": 0.0005485927313320622,
+      "ci_lo": 0.9894908712141479,
+      "ci_hi": 0.9915066804021044,
+      "n": 9013,
+      "units": "correlation",
+      "source": "NLSY79 (ASVAB 1980-81; interviews 1979-2000), weights = 1979 SAMPWEIGHT",
+      "note": "Sensitivity of the observed score to age-norming.",
+      "extra": {
+        "R_comp_own": {
+          "value": 0.9085582987585702,
+          "se": 0.0016853744805072663,
+          "ci_lo": 0.9045875252668109,
+          "ci_hi": 0.9112410056531223
+        }
+      }
+    }
+  ],
+  "sensitivities": [
+    {
+      "key": "sens.B.main.rho_pc_latent",
+      "label": "Main dyad sample: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5766299079601815,
+      "se": 0.014023593002952637,
+      "ci_lo": 0.5482038653982296,
+      "ci_hi": 0.6011893179901012,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Main dyad sample",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.main.R_comp_mother",
+      "label": "Main dyad sample: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9150429366810151,
+      "se": 0.002431423567811151,
+      "ci_lo": 0.9099226440597399,
+      "ci_hi": 0.9188987746890777,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Main dyad sample",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.main.R_comp_child",
+      "label": "Main dyad sample: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8924504121975453,
+      "se": 0.002923761111019223,
+      "ci_lo": 0.8863059985465834,
+      "ci_hi": 0.8977413612927739,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Main dyad sample",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.main.R_comp_child_all4",
+      "label": "Main dyad sample: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8974853431258424,
+      "se": 0.0027862480169347768,
+      "ci_lo": 0.8917698717776457,
+      "ci_hi": 0.9025138344807244,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Main dyad sample",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.a.rho_pc_latent",
+      "label": "Cross-sectional mothers only (SAMPLE_ID 5-8): rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5292689017161321,
+      "se": 0.017850434847725513,
+      "ci_lo": 0.49341152555429835,
+      "ci_hi": 0.5584742576269214,
+      "n": 4796,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Cross-sectional mothers only (SAMPLE_ID 5-8)",
+      "extra": {
+        "n_mothers": 2140,
+        "n_children": 4796
+      }
+    },
+    {
+      "key": "sens.B.a.R_comp_mother",
+      "label": "Cross-sectional mothers only (SAMPLE_ID 5-8): R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9054985534494742,
+      "se": 0.0032811095840363336,
+      "ci_lo": 0.89811111263862,
+      "ci_hi": 0.9105590464569231,
+      "n": 4796,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Cross-sectional mothers only (SAMPLE_ID 5-8)",
+      "extra": {
+        "n_mothers": 2140,
+        "n_children": 4796
+      }
+    },
+    {
+      "key": "sens.B.a.R_comp_child",
+      "label": "Cross-sectional mothers only (SAMPLE_ID 5-8): R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8859084325003745,
+      "se": 0.003597434835517427,
+      "ci_lo": 0.8789280349260641,
+      "ci_hi": 0.8925131649160839,
+      "n": 4796,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Cross-sectional mothers only (SAMPLE_ID 5-8)",
+      "extra": {
+        "n_mothers": 2140,
+        "n_children": 4796
+      }
+    },
+    {
+      "key": "sens.B.a.R_comp_child_all4",
+      "label": "Cross-sectional mothers only (SAMPLE_ID 5-8): R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8900797224624457,
+      "se": 0.003477397246389366,
+      "ci_lo": 0.8833907927209558,
+      "ci_hi": 0.896894997690304,
+      "n": 4796,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Cross-sectional mothers only (SAMPLE_ID 5-8)",
+      "extra": {
+        "n_mothers": 2140,
+        "n_children": 4796
+      }
+    },
+    {
+      "key": "sens.B.b.rho_pc_latent",
+      "label": "Unweighted: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.6299783704846894,
+      "se": 0.010949126214455332,
+      "ci_lo": 0.6027554063494978,
+      "ci_hi": 0.647909041388504,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Unweighted",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.b.R_comp_mother",
+      "label": "Unweighted: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9215828524001983,
+      "se": 0.0023602543956966183,
+      "ci_lo": 0.91660925200091,
+      "ci_hi": 0.9254888693629211,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Unweighted",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.b.R_comp_child",
+      "label": "Unweighted: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9048921167204111,
+      "se": 0.0024832397265290578,
+      "ci_lo": 0.8997760339953284,
+      "ci_hi": 0.9092793195293264,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Unweighted",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.b.R_comp_child_all4",
+      "label": "Unweighted: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9099978735736567,
+      "se": 0.00237485267578236,
+      "ci_lo": 0.9051639218621937,
+      "ci_hi": 0.9142162749739335,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Unweighted",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.c.rho_pc_latent",
+      "label": "Child weights (mean CSAMWT_REV), no 1/n_c: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.6113857572555642,
+      "se": 0.013348129023508232,
+      "ci_lo": 0.5858350537532993,
+      "ci_hi": 0.6339194978606854,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child weights (mean CSAMWT_REV), no 1/n_c",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.c.R_comp_mother",
+      "label": "Child weights (mean CSAMWT_REV), no 1/n_c: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9195676608305353,
+      "se": 0.002696144412208681,
+      "ci_lo": 0.9135376531053585,
+      "ci_hi": 0.9236942957219597,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child weights (mean CSAMWT_REV), no 1/n_c",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.c.R_comp_child",
+      "label": "Child weights (mean CSAMWT_REV), no 1/n_c: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.901391724509429,
+      "se": 0.002651295671606015,
+      "ci_lo": 0.8966244138700689,
+      "ci_hi": 0.9063604158718062,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child weights (mean CSAMWT_REV), no 1/n_c",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.c.R_comp_child_all4",
+      "label": "Child weights (mean CSAMWT_REV), no 1/n_c: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9056330215958358,
+      "se": 0.0025453284101089727,
+      "ci_lo": 0.9010128911006011,
+      "ci_hi": 0.910002623595241,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child weights (mean CSAMWT_REV), no 1/n_c",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.d.rho_pc_latent",
+      "label": "Children born 1981-2000: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5844907661130588,
+      "se": 0.014834323385869479,
+      "ci_lo": 0.5567965514959136,
+      "ci_hi": 0.6114984243586805,
+      "n": 6436,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Children born 1981-2000",
+      "extra": {
+        "n_mothers": 3180,
+        "n_children": 6436
+      }
+    },
+    {
+      "key": "sens.B.d.R_comp_mother",
+      "label": "Children born 1981-2000: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9139956330073793,
+      "se": 0.002595597175330006,
+      "ci_lo": 0.9086546090040457,
+      "ci_hi": 0.91818100232135,
+      "n": 6436,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Children born 1981-2000",
+      "extra": {
+        "n_mothers": 3180,
+        "n_children": 6436
+      }
+    },
+    {
+      "key": "sens.B.d.R_comp_child",
+      "label": "Children born 1981-2000: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8929578332285247,
+      "se": 0.003144021391439634,
+      "ci_lo": 0.8874760431410069,
+      "ci_hi": 0.8979842993132328,
+      "n": 6436,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Children born 1981-2000",
+      "extra": {
+        "n_mothers": 3180,
+        "n_children": 6436
+      }
+    },
+    {
+      "key": "sens.B.d.R_comp_child_all4",
+      "label": "Children born 1981-2000: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.898644729964518,
+      "se": 0.0030034836709818664,
+      "ci_lo": 0.893064267539254,
+      "ci_hi": 0.9039803935514705,
+      "n": 6436,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Children born 1981-2000",
+      "extra": {
+        "n_mothers": 3180,
+        "n_children": 6436
+      }
+    },
+    {
+      "key": "sens.B.e.rho_pc_latent",
+      "label": "One child per mother (first-born): rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5907938008114237,
+      "se": 0.016667066839183863,
+      "ci_lo": 0.5576694526398791,
+      "ci_hi": 0.6225188506255772,
+      "n": 3480,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "One child per mother (first-born)",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 3480
+      }
+    },
+    {
+      "key": "sens.B.e.R_comp_mother",
+      "label": "One child per mother (first-born): R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9149509639041176,
+      "se": 0.0024250777841106517,
+      "ci_lo": 0.9099107479431012,
+      "ci_hi": 0.9187625623080867,
+      "n": 3480,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "One child per mother (first-born)",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 3480
+      }
+    },
+    {
+      "key": "sens.B.e.R_comp_child",
+      "label": "One child per mother (first-born): R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8967747219174568,
+      "se": 0.0036580195642682786,
+      "ci_lo": 0.8896663902773242,
+      "ci_hi": 0.9031947530773329,
+      "n": 3480,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "One child per mother (first-born)",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 3480
+      }
+    },
+    {
+      "key": "sens.B.e.R_comp_child_all4",
+      "label": "One child per mother (first-born): R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9006937949970673,
+      "se": 0.0035268218261581114,
+      "ci_lo": 0.8941299694419614,
+      "ci_hi": 0.9072367398698926,
+      "n": 3480,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "One child per mother (first-born)",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 3480
+      }
+    },
+    {
+      "key": "sens.B.f.rho_pc_latent",
+      "label": "Child scores from ages 10-14 only: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.593030157840528,
+      "se": 0.01348304201383601,
+      "ci_lo": 0.5640496562782892,
+      "ci_hi": 0.6160772090510616,
+      "n": 7393,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child scores from ages 10-14 only",
+      "extra": {
+        "n_mothers": 3258,
+        "n_children": 7393
+      }
+    },
+    {
+      "key": "sens.B.f.R_comp_mother",
+      "label": "Child scores from ages 10-14 only: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9148660456530755,
+      "se": 0.002439693357801139,
+      "ci_lo": 0.9095444374887266,
+      "ci_hi": 0.9184144432572,
+      "n": 7393,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child scores from ages 10-14 only",
+      "extra": {
+        "n_mothers": 3258,
+        "n_children": 7393
+      }
+    },
+    {
+      "key": "sens.B.f.R_comp_child",
+      "label": "Child scores from ages 10-14 only: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8754436086280456,
+      "se": 0.0036383673850671518,
+      "ci_lo": 0.8684890234457328,
+      "ci_hi": 0.8818154417028137,
+      "n": 7393,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child scores from ages 10-14 only",
+      "extra": {
+        "n_mothers": 3258,
+        "n_children": 7393
+      }
+    },
+    {
+      "key": "sens.B.f.R_comp_child_all4",
+      "label": "Child scores from ages 10-14 only: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8810812502216627,
+      "se": 0.003527363473246788,
+      "ci_lo": 0.8744083328126488,
+      "ci_hi": 0.8870830266939408,
+      "n": 7393,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Child scores from ages 10-14 only",
+      "extra": {
+        "n_mothers": 3258,
+        "n_children": 7393
+      }
+    },
+    {
+      "key": "sens.B.g.rho_pc_latent",
+      "label": "Linear age-norming: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5687213946434184,
+      "se": 0.014130914726227468,
+      "ci_lo": 0.5411315601305445,
+      "ci_hi": 0.5922368494883048,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Linear age-norming",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.g.R_comp_mother",
+      "label": "Linear age-norming: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9150598393460807,
+      "se": 0.0024288699659137875,
+      "ci_lo": 0.9099580676416423,
+      "ci_hi": 0.9189321375134583,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Linear age-norming",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.g.R_comp_child",
+      "label": "Linear age-norming: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8879531483614799,
+      "se": 0.0031817276717272247,
+      "ci_lo": 0.881693455874093,
+      "ci_hi": 0.8939812347820735,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Linear age-norming",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.g.R_comp_child_all4",
+      "label": "Linear age-norming: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8925182850635608,
+      "se": 0.0030719821378846403,
+      "ci_lo": 0.8861161914702816,
+      "ci_hi": 0.8984625280091304,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Linear age-norming",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.h.rho_pc_latent",
+      "label": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.6045834230109784,
+      "se": 0.014555352392718877,
+      "ci_lo": 0.57646607317981,
+      "ci_hi": 0.6284167187573418,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.h.R_comp_mother",
+      "label": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8868073389357664,
+      "se": 0.004311519482446046,
+      "ci_lo": 0.878426416716721,
+      "ci_hi": 0.8932459938169309,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.h.R_comp_child",
+      "label": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8409484767494256,
+      "se": 0.00526886031105939,
+      "ci_lo": 0.830816886038385,
+      "ci_hi": 0.8500611776112493,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.h.R_comp_child_all4",
+      "label": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8468240930431566,
+      "se": 0.0050852867820366165,
+      "ci_lo": 0.8373624349136626,
+      "ci_hi": 0.8564016179998789,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop within-domain pairs AR-MK, WK-PC, RECOG-COMP",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.i.rho_pc_latent",
+      "label": "Mothers' own-normed section scores: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5736186207139974,
+      "se": 0.013943036597004377,
+      "ci_lo": 0.544746522577896,
+      "ci_hi": 0.5968117062301177,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Mothers' own-normed section scores",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.i.R_comp_mother",
+      "label": "Mothers' own-normed section scores: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9049299939497802,
+      "se": 0.002693629448520504,
+      "ci_lo": 0.8982503718855616,
+      "ci_hi": 0.9085817476391457,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Mothers' own-normed section scores",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.i.R_comp_child",
+      "label": "Mothers' own-normed section scores: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8926966307324138,
+      "se": 0.002912354075114464,
+      "ci_lo": 0.8866141108240602,
+      "ci_hi": 0.8979288957581638,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Mothers' own-normed section scores",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.i.R_comp_child_all4",
+      "label": "Mothers' own-normed section scores: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8975809155267301,
+      "se": 0.0027830742388117637,
+      "ci_lo": 0.8919107174056622,
+      "ci_hi": 0.9025475058854765,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Mothers' own-normed section scores",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.j.rho_pc_latent",
+      "label": "Drop only the RECOG-COMP pair: rho_pc_latent",
+      "model_object": "\u03c1z (plus the Q_l channel and assortative mating)",
+      "value": 0.5950146743197683,
+      "se": 0.014249781755797414,
+      "ci_lo": 0.5665141184205419,
+      "ci_hi": 0.6193112822983337,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop only the RECOG-COMP pair",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.j.R_comp_mother",
+      "label": "Drop only the RECOG-COMP pair: R_comp_mother",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.9150448163058299,
+      "se": 0.002431283124586186,
+      "ci_lo": 0.9099222918665854,
+      "ci_hi": 0.9189056225951978,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop only the RECOG-COMP pair",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.j.R_comp_child",
+      "label": "Drop only the RECOG-COMP pair: R_comp_child",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8408953029079649,
+      "se": 0.00526941427079652,
+      "ci_lo": 0.8308096926570805,
+      "ci_hi": 0.8500235714872496,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop only the RECOG-COMP pair",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.B.j.R_comp_child_all4",
+      "label": "Drop only the RECOG-COMP pair: R_comp_child_all4",
+      "model_object": "var(u) in the score measurement equation",
+      "value": 0.8467564825504131,
+      "se": 0.005087457156482248,
+      "ci_lo": 0.8373349892113325,
+      "ci_hi": 0.856290641981371,
+      "n": 8137,
+      "units": "",
+      "source": "NLSY79 women x CNLSY children (PIAT/PPVT 1986-2014)",
+      "note": "Drop only the RECOG-COMP pair",
+      "extra": {
+        "n_mothers": 3480,
+        "n_children": 8137
+      }
+    },
+    {
+      "key": "sens.C.xs.wage_slope_latent_pooled",
+      "label": "Cross-sectional sample only (SAMPLE_ID 1-8): pooled latent wage slope",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.18771035852424728,
+      "se": 0.008284147553371498,
+      "ci_lo": 0.1741889355751249,
+      "ci_hi": 0.20526095329181432,
+      "n": null,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Cross-sectional sample only (SAMPLE_ID 1-8)",
+      "extra": {}
+    },
+    {
+      "key": "sens.C.unw.wage_slope_latent_pooled",
+      "label": "Fully unweighted (incl. standardization and R_comp_pop): pooled latent wage slope",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.20928514520918845,
+      "se": 0.0061202163833535455,
+      "ci_lo": 0.1976600373742773,
+      "ci_hi": 0.22170355482971196,
+      "n": null,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Fully unweighted (incl. standardization and R_comp_pop)",
+      "extra": {}
+    },
+    {
+      "key": "sens.C.own.wage_slope_latent_pooled",
+      "label": "Own-normed afqt (A4), Block A sample: pooled latent wage slope",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.19627959626499203,
+      "se": 0.007198866751893698,
+      "ci_lo": 0.18453797003740538,
+      "ci_hi": 0.21092323478082617,
+      "n": null,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Own-normed afqt (A4), Block A sample",
+      "extra": {}
+    },
+    {
+      "key": "sens.C.hrp.wage_slope_latent_pooled",
+      "label": "Hourly wage from HRP1: pooled latent wage slope",
+      "model_object": "b\u00b7s_z, b = 1/(1\u2212\u03b7)",
+      "value": 0.18420792721797832,
+      "se": 0.006411245757954083,
+      "ci_lo": 0.1724444555403461,
+      "ci_hi": 0.19680842399505605,
+      "n": null,
+      "units": "log points per SD of f",
+      "source": "NLSY79, ages 25-34, full-year full-time wage workers",
+      "note": "Hourly wage from HRP1",
+      "extra": {}
+    }
+  ]
+}

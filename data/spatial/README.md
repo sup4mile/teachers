@@ -38,7 +38,7 @@ cuts that to a few minutes if you only want the benchmark cross-sections.
 | NCES EDGE | **CWIFT** (comparable wage index for teachers, at district / county / state level), district geocode+locale files | 2013–2023 | no |
 | David Dorn | 1990 county → 1990 commuting-zone crosswalk (3,141 counties) | — | no |
 | *optional* Census ACS | school-district income, home value, property tax | 2009–2022 | yes (`--census-key` or `CENSUS_API_KEY`) |
-| *optional* NLS (BLS) | **NLSY79** ASVAB/AFQT (section scores, SEs, item responses), **NLSY79 Child/YA** PIAT/PPVT with mother links, **NLSY97** CAT-ASVAB with posterior variances; plus ages, weights, parental and own schooling, occupation, wages | 1979–2023 | no |
+| *optional* NLS (BLS) | **NLSY79** ASVAB/AFQT (section scores, SEs, item responses), **NLSY79 Child/YA** PIAT/PPVT with mother links, **NLSY97** CAT-ASVAB with posterior variances; plus ages, weights, parental and own schooling, occupation, wages, annual wage income, weeks and hours (young adults: income and weights) | 1979–2023 | no |
 
 ACS is off by default: `--sources urban seda edge czones acs`. Nothing else
 needs a key. A free Census key takes about a minute at
@@ -107,8 +107,8 @@ pass `--format both` if you want CSV alongside it.
   uncompressed, with reference numbers (`R0618301`) as column names, plus a
   codebook and a variable index (`.sdf`). The script reads the index, selects
   variables by **question name** with the regexes in `NLSY_BLOCKS`, and cuts
-  only those columns from the CSV. The selection is 367 NLSY79, 293 Child/YA
-  and 208 NLSY97 variables. Selecting by question name (`MATH1996`, `ASVAB-3`,
+  only those columns from the CSV. The selection is 493 NLSY79, 354 Child/YA
+  and 340 NLSY97 variables. Selecting by question name (`MATH1996`, `ASVAB-3`,
   `KEY!SEX`) means new survey rounds come in without editing a list of
   R-numbers. To add a variable, add its question name to a block. The zips are
   kept in `_downloads/` and reused when a rerun only changes the selection.
@@ -231,3 +231,42 @@ Two results worth reading before trusting them: `σ` and `σ_ν` both come back
 wrong-signed and insignificant (t = -0.29 and -0.62). That is the within-CZ
 cross-section saying it cannot identify either without an instrument, which is
 already the first item on the data-gap list — not a bug in the pipeline.
+
+---
+
+# Ability moments — `nlsy_ability.py`
+
+Reads the three NLSY tables that `fetch_data.py --sources nlsy` leaves in
+`raw/` and builds the data side of the ability block (Table 2, item T2a in
+`spatial_calibration.md`): the moments that T2b recomputes on simulated model
+panels.
+
+```bash
+uv run nlsy_ability.py              # B = 200 household bootstrap, about a minute
+uv run nlsy_ability.py --quick      # B = 20
+uv run nlsy_ability.py --selftest   # factor fit, norming and disattenuation on synthetic data
+```
+
+- **Mother–child measurement system.** NLSY79 women's four AFQT subtests (IRT
+  z-scores, age-normed by NLS) against their CNLSY children's PIAT math,
+  reading recognition, reading comprehension and PPVT at ages 5–14. The
+  children's scores are rank-normed within 3-month age cells and averaged over
+  rounds. A two-factor model fit by least squares to the off-diagonal
+  correlations gives the latent mother–child correlation, loadings and
+  composite reliabilities. Sibling pairs give the latent sibling correlation.
+- **Wage slope.** Log hourly wage (annual wage income over annual hours) on the
+  standardized AFQT composite, on an ACS-style sample: ages 25–34, full-year
+  full-time, at least some high school. The slope is divided by the square
+  root of the composite's reliability to put it per latent SD. NLSY97 repeats
+  it for the cohorts the ACS 2009–13 sample covers.
+- **Checks.** Mother–child and sibling correlations of permanent log earnings;
+  participation gradients in ability.
+
+Two data traps are handled explicitly. PIAT comprehension is not
+administered below a recognition raw score of 19; the file copies the
+recognition score instead. Those values stay in the norming reference but are
+kept out of the child means. PIAT/PPVT ages come from the child supplement
+(`CSAGE`), not the mother supplement.
+
+Writes `estimates/nlsy_ability.json` and `estimates/nlsy_ability.md`. The
+report ends with the exact definition of each moment's model counterpart.
