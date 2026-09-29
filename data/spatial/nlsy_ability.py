@@ -89,10 +89,47 @@ ETA = 0.0807                    # goods-investment elasticity (Table 1)
 CHI = float(np.log(1.12))       # earnings-achievement bridge, 0.11333
 AGE_LO, AGE_HI = 25, 34         # ACS-matched age window
 MIN_HGC = 9                     # "at least one year of high school"
-FT_HOURS = 35                   # full-time: usual hours per week
-FY_WEEKS = 50                   # full-year: weeks per year
+FT_HOURS = 30                   # ACS workbook: hours per week
+FY_WEEKS = 48                   # ACS workbook: weeks per year
+MIN_INCOME_2010 = 1000.0        # ACS workbook: annual earnings in 2010 dollars
 HP_HOURS = 15 * 52              # note's 15-hour home-production cutoff, per year
-TRIM = (0.01, 0.99)             # weighted log-wage trimming within year
+TRIM = (0.01, 0.99)             # earnings checks and wage sensitivity ONLY
+
+# BLS CPI-U, U.S. city average, all items, not seasonally adjusted, annual
+# averages (1982-84=100), series CUUR0000SA0. Pinned for offline reproducibility.
+CPI_SOURCE = "https://www.bls.gov/cpi/tables/supplemental-files/historical-cpi-u-202312.pdf"
+CPI_U = {
+    1978: 65.2, 1979: 72.6, 1980: 82.4, 1981: 90.9, 1982: 96.5,
+    1983: 99.6, 1984: 103.9, 1985: 107.6, 1986: 109.6, 1987: 113.6,
+    1988: 118.3, 1989: 124.0, 1990: 130.7, 1991: 136.2, 1992: 140.3,
+    1993: 144.5, 1994: 148.2, 1995: 152.4, 1996: 156.9, 1997: 160.5,
+    1998: 163.0, 1999: 166.6, 2000: 172.2, 2001: 177.1, 2002: 179.9,
+    2003: 184.0, 2004: 188.9, 2005: 195.3, 2006: 201.6, 2007: 207.342,
+    2008: 215.303, 2009: 214.537, 2010: 218.056, 2011: 224.939,
+    2012: 229.594, 2013: 232.957, 2014: 236.736, 2015: 237.017,
+    2016: 240.007, 2017: 245.120, 2018: 251.107, 2019: 255.657,
+    2020: 258.811, 2021: 270.970, 2022: 292.655, 2023: 304.702,
+}
+
+
+def nominal_income_floor(survey_year: np.ndarray | int) -> np.ndarray:
+    """$1,000 in 2010 dollars expressed in prior-calendar-year dollars.
+
+    Both wage extracts report income for Y-1. A missing CPI year must fail
+    explicitly rather than silently dropping observations or using today's CPI.
+    """
+    years = np.asarray(survey_year) - 1
+    cpi = np.array([CPI_U[int(y)] for y in years.ravel()]).reshape(years.shape)
+    return MIN_INCOME_2010 * (cpi / CPI_U[2010])
+
+
+def wage_work_mask(inc: np.ndarray, wks: np.ndarray, hrs: np.ndarray,
+                   survey_year: np.ndarray | int) -> np.ndarray:
+    """Common ACS weeks/hours/real-income restrictions for both NLSY cohorts."""
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return (np.isfinite(inc) & np.isfinite(wks) & np.isfinite(hrs)
+                & (inc >= nominal_income_floor(survey_year)) & (wks >= FY_WEEKS)
+                & (hrs > 0) & (hrs / wks >= FT_HOURS))
 
 TESTS79 = ["AR", "WK", "PC", "MK"]
 IRT_Q = {"AR": "ASVAB-ARITHREASON-IRT-ZSCORE", "WK": "ASVAB-WORDKNOW-IRT-ZSCORE",
@@ -488,7 +525,7 @@ class PY79:
     inc: np.ndarray
     hrp1: np.ndarray         # dollars per hour, current/most recent job
     lw: np.ndarray = None    # log hourly wage from income / hours
-    fy: np.ndarray = None    # full-year full-time wage sample (before trimming)
+    fy: np.ndarray = None    # wage sample with ACS weeks/hours/real-income cutoffs
     elig: np.ndarray = None  # C5 sample: hgc >= 9, not armed forces
     fyft: np.ndarray = None  # C5 outcome 1{FYFT wage worker}, NaN if unknown
     hp: np.ndarray = None    # C5 outcome 1{hours < 15*52}, NaN if unknown
@@ -583,12 +620,13 @@ def build_py79(c: Cohort, D: N79) -> PY79:
     py = PY79(**a)
     with np.errstate(divide="ignore", invalid="ignore"):
         hpw = py.hrs / py.wks
-        py.fy = ((py.inc > 0) & (py.wks >= FY_WEEKS) & (hpw >= FT_HOURS)
-                 & (py.hrs > 0) & ~(py.esr == 4) & (py.hgc >= MIN_HGC))
+        py.fy = (wage_work_mask(py.inc, py.wks, py.hrs, py.Y)
+                 & ~(py.esr == 4) & (py.hgc >= MIN_HGC))
         py.lw = np.where(py.fy, np.log(py.inc / py.hrs), np.nan)
         py.elig = (py.hgc >= MIN_HGC) & ~(py.esr == 4)
         # outcome known-zero if a defining condition demonstrably fails
-        fails = (py.inc == 0) | (py.wks < FY_WEEKS) | (hpw < FT_HOURS)
+        fails = ((py.inc < nominal_income_floor(py.Y))
+                 | (py.wks < FY_WEEKS) | (hpw < FT_HOURS))
         known = np.isfinite(py.inc) & np.isfinite(py.wks) & np.isfinite(py.hrs)
         py.fyft = np.where(py.fy, 1.0, np.where(fails | (known & ~py.fy), 0.0, np.nan))
         py.fyft = np.where(py.fy | fails | known, py.fyft, np.nan)
@@ -900,8 +938,8 @@ def build_n97(c: Cohort) -> N97:
         hg = c.try_get("CV_HGC_EVER_EDT", Y)
         hg = np.full(n, np.nan) if hg is None else np.where(hg >= 95, np.nan, hg)
         with np.errstate(divide="ignore", invalid="ignore"):
-            ok = ((age >= AGE_LO) & (age <= AGE_HI) & (inc > 0) & (wk >= FY_WEEKS)
-                  & (hr > 0) & (hr / wk >= FT_HOURS) & ~(hg < MIN_HGC))
+            ok = ((age >= AGE_LO) & (age <= AGE_HI)
+                  & wage_work_mask(inc, wk, hr, Y) & ~(hg < MIN_HGC))
         i = np.flatnonzero(ok)
         p_.append(i)
         Y_.append(np.full(i.size, Y))
@@ -1007,15 +1045,17 @@ def _design(pd_: PY79 | N97, rows: np.ndarray, extra: list[np.ndarray]) -> np.nd
 
 def slope_set(py: PY79, y: np.ndarray, w: np.ndarray, afqt: np.ndarray,
               female: np.ndarray, base: np.ndarray, sqrtR: float, prefix: str,
-              out: dict, info: dict | None, extras: bool = False) -> None:
-    """Trim within year, then weighted OLS of y on afqt (+ female) + age + year
-    dummies: pooled, male, female.  `base` = person-year mask before trimming;
+              out: dict, info: dict | None, extras: bool = False,
+              trim: tuple[float, float] | None = None) -> None:
+    """Weighted OLS of y on afqt (+ female) + age + year dummies, without
+    trimming by default. `base` = person-year mask before optional trimming;
     `w` = person-year weight (0 excludes)."""
     rows = base & (w > 0) & np.isfinite(afqt) & np.isfinite(y)
-    keep = np.zeros(len(y), bool)
-    r = np.flatnonzero(rows)
-    keep[r] = trim_mask(y[r], w[r], py.Y[r])
-    rows = keep
+    if trim is not None:
+        keep = np.zeros(len(y), bool)
+        r = np.flatnonzero(rows)
+        keep[r] = trim_mask(y[r], w[r], py.Y[r], trim)
+        rows = keep
     for lab, sel, use_f in (("pooled", rows, True), ("male", rows & ~female, False),
                             ("female", rows & female, False)):
         ex = [afqt] + ([female.astype(float)] if use_f else [])
@@ -1071,6 +1111,10 @@ def block_c(D: N79, w: np.ndarray, afqt: np.ndarray, Rc: float, afqt_o: np.ndarr
     lw_h = np.where(py.fy & (py.hrp1 > 0), np.log(np.where(py.hrp1 > 0, py.hrp1, 1.0)), np.nan)
     slope_set(py, lw_h, wpy, a_py, female, py.fy & np.isfinite(lw_h), np.sqrt(Rc), "sens.hrp.", tmp, None)
     out["sens.C.hrp"] = tmp["sens.hrp.wage_slope_latent_pooled"]
+    tmp = {}
+    slope_set(py, py.lw, wpy, a_py, female, py.fy, np.sqrt(Rc), "sens.trim.",
+              tmp, None, trim=TRIM)
+    out["sens.C.trim"] = tmp["sens.trim.wage_slope_latent_pooled"]
     # C5: participation, all Block A person-years at 25-34 (hgc >= 9, not armed forces)
     base = py.elig & (wpy > 0) & np.isfinite(a_py)
     for oname, yv in (("fyft", py.fyft), ("hp", py.hp)):
@@ -1079,8 +1123,8 @@ def block_c(D: N79, w: np.ndarray, afqt: np.ndarray, Rc: float, afqt_o: np.ndarr
             ex = [a_py] + ([female.astype(float)] if lab == "pooled" else [])
             X = _design(py, s, ex)
             out[f"C5.{oname}_{lab}"] = wls(yv[s], X, wpy[s])[1]
-            if info is not None and oname == "fyft":
-                info[f"n.C5_{lab}"] = int(s.sum())
+            if info is not None:
+                info[f"n.C5.{oname}_{lab}"] = int(s.sum())
 
 
 # ---- block B -----------------------------------------------------------------
@@ -1423,7 +1467,7 @@ def make_records(reg: Registry, bt: Boot, info: dict, args: argparse.Namespace) 
     for lab in ("pooled", "male", "female"):
         add(f"wage_slope_obs_{lab}", f"Log-wage slope on observed afqt_c ({lab})", OBJ_CHK,
             f"wage_slope_obs_{lab}", "log points per SD of afqt_c", SRCC,
-            "Weighted OLS with age and year dummies (+ female when pooled); trimmed 1/99 within year.",
+            "Weighted OLS with age and year dummies (+ female when pooled); no percentile trimming.",
             info[f"n.py_{lab}"], {"n_persons": info[f"n.pers_{lab}"]})
         add(f"wage_slope_latent_{lab}", f"Log-wage slope per SD of latent ability ({lab})", OBJ_B,
             f"wage_slope_latent_{lab}", "log points per SD of f", SRCC,
@@ -1436,13 +1480,13 @@ def make_records(reg: Registry, bt: Boot, info: dict, args: argparse.Namespace) 
         info["n.py_pooled"])
     for lab in ("pooled", "male", "female"):
         add(f"C.p9010_{lab}", f"Weighted 90/10 of year-demeaned hourly wage ({lab})", OBJ_CHK,
-            f"C.p9010_{lab}", "ratio", SRCC, "Trimmed sample; ACS 2009-13 pooled is 3.74 (different vintage).",
+            f"C.p9010_{lab}", "ratio", SRCC, "Untrimmed sample; ACS 2009-13 pooled is 3.74 (different vintage and income coverage).",
             info[f"n.py_{lab}"])
     for oname, desc in (("fyft", "1{full-year full-time wage worker}"), ("hp", "1{annual hours < 780}")):
         for lab in ("pooled", "male", "female"):
             add(f"C5.{oname}_{lab}", f"LPM slope of {desc} on afqt_c ({lab})", OBJ_CHK,
                 f"C5.{oname}_{lab}", "probability per SD", SRC79 + ", ages 25-34, hgc >= 9",
-                "Model makes work independent of z; a nonzero slope is a caveat.", info[f"n.C5_{lab}"])
+                "Model makes work independent of z; a nonzero slope is a caveat.", info[f"n.C5.{oname}_{lab}"])
     add("rho_sib_latent", "Latent sibling correlation (off-diagonal cross-test)", OBJ_CHK,
         "rho_sib_latent", "correlation", SRCB,
         "Σ_{k≠l} C_kl λ_k λ_l / Σ_{k≠l} (λ_k λ_l)² with child loadings from B2.", nS[1],
@@ -1455,7 +1499,8 @@ def make_records(reg: Registry, bt: Boot, info: dict, args: argparse.Namespace) 
     for lab in ("pooled", "male", "female"):
         add(f"wage_slope_latent97_{lab}", f"NLSY97 latent log-wage slope ({lab})", OBJ_B,
             f"wage_slope_latent97_{lab}", "log points per SD of f", SRC97,
-            "Same definition as block C; slope_obs / sqrt(R_comp_97).", info[f"n.V.py_{lab}"],
+            "Same weeks/hours/real-income cutoffs and no trimming as block C; slope_obs / sqrt(R_comp_97). "
+            "No military-status filter available; missing highest grade retained.", info[f"n.V.py_{lab}"],
             {"obs": bt.pair(f"wage_slope_obs97_{lab}")})
     add("R_comp_97", "Reliability of the NLSY97 4-subtest composite", OBJ_U, "R_comp_97", "share",
         SRC97, "One-factor ULS on age-normed CAT-ASVAB thetas.", info["n.V_persons"],
@@ -1495,7 +1540,8 @@ def make_records(reg: Registry, bt: Boot, info: dict, args: argparse.Namespace) 
                                bt.val(pre + st), bt.se(pre + st), lo, hi, nn[1], "", SRCB,
                                lab, {"n_mothers": nn[0], "n_children": nn[1]}))
     for st, lab in (("xs", "Cross-sectional sample only (SAMPLE_ID 1-8)"), ("unw", "Fully unweighted (incl. standardization and R_comp_pop)"),
-                    ("own", "Own-normed afqt (A4), Block A sample"), ("hrp", "Hourly wage from HRP1")):
+                    ("own", "Own-normed afqt (A4), Block A sample"), ("hrp", "Hourly wage from HRP1"),
+                    ("trim", "ACS cutoffs with weighted 1/99 wage trimming within year")):
         k = f"sens.C.{st}"
         lo, hi = bt.ci(k)
         reg_s.add(Estimate(f"sens.C.{st}.wage_slope_latent_pooled", f"{lab}: pooled latent wage slope",
@@ -1619,9 +1665,17 @@ def write_reports(reg: Registry, meta: dict[str, Any], outdir: Path, bt: Boot) -
         add(f"| {k} | " + " | ".join(f"{bt.val(f'S.C_{k}_{l}'):.3f}" for l in CH_TESTS) + " |")
 
     add("\n## C. Log-wage slope on latent AFQT (NLSY79)\n")
-    add(f"Person-years of the block A sample, survey rounds with ages {AGE_LO}-{AGE_HI}; income > 0, weeks ≥ {FY_WEEKS}, "
+    add(f"Person-years of the block A sample, survey rounds with ages {AGE_LO}-{AGE_HI}; "
+        f"annual wage-and-salary income ≥ ${MIN_INCOME_2010:,.0f} in 2010 dollars, weeks ≥ {FY_WEEKS}, "
         f"hours/week ≥ {FT_HOURS}, not armed forces (ESR ≠ 4), highest grade ≥ {MIN_HGC}; log(income / annual hours); "
-        "weighted 1/99 trim within year; weight = 1979 SAMPWEIGHT; controls: age and year dummies (+ female).\n")
+        "no percentile trimming; weight = 1979 SAMPWEIGHT; controls: age and year dummies (+ female).\n")
+    add(f"The nominal income floor in survey year Y is $1,000 × CPI-U(Y−1) / CPI-U(2010), "
+        f"using [BLS annual averages]({CPI_SOURCE}) (2010 = {CPI_U[2010]}). Income and annual hours/weeks "
+        "refer to Y−1; hours/week = annual hours / weeks worked. Log wages remain nominal because year "
+        "dummies absorb this common deflator. These cutoffs match the ACS workbook's readme, which lists "
+        "no percentile trimming. The samples are not identical: ACS includes business/farm income, absent "
+        "from these NLSY extracts; NLSY ages are at interview and weekly hours are constructed. NLSY79's "
+        "existing ESR filter excludes armed forces, not the currently unemployed, and retains missing ESR.\n")
     add("| slope | pooled | male | female |\n|---|---|---|---|")
     for nm, pre in (("observed, per SD of afqt_c", "wage_slope_obs_"), ("latent, per SD of f", "wage_slope_latent_")):
         add(f"| {nm} | " + " | ".join(fmt(E[f'{pre}{l}'].value, E[f'{pre}{l}'].se) for l in ("pooled", "male", "female")) + " |")
@@ -1637,15 +1691,17 @@ def write_reports(reg: Registry, meta: dict[str, Any], outdir: Path, bt: Boot) -
     add("\nSensitivities (pooled latent slope):\n")
     add("| variant | slope (SE) |\n|---|---|")
     add(f"| Main | {fmt(E['wage_slope_latent_pooled'].value, E['wage_slope_latent_pooled'].se)} |")
-    for st in ("xs", "unw", "own", "hrp"):
+    for st in ("xs", "unw", "own", "hrp", "trim"):
         s = S[f"sens.C.{st}.wage_slope_latent_pooled"]
         add(f"| {s.note} | {fmt(s.value, s.se)} |")
 
     add("\n## V. NLSY97 vintage check\n")
     e = E["R_comp_97"]
     add(f"CAT-ASVAB thetas age-normed within birth-year x quarter (1997 weight, fixed across draws), one-factor ULS: "
-        f"R_comp_97 = {fmt(e.value, e.se)} (N = {e.n}). Wage sample as block C with `YINC-1700` and CVC hours/weeks of "
-        "calendar year Y−1; both NLSY97 samples, weighted by 1997 SAMPLING_WEIGHT_CC; bootstrap by person.\n")
+        f"R_comp_97 = {fmt(e.value, e.se)} (N = {e.n}). Same weeks/hours/real-income cutoffs and no trimming as "
+        "block C, with `YINC-1700` and CVC hours/weeks of calendar year Y−1; both NLSY97 samples, weighted by "
+        "1997 SAMPLING_WEIGHT_CC; bootstrap by person. The existing extract has no military-status filter; "
+        "highest grade below 9 is excluded, but missing highest grade is retained.\n")
     add("| | pooled | male | female |\n|---|---|---|---|")
     add("| latent slope | " + " | ".join(fmt(E[f'wage_slope_latent97_{l}'].value, E[f'wage_slope_latent97_{l}'].se) for l in ("pooled", "male", "female")) + " |")
     add("| observed slope | " + " | ".join(fmt(E[f'wage_slope_latent97_{l}'].extra['obs']['value'], E[f'wage_slope_latent97_{l}'].extra['obs']['se']) for l in ("pooled", "male", "female")) + " |")
@@ -1684,8 +1740,9 @@ def write_reports(reg: Registry, meta: dict[str, Any], outdir: Path, bt: Boot) -
     add(f"- **`wage_slope_latent_pooled`** (b·s_z). `afqt_c` = equal-weight mean of the four standardized IRT z-scores, "
         "re-standardized (weighted) in the Block A POPULATION sample (all persons with four valid scores, any labor-market "
         f"state; NOT the wage sample). Pooled person-years at ages {AGE_LO}-{AGE_HI} at interview, with income, weeks and "
-        f"hours for the previous calendar year; filters income > 0, weeks ≥ {FY_WEEKS}, hours/weeks ≥ {FT_HOURS}, "
-        f"ESR ≠ 4, highest grade ≥ {MIN_HGC}; weighted 1st/99th percentile trim of log hourly wage within survey year; "
+        f"hours for the previous calendar year; filters annual wage-and-salary income ≥ ${MIN_INCOME_2010:,.0f} "
+        f"in 2010 dollars (CPI-U for Y−1), weeks ≥ {FY_WEEKS}, hours/weeks ≥ {FT_HOURS}, "
+        f"ESR ≠ 4, highest grade ≥ {MIN_HGC}; no percentile trimming of log hourly wage; "
         "weighted OLS on afqt_c with female, age and year dummies; slope divided by sqrt(R_comp_pop). Model counterpart: "
         "the same regression on the noisy simulated composite standardized in the simulated population, divided by the "
         "square root of its reliability, or equivalently the slope on the noise-free signal standardized in the population. "
@@ -1762,6 +1819,37 @@ def selftest() -> int:
     check("comp_reliability", abs(rc - 10.24 / 11.68) < 1e-9, f"{rc:.4f}")
     # phi_inv agrees with NormalDist
     check("phi_inv", abs(phi_inv(np.array([0.975]))[0] - 1.959964) < 1e-5, "Phi^-1(.975)")
+    # The floor uses the income year Y-1; all three ACS thresholds are inclusive.
+    floors = nominal_income_floor(np.array([1985, 2011]))
+    check("income_year", np.allclose(floors, [1000 * 103.9 / 218.056, 1000]),
+          f"1984 income floor={floors[0]:.4f}; 2010 income floor={floors[1]:.0f}")
+    inc = np.array([1000, 999.99, 1000, 1000, np.nan, 1000, 1000, np.inf])
+    wk = np.array([48, 48, 47, 48, 48, 0, np.nan, 48])
+    hr = np.array([1440, 1440, 1410, 1439, 1440, 0, 1440, 1440])
+    selected = wage_work_mask(inc, wk, hr, 2011)
+    check("ACS_cutoffs", np.array_equal(selected, [True] + [False] * 7),
+          "accept 48 weeks, 30 hours/week and $1,000; reject below-cutoff and missing values")
+    check("historical_income_floor",
+          bool(wage_work_mask(np.array([500.]), np.array([48.]), np.array([1440.]), 1985)[0]),
+          "$500 in 1984 exceeds $1,000 in 2010 dollars")
+    # Integration check: default regression keeps the tails; trimming is opt-in.
+    n = 200
+    af = np.linspace(-2, 2, n)
+    female = np.arange(n) % 2 == 0
+    y = .2 * af + .1 * female
+    y[-1] += 8
+    py = PY79(p=np.arange(n), Y=np.full(n, 2011), age=np.full(n, 30),
+              hgc=np.full(n, 12), esr=np.ones(n), wks=np.full(n, 48),
+              hrs=np.full(n, 1440), inc=np.full(n, 10000), hrp1=np.ones(n),
+              age_d=np.empty((n, 0)), yr_d=np.empty((n, 0)))
+    out, info = {}, {}
+    slope_set(py, y, np.ones(n), af, female, np.ones(n, bool), 1., "", out, info)
+    slope_set(py, y, np.ones(n), af, female, np.ones(n, bool), 1., "trim.", out, info, trim=TRIM)
+    expected = wls(y, np.column_stack([np.ones(n), af, female]), np.ones(n))[1]
+    check("wage_trimming_opt_in", info["n.py_pooled"] == n and info["n.trim.py_pooled"] < n
+          and np.isclose(out["wage_slope_obs_pooled"], expected)
+          and not np.isclose(out["wage_slope_obs_pooled"], out["trim.wage_slope_obs_pooled"]),
+          f"default N={info['n.py_pooled']}; trimmed N={info['n.trim.py_pooled']}")
     print("selftest:", "ALL PASS" if not fails else f"{fails} FAILED")
     return 1 if fails else 0
 
@@ -1820,7 +1908,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         "assumptions": {
             "eta": ETA, "chi": CHI, "B": B, "seed": args.seed, "failed_draws": nfail,
             "age_window": [AGE_LO, AGE_HI], "min_hgc": MIN_HGC, "fy_weeks": FY_WEEKS,
-            "ft_hours_per_week": FT_HOURS, "trim": list(TRIM),
+            "ft_hours_per_week": FT_HOURS, "min_income_2010": MIN_INCOME_2010,
+            "wage_trim": None, "wage_sensitivity_trim": list(TRIM), "earnings_trim": list(TRIM),
+            "income_deflator": {"series": "CUUR0000SA0", "frequency": "annual average",
+                                "base_year": 2010, "income_year": "survey year - 1",
+                                "source": CPI_SOURCE, "annual_cpi": CPI_U},
+            "acs_comparability": "Matched weeks/hours/real-income cutoffs, no wage trimming. "
+                                 "NLSY income is wages/salary only; ACS also includes business/farm income. "
+                                 "NLSY age is at interview; hours/week is annual hours divided by weeks. "
+                                 "NLSY79 excludes ESR=4 only (missing ESR retained); NLSY97 has no military "
+                                 "filter and retains missing highest grade.",
             "weights": {"nlsy79": "1979 SAMPWEIGHT/100", "cnlsy_dyad": "mother's weight / n_c",
                         "nlsy97": "1997 SAMPLING_WEIGHT_CC/100"},
             "clusters": {"nlsy79_cnlsy": "HHID (multinomial household multiplicities)",

@@ -1,18 +1,18 @@
 # NLSY ability moments for the first-stage indirect inference (T2a)
 
-Generated 2026-09-28T18:15:41 by `nlsy_ability.py`; cluster bootstrap B = 200 (seed 20260928), SE = bootstrap SD, CI = 95% percentile. Data side of T2b: every statistic is to be recomputed on simulated model panels as defined in the last section.
+Generated 2026-09-28T23:21:06 by `nlsy_ability.py`; cluster bootstrap B = 200 (seed 20260928), SE = bootstrap SD, CI = 95% percentile. Data side of T2b: every statistic is to be recomputed on simulated model panels as defined in the last section.
 
 ## What feeds T2b
 
 | key | quantity | estimate (SE) | 95% CI | n |
 |---|---|---|---|---|
 | `rho_pc_latent` | Latent mother-child ability correlation (two-factor ULS) | 0.577 (0.014) | [0.548, 0.601] | 8137 |
-| `wage_slope_latent_pooled` | Log-wage slope per SD of latent ability (pooled) | 0.196 (0.007) | [0.185, 0.213] | 34118 |
+| `wage_slope_latent_pooled` | Log-wage slope per SD of latent ability (pooled) | 0.213 (0.008) | [0.200, 0.229] | 37870 |
 | `R_comp_mother` | Reliability of the equal-weight mother composite (4 IRT z) | 0.915 (0.002) | [0.910, 0.919] | 3480 |
 | `R_comp_child` | Reliability of the child composite actually used (mean of available tests) | 0.892 (0.003) | [0.886, 0.898] | 8137 |
 | `R_comp_pop` | Reliability of the 4-subtest AFQT composite, NLSY79 population | 0.916 (0.002) | [0.912, 0.919] | 9033 |
-| `implied_s_z` | Implied stationary SD of log ability, s_z = slope_latent (1−η) | 0.181 (0.007) | [0.170, 0.195] | 34118 |
-| `gap_to_chi` | Pooled latent slope minus χ = log 1.12 | 0.083 (0.007) | [0.072, 0.099] | 34118 |
+| `implied_s_z` | Implied stationary SD of log ability, s_z = slope_latent (1−η) | 0.195 (0.007) | [0.184, 0.211] | 37870 |
+| `gap_to_chi` | Pooled latent slope minus χ = log 1.12 | 0.099 (0.008) | [0.087, 0.116] | 37870 |
 
 η = 0.0807, χ = log 1.12 = 0.11333. `rho_pc_latent` is the target for ρz; `wage_slope_latent_pooled` is the target for b·s_z; the R_comp's set var(u) in the score measurement equation (mother composite, child composite, population composite).
 
@@ -101,44 +101,47 @@ Cross-sibling cross-test correlations C[k, l] (child k, sibling l):
 
 ## C. Log-wage slope on latent AFQT (NLSY79)
 
-Person-years of the block A sample, survey rounds with ages 25-34; income > 0, weeks ≥ 50, hours/week ≥ 35, not armed forces (ESR ≠ 4), highest grade ≥ 9; log(income / annual hours); weighted 1/99 trim within year; weight = 1979 SAMPWEIGHT; controls: age and year dummies (+ female).
+Person-years of the block A sample, survey rounds with ages 25-34; annual wage-and-salary income ≥ $1,000 in 2010 dollars, weeks ≥ 48, hours/week ≥ 30, not armed forces (ESR ≠ 4), highest grade ≥ 9; log(income / annual hours); no percentile trimming; weight = 1979 SAMPWEIGHT; controls: age and year dummies (+ female).
+
+The nominal income floor in survey year Y is $1,000 × CPI-U(Y−1) / CPI-U(2010), using [BLS annual averages](https://www.bls.gov/cpi/tables/supplemental-files/historical-cpi-u-202312.pdf) (2010 = 218.056). Income and annual hours/weeks refer to Y−1; hours/week = annual hours / weeks worked. Log wages remain nominal because year dummies absorb this common deflator. These cutoffs match the ACS workbook's readme, which lists no percentile trimming. The samples are not identical: ACS includes business/farm income, absent from these NLSY extracts; NLSY ages are at interview and weekly hours are constructed. NLSY79's existing ESR filter excludes armed forces, not the currently unemployed, and retains missing ESR.
 
 | slope | pooled | male | female |
 |---|---|---|---|
-| observed, per SD of afqt_c | 0.188 (0.007) | 0.171 (0.009) | 0.215 (0.009) |
-| latent, per SD of f | 0.196 (0.007) | 0.179 (0.009) | 0.224 (0.009) |
-| N person-years | 34118 | 19245 | 14873 |
-| N persons | 6904 | 3667 | 3237 |
-| 90/10 (year-demeaned) | 3.40 (0.06) | 3.43 (0.08) | 3.20 (0.05) |
+| observed, per SD of afqt_c | 0.204 (0.007) | 0.182 (0.010) | 0.236 (0.010) |
+| latent, per SD of f | 0.213 (0.008) | 0.190 (0.010) | 0.247 (0.010) |
+| N person-years | 37870 | 21075 | 16795 |
+| N persons | 7219 | 3756 | 3463 |
+| 90/10 (year-demeaned) | 3.66 (0.05) | 3.67 (0.08) | 3.46 (0.07) |
 
-Implied s_z = 0.181 (0.007); gap to χ = 0.083 (0.007).
+Implied s_z = 0.195 (0.007); gap to χ = 0.099 (0.008).
 
 Participation (LPM slope per SD of afqt_c; all block A person-years, hgc ≥ 9, not armed forces, no labor-supply filter):
 
 | outcome | pooled | male | female |
 |---|---|---|---|
-| 1{FYFT wage worker} | 0.079 (0.005) | 0.077 (0.005) | 0.080 (0.006) |
+| 1{FYFT wage worker} | 0.079 (0.004) | 0.073 (0.005) | 0.085 (0.006) |
 | 1{hours < 780} | -0.063 (0.004) | -0.043 (0.004) | -0.084 (0.006) |
 
 Sensitivities (pooled latent slope):
 
 | variant | slope (SE) |
 |---|---|
-| Main | 0.196 (0.007) |
-| Cross-sectional sample only (SAMPLE_ID 1-8) | 0.188 (0.008) |
-| Fully unweighted (incl. standardization and R_comp_pop) | 0.209 (0.006) |
-| Own-normed afqt (A4), Block A sample | 0.196 (0.007) |
-| Hourly wage from HRP1 | 0.184 (0.006) |
+| Main | 0.213 (0.008) |
+| Cross-sectional sample only (SAMPLE_ID 1-8) | 0.200 (0.009) |
+| Fully unweighted (incl. standardization and R_comp_pop) | 0.230 (0.006) |
+| Own-normed afqt (A4), Block A sample | 0.211 (0.008) |
+| Hourly wage from HRP1 | 0.190 (0.007) |
+| ACS cutoffs with weighted 1/99 wage trimming within year | 0.196 (0.007) |
 
 ## V. NLSY97 vintage check
 
-CAT-ASVAB thetas age-normed within birth-year x quarter (1997 weight, fixed across draws), one-factor ULS: R_comp_97 = 0.912 (0.002) (N = 7093). Wage sample as block C with `YINC-1700` and CVC hours/weeks of calendar year Y−1; both NLSY97 samples, weighted by 1997 SAMPLING_WEIGHT_CC; bootstrap by person.
+CAT-ASVAB thetas age-normed within birth-year x quarter (1997 weight, fixed across draws), one-factor ULS: R_comp_97 = 0.912 (0.002) (N = 7093). Same weeks/hours/real-income cutoffs and no trimming as block C, with `YINC-1700` and CVC hours/weeks of calendar year Y−1; both NLSY97 samples, weighted by 1997 SAMPLING_WEIGHT_CC; bootstrap by person. The existing extract has no military-status filter; highest grade below 9 is excluded, but missing highest grade is retained.
 
 | | pooled | male | female |
 |---|---|---|---|
-| latent slope | 0.175 (0.009) | 0.159 (0.011) | 0.203 (0.014) |
-| observed slope | 0.168 (0.008) | 0.152 (0.011) | 0.194 (0.014) |
-| N person-years | 17543 | 9660 | 7883 |
+| latent slope | 0.199 (0.009) | 0.174 (0.012) | 0.236 (0.015) |
+| observed slope | 0.190 (0.009) | 0.167 (0.012) | 0.226 (0.014) |
+| N person-years | 19782 | 10700 | 9082 |
 
 | subtest | loading | posterior-variance reliability |
 |---|---|---|
@@ -166,7 +169,7 @@ Permanent earnings = mean over ages 25-34 of log wage-and-salary income residual
 In every case the model panel must use the same sample, ages, weights and composites. 'Score signal' means `θ0 + θ1 (log z + c log Q_l)` without the noise u; var(u) comes from the R_comp's.
 
 - **`rho_pc_latent`** (ρz). Data: mothers' scores are the 1980 ASVAB taken at ages 15-23 (four IRT z-scores, age-normed by NLS within birth cohort); children's scores are PIAT math, recognition, comprehension and PPVT-R at ages 5-14, each age-normed within 3-month cells and averaged over the child's assessment rounds (about 3.9 rounds per child, so the child factor is a multi-round average; imputed comprehension scores excluded). Estimate: two-factor ULS on the 8x8 weighted pairwise-complete correlation matrix, weights = mother's 1979 weight / n_c. Model counterpart: the correlation between the latent score signals of a parent and a child, one child per parent, parents weighted by population mass. Includes assortative mating and the Q_l channel because the data factor does too.
-- **`wage_slope_latent_pooled`** (b·s_z). `afqt_c` = equal-weight mean of the four standardized IRT z-scores, re-standardized (weighted) in the Block A POPULATION sample (all persons with four valid scores, any labor-market state; NOT the wage sample). Pooled person-years at ages 25-34 at interview, with income, weeks and hours for the previous calendar year; filters income > 0, weeks ≥ 50, hours/weeks ≥ 35, ESR ≠ 4, highest grade ≥ 9; weighted 1st/99th percentile trim of log hourly wage within survey year; weighted OLS on afqt_c with female, age and year dummies; slope divided by sqrt(R_comp_pop). Model counterpart: the same regression on the noisy simulated composite standardized in the simulated population, divided by the square root of its reliability, or equivalently the slope on the noise-free signal standardized in the population. Standardizing in the wage sample instead would move the slope by about 7% (SD of afqt_c in the full-year full-time sample is 0.94). `implied_s_z` = slope × (1 − η).
+- **`wage_slope_latent_pooled`** (b·s_z). `afqt_c` = equal-weight mean of the four standardized IRT z-scores, re-standardized (weighted) in the Block A POPULATION sample (all persons with four valid scores, any labor-market state; NOT the wage sample). Pooled person-years at ages 25-34 at interview, with income, weeks and hours for the previous calendar year; filters annual wage-and-salary income ≥ $1,000 in 2010 dollars (CPI-U for Y−1), weeks ≥ 48, hours/weeks ≥ 30, ESR ≠ 4, highest grade ≥ 9; no percentile trimming of log hourly wage; weighted OLS on afqt_c with female, age and year dummies; slope divided by sqrt(R_comp_pop). Model counterpart: the same regression on the noisy simulated composite standardized in the simulated population, divided by the square root of its reliability, or equivalently the slope on the noise-free signal standardized in the population. Standardizing in the wage sample instead would move the slope by about 6% (SD of afqt_c in the full-year full-time sample is 0.94). `implied_s_z` = slope × (1 − η).
 - **`R_comp_mother`, `R_comp_pop`**: (Σλ)² / (1'S1) for the equal-weight composite of the four standardized IRT z-scores, S the sample correlation matrix, in the dyad sample and the population sample respectively. **`R_comp_child`**: reliability of the composite actually used, the mean of each child's available standardized tests, R = Σ_i w_i (mean_{k∈K_i} λ_k)² / Σ_i w_i (1'S_{K_i}1 / |K_i|²) over dyad children (`R_comp_child_all4` in the JSON assumes all four tests present). The model composite's noise variance is set so that the simulated composite's reliability matches these.
 - **`rho_sib_latent`**: Σ_{k≠l} C_kl λ_k λ_l / Σ_{k≠l} (λ_k λ_l)² over ordered sibling pairs (mother-level weights); a check, expected ≥ ρ² but sibling-shared inputs are outside the model.
 - **Earnings checks (E1-E3)**: permanent earnings = mean of age-and-year-residualized log wage-and-salary income over ages 25-34 per person; correlations weighted with mother's weight / (number of children with earnings).
