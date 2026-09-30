@@ -7,6 +7,12 @@ splitting each CZ into two locations, and computing the within-CZ gaps happen
 downstream — see `notes/spatial_calibration_notes.md` for the moment map these
 data feed.
 
+Model calibration code, notes, the Julia environment, SLURM helpers and runs live
+in [`julia/spatial_model/calibration/`](../../julia/spatial_model/calibration/).
+Start with the [calibration note](../../julia/spatial_model/calibration/spatial_calibration.md)
+and [calibration log](../../julia/spatial_model/calibration/calibration_log.md).
+Data acquisition scripts, raw inputs and generated data reports remain here.
+
 ## Quick start
 
 ```bash
@@ -238,8 +244,10 @@ already the first item on the data-gap list — not a bug in the pipeline.
 
 Reads the three NLSY tables that `fetch_data.py --sources nlsy` leaves in
 `raw/` and builds the data side of the ability block (Table 2, item T2a in
-`spatial_calibration.md`): the moments that T2b recomputes on simulated model
-panels.
+`spatial_calibration.md`). T2b uses the latent correlation and wage slope in
+closed form, then fits wage dispersion outside equilibrium; it does not need
+simulated panels or score noise. Full-equilibrium consistency checks follow
+the first internal fit (T6).
 
 ```bash
 uv run nlsy_ability.py              # B = 200 household bootstrap, about a minute
@@ -270,3 +278,122 @@ kept out of the child means. PIAT/PPVT ages come from the child supplement
 
 Writes `estimates/nlsy_ability.json` and `estimates/nlsy_ability.md`. The
 report ends with the exact definition of each moment's model counterpart.
+
+## First-stage estimation — `spatial_first_stage.jl` (T2b)
+
+**Complete as a first pass; verified 2026-09-29.** From the repository root:
+
+```bash
+julia --project=julia/spatial_model/calibration/estimation julia/spatial_model/calibration/spatial_first_stage.jl
+```
+
+Add `--write` to regenerate `estimates/first_stage.md` and
+`estimates/first_stage.toml`. The script combines the ACS occupational shares
+and wage 90/10s with the T2a latent moments, holding school quality and taxes
+fixed and ignoring teaching selection for both genders. On the model's Nz = 5
+grid, it estimates ρz = 0.5766, s_z = 0.1956 and σϵ = 0.7861, matching the pooled
+within-occupation wage 90/10 of 3.7374. It also reports grid convergence,
+untargeted cell 90/10s and first-stage sensitivity refits.
+
+The rounded estimates are installed in `spatial_calibrate.jl`; the reference
+levels in `spatial_reference.toml` have been refrozen after retuning the starting
+teaching margin and CFR map. This is not a joint internal fit. Schooling inputs
+remain under T2, and full-equilibrium counterparts and consistency checks remain
+under T4/T6. See the [first-stage report](estimates/first_stage.md) and
+[calibration status and verification](../../julia/spatial_model/calibration/spatial_calibration.md).
+
+## District bootstrap and audit — `district_bootstrap.py`, `district_audit.py`, `acs_earnings.py` (T3, T5)
+
+The 2018 district moments were rebuilt on the SSCC machines on 2026-09-29 and
+match the tracked `spatial_moments.json` exactly (68 non-trend estimates):
+
+```bash
+python3 fetch_data.py --sources urban seda edge czones acs \
+    --urban-topics ccd_directory ccd_finance saipe --years 2018 --seda-levels geodist_pool
+python3 data_estimate.py --scheme all --years 2018 --base-year 2018 --outdir <dir> --dump-panel
+set -a; source .env; set +a; python3 acs_earnings.py   # ACS 2014-18 earnings tables by school district
+python3 district_bootstrap.py                          # about 1 minute
+python3 district_audit.py                              # about 4 minutes
+```
+
+Keep `--outdir` away from `estimates/` for a 2018-only run: the trend estimates
+need the earlier years and would be overwritten. `district_bootstrap.py`
+resamples whole commuting zones (B = 1999, seed 20260929) for every targeted and
+validation gap and for the earnings alternatives; one resampling matrix is shared,
+so `estimates/district_bootstrap_draws.csv` holds joint draws. `district_audit.py`
+documents how the salary and FTE gaps are built and recomputes them under
+alternatives; its variant 28 (zero-coded wage bills filled, New York City as one
+district, K–12 FTE) is the salary target and FTE variant 11 (K–12 teachers per
+K–12 pupil) the FTE-per-pupil gap, validation since the exactly identified fit. `acs_earnings.py` adds the earnings tables and the binned
+earnings distributions (B20001, B20005) behind the pooled-median earnings gap (validation).
+Reports: `estimates/district_bootstrap.md`, `estimates/district_audit.md`.
+
+## NLSY extensions — `nlsy_extensions.py` (T6a, T3)
+
+```bash
+python3 fetch_data.py --sources nlsy   # NLSY_BLOCKS includes geography, family income and YA job history
+python3 nlsy_extensions.py             # B = 500; --quick, --only t3|t6a
+```
+
+T6a regresses CNLSY children's earnings at about 28 on observed scores at ages
+8–14, from CFR's definitions to the ACS-style latent slope, with and without
+lagged-score controls. T3 measures city–suburb transitions between ages 12–16 and
+25–34 in the NLSY97 and NLSY79, by parental-income tercile; the NLSY79 move rate
+(0.216) is the calibration's residential-transition target. Report:
+`estimates/nlsy_extensions.md`.
+
+## Occupational block from ACS microdata — `acs_occupations.py` (T4, T7)
+
+```bash
+set -a; source .env; set +a
+python3 acs_occupations.py fetch     # Census API PUMS, cached in raw/acs_pums/ (~100 MB)
+python3 acs_occupations.py build     # about 6 minutes; --selftest, --check-bls-table
+```
+
+Rebuilds `data/LaborMarketData/wages_occ_shares_v2.xlsx` from Census PUMS microdata
+(ACS 2013 5-year file): every group count and wage-sample count matches exactly and
+the cell 90/10s to 0.2%, with occupation codes mapped Census → occ1990 → HHJK groups
+through the BLS/IPUMS table, the Census 2002→2010→2018 crosswalks and eleven inferred
+code departures, and with rules the workbook does not state (listed in the report).
+It adds mean hourly and log wages and schooling by occupation × gender (T4) and the
+same block on pooled ACS 1-year 2016–19 (T7), which `spatial_calibrate.jl` carries as
+`ACS_2016_19` and `spatial_first_stage.jl --t7 --write` refits
+(`estimates/first_stage_t7.md`). Report: `estimates/acs_occupations.md`.
+
+## Literature targets
+
+`estimates/literature_targets.md` documents the CFR, BFM and FOO numbers behind
+Table 3 (tables, pages, quotes) and the conversion of BFM's willingness to pay to
+a consumption share.
+
+## Internal calibration — `spatial_estimate.jl`, `spatial_diagnose.jl` (T6)
+
+From the repository root, on SLURM (`econ-grad` preempts the other partitions):
+
+```bash
+E=julia/spatial_model/calibration/estimation
+julia --project=$E julia/spatial_model/calibration/spatial_estimate.jl --calibrate-phi       # φ from schooling, after a solver or Table 2 change
+julia --project=$E julia/spatial_model/calibration/spatial_estimate.jl --freeze-reference    # C̄, h̄ at ϑ₀
+sbatch -c 48 julia/spatial_model/calibration/slurm/estimate.sh --run-dir julia/spatial_model/calibration/runs/<name> \
+       --n-samples 470 --n-local 47 --local-max-evals 150 --max-evals 8000     # TikTak
+sbatch julia/spatial_model/calibration/slurm/diagnose.sh --theta julia/spatial_model/calibration/runs/<name> \
+       --polish --jacobian --consistency --out julia/spatial_model/calibration/runs/<name>/polish   # LM polish and checks
+n=$(grep -vc '^#' julia/spatial_model/calibration/slurm/panel_cases.tsv)
+sbatch --array=1-$n%10 julia/spatial_model/calibration/slurm/panel.sh julia/spatial_model/calibration/runs/polish-noincome   # Table 5
+python3 julia/spatial_model/calibration/slurm/panel_summary.py                               # estimates/sensitivity_panel.md
+```
+
+`spatial_diagnose.jl` prints the moment table (validation moments starred), the
+validation and §4 consistency diagnostics and the standardized Jacobian at any ϑ
+(`--theta theta0`, a TikTak run directory, a `theta.toml`, or comma-separated
+values); `--grid Nz=9` re-solves on another grid. Both scripts take `--fix`,
+`--external`, `--measure`, `--target key=value`, `--target-se key=value`,
+`--activate key` and `--deactivate key`. TikTak's first local search runs alone
+before the parallel phase opens, so a run spends its first ~40 minutes on one
+worker; the Levenberg–Marquardt polish is the fast finisher. A requeued TikTak job
+resumes its journal only if the model files are unchanged (the problem id hashes
+them). The baseline is the exactly identified fit in
+`julia/spatial_model/calibration/runs/exact-polish-base/` (eight moments, eight parameters; the
+FTE-per-pupil gap is validation); the first, overidentified fit is in
+`julia/spatial_model/calibration/runs/polish-noincome/`. Both are described in the calibration
+log's §4.

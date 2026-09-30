@@ -222,19 +222,25 @@ end
 Grids and shock laws at aggregates (H̃_T, M, t):
 - `z`, `Πz`: Rouwenhorst ability nodes and transitions;
 - `Q`: teacher-quality index Q_l = (2H̃_T/M)^σ;
-- `dT`, `ϵTgrid`: law of ϵ_T ~ LogNormal(−σϵ²/2, σϵ) and its quantile grid;
+- `dT`, `ϵTgrid`: law of ϵ_T ~ LogNormal(−σϵ²/2, σϵ) and a log-spaced grid between its
+  `q_lo` and `q_hi` quantiles. Teachers come from the upper tail of ϵ_T; a grid spaced
+  in quantiles would leave that whole tail (above the 0.98 quantile at nϵT = 48) in one
+  interval;
 - `dO[i,g]`: law of X_{O,i} = Θ_{i,g} ϵ_i^α; `XOgrid[:,g]`: log-spaced grid between the
   `q_lo` and `q_hi` quantiles of X_O*;
+- `lϵT`, `lXO`: the grids in logs, the coordinate of every spline and integral;
 - `logΘ[i,g]`: log Θ_{i,g}, to recover h_O from X_O*.
 """
 function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
                      q_lo = 1e-5, q_hi = 1 - 1e-6)
     I, L = length(p.A), length(p.B)
     z, Πz = rouwenhorst(Nz, p.ρz, p.σξ)
-    Q = (2 .* H̃T ./ max.(M, M_FLOOR)) .^ p.σ
+    # H̃_T is an integral of a spline and can undershoot zero when a location has
+    # almost no teachers; the floor keeps Q real there.
+    Q = (2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) .^ p.σ
 
     dT     = LogNormal(-p.σϵ^2 / 2, p.σϵ)
-    ϵTgrid = quantile.(dT, range(q_lo, q_hi, nϵT))
+    ϵTgrid = exp.(range(log(quantile(dT, q_lo)), log(quantile(dT, q_hi)), nϵT))
 
     nonteach = [i for i in 1:I if i != p.T]
     dO   = Matrix{LogNormal{Float64}}(undef, I, 2)
@@ -250,7 +256,8 @@ function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
         hi = quantile_xo(dO, nonteach, g, q_hi)
         XOgrid[:, g] = exp.(range(log(lo), log(hi), nXO))
     end
-    return (; z, Πz, Nz, Q, t, I, L, dT, ϵTgrid, dO, XOgrid, logΘ, nonteach, nϵT, nXO)
+    return (; z, Πz, Nz, Q, t, I, L, dT, ϵTgrid, dO, XOgrid, lϵT = log.(ϵTgrid), lXO = log.(XOgrid),
+              logΘ, nonteach, nϵT, nXO)
 end
 
 """
@@ -465,10 +472,13 @@ end
 #
 #   teach_wt(ϵ_T)    = P(teach | ϵ_T)  = F_{X_O*}( W_O^{-1}(W_T(ϵ_T)) )
 #   nonteach_wt(X_O*) = P(don't | X_O*) = F_{ϵ_T}( W_T^{-1}(W_O(X_O*)) )
+#
+# Values are splined in the log shocks, where they are close to linear; in levels a
+# cubic spline between widely spaced tail nodes misses the values by several units.
 # -----------------------------------------------------------------------------
 struct ChoiceMaps{G}
-    splWT::Spline1D;    splWO::Spline1D      # W_T(ϵ_T), W_O(X_O*)
-    splWTinv::Spline1D; splWOinv::Spline1D   # their inverses
+    splWT::Spline1D;    splWO::Spline1D      # W_T(log ϵ_T), W_O(log X_O*)
+    splWTinv::Spline1D; splWOinv::Spline1D   # their inverses, returning logs
     WTv::Vector{Float64}; WOv::Vector{Float64}
     g::Int
     gr::G
@@ -492,47 +502,54 @@ end
 function choice_maps(WTv, WOv, g, gr)
     warn_nonmonotone(WTv, "W_T(ϵ_T)")
     warn_nonmonotone(WOv, "W_O(X_O*)")
-    return ChoiceMaps(Spline1D(gr.ϵTgrid, WTv), Spline1D(gr.XOgrid[:, g], WOv),
-                      Spline1D(make_increasing(WTv), gr.ϵTgrid; k = 1),
-                      Spline1D(make_increasing(WOv), gr.XOgrid[:, g]; k = 1),
+    return ChoiceMaps(Spline1D(gr.lϵT, WTv), Spline1D(gr.lXO[:, g], WOv),
+                      Spline1D(make_increasing(WTv), gr.lϵT; k = 1),
+                      Spline1D(make_increasing(WOv), gr.lXO[:, g]; k = 1),
                       WTv, WOv, g, gr)
 end
 
 choice_maps(hh, g, l, zi, gr) = choice_maps(hh.WT[g, l, zi, :], hh.WO[g, l, zi, :], g, gr)
 
-@inline function teach_wt(cm::ChoiceMaps, ϵT)
-    wT = cm.splWT(ϵT)
+"P(teach | log ϵ_T = u)."
+@inline function teach_wt_log(cm::ChoiceMaps, u)
+    wT = cm.splWT(u)
     wT <= cm.WOv[1]   && return 0.0
     wT >= cm.WOv[end] && return 1.0
-    return Fxo(cm.gr, cm.g, cm.splWOinv(wT))
+    return Fxo(cm.gr, cm.g, exp(cm.splWOinv(wT)))
 end
 
-@inline function nonteach_wt(cm::ChoiceMaps, XO)
-    wO = cm.splWO(XO)
+"P(don't teach | log X_O* = v)."
+@inline function nonteach_wt_log(cm::ChoiceMaps, v)
+    wO = cm.splWO(v)
     wO <= cm.WTv[1]   && return 0.0
     wO >= cm.WTv[end] && return 1.0
-    return cdf(cm.gr.dT, cm.splWTinv(wO))
+    return cdf(cm.gr.dT, exp(cm.splWTinv(wO)))
 end
 
+@inline teach_wt(cm::ChoiceMaps, ϵT) = teach_wt_log(cm, log(ϵT))
+@inline nonteach_wt(cm::ChoiceMaps, XO) = nonteach_wt_log(cm, log(XO))
+
 # Integrals of a grid quantity over the teachers / non-teachers of one cell:
-# quadrature over the grid, plus the shock mass outside the grid at the endpoint
-# values (constant extrapolation; the residual is O(1 − q_hi)).
+# quadrature in the log shock (density f(eᵘ)eᵘ) over the grid, plus the shock mass
+# outside the grid at the endpoint values (constant extrapolation; the residual is
+# O(1 − q_hi)).
 function integrate_teach(q, cm::ChoiceMaps, gr)
-    (; dT, ϵTgrid) = gr
+    (; dT, ϵTgrid, lϵT) = gr
     lo, hi = ϵTgrid[1], ϵTgrid[end]
-    spl = Spline1D(ϵTgrid, q)
-    f(ϵ) = (w = teach_wt(cm, ϵ); w <= 0.0 ? 0.0 : pdf(dT, ϵ) * spl(ϵ) * w)
-    return quadgk(f, lo, hi)[1] +
+    spl = Spline1D(lϵT, q)
+    f(u) = (w = teach_wt_log(cm, u); w <= 0.0 ? 0.0 : (ϵ = exp(u); pdf(dT, ϵ) * ϵ * spl(u) * w))
+    return quadgk(f, lϵT[1], lϵT[end])[1] +
            cdf(dT, lo)  * q[1]   * teach_wt(cm, lo) +
            ccdf(dT, hi) * q[end] * teach_wt(cm, hi)
 end
 
 function integrate_nonteach(q, cm::ChoiceMaps, gr)
     g = cm.g
+    lx = view(gr.lXO, :, g)
     lo, hi = gr.XOgrid[1, g], gr.XOgrid[end, g]
-    spl = Spline1D(gr.XOgrid[:, g], q)
-    f(x) = (w = nonteach_wt(cm, x); w <= 0.0 ? 0.0 : fxo(gr, g, x) * spl(x) * w)
-    return quadgk(f, lo, hi)[1] +
+    spl = Spline1D(lx, q)
+    f(v) = (w = nonteach_wt_log(cm, v); w <= 0.0 ? 0.0 : (x = exp(v); fxo(gr, g, x) * x * spl(v) * w))
+    return quadgk(f, lx[1], lx[end])[1] +
            Fxo(gr, g, lo)       * q[1]   * nonteach_wt(cm, lo) +
            (1 - Fxo(gr, g, hi)) * q[end] * nonteach_wt(cm, hi)
 end

@@ -1,0 +1,52 @@
+# Ignore new run artifacts unless explicitly retained below.
+*
+!/.gitignore
+!/README.md
+
+# Both Sobol batches, plus the combined plotting data and figures.
+!/screen-1-512/
+!/screen-1-512/screen.jsonl
+!/screen/
+!/screen/screen.jsonl
+!/screen/plots/
+!/screen/plots/*.png
+!/screen/plots/screen_points.csv
+
+# Baseline estimates and grid checks cited in the calibration notes.
+!/exact-polish-base/
+!/exact-polish-base/report.txt
+!/exact-polish-base/theta.toml
+!/exact-grid-Nz_9/
+!/exact-grid-Nz_9/report.txt
+!/exact-grid-Nz_9/theta.toml
+!/exact-grid-Nz_15/
+!/exact-grid-Nz_15/report.txt
+!/exact-grid-Nz_15/theta.toml
+!/exact-grid-neT_96_nXO_96/
+!/exact-grid-neT_96_nXO_96/report.txt
+!/exact-grid-neT_96_nXO_96/theta.toml
+!/polish-noincome/
+!/polish-noincome/report.txt
+!/polish-noincome/theta.toml
+!/grid-Nz_9/
+!/grid-Nz_9/report.txt
+!/grid-Nz_9/theta.toml
+!/grid-Nz_15/
+!/grid-Nz_15/report.txt
+!/grid-Nz_15/theta.toml
+!/grid-neT_96gridnXO_96/
+!/grid-neT_96gridnXO_96/report.txt
+!/grid-neT_96gridnXO_96/theta.toml
+!/t7-2016-19/
+!/t7-2016-19/report.txt
+!/t7-2016-19/theta.toml
+
+# Compact diagnostics for exact-fit multistarts and the historical sensitivity panel.
+!/exact-ms/
+!/exact-ms/*/
+!/exact-ms/*/report.txt
+!/exact-ms/*/theta.toml
+!/panel/
+!/panel/*/
+!/panel/*/report.txt
+!/panel/*/theta.toml

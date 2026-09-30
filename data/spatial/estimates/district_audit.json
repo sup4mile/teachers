@@ -1,0 +1,1497 @@
+{
+  "baseline": {
+    "pupils": 0.3763546672825929,
+    "salary_real": 0.01622596475826441,
+    "teachers_pp": -0.012164380555830152,
+    "salary_per_teacher": -0.01705078057948998,
+    "seda_lninc": 0.2708014474605399
+  },
+  "attrition": [
+    [
+      "CCD directory 2018, all agencies",
+      19840,
+      50961814.0
+    ],
+    [
+      "regular districts (agency type 1-2)",
+      13613,
+      48330011.0
+    ],
+    [
+      "... with a commuting zone, >= 500 pupils, city or suburb locale, in a CZ that has both",
+      3510,
+      31423080.0
+    ],
+    [
+      "... after dropping CZs where a group has < 10% of pupils (the 188 CZs of the tracked moment)",
+      3291,
+      28551744.0
+    ],
+    [
+      "... with valid CCD FTE teachers (> 0)",
+      3285,
+      28518826.0
+    ],
+    [
+      "... with an F-33 teacher wage bill (non-missing)",
+      3249,
+      27527295.0
+    ],
+    [
+      "... and wage bill > 0 (F-33 zero-coded otherwise)",
+      2931,
+      25887528.0
+    ],
+    [
+      "... and a CWIFT index",
+      2885,
+      25811089.0
+    ],
+    [
+      "... surviving the [0.5%, 99.5%] screen = districts with `salary_real` > 0",
+      2852,
+      25669461.0
+    ],
+    [
+      "`salary_real` non-missing including zeros (what enters the tracked gap)",
+      3164,
+      27301940.0
+    ]
+  ],
+  "lost_cz": [
+    {
+      "czone": 19400.0,
+      "name": "NEW YORK CITY GEOGRAPHIC DISTRICT # 2",
+      "pupils": 1525410.0,
+      "weight": 0.05342615848615062,
+      "pupils_valid_salary_share": 0.32443343101199024
+    },
+    {
+      "czone": 24300.0,
+      "name": "City of Chicago SD 299",
+      "pupils": 1279698.0,
+      "weight": 0.04482030940036447,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 34901.0,
+      "name": "ALBUQUERQUE PUBLIC SCHOOLS",
+      "pupils": 118768.0,
+      "weight": 0.004159745898534254,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 24400.0,
+      "name": "Rockford SD 205",
+      "pupils": 63395.0,
+      "weight": 0.002220354735598638,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 23900.0,
+      "name": "Peoria SD 150",
+      "pupils": 32981.0,
+      "weight": 0.0011551308389427981,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 23500.0,
+      "name": "Champaign CUSD 4",
+      "pupils": 26743.0,
+      "weight": 0.0009366503146007473,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 24802.0,
+      "name": "Springfield SD 186",
+      "pupils": 22543.0,
+      "weight": 0.0007895489676567567,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 34115.0,
+      "name": "Fairbanks North Star Borough School District",
+      "pupils": 20264.0,
+      "weight": 0.0007097289748745296,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 23400.0,
+      "name": "McLean County USD 5",
+      "pupils": 18368.0,
+      "weight": 0.0006433232239683853,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 14500.0,
+      "name": "Lafayette School Corporation",
+      "pupils": 18101.0,
+      "weight": 0.0006339717811983744,
+      "pupils_valid_salary_share": 0.5749406110159659
+    },
+    {
+      "czone": 24200.0,
+      "name": "Kankakee SD 111",
+      "pupils": 13007.0,
+      "weight": 0.0004555588618334488,
+      "pupils_valid_salary_share": 0.0
+    },
+    {
+      "czone": 25601.0,
+      "name": "Marion CUSD 2",
+      "pupils": 11112.0,
+      "weight": 0.00038918813505752924,
+      "pupils_valid_salary_share": 0.0
+    }
+  ],
+  "cz_salary": {
+    "n_cz": 188,
+    "n_with_gap": 176,
+    "n_lost": 12,
+    "pupil_share_lost": 0.11033966961878056
+  },
+  "coverage_by_group": [
+    {
+      "group": "city",
+      "districts": 656,
+      "pupils": 12029227.0,
+      "teachers_valid": 0.9969512195121951,
+      "wb_missing": 0.057926829268292686,
+      "wb_zero": 0.05030487804878049,
+      "wb_zero_pupils": 0.05456036368754202,
+      "cwift_missing": 0.07926829268292683,
+      "salary_real_valid_pos": 0.8567073170731707
+    },
+    {
+      "group": "suburb",
+      "districts": 2635,
+      "pupils": 16522517.0,
+      "teachers_valid": 0.9984819734345352,
+      "wb_missing": 0.0015180265654648956,
+      "wb_zero": 0.10815939278937381,
+      "wb_zero_pupils": 0.05952168183576389,
+      "cwift_missing": 0.012903225806451613,
+      "salary_real_valid_pos": 0.8690702087286527
+    }
+  ],
+  "zero_coded_states": [
+    {
+      "st": "02",
+      "n": 53,
+      "zero": 53,
+      "pupils": 130529.0,
+      "zero_share": 1.0
+    },
+    {
+      "st": "35",
+      "n": 89,
+      "zero": 89,
+      "pupils": 318845.0,
+      "zero_share": 1.0
+    },
+    {
+      "st": "17",
+      "n": 894,
+      "zero": 853,
+      "pupils": 1956283.0,
+      "zero_share": 0.9541387024608501
+    },
+    {
+      "st": "23",
+      "n": 256,
+      "zero": 50,
+      "pupils": 177857.0,
+      "zero_share": 0.1953125
+    },
+    {
+      "st": "50",
+      "n": 258,
+      "zero": 23,
+      "pupils": 87132.0,
+      "zero_share": 0.08914728682170543
+    },
+    {
+      "st": "33",
+      "n": 180,
+      "zero": 15,
+      "pupils": 174180.0,
+      "zero_share": 0.08333333333333333
+    }
+  ],
+  "zero_all": {
+    "n": 1124,
+    "share": 0.08256813340189524
+  },
+  "screen_cuts": {
+    "nominal_lo": 0.0,
+    "nominal_hi": 137685.59654631093,
+    "real_lo": 0.0,
+    "real_hi": 123300.82473826906,
+    "share_zero_all": 0.08256813340189524,
+    "n_screened_real": 65
+  },
+  "nyc": {
+    "n_geo_districts": 32,
+    "pupils": 960484.0,
+    "teachers": 64972.0,
+    "f33_wagebill_nan": 32,
+    "chancellor_wagebill": 7704346000.0,
+    "chancellor_enrollment": 960484.0,
+    "czone": 19400.0
+  },
+  "universe": {
+    "teacher_over_instruction_salary": {
+      "count": 2931.0,
+      "mean": 0.8785198474968187,
+      "std": 0.07515409850957369,
+      "min": 0.13401930894308944,
+      "1%": 0.6778567330481955,
+      "5%": 0.7570372771173861,
+      "50%": 0.8811478440943717,
+      "95%": 1.0,
+      "99%": 1.0000515379060169,
+      "max": 1.000278164116829
+    },
+    "n_teacher_salary_above_instruction": 0,
+    "ccd_over_f33_enrollment": {
+      "exact": 0.9604983287754482,
+      "within2pct": 0.9741719841993315,
+      "within10pct": 0.9857186265572774,
+      "n_off_by_over_10pct": 6
+    },
+    "f33_enrollment_vs_ccd_year": {
+      "2017": {
+        "n": 13168,
+        "exact": 0.016555285540704737,
+        "within2pct": 0.46863608748481167
+      },
+      "2018": {
+        "n": 13211,
+        "exact": 0.9815305427295435,
+        "within2pct": 0.9913708273408524
+      },
+      "2019": {
+        "n": 13125,
+        "exact": 0.015695238095238095,
+        "within2pct": 0.49333333333333335
+      }
+    },
+    "pay_on_prek_and_aides": {
+      "coef": {
+        "prek_share": -0.7282477201498353,
+        "aide_ratio": 0.07958999240545316
+      },
+      "se": {
+        "prek_share": 0.2827524137614465,
+        "aide_ratio": 0.027612671564805225
+      },
+      "n": 2520,
+      "n_clusters": 174,
+      "r2_within": 0.01944500072486266
+    },
+    "ccd_prek_teachers_share_mean": 0.018293111613693812
+  },
+  "hybrid_share": 0.8811478440943717,
+  "top_cz": [
+    {
+      "czone": 38300.0,
+      "name": "Los Angeles Unified",
+      "weight": 0.09079462886750456,
+      "gaps": {
+        "pupils": 0.0944565228503899,
+        "salary_real": 0.007874144898681596,
+        "teachers_pp": -0.008870512342019504,
+        "seda_lninc": 0.08313209561653245
+      }
+    },
+    {
+      "czone": 19400.0,
+      "name": "NEW YORK CITY GEOGRAPHIC DISTRICT # 2",
+      "weight": 0.05342615848615062,
+      "gaps": {
+        "pupils": -0.550871032051978,
+        "salary_real": null,
+        "teachers_pp": 0.1694516233778895,
+        "seda_lninc": 0.16017617939028383
+      }
+    },
+    {
+      "czone": 24300.0,
+      "name": "City of Chicago SD 299",
+      "weight": 0.04482030940036447,
+      "gaps": {
+        "pupils": 0.6645910269158222,
+        "salary_real": null,
+        "teachers_pp": 0.06696945116921518,
+        "seda_lninc": 0.32729769620239146
+      }
+    },
+    {
+      "czone": 32000.0,
+      "name": "HOUSTON ISD",
+      "weight": 0.03876922544556297,
+      "gaps": {
+        "pupils": 0.6624604144425522,
+        "salary_real": 0.0837841134552838,
+        "teachers_pp": 0.04302187734879543,
+        "seda_lninc": 0.2806785945612358
+      }
+    },
+    {
+      "czone": 19600.0,
+      "name": "Newark Public School District",
+      "weight": 0.030176650505132015,
+      "gaps": {
+        "pupils": 2.092527279246861,
+        "salary_real": 0.0027042542324410444,
+        "teachers_pp": 0.12458653312447382,
+        "seda_lninc": 0.633886490919652
+      }
+    }
+  ],
+  "salary": [
+    {
+      "value": 0.01622596475826441,
+      "n": 176,
+      "se": 0.008968713231458075,
+      "value_c": 0.01622596475826441,
+      "n_c": 176,
+      "se_c": 0.00897593088363264,
+      "group": "salary gap",
+      "label": "baseline: teacher-weighted mean of screened district `salary_real` (zeros kept; [0.5,99.5] screen)",
+      "note": ""
+    },
+    {
+      "value": 0.01683015373602195,
+      "n": 176,
+      "se": 0.009464643885682092,
+      "value_c": 0.01683015373602195,
+      "n_c": 176,
+      "se_c": 0.00946871720007825,
+      "group": "salary gap",
+      "label": "pupil-weighted (not teacher-weighted) mean within location",
+      "note": ""
+    },
+    {
+      "value": -0.003894684425462587,
+      "n": 176,
+      "se": 0.007425693870333744,
+      "value_c": -0.0038946844254625873,
+      "n_c": 176,
+      "se_c": 0.007367127975600652,
+      "group": "salary gap",
+      "label": "unweighted district mean within location",
+      "note": ""
+    },
+    {
+      "value": 0.0027401901605273657,
+      "n": 177,
+      "se": 0.01581217981125015,
+      "value_c": 0.016610176296183894,
+      "n_c": 176,
+      "se_c": 0.0092105117536911,
+      "group": "salary gap",
+      "label": "ratio of totals, deflated: sum(wage bill/CWIFT) / sum(FTE)",
+      "note": ""
+    },
+    {
+      "value": 0.0003161702484268599,
+      "n": 176,
+      "se": 0.010130828595697888,
+      "value_c": 0.00031617024842686133,
+      "n_c": 176,
+      "se_c": 0.009985029481915158,
+      "group": "salary gap",
+      "label": "undeflated, same aggregation (`salary_per_teacher`, screened, teacher-weighted mean)",
+      "note": ""
+    },
+    {
+      "value": -0.01705078057948998,
+      "n": 177,
+      "se": 0.01804130520194684,
+      "value_c": -0.0009503264856250341,
+      "n_c": 176,
+      "se_c": 0.010084819309207724,
+      "group": "salary gap",
+      "label": "undeflated ratio of totals (tracked `gap_salary_per_teacher_locale`)",
+      "note": ""
+    },
+    {
+      "value": 0.015862509491036084,
+      "n": 176,
+      "se": 0.008957074629026325,
+      "value_c": 0.015862509491036087,
+      "n_c": 176,
+      "se_c": 0.008988024077379241,
+      "group": "salary gap",
+      "label": "baseline with zero-coded wage bills set to missing",
+      "note": ""
+    },
+    {
+      "value": 0.0023973247532310753,
+      "n": 177,
+      "se": 0.015792469721403732,
+      "value_c": 0.01624672102895558,
+      "n_c": 176,
+      "se_c": 0.009222605081076772,
+      "group": "salary gap",
+      "label": "zeros missing, no trimming",
+      "note": ""
+    },
+    {
+      "value": 0.015902149164586248,
+      "n": 176,
+      "se": 0.008931940668185027,
+      "value_c": 0.01590214916458625,
+      "n_c": 176,
+      "se_c": 0.008963428775818072,
+      "group": "salary gap",
+      "label": "zeros missing, trim [0.5%, 99.5%] recomputed on non-zero districts",
+      "note": ""
+    },
+    {
+      "value": 0.014572384650079581,
+      "n": 176,
+      "se": 0.008869133827290428,
+      "value_c": 0.014572384650079586,
+      "n_c": 176,
+      "se_c": 0.008893605340975186,
+      "group": "salary gap",
+      "label": "zeros missing, trim [1%, 99%]",
+      "note": ""
+    },
+    {
+      "value": 0.014159233593423387,
+      "n": 176,
+      "se": 0.008737354902938947,
+      "value_c": 0.014159233593423392,
+      "n_c": 176,
+      "se_c": 0.008697980002518401,
+      "group": "salary gap",
+      "label": "zeros missing, trim [2.5%, 97.5%]",
+      "note": ""
+    },
+    {
+      "value": 0.00682115555105231,
+      "n": 171,
+      "se": 0.0076297804723201275,
+      "value_c": 0.006821155551052311,
+      "n_c": 171,
+      "se_c": 0.007584276950188898,
+      "group": "salary gap",
+      "label": "zeros missing, trim [5%, 95%]",
+      "note": ""
+    },
+    {
+      "value": 0.015625344298231404,
+      "n": 176,
+      "se": 0.00909617997938229,
+      "value_c": 0.015625344298231404,
+      "n_c": 176,
+      "se_c": 0.00914560911489251,
+      "group": "salary gap",
+      "label": "zeros missing, drop nominal salary/FTE < $25,000 or > $125,000",
+      "note": ""
+    },
+    {
+      "value": 0.002517719967282741,
+      "n": 177,
+      "se": 0.015796489355531997,
+      "value_c": 0.016374346253795906,
+      "n_c": 176,
+      "se_c": 0.009205112192716513,
+      "group": "salary gap",
+      "label": "zeros missing, drop nominal salary/FTE < $25,000 only",
+      "note": ""
+    },
+    {
+      "value": 0.0020234056633673786,
+      "n": 177,
+      "se": 0.015810557955378255,
+      "value_c": 0.01585034723376913,
+      "n_c": 176,
+      "se_c": 0.00925687980726012,
+      "group": "salary gap",
+      "label": "zeros missing, drop districts whose CCD and F-33 enrollment differ by > 10%",
+      "note": ""
+    },
+    {
+      "value": 0.0025935923698416313,
+      "n": 177,
+      "se": 0.015794878396416936,
+      "value_c": 0.016454774969439027,
+      "n_c": 176,
+      "se_c": 0.009195626762977204,
+      "group": "salary gap",
+      "label": "zeros missing, drop teacher pay outside 50-100% of instruction salaries",
+      "note": ""
+    },
+    {
+      "value": 0.003107710053172841,
+      "n": 177,
+      "se": 0.015796047778907498,
+      "value_c": 0.016999766607573207,
+      "n_c": 176,
+      "se_c": 0.00919206269052408,
+      "group": "salary gap",
+      "label": "zeros missing, drop students-per-teacher outside [6, 30]",
+      "note": ""
+    },
+    {
+      "value": 0.004338301486820062,
+      "n": 176,
+      "se": 0.009106405792152796,
+      "value_c": 0.0043383014868200636,
+      "n_c": 176,
+      "se_c": 0.009003806523178719,
+      "group": "salary gap",
+      "label": "zeros missing, FTE denominator excludes pre-K teacher FTE",
+      "note": ""
+    },
+    {
+      "value": 0.015531794000149752,
+      "n": 176,
+      "se": 0.008749962244758349,
+      "value_c": 0.015531794000149752,
+      "n_c": 176,
+      "se_c": 0.008780360472018436,
+      "group": "salary gap",
+      "label": "zeros missing, CWIFT 2015 release",
+      "note": ""
+    },
+    {
+      "value": 0.01665409801977634,
+      "n": 176,
+      "se": 0.008813939181350828,
+      "value_c": 0.01665409801977634,
+      "n_c": 176,
+      "se_c": 0.008911417505846456,
+      "group": "salary gap",
+      "label": "zeros missing, CWIFT 2019 release",
+      "note": ""
+    },
+    {
+      "value": 0.011580345560889311,
+      "n": 187,
+      "se": 0.010301730455495331,
+      "value_c": 0.007717455871425625,
+      "n_c": 176,
+      "se_c": 0.010154392748093665,
+      "group": "salary gap",
+      "label": "instruction salaries (F-33 `salaries_instruction`) per FTE teacher, deflated",
+      "note": ""
+    },
+    {
+      "value": 0.018144715650962775,
+      "n": 188,
+      "se": 0.011871871594691252,
+      "value_c": 0.01908457820788942,
+      "n_c": 176,
+      "se_c": 0.011593163547706987,
+      "group": "salary gap",
+      "label": "instruction salaries per (FTE teachers + instructional aides), deflated",
+      "note": ""
+    },
+    {
+      "value": -0.032348905767597656,
+      "n": 188,
+      "se": 0.013756950859052035,
+      "value_c": -0.021440200609684223,
+      "n_c": 176,
+      "se_c": 0.012679815559585842,
+      "group": "salary gap",
+      "label": "total salaries per total staff FTE, deflated",
+      "note": ""
+    },
+    {
+      "value": 0.057167776375823855,
+      "n": 176,
+      "se": 0.01020516499516389,
+      "value_c": 0.057167776375823855,
+      "n_c": 176,
+      "se_c": 0.01057491915165436,
+      "group": "salary gap",
+      "label": "regular-program teacher salaries only per FTE teacher, deflated",
+      "note": ""
+    },
+    {
+      "value": 0.008966688283158426,
+      "n": 176,
+      "se": 0.009265435188863663,
+      "value_c": 0.008966688283158426,
+      "n_c": 176,
+      "se_c": 0.009309573296904579,
+      "group": "salary gap",
+      "label": "teacher salaries + instruction benefits per FTE teacher, deflated",
+      "note": ""
+    },
+    {
+      "value": 0.018782317973969724,
+      "n": 187,
+      "se": 0.009034576312363705,
+      "value_c": 0.01565709342113585,
+      "n_c": 176,
+      "se_c": 0.00898370323242826,
+      "group": "salary gap",
+      "label": "hybrid: teacher salaries, else 0.88 x instruction salaries where zero-coded (recovers IL, AK, NM)",
+      "note": ""
+    },
+    {
+      "value": 0.016854856655776462,
+      "n": 177,
+      "se": 0.008463520178335229,
+      "value_c": 0.01590214916458625,
+      "n_c": 176,
+      "se_c": 0.008963428775818072,
+      "group": "salary gap",
+      "label": "zeros missing + NYC collapsed to one district ([0.5,99.5] on non-zero)",
+      "note": ""
+    },
+    {
+      "value": 0.01947738897350063,
+      "n": 188,
+      "se": 0.00856971479345167,
+      "value_c": 0.01565709342113585,
+      "n_c": 176,
+      "se_c": 0.00898370323242826,
+      "group": "salary gap",
+      "label": "hybrid + NYC collapsed",
+      "note": ""
+    },
+    {
+      "value": 0.008620482439174196,
+      "n": 188,
+      "se": 0.009158968569601845,
+      "value_c": 0.003885357623564121,
+      "n_c": 176,
+      "se_c": 0.009040505459552723,
+      "group": "salary gap",
+      "label": "hybrid + NYC collapsed + FTE denominator excludes pre-K teacher FTE",
+      "note": ""
+    },
+    {
+      "value": 0.011580345560889311,
+      "n": 187,
+      "se": 0.010301730455495331,
+      "value_c": 0.007717455871425625,
+      "n_c": 176,
+      "se_c": 0.010154392748093665,
+      "group": "salary gap",
+      "label": "instruction salaries per FTE teacher + NYC collapsed",
+      "note": ""
+    },
+    {
+      "value": 0.016058798999102765,
+      "n": 176,
+      "se": 0.00894857578669144,
+      "value_c": 0.01605879899910277,
+      "n_c": 176,
+      "se_c": 0.008959843233054344,
+      "group": "salary gap",
+      "label": "min district size 0 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.016076848781080507,
+      "n": 176,
+      "se": 0.008948793228250146,
+      "value_c": 0.01607684878108051,
+      "n_c": 176,
+      "se_c": 0.008958989792442074,
+      "group": "salary gap",
+      "label": "min district size 250 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.016788450986107137,
+      "n": 176,
+      "se": 0.008897906660277592,
+      "value_c": 0.016788450986107137,
+      "n_c": 176,
+      "se_c": 0.008986399436980293,
+      "group": "salary gap",
+      "label": "min district size 1000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.01982576220785782,
+      "n": 169,
+      "se": 0.0091515498935459,
+      "value_c": 0.018852815183960647,
+      "n_c": 168,
+      "se_c": 0.00882715011177026,
+      "group": "salary gap",
+      "label": "min district size 2000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.017440969319057947,
+      "n": 189,
+      "se": 0.008845261525363555,
+      "value_c": 0.01622596475826441,
+      "n_c": 176,
+      "se_c": 0.00897593088363264,
+      "group": "salary gap",
+      "label": "min group share 5% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.026066376404680885,
+      "n": 148,
+      "se": 0.009942653514597789,
+      "value_c": 0.026066376404680885,
+      "n_c": 148,
+      "se_c": 0.009721254796459782,
+      "group": "salary gap",
+      "label": "min group share 20% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.01708965441449107,
+      "n": 100,
+      "se": 0.008185818219634263,
+      "value_c": 0.01708965441449107,
+      "n_c": 100,
+      "se_c": 0.008002336883122295,
+      "group": "salary gap",
+      "label": "min group share 30% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.001938885167318435,
+      "n": 176,
+      "se": 0.0077812891548816425,
+      "value_c": 0.001938885167318435,
+      "n_c": 176,
+      "se_c": 0.0074484968531369055,
+      "group": "salary gap",
+      "label": "unweighted average across CZs",
+      "note": ""
+    },
+    {
+      "value": 0.017175186114347443,
+      "n": 175,
+      "se": 0.00990262944050949,
+      "value_c": 0.017175186114347443,
+      "n_c": 175,
+      "se_c": 0.009660592994948857,
+      "group": "salary gap",
+      "label": "drop the 1 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.014235558785785776,
+      "n": 173,
+      "se": 0.010023470318913121,
+      "value_c": 0.014235558785785776,
+      "n_c": 173,
+      "se_c": 0.010303786752904297,
+      "group": "salary gap",
+      "label": "drop the 5 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.010827320828116615,
+      "n": 168,
+      "se": 0.006797410618301267,
+      "value_c": 0.010827320828116613,
+      "n_c": 168,
+      "se_c": 0.006645359313326292,
+      "group": "salary gap",
+      "label": "drop the 10 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.015427507798114415,
+      "n": 593,
+      "se": 0.009883364453738252,
+      "value_c": 0.012767468102132801,
+      "n_c": 176,
+      "se_c": 0.011938987692693852,
+      "group": "salary gap",
+      "label": "partition: revenue split (tracked: 0.0154)",
+      "note": ""
+    },
+    {
+      "value": 0.018749545077776802,
+      "n": 591,
+      "se": 0.0062395606501666374,
+      "value_c": 0.02259808451881867,
+      "n_c": 175,
+      "se_c": 0.007109987650407894,
+      "group": "salary gap",
+      "label": "partition: ses split (tracked: 0.0188)",
+      "note": ""
+    }
+  ],
+  "fte": [
+    {
+      "value": -0.012164380555830152,
+      "n": 188,
+      "se": 0.013934795583432533,
+      "value_c": -0.012164380555830152,
+      "n_c": 188,
+      "se_c": 0.013934795583432533,
+      "group": "FTE per pupil gap",
+      "label": "baseline: ratio of location totals, sum(teachers)/sum(pupils) (screen has no effect)",
+      "note": ""
+    },
+    {
+      "value": -0.012080893270269342,
+      "n": 187,
+      "se": 0.013922499492815443,
+      "value_c": -0.012080893270269342,
+      "n_c": 187,
+      "se_c": 0.013922499492815443,
+      "group": "FTE per pupil gap",
+      "label": "apply the [0.5%, 99.5%] screen of `teachers_pp` (drop flagged districts)",
+      "note": ""
+    },
+    {
+      "value": -0.012676057556416861,
+      "n": 187,
+      "se": 0.013918506020489347,
+      "value_c": -0.012676057556416861,
+      "n_c": 187,
+      "se_c": 0.013918506020489347,
+      "group": "FTE per pupil gap",
+      "label": "screen [1%, 99%]",
+      "note": ""
+    },
+    {
+      "value": -0.010715723008898953,
+      "n": 186,
+      "se": 0.014098563700800038,
+      "value_c": -0.010715723008898953,
+      "n_c": 186,
+      "se_c": 0.014098563700800038,
+      "group": "FTE per pupil gap",
+      "label": "screen [2.5%, 97.5%]",
+      "note": ""
+    },
+    {
+      "value": -0.02156607043942353,
+      "n": 183,
+      "se": 0.016452678060989635,
+      "value_c": -0.02156607043942353,
+      "n_c": 183,
+      "se_c": 0.016452678060989635,
+      "group": "FTE per pupil gap",
+      "label": "screen [5%, 95%]",
+      "note": ""
+    },
+    {
+      "value": -0.013217583701496437,
+      "n": 187,
+      "se": 0.013943089884400416,
+      "value_c": -0.013217583701496437,
+      "n_c": 187,
+      "se_c": 0.013943089884400416,
+      "group": "FTE per pupil gap",
+      "label": "drop students-per-teacher outside [6, 30]",
+      "note": ""
+    },
+    {
+      "value": -0.008749814805146743,
+      "n": 188,
+      "se": 0.014664153262768057,
+      "value_c": -0.008749814805146743,
+      "n_c": 188,
+      "se_c": 0.014664153262768057,
+      "group": "FTE per pupil gap",
+      "label": "mean of district ratios, teacher-weighted",
+      "note": ""
+    },
+    {
+      "value": -0.0032253746871466395,
+      "n": 188,
+      "se": 0.01455081782876568,
+      "value_c": -0.0032253746871466395,
+      "n_c": 188,
+      "se_c": 0.01455081782876568,
+      "group": "FTE per pupil gap",
+      "label": "mean of district ratios, unweighted",
+      "note": ""
+    },
+    {
+      "value": -0.010817472803506319,
+      "n": 188,
+      "se": 0.015473724236212244,
+      "value_c": -0.010817472803506319,
+      "n_c": 188,
+      "se_c": 0.015473724236212244,
+      "group": "FTE per pupil gap",
+      "label": "denominator: F-33 fall enrollment (responsible) instead of CCD enrollment",
+      "note": ""
+    },
+    {
+      "value": -0.009935902215461848,
+      "n": 188,
+      "se": 0.015427731258991925,
+      "value_c": -0.009935902215461848,
+      "n_c": 188,
+      "se_c": 0.015427731258991925,
+      "group": "FTE per pupil gap",
+      "label": "drop districts whose CCD and F-33 enrollment differ by > 10%",
+      "note": ""
+    },
+    {
+      "value": -0.00137472234456005,
+      "n": 188,
+      "se": 0.014081458612993253,
+      "value_c": -0.00137472234456005,
+      "n_c": 188,
+      "se_c": 0.014081458612993253,
+      "group": "FTE per pupil gap",
+      "label": "numerator excludes pre-K teacher FTE, denominator unchanged (pre-K pupils stay in: mismatched)",
+      "note": ""
+    },
+    {
+      "value": -0.017718866687234436,
+      "n": 188,
+      "se": 0.013082144834898024,
+      "value_c": -0.017718866687234436,
+      "n_c": 188,
+      "se_c": 0.013082144834898024,
+      "group": "FTE per pupil gap",
+      "label": "K-12 consistent: (teachers - pre-K teacher FTE) / (pupils - pre-K enrollment)",
+      "note": ""
+    },
+    {
+      "value": -0.028810206550708598,
+      "n": 184,
+      "se": 0.015248463736827408,
+      "value_c": -0.028810206550708598,
+      "n_c": 184,
+      "se_c": 0.015248463736827408,
+      "group": "FTE per pupil gap",
+      "label": "numerator: teachers + instructional aides",
+      "note": ""
+    },
+    {
+      "value": 0.01418731057503613,
+      "n": 188,
+      "se": 0.042816185807175285,
+      "value_c": 0.01418731057503613,
+      "n_c": 188,
+      "se_c": 0.042816185807175285,
+      "group": "FTE per pupil gap",
+      "label": "numerator: total staff FTE",
+      "note": ""
+    },
+    {
+      "value": -0.026108141027823016,
+      "n": 176,
+      "se": 0.010654471105060705,
+      "value_c": -0.026108141027823016,
+      "n_c": 176,
+      "se_c": 0.010654471105060705,
+      "group": "FTE per pupil gap",
+      "label": "restrict to districts in the salary sample (valid, positive `salary_real`)",
+      "note": ""
+    },
+    {
+      "value": -0.0144851281258185,
+      "n": 177,
+      "se": 0.01430377011089039,
+      "value_c": -0.0144851281258185,
+      "n_c": 177,
+      "se_c": 0.01430377011089039,
+      "group": "FTE per pupil gap",
+      "label": "drop IL, AK and NM (zero-coded F-33 states)",
+      "note": ""
+    },
+    {
+      "value": -0.011287323923354154,
+      "n": 188,
+      "se": 0.01420102463436102,
+      "value_c": -0.011287323923354154,
+      "n_c": 188,
+      "se_c": 0.01420102463436102,
+      "group": "FTE per pupil gap",
+      "label": "min district size 0 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": -0.011674193114091303,
+      "n": 188,
+      "se": 0.01401163861394824,
+      "value_c": -0.011674193114091303,
+      "n_c": 188,
+      "se_c": 0.01401163861394824,
+      "group": "FTE per pupil gap",
+      "label": "min district size 250 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": -0.013717248115150233,
+      "n": 186,
+      "se": 0.013865871466263531,
+      "value_c": -0.013717248115150233,
+      "n_c": 186,
+      "se_c": 0.013865871466263531,
+      "group": "FTE per pupil gap",
+      "label": "min district size 1000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": -0.017799491881075512,
+      "n": 180,
+      "se": 0.013095923604510017,
+      "value_c": -0.017086685522827934,
+      "n_c": 179,
+      "se_c": 0.012983709018711567,
+      "group": "FTE per pupil gap",
+      "label": "min district size 2000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": -0.01625363502280985,
+      "n": 202,
+      "se": 0.013832200326004105,
+      "value_c": -0.012164380555830152,
+      "n_c": 188,
+      "se_c": 0.013934795583432533,
+      "group": "FTE per pupil gap",
+      "label": "min group share 5% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": -0.009471719629456742,
+      "n": 158,
+      "se": 0.015563563374642002,
+      "value_c": -0.009471719629456742,
+      "n_c": 158,
+      "se_c": 0.015563563374642002,
+      "group": "FTE per pupil gap",
+      "label": "min group share 20% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": -0.002924570398669549,
+      "n": 108,
+      "se": 0.01711687571040606,
+      "value_c": -0.002924570398669549,
+      "n_c": 108,
+      "se_c": 0.01711687571040606,
+      "group": "FTE per pupil gap",
+      "label": "min group share 30% of CZ pupils (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": -0.04808142451223104,
+      "n": 188,
+      "se": 0.009506615266261662,
+      "value_c": -0.04808142451223104,
+      "n_c": 188,
+      "se_c": 0.009506615266261662,
+      "group": "FTE per pupil gap",
+      "label": "unweighted average across CZs",
+      "note": ""
+    },
+    {
+      "value": -0.012493311236957669,
+      "n": 187,
+      "se": 0.014986935328610231,
+      "value_c": -0.012493311236957669,
+      "n_c": 187,
+      "se_c": 0.014986935328610231,
+      "group": "FTE per pupil gap",
+      "label": "drop the 1 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": -0.03886893431355351,
+      "n": 183,
+      "se": 0.009774947245655002,
+      "value_c": -0.03886893431355351,
+      "n_c": 183,
+      "se_c": 0.009774947245655002,
+      "group": "FTE per pupil gap",
+      "label": "drop the 5 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": -0.042072994421971,
+      "n": 178,
+      "se": 0.0086280787261037,
+      "value_c": -0.042072994421971,
+      "n_c": 178,
+      "se_c": 0.0086280787261037,
+      "group": "FTE per pupil gap",
+      "label": "drop the 10 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": -0.025321823058441086,
+      "n": 176,
+      "se": 0.010408711340225165,
+      "value_c": -0.025321823058441086,
+      "n_c": 176,
+      "se_c": 0.010408711340225165,
+      "group": "FTE per pupil gap",
+      "label": "restrict to the CZs that have a salary gap",
+      "note": ""
+    },
+    {
+      "value": 0.03661241299923859,
+      "n": 621,
+      "se": 0.005967908819468922,
+      "value_c": 0.03775207375909936,
+      "n_c": 187,
+      "se_c": 0.007475372484986406,
+      "group": "FTE per pupil gap",
+      "label": "partition: revenue split (tracked: 0.0366)",
+      "note": ""
+    },
+    {
+      "value": -0.0036107163019313353,
+      "n": 618,
+      "se": 0.0068286827120640076,
+      "value_c": -0.003972521701180077,
+      "n_c": 187,
+      "se_c": 0.008549938306434716,
+      "group": "FTE per pupil gap",
+      "label": "partition: ses split (tracked: -0.0036)",
+      "note": ""
+    }
+  ],
+  "other": [
+    {
+      "value": 0.3763546672825929,
+      "n": 188,
+      "se": 0.1153753993488485,
+      "value_c": 0.3763546672825929,
+      "n_c": 188,
+      "se_c": 0.1153753993488485,
+      "group": "pupils",
+      "label": "baseline",
+      "note": ""
+    },
+    {
+      "value": 0.379511632586191,
+      "n": 188,
+      "se": 0.11560791714349276,
+      "value_c": 0.379511632586191,
+      "n_c": 188,
+      "se_c": 0.11560791714349276,
+      "group": "pupils",
+      "label": "min district size 0 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.3789893816307525,
+      "n": 188,
+      "se": 0.11560040823977664,
+      "value_c": 0.3789893816307525,
+      "n_c": 188,
+      "se_c": 0.11560040823977664,
+      "group": "pupils",
+      "label": "min district size 250 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.36733592146726696,
+      "n": 186,
+      "se": 0.11560331692961939,
+      "value_c": 0.36733592146726696,
+      "n_c": 186,
+      "se_c": 0.11560331692961939,
+      "group": "pupils",
+      "label": "min district size 1000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.3355159950596853,
+      "n": 180,
+      "se": 0.11670770418118341,
+      "value_c": 0.3179744795594761,
+      "n_c": 179,
+      "se_c": 0.11433161483762705,
+      "group": "pupils",
+      "label": "min district size 2000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.4278057861492917,
+      "n": 202,
+      "se": 0.12999077105359938,
+      "value_c": 0.3763546672825929,
+      "n_c": 188,
+      "se_c": 0.1153753993488485,
+      "group": "pupils",
+      "label": "min group share 5% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.15536593111405472,
+      "n": 158,
+      "se": 0.0900287041574192,
+      "value_c": 0.15536593111405472,
+      "n_c": 158,
+      "se_c": 0.0900287041574192,
+      "group": "pupils",
+      "label": "min group share 20% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.11390939658888266,
+      "n": 108,
+      "se": 0.0874696753160786,
+      "value_c": 0.11390939658888266,
+      "n_c": 108,
+      "se_c": 0.0874696753160786,
+      "group": "pupils",
+      "label": "min group share 30% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": -0.015162645137264336,
+      "n": 188,
+      "se": 0.07140999360461146,
+      "value_c": -0.015162645137264336,
+      "n_c": 188,
+      "se_c": 0.07140999360461146,
+      "group": "pupils",
+      "label": "unweighted average across CZs",
+      "note": ""
+    },
+    {
+      "value": 0.4045054440100549,
+      "n": 187,
+      "se": 0.1265828099150589,
+      "value_c": 0.4045054440100549,
+      "n_c": 187,
+      "se_c": 0.1265828099150589,
+      "group": "pupils",
+      "label": "drop the 1 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.37545665396195727,
+      "n": 183,
+      "se": 0.12056718212765624,
+      "value_c": 0.37545665396195727,
+      "n_c": 183,
+      "se_c": 0.12056718212765624,
+      "group": "pupils",
+      "label": "drop the 5 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.2209486136325674,
+      "n": 178,
+      "se": 0.10285364663521161,
+      "value_c": 0.2209486136325674,
+      "n_c": 178,
+      "se_c": 0.10285364663521161,
+      "group": "pupils",
+      "label": "drop the 10 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.4305042615592356,
+      "n": 176,
+      "se": 0.11662010129706109,
+      "value_c": 0.4305042615592356,
+      "n_c": 176,
+      "se_c": 0.11662010129706109,
+      "group": "pupils",
+      "label": "restrict to the CZs that have a salary gap",
+      "note": ""
+    },
+    {
+      "value": -0.024739008373202975,
+      "n": 621,
+      "se": 0.021785655180633936,
+      "value_c": -0.0030446636694303774,
+      "n_c": 187,
+      "se_c": 0.021377752739045866,
+      "group": "pupils",
+      "label": "partition: revenue split",
+      "note": ""
+    },
+    {
+      "value": -0.0012870826932678279,
+      "n": 619,
+      "se": 0.023522608277300065,
+      "value_c": 0.010627073063504024,
+      "n_c": 187,
+      "se_c": 0.019997922688532822,
+      "group": "pupils",
+      "label": "partition: ses split",
+      "note": ""
+    },
+    {
+      "value": 0.27080144746053997,
+      "n": 187,
+      "se": 0.02681857475261312,
+      "value_c": 0.2708014474605399,
+      "n_c": 187,
+      "se_c": 0.0271305193269339,
+      "group": "seda_lninc",
+      "label": "baseline",
+      "note": ""
+    },
+    {
+      "value": 0.2709694836344317,
+      "n": 187,
+      "se": 0.026833549070257357,
+      "value_c": 0.2709694836344317,
+      "n_c": 187,
+      "se_c": 0.02715128362972382,
+      "group": "seda_lninc",
+      "label": "min district size 0 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.27093650415387366,
+      "n": 187,
+      "se": 0.02683353544179386,
+      "value_c": 0.27093650415387366,
+      "n_c": 187,
+      "se_c": 0.027151435925612966,
+      "group": "seda_lninc",
+      "label": "min district size 250 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.2698101335908189,
+      "n": 185,
+      "se": 0.027041612731254456,
+      "value_c": 0.2698101335908189,
+      "n_c": 185,
+      "se_c": 0.026702507017728392,
+      "group": "seda_lninc",
+      "label": "min district size 1000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.27013913563641584,
+      "n": 178,
+      "se": 0.027147698641811314,
+      "value_c": 0.26802449610166307,
+      "n_c": 177,
+      "se_c": 0.02769304046442927,
+      "group": "seda_lninc",
+      "label": "min district size 2000 pupils (baseline 500)",
+      "note": ""
+    },
+    {
+      "value": 0.26721429716126016,
+      "n": 200,
+      "se": 0.026964883236609234,
+      "value_c": 0.2708014474605399,
+      "n_c": 187,
+      "se_c": 0.0271305193269339,
+      "group": "seda_lninc",
+      "label": "min group share 5% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.24938941705858525,
+      "n": 157,
+      "se": 0.028562781130654108,
+      "value_c": 0.24938941705858525,
+      "n_c": 157,
+      "se_c": 0.0278590817479876,
+      "group": "seda_lninc",
+      "label": "min group share 20% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.2249778481321883,
+      "n": 107,
+      "se": 0.029078125491587177,
+      "value_c": 0.2249778481321883,
+      "n_c": 107,
+      "se_c": 0.029223349100626347,
+      "group": "seda_lninc",
+      "label": "min group share 30% (baseline 10%)",
+      "note": ""
+    },
+    {
+      "value": 0.26580597841812137,
+      "n": 187,
+      "se": 0.014876846668869128,
+      "value_c": 0.26580597841812137,
+      "n_c": 187,
+      "se_c": 0.015170223608677348,
+      "group": "seda_lninc",
+      "label": "unweighted average across CZs",
+      "note": ""
+    },
+    {
+      "value": 0.2895524269038823,
+      "n": 186,
+      "se": 0.023828806479885396,
+      "value_c": 0.2895524269038823,
+      "n_c": 186,
+      "se_c": 0.023933469937256945,
+      "group": "seda_lninc",
+      "label": "drop the 1 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.2830435623247792,
+      "n": 182,
+      "se": 0.02306736010543188,
+      "value_c": 0.2830435623247792,
+      "n_c": 182,
+      "se_c": 0.024314933375077716,
+      "group": "seda_lninc",
+      "label": "drop the 5 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.27543937648144007,
+      "n": 177,
+      "se": 0.02254329102215405,
+      "value_c": 0.27543937648144007,
+      "n_c": 177,
+      "se_c": 0.022605137488355534,
+      "group": "seda_lninc",
+      "label": "drop the 10 largest CZs by pupils",
+      "note": ""
+    },
+    {
+      "value": 0.27513385347317854,
+      "n": 175,
+      "se": 0.029610201589272193,
+      "value_c": 0.2751338534731784,
+      "n_c": 175,
+      "se_c": 0.02973298198002308,
+      "group": "seda_lninc",
+      "label": "restrict to the CZs that have a salary gap",
+      "note": ""
+    },
+    {
+      "value": 0.15725658158108238,
+      "n": 615,
+      "se": 0.01840576927790046,
+      "value_c": 0.1850092166140715,
+      "n_c": 186,
+      "se_c": 0.023690209703688965,
+      "group": "seda_lninc",
+      "label": "partition: revenue split",
+      "note": ""
+    },
+    {
+      "value": 0.3541832221828005,
+      "n": 619,
+      "se": 0.015165952787205299,
+      "value_c": 0.4041407716402001,
+      "n_c": 187,
+      "se_c": 0.015728872407940745,
+      "group": "seda_lninc",
+      "label": "partition: ses split",
+      "note": ""
+    }
+  ],
+  "meta": {
+    "generated": "2026-09-29T16:25:07",
+    "B": 1999,
+    "seed": 20260929,
+    "year": 2018
+  }
+}

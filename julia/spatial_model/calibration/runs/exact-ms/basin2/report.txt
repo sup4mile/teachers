@@ -1,0 +1,33 @@
+spatial_diagnose.jl  2026-09-29 22:45:58
+  options: max-iter = 40, out = julia/spatial_model/runs/exact-ms/basin2, polish = true, theta = -1.75480,-0.00093,0.04899,0.44611,0.48660,0.05000,0.97715,0.60513, workers = 16
+  measurement: Measurement(0.11332868530700327, 12.0, :within, 0.45, :log_median_market, 20, (0.24439828166912048, 0.7556017183308795), 0.18, 600, 5.5, 4.0)
+  solver: (Nz = 5, nϵT = 48, nXO = 48, damping = 0.75, tol = 1.0e-6, maxit = 120, hh_tol = 1.0e-7, hh_maxit = 1000)
+  workers: 16
+
+polish: 16 iterations, 5.9 minutes, criterion 1.52919e-19
+
+ϑ = (logκ̃ = -1.20377, δκ = 0.00451, ΔB = 0.06617, β = 0.22777, λ = 0.12452, r_m = 0.20593, ωf = 0.96644, γ = 0.61939)
+  moment                  target       model  (m−t)/se  param  source
+  male_teach_share       0.01945     0.01945     -0.00  logκ̃   ACS 2009–13, men 25–34 (wages_occ_shares_v2.xlsx: moments_shares)
+  female_teach_share     0.05987     0.05987     -0.00  ωf     ACS 2009–13, women 25–34 (wages_occ_shares_v2.xlsx: moments_shares)
+  teacher_p9010          2.77278     2.77278     -0.00  γ      ACS 2009–13 (wages_occ_shares_v2.xlsx: 90_10_hr_wages_weighted)
+  gap_salary             0.00860     0.00860     -0.00  δκ     district_audit.md, variant 28 (spatial_moments.json: 0.01623 on 176 CZs)
+  gap_pupils             0.37640     0.37640     +0.00  ΔB     spatial_moments.json: gap_pupils_locale
+  cfr_effect             0.01334     0.01334     -0.00  β      CFR (2014b) Table 3 col. 2: 1.34% earnings at 28 per teacher-VA SD-year
+  wtp_share              0.00595     0.00595     +0.00  λ      BFM (2007) Table 7 col. 4: $19.70/month (SE $7.40) per school-average SD
+  gap_income             0.11220    -0.01017    -7.28*  r_m    district_bootstrap.md: pm_ftyr_all (ACS 2014–18 school districts, B20005)
+  gap_teachers_pp       -0.01770     0.02340    +3.14*  none   district_audit.md, FTE variant 11 (spatial_moments.json: −0.01216)
+  move_rate              0.21560     0.21560     +0.00  r_m    NLSY79 (nlsy_extensions.json T3/nlsy79_main): city↔suburb, ages 14–16 → 25–34
+  * validation: not in the criterion
+  criterion over 8 active targets = 0.0000
+  validation: SEDA growth gap 0.0119 SD/grade [data 0.0031 (0.0030)];  Δlog Q = 0.0149
+              score-level gap 0.0605 SD [0.2887];  child-poverty gap +0.0024 [−0.0888] (poor shares (0.1786, 0.1810);
+              provisional: relative line, home-production output counted as income)
+  income gaps: mean log -0.0102, log mean -0.0140, log median -0.0117;  market workers: mean log -0.0084, log median -0.0102
+  occupations: teaching share 0.0397 (male 0.0194, female 0.0599);  teacher 90/10 men 2.654, women 2.811 [2.597, 2.830]
+  ability (§4 check): wage slope 0.2138 [NLSY 0.2127];  mother–child ρ 0.5760 [0.5766];  c = 1.8760;  s_T/s_O = 0.7605 [1.176]
+  mobility: gross move rate 0.2156;  P(1→2) = 0.2649, P(2→1) = 0.1818;  by parental-income tercile (0.2045, 0.2164, 0.2259) [NLSY79 0.221, 0.226, 0.207]
+  CFR pieces: sd(log h_T) = 0.6565;  non-teachers 0.01343;  analytic 0.01354
+  WTP share by location (0.0059, 0.0060);  students/teacher (25.5702, 24.9788);  t = (0.0163, 0.0171);  M = (0.8140, 1.1860)
+  levels: mean C = 0.040271, mean h = 0.085583;  stationarity dev 1.5e-05
+  consumption support: min C = -8.419e-03;  558 (node, l′) pairs at the floor, chosen by a population share 1.1e-23

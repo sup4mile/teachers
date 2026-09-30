@@ -1,0 +1,16 @@
+created = "2026-09-29 17:22:55"
+criterion = 17.380525472942836
+note = "spatial_diagnose.jl --theta julia/spatial_model/runs/polish-noincome"
+theta = [-1.7147984280919266, -0.0009942610581969184, 0.046543812455843325, 0.441768708722471, 0.459333804727659, 0.05, 0.9748479306418691, 0.6126165762263149]
+theta_names = ["logκ̃", "δκ", "ΔB", "β", "λ", "r_m", "ωf", "γ"]
+
+[moments]
+cfr_effect = 0.025852296212079455
+female_teach_share = 0.057672608178556975
+gap_pupils = 0.2619352031978077
+gap_salary = -0.002918416260464518
+gap_teachers_pp = 0.01129572607509699
+male_teach_share = 0.019036865785259267
+move_rate = 0.2416815360106822
+teacher_p9010 = 2.749981874075794
+wtp_share = 0.005953819402024284

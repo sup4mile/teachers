@@ -140,6 +140,12 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         # hourly wage (income over hours) on full-year, full-time workers;
         # ESR_COL flags the armed forces at the interview date
         "earnings": r"Q13-5(_TRUNC(_REVISED)?)?|WKSWK-PCY|HRSWK-PCY|ESR_COL",
+        # residence in an SMSA (0/1 not in, SMSA with or without central city;
+        # the coding shifts across rounds, so read the codebook), urban/rural,
+        # census region, and residence at 14; 1978 family income and poverty
+        # status: the NLSY extensions (T3, residential transition)
+        "geo": r"SMSARES|URBAN-RURAL|REGION|FAM-5|FAM-6|FAM-RES",
+        "famincome": r"TNFI_TRUNC|POVSTATUS|FAMSIZE",
     },
     "nlscya": {
         "id": r"CPUBID|MPUBID|CRACE|CSEX|CMOB|CYRB|BTHORDR",
@@ -156,6 +162,13 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         "ya_weights": r"YA\d\dWEIGHT(_REVISED)?",
         "ya_age": r"AGEINT(\d\d|\d{4})",
         "ya_earnings": r"Q15-5(-TOP)?",       # wage and salary income, past year
+        # young-adult job history (start/stop dates, current flag), usual hours at
+        # the interview date and the interview date itself: annual weeks and
+        # hours are not released, so the ACS-style wage sample of the CFR
+        # replication (T6a) is built from these
+        "ya_jobs": r"TOTHOURS\d\d|NUMCURJOBS\d\d|WORK\d\d"
+                   r"|JOB-HISTORY_(CURRFLAG|START-DATE|STOP-DATE)\.\d\d(~[MY])?"
+                   r"|Q-1C_[MY]|(SYMBOL!)?CURDATE~[MY]",
     },
     "nlsy97": {
         "id": r"PUBID|KEY!SEX|KEY!BDATE_[MY]|KEY!RACE_ETHNICITY|CV_SAMPLE_TYPE",
@@ -171,6 +184,13 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         # calendar-year wage income, weeks and hours: the ACS-vintage check on
         # the NLSY79 log-wage slope
         "earnings": r"YINC-1700|CVC_(HOURS_WK|WKSWK)_YR_ALL\.\d\d|CV_AGE_INT_DATE",
+        # residence by round (MSA with/without central city, urban/rural, census
+        # region; definitions change with the 2000/2010/2020 standards) and at
+        # 12, from the parent (round 1) and the youth (YCHR); round-1 household
+        # income, poverty ratio and size: the residential-transition target (T3)
+        "geo": r"CV_(MSA|URBAN-RURAL|CENSUS_REGION)(_AGE_12(_YCHR)?)?",
+        "parent_income": r"CV_INCOME_GROSS_YR|CV_HH_POV_RATIO|CV_HH_SIZE|CV_HH_INCOME_SOURCE"
+                         r"|CV_INTERVIEW_DATE(_[MY]|~[MY])",
     },
 }
 

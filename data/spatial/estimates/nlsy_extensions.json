@@ -1,0 +1,4268 @@
+{
+ "meta": {
+  "generated": "2026-09-29T16:13:28",
+  "script": "data/spatial/nlsy_extensions.py",
+  "B": 500,
+  "seed": 20260929
+ },
+ "T6a.sample": {
+  "ya_person_rounds_25_34": 19301,
+  "ya_children_25_34": 7016,
+  "age28_children": 5800,
+  "age28_age_counts": {
+   "27": 917,
+   "28": 2579,
+   "29": 2304
+  },
+  "age28_interview_years": {
+   "2000": 7,
+   "2002": 53,
+   "2004": 179,
+   "2005": 7,
+   "2006": 313,
+   "2007": 9,
+   "2008": 528,
+   "2009": 117,
+   "2010": 791,
+   "2011": 1,
+   "2012": 605,
+   "2013": 238,
+   "2014": 447,
+   "2015": 322,
+   "2016": 199,
+   "2017": 535,
+   "2018": 355,
+   "2019": 333,
+   "2020": 478,
+   "2021": 283
+  },
+  "single_year_score_obs": 23221,
+  "children_with_scores_8_14": 8534,
+  "mean_rounds_per_child": 2.7300210921021795,
+  "months_covered_dist_age28": {
+   "0": 986,
+   "1": 52,
+   "2": 87,
+   "3": 84,
+   "4": 82,
+   "5": 89,
+   "6": 81,
+   "7": 90,
+   "8": 101,
+   "9": 98,
+   "10": 140,
+   "11": 138,
+   "12": 3739
+  }
+ },
+ "T6a.reliability": {
+  "weighted": {
+   "single": 0.8352300981340983,
+   "avg": 0.8949128073055143,
+   "lam_single": [
+    0.7138801149400787,
+    0.8050113170271435,
+    0.8171614666983045,
+    0.7471180814493393
+   ],
+   "lam_avg": [
+    0.7774369003146697,
+    0.8559264694481963,
+    0.907302480654569,
+    0.7610137532500708
+   ]
+  },
+  "unweighted": {
+   "single": 0.8479658190459627,
+   "avg": 0.9042940504487293,
+   "lam_single": [
+    0.7341926647305698,
+    0.8143557711794571,
+    0.8280925991412644,
+    0.7679939316174484
+   ],
+   "lam_avg": [
+    0.8008135460702988,
+    0.8598602766422995,
+    0.908634221403461,
+    0.7894149410078901
+   ]
+  }
+ },
+ "T6a.reliability_saved_child_composite_T2a": 0.892,
+ "T6a.ladder": {
+  "weighted|1|single|base": {
+   "coef": 0.2299901624612377,
+   "se": 0.013745896849419048,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991,
+   "disatt_coef": 0.25165536413067385,
+   "disatt_se": 0.015040768004702146,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|1|single|ctrl": {
+   "coef": 0.1576151982979681,
+   "se": 0.014825241285612165,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991,
+   "disatt_coef": 0.17246263794821473,
+   "disatt_se": 0.016221787289204696,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|1|single|base_lagsample": {
+   "coef": 0.22941123786767703,
+   "se": 0.014051549399900378,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "disatt_coef": 0.25102190451728157,
+   "disatt_se": 0.015375213196034241,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|1|single|lag": {
+   "coef": 0.17419141763411555,
+   "se": 0.015515766327391189,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|1|single|ctrl_lag": {
+   "coef": 0.11755635013864207,
+   "se": 0.015731645419462113,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|1|avg|base": {
+   "coef": 0.23946141821507938,
+   "se": 0.014818912152869368,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.7855347598701058,
+   "disatt_coef": 0.2531309147636911,
+   "disatt_se": 0.015664839943816827,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|1|avg|ctrl": {
+   "coef": 0.166083545379621,
+   "se": 0.016595369562461142,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.7855347598701058,
+   "disatt_coef": 0.17556431462950828,
+   "disatt_se": 0.017542705248718735,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|2|single|base": {
+   "coef": 0.17115923141083889,
+   "se": 0.01228159721187758,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8018495363739976,
+   "disatt_coef": 0.18728252653971852,
+   "disatt_se": 0.013438530524027215,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|2|single|ctrl": {
+   "coef": 0.10643145198768877,
+   "se": 0.013126935814033316,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8018495363739976,
+   "disatt_coef": 0.11645735416806056,
+   "disatt_se": 0.014363500494319184,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|2|single|base_lagsample": {
+   "coef": 0.17313022060181738,
+   "se": 0.012506386217741116,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "disatt_coef": 0.1894391840125655,
+   "disatt_se": 0.013684494779705736,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|2|single|lag": {
+   "coef": 0.13310823881513162,
+   "se": 0.013547552612748882,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|2|single|ctrl_lag": {
+   "coef": 0.08357065006518383,
+   "se": 0.013789755762613992,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|2|avg|base": {
+   "coef": 0.1798401281282349,
+   "se": 0.013312993921920218,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.757169353908874,
+   "disatt_coef": 0.19010618279823097,
+   "disatt_se": 0.014072957367488407,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|2|avg|ctrl": {
+   "coef": 0.11292852392951147,
+   "se": 0.01484361224790973,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.757169353908874,
+   "disatt_coef": 0.11937497396559943,
+   "disatt_se": 0.015690950027432475,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|3|single|base": {
+   "coef": 0.22949793300149768,
+   "se": 0.017988397941211053,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8018495363739976,
+   "disatt_coef": 0.25111676638109576,
+   "disatt_se": 0.019682915067229825,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|3|single|ctrl": {
+   "coef": 0.14352617578299487,
+   "se": 0.01924116213339732,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8018495363739976,
+   "disatt_coef": 0.1570464216487527,
+   "disatt_se": 0.021053690345531735,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|3|single|base_lagsample": {
+   "coef": 0.22778301783236854,
+   "se": 0.018101607379847933,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "disatt_coef": 0.24924030524588026,
+   "disatt_se": 0.019806788898172462,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|3|single|lag": {
+   "coef": 0.17468133253734652,
+   "se": 0.01810680069599706,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|3|single|ctrl_lag": {
+   "coef": 0.10934757480350754,
+   "se": 0.01825042179404565,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.8002334129140463,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|3|avg|base": {
+   "coef": 0.24252459769715884,
+   "se": 0.019546329809794108,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.757169353908874,
+   "disatt_coef": 0.2563689538188499,
+   "disatt_se": 0.02066211910839846,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|3|avg|ctrl": {
+   "coef": 0.15388686138442154,
+   "se": 0.021693441712322428,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.757169353908874,
+   "disatt_coef": 0.16267139100197214,
+   "disatt_se": 0.02293179747261345,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|4|single|base": {
+   "coef": 0.17091161720907522,
+   "se": 0.013379711489446692,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7786962792226447,
+   "disatt_coef": 0.18701158694194653,
+   "disatt_se": 0.014640087779439485,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|4|single|ctrl": {
+   "coef": 0.10947032955402847,
+   "se": 0.014590445105778746,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7786962792226447,
+   "disatt_coef": 0.11978249569725376,
+   "disatt_se": 0.015964873178182973,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|4|single|base_lagsample": {
+   "coef": 0.17158062878149938,
+   "se": 0.013849696314690135,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "disatt_coef": 0.18774361977789192,
+   "disatt_se": 0.015154345437535898,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|4|single|lag": {
+   "coef": 0.1264506832194363,
+   "se": 0.014791149102320433,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|4|single|ctrl_lag": {
+   "coef": 0.0794150408457881,
+   "se": 0.01547885025444531,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|4|avg|base": {
+   "coef": 0.18023332839880624,
+   "se": 0.014338692642419845,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.729747523390108,
+   "disatt_coef": 0.19052182864597106,
+   "disatt_se": 0.015157207420492012,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|4|avg|ctrl": {
+   "coef": 0.11717388546935581,
+   "se": 0.016154279286865466,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.729747523390108,
+   "disatt_coef": 0.12386267915875157,
+   "disatt_se": 0.017076435626718012,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|5|single|base": {
+   "coef": 0.15997020786220384,
+   "se": 0.012749738471856087,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7786962792226447,
+   "disatt_coef": 0.17503949072781502,
+   "disatt_se": 0.013950770951981776,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|5|single|ctrl": {
+   "coef": 0.10169328616044027,
+   "se": 0.013820799806798444,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7786962792226447,
+   "disatt_coef": 0.11127285047534849,
+   "disatt_se": 0.015122726862472654,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|5|single|base_lagsample": {
+   "coef": 0.16187598964850247,
+   "se": 0.013054367557895897,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "disatt_coef": 0.17712479822206675,
+   "disatt_se": 0.014284096267950729,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|5|single|lag": {
+   "coef": 0.11860470656080657,
+   "se": 0.014834793503944187,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|5|single|ctrl_lag": {
+   "coef": 0.07367721357378798,
+   "se": 0.01574133153731157,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.7774827497368648,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|5|avg|base": {
+   "coef": 0.16783076235455585,
+   "se": 0.013732292577461435,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.729747523390108,
+   "disatt_coef": 0.17741127032889642,
+   "disatt_se": 0.014516191409228708,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|5|avg|ctrl": {
+   "coef": 0.10778125517930448,
+   "se": 0.015372411301022288,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.729747523390108,
+   "disatt_coef": 0.11393387678599369,
+   "disatt_se": 0.016249935224456277,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|6|single|base": {
+   "coef": 0.16568221704850672,
+   "se": 0.010618785505555612,
+   "n_obs": 26286,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7833358119782389,
+   "disatt_coef": 0.1812895743675406,
+   "disatt_se": 0.011619081026896102,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|6|single|ctrl": {
+   "coef": 0.11008663044290756,
+   "se": 0.011299969506735112,
+   "n_obs": 26286,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7833358119782389,
+   "disatt_coef": 0.12045685247384444,
+   "disatt_se": 0.012364432941179426,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "weighted|6|single|base_lagsample": {
+   "coef": 0.1670040576081635,
+   "se": 0.010997084839943773,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.7853886006515848,
+   "disatt_coef": 0.1827359330456827,
+   "disatt_se": 0.012033016369725773,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|6|single|lag": {
+   "coef": 0.12957620842547735,
+   "se": 0.014092048075784758,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.7853886006515848,
+   "share_lag_gap_2": 0.9430318244392258,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "weighted|6|single|ctrl_lag": {
+   "coef": 0.08808999689090058,
+   "se": 0.015144970678972311,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.7853886006515848,
+   "share_lag_gap_2": 0.9430318244392258,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "weighted|6|avg|base": {
+   "coef": 0.17688128874218856,
+   "se": 0.011470498520790462,
+   "n_obs": 9278,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7362479694583987,
+   "disatt_coef": 0.18697844002441996,
+   "disatt_se": 0.012125284336015067,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "weighted|6|avg|ctrl": {
+   "coef": 0.12046663720798279,
+   "se": 0.0126864445089714,
+   "n_obs": 9278,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7362479694583987,
+   "disatt_coef": 0.1273433954507588,
+   "disatt_se": 0.013410641796042415,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "weighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|1|single|base": {
+   "coef": 0.27671297894686153,
+   "se": 0.011656103702094033,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8574293273243752,
+   "disatt_coef": 0.3004971494068289,
+   "disatt_se": 0.012657974877073864,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|1|single|ctrl": {
+   "coef": 0.1848665862108234,
+   "se": 0.011781815417454726,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8574293273243752,
+   "disatt_coef": 0.20075633021749986,
+   "disatt_se": 0.012794491827802746,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|1|single|base_lagsample": {
+   "coef": 0.27366147571835076,
+   "se": 0.011909343224295167,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367,
+   "disatt_coef": 0.29718336186761374,
+   "disatt_se": 0.012932980967602061,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|1|single|lag": {
+   "coef": 0.20309408487105754,
+   "se": 0.011774131735486625,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367,
+   "share_lag_gap_2": 0.9384649479205142,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|1|single|ctrl_lag": {
+   "coef": 0.129862633133925,
+   "se": 0.011607804372473716,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367,
+   "share_lag_gap_2": 0.9384649479205142,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|1|avg|base": {
+   "coef": 0.28928215705026905,
+   "se": 0.01202051088429117,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8187688456096031,
+   "disatt_coef": 0.30420532390742416,
+   "disatt_se": 0.012640611658786412,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|1|avg|ctrl": {
+   "coef": 0.19900803546049417,
+   "se": 0.013015540226709118,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8187688456096031,
+   "disatt_coef": 0.20927424112410695,
+   "disatt_se": 0.013686971470584426,
+   "rung": "1",
+   "label": "CFR: earnings capped at $100,000 (2010$) / mean, zeros included, age ~28",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|2|single|base": {
+   "coef": 0.1985419086441983,
+   "se": 0.010479048587945601,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8272788476324404,
+   "disatt_coef": 0.21560708071026063,
+   "disatt_se": 0.011379748941151081,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|2|single|ctrl": {
+   "coef": 0.12079902993993841,
+   "se": 0.010455110463200754,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8272788476324404,
+   "disatt_coef": 0.1311820077475747,
+   "disatt_se": 0.011353753274900265,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|2|single|base_lagsample": {
+   "coef": 0.19687033348478025,
+   "se": 0.010701673744210884,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "disatt_coef": 0.21379182949820655,
+   "disatt_se": 0.011621509284661437,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|2|single|lag": {
+   "coef": 0.14472458579620667,
+   "se": 0.010239556352863423,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|2|single|ctrl_lag": {
+   "coef": 0.08318369369970213,
+   "se": 0.010022055425029486,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|2|avg|base": {
+   "coef": 0.20765929167066477,
+   "se": 0.010755931465454848,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.7818620592059666,
+   "disatt_coef": 0.21837178873802265,
+   "disatt_se": 0.011310796520388793,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|2|avg|ctrl": {
+   "coef": 0.12919238199456373,
+   "se": 0.0114309969151364,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.7818620592059666,
+   "disatt_coef": 0.1358570152123089,
+   "disatt_se": 0.012020686497264906,
+   "rung": "2",
+   "label": "Drop zeros (earnings > 0), capped earnings / mean",
+   "y": "inc_cap",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|3|single|base": {
+   "coef": 0.2628139868185473,
+   "se": 0.01613978501684426,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8272788476324404,
+   "disatt_coef": 0.28540350425118033,
+   "disatt_se": 0.017527039779843892,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|3|single|ctrl": {
+   "coef": 0.16635601075449813,
+   "se": 0.01568591433713315,
+   "n_obs": 12240,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.8272788476324404,
+   "disatt_coef": 0.18065472464888674,
+   "disatt_se": 0.017034157783590586,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|3|single|base_lagsample": {
+   "coef": 0.2573172579387525,
+   "se": 0.016349114612658137,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "disatt_coef": 0.2794343178193515,
+   "disatt_se": 0.017754361776332658,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|3|single|lag": {
+   "coef": 0.19483269409646287,
+   "se": 0.014932103826959189,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|3|single|ctrl_lag": {
+   "coef": 0.11590256618239891,
+   "se": 0.014405129214425808,
+   "n_obs": 11552,
+   "n_children": 4225,
+   "n_mothers": 2199,
+   "sd_score_raw": 0.826585713937922,
+   "share_lag_gap_2": 0.9381925207756233,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|3|avg|base": {
+   "coef": 0.27988209157594923,
+   "se": 0.017059173659524033,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.7818620592059666,
+   "disatt_coef": 0.2943203382881087,
+   "disatt_se": 0.017939203377091522,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|3|avg|ctrl": {
+   "coef": 0.18456093795418838,
+   "se": 0.01772467000519661,
+   "n_obs": 4349,
+   "n_children": 4349,
+   "n_mothers": 2244,
+   "sd_score_raw": 0.7818620592059666,
+   "disatt_coef": 0.19408186278580458,
+   "disatt_se": 0.018639030609641345,
+   "rung": "3",
+   "label": "Log earnings, earnings > 0",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|4|single|base": {
+   "coef": 0.19214419893574775,
+   "se": 0.01193184571257303,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.8044827567401613,
+   "disatt_coef": 0.2086594719011669,
+   "disatt_se": 0.01295741760085213,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|4|single|ctrl": {
+   "coef": 0.12350309832720541,
+   "se": 0.012470049454759734,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.8044827567401613,
+   "disatt_coef": 0.1341184975546932,
+   "disatt_se": 0.013541881296565694,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|4|single|base_lagsample": {
+   "coef": 0.19045417484393257,
+   "se": 0.012112500290738331,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "disatt_coef": 0.20682418602497804,
+   "disatt_se": 0.013153599890430932,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|4|single|lag": {
+   "coef": 0.13893394949963578,
+   "se": 0.011242909512574333,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|4|single|ctrl_lag": {
+   "coef": 0.0850168922568173,
+   "se": 0.011509891439206645,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|4|avg|base": {
+   "coef": 0.20541708342101916,
+   "se": 0.012973533299435085,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7570201018017868,
+   "disatt_coef": 0.21601391193771655,
+   "disatt_se": 0.013642797536567707,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|4|avg|ctrl": {
+   "coef": 0.1372608460272886,
+   "se": 0.014564207025789859,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7570201018017868,
+   "disatt_coef": 0.14434170621274262,
+   "disatt_se": 0.0153155291737032,
+   "rung": "4",
+   "label": "Log earnings, ACS-style sample (full-year, full-time, >= $1,000 in 2010$, hgc >= 9)",
+   "y": "learn",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|5|single|base": {
+   "coef": 0.18145491782315992,
+   "se": 0.01157797255108244,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.8044827567401613,
+   "disatt_coef": 0.1970514204257147,
+   "disatt_se": 0.012573128158830963,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|5|single|ctrl": {
+   "coef": 0.11662881452085117,
+   "se": 0.01197399040382141,
+   "n_obs": 7970,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.8044827567401613,
+   "disatt_coef": 0.12665335191575425,
+   "disatt_se": 0.0130031847333913,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|5|single|base_lagsample": {
+   "coef": 0.18107322101304277,
+   "se": 0.01173406682692902,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "disatt_coef": 0.1966369158230957,
+   "disatt_se": 0.012742639126871345,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|5|single|lag": {
+   "coef": 0.12990028710653845,
+   "se": 0.01106625838015335,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|5|single|ctrl_lag": {
+   "coef": 0.07819218094994085,
+   "se": 0.011271615918293933,
+   "n_obs": 7556,
+   "n_children": 2745,
+   "n_mothers": 1722,
+   "sd_score_raw": 0.8022240740590356,
+   "share_lag_gap_2": 0.9383271572260455,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|5|avg|base": {
+   "coef": 0.19280028864587373,
+   "se": 0.01264557660756,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7570201018017868,
+   "disatt_coef": 0.2027462559565021,
+   "disatt_se": 0.013297922578855984,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|5|avg|ctrl": {
+   "coef": 0.12801459004705862,
+   "se": 0.014040901582841865,
+   "n_obs": 2831,
+   "n_children": 2831,
+   "n_mothers": 1763,
+   "sd_score_raw": 0.7570201018017868,
+   "disatt_coef": 0.13461846464099214,
+   "disatt_se": 0.014765228030356674,
+   "rung": "5",
+   "label": "Log hourly wage, ACS-style sample",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|6|single|base": {
+   "coef": 0.1804385050463304,
+   "se": 0.009081171786227249,
+   "n_obs": 26286,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.8050220963843125,
+   "disatt_coef": 0.1959476444365277,
+   "disatt_se": 0.0098617211430442,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|6|single|ctrl": {
+   "coef": 0.11759952019033904,
+   "se": 0.009208666223008151,
+   "n_obs": 26286,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.8050220963843125,
+   "disatt_coef": 0.12770749215776353,
+   "disatt_se": 0.010000174044544159,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": null
+  },
+  "unweighted|6|single|base_lagsample": {
+   "coef": 0.18087568220425132,
+   "se": 0.009261821240154726,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.8034775410989389,
+   "disatt_coef": 0.19642239806117154,
+   "disatt_se": 0.01005789786794416,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|6|single|lag": {
+   "coef": 0.12288972880403226,
+   "se": 0.008854669285010502,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.8034775410989389,
+   "share_lag_gap_2": 0.9430318244392258,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": false,
+   "lag": "subj"
+  },
+  "unweighted|6|single|ctrl_lag": {
+   "coef": 0.07381320241773892,
+   "se": 0.00874768866152526,
+   "n_obs": 24698,
+   "n_children": 4242,
+   "n_mothers": 2215,
+   "sd_score_raw": 0.8034775410989389,
+   "share_lag_gap_2": 0.9430318244392258,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "single",
+   "controls": true,
+   "lag": "subj"
+  },
+  "unweighted|6|avg|base": {
+   "coef": 0.1921722503665293,
+   "se": 0.009517111199397764,
+   "n_obs": 9278,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7551197517700113,
+   "disatt_coef": 0.2020858191354332,
+   "disatt_se": 0.010008069369355105,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": false,
+   "lag": null
+  },
+  "unweighted|6|avg|ctrl": {
+   "coef": 0.13212673359757332,
+   "se": 0.010235075902835263,
+   "n_obs": 9278,
+   "n_children": 4366,
+   "n_mothers": 2260,
+   "sd_score_raw": 0.7551197517700113,
+   "disatt_coef": 0.13894274088911476,
+   "disatt_se": 0.010763071639078048,
+   "rung": "6",
+   "label": "Log hourly wage, ACS-style sample, ages 25-34 pooled",
+   "y": "lw",
+   "weighting": "unweighted",
+   "design": "avg",
+   "controls": true,
+   "lag": null
+  }
+ },
+ "T6a.bootstrap_disattenuated": {
+  "5|single": {
+   "point": 0.17503949072781502,
+   "se_analytic": 0.013950770951981776,
+   "se_boot": 0.014432900083283401,
+   "ci95": [
+    0.14582464312495746,
+    0.2000843660955543
+   ],
+   "B": 250
+  },
+  "5|avg": {
+   "point": 0.17741127032889642,
+   "se_analytic": 0.014516191409228708,
+   "se_boot": 0.014914388542242089,
+   "ci95": [
+    0.14728653831917057,
+    0.20407806996313257
+   ],
+   "B": 250
+  },
+  "6|single": {
+   "point": 0.1812895743675406,
+   "se_analytic": 0.011619081026896102,
+   "se_boot": 0.011352381659993454,
+   "ci95": [
+    0.1582415558100868,
+    0.2011353789930322
+   ],
+   "B": 250
+  },
+  "6|avg": {
+   "point": 0.18697844002441996,
+   "se_analytic": 0.012125284336015067,
+   "se_boot": 0.011703127033615309,
+   "ci95": [
+    0.16428522485054017,
+    0.20695771837418195
+   ],
+   "B": 250
+  }
+ },
+ "T6a.subject_single_year_cfr": {
+  "weighted|math|base": {
+   "coef": 0.23983223045288926,
+   "se": 0.012650538220679271,
+   "n_obs": 14311,
+   "n_children": 5099,
+   "n_mothers": 2374,
+   "sd_score_raw": 0.9482602582342946
+  },
+  "weighted|math|ctrl": {
+   "coef": 0.17369270645995982,
+   "se": 0.01293793010834154,
+   "n_obs": 14311,
+   "n_children": 5099,
+   "n_mothers": 2374,
+   "sd_score_raw": 0.9482602582342946
+  },
+  "weighted|math|base_lagsample": {
+   "coef": 0.24327849063940876,
+   "se": 0.01280856641646822,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9446184333908838
+  },
+  "weighted|math|lag": {
+   "coef": 0.16584934450060984,
+   "se": 0.012089638392398497,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9446184333908838,
+   "share_lag_gap_2": 0.9385288447278659
+  },
+  "weighted|math|ctrl_lag": {
+   "coef": 0.1294432190388477,
+   "se": 0.011961017710554236,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9446184333908838,
+   "share_lag_gap_2": 0.9385288447278659
+  },
+  "weighted|read|base": {
+   "coef": 0.19245599376122913,
+   "se": 0.01373891601459213,
+   "n_obs": 14363,
+   "n_children": 5105,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.914600108287439
+  },
+  "weighted|read|ctrl": {
+   "coef": 0.12058621826101756,
+   "se": 0.014444336866270995,
+   "n_obs": 14363,
+   "n_children": 5105,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.914600108287439
+  },
+  "weighted|read|base_lagsample": {
+   "coef": 0.1893957156051071,
+   "se": 0.014054454129323065,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9098135749734919
+  },
+  "weighted|read|lag": {
+   "coef": 0.10335760271451505,
+   "se": 0.015597848196679759,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9098135749734919,
+   "share_lag_gap_2": 0.9384842883548984
+  },
+  "weighted|read|ctrl_lag": {
+   "coef": 0.06101898787147064,
+   "se": 0.015361803778581205,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9098135749734919,
+   "share_lag_gap_2": 0.9384842883548984
+  },
+  "weighted|comp|base": {
+   "coef": 0.2299901624612377,
+   "se": 0.013745896849419048,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991
+  },
+  "weighted|comp|ctrl": {
+   "coef": 0.1576151982979681,
+   "se": 0.014825241285612165,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991
+  },
+  "weighted|comp|base_lagsample": {
+   "coef": 0.22941123786767703,
+   "se": 0.014051549399900378,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645
+  },
+  "weighted|comp|lag": {
+   "coef": 0.17419141763411555,
+   "se": 0.015515766327391189,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142
+  },
+  "weighted|comp|ctrl_lag": {
+   "coef": 0.11755635013864207,
+   "se": 0.015731645419462113,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142
+  },
+  "unweighted|math|base": {
+   "coef": 0.2701632599703744,
+   "se": 0.011232593325820188,
+   "n_obs": 14311,
+   "n_children": 5099,
+   "n_mothers": 2374,
+   "sd_score_raw": 0.96508002531617
+  },
+  "unweighted|math|ctrl": {
+   "coef": 0.1854152067029844,
+   "se": 0.010700524592121964,
+   "n_obs": 14311,
+   "n_children": 5099,
+   "n_mothers": 2374,
+   "sd_score_raw": 0.96508002531617
+  },
+  "unweighted|math|base_lagsample": {
+   "coef": 0.2682969724145101,
+   "se": 0.01149874036287782,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9633058910918073
+  },
+  "unweighted|math|lag": {
+   "coef": 0.16369405339430781,
+   "se": 0.009640113916453799,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9633058910918073,
+   "share_lag_gap_2": 0.9385288447278659
+  },
+  "unweighted|math|ctrl_lag": {
+   "coef": 0.12127694399974942,
+   "se": 0.009419993504385703,
+   "n_obs": 13486,
+   "n_children": 4941,
+   "n_mothers": 2325,
+   "sd_score_raw": 0.9633058910918073,
+   "share_lag_gap_2": 0.9385288447278659
+  },
+  "unweighted|read|base": {
+   "coef": 0.23887897807907132,
+   "se": 0.011471125086675108,
+   "n_obs": 14363,
+   "n_children": 5105,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.9401735469606555
+  },
+  "unweighted|read|ctrl": {
+   "coef": 0.14794572441699572,
+   "se": 0.011246085151607787,
+   "n_obs": 14363,
+   "n_children": 5105,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.9401735469606555
+  },
+  "unweighted|read|base_lagsample": {
+   "coef": 0.23596860666043415,
+   "se": 0.011688990509970118,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9372944048981158
+  },
+  "unweighted|read|lag": {
+   "coef": 0.1344056378814497,
+   "se": 0.01108555077807534,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9372944048981158,
+   "share_lag_gap_2": 0.9384842883548984
+  },
+  "unweighted|read|ctrl_lag": {
+   "coef": 0.08003543835219773,
+   "se": 0.010766316580107458,
+   "n_obs": 13525,
+   "n_children": 4951,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.9372944048981158,
+   "share_lag_gap_2": 0.9384842883548984
+  },
+  "unweighted|comp|base": {
+   "coef": 0.27671297894686153,
+   "se": 0.011656103702094033,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8574293273243752
+  },
+  "unweighted|comp|ctrl": {
+   "coef": 0.1848665862108234,
+   "se": 0.011781815417454726,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8574293273243752
+  },
+  "unweighted|comp|base_lagsample": {
+   "coef": 0.27366147571835076,
+   "se": 0.011909343224295167,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367
+  },
+  "unweighted|comp|lag": {
+   "coef": 0.20309408487105754,
+   "se": 0.011774131735486625,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367,
+   "share_lag_gap_2": 0.9384649479205142
+  },
+  "unweighted|comp|ctrl_lag": {
+   "coef": 0.129862633133925,
+   "se": 0.011607804372473716,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8549808444327367,
+   "share_lag_gap_2": 0.9384649479205142
+  }
+ },
+ "T6a.sensitivities": {
+  "rung1_uncapped|single|base": {
+   "coef": 0.24126851200865573,
+   "se": 0.01563897732182715,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991,
+   "disatt_coef": 0.2639961405003016,
+   "disatt_se": 0.017112177714205794
+  },
+  "rung1_uncapped|single|ctrl": {
+   "coef": 0.16637797200871063,
+   "se": 0.01681647356072022,
+   "n_obs": 14380,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.8304437345333991,
+   "disatt_coef": 0.18205086983332097,
+   "disatt_se": 0.0184005947560046
+  },
+  "rung1_uncapped|single|lag": {
+   "coef": 0.179246298188541,
+   "se": 0.016668554453562336,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142
+  },
+  "rung1_uncapped|single|ctrl_lag": {
+   "coef": 0.11972080089743997,
+   "se": 0.016805919594870572,
+   "n_obs": 13537,
+   "n_children": 4952,
+   "n_mothers": 2329,
+   "sd_score_raw": 0.8268720986278645,
+   "share_lag_gap_2": 0.9384649479205142
+  },
+  "rung1_uncapped|avg|base": {
+   "coef": 0.2511340989809723,
+   "se": 0.016798991231844383,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.7855347598701058,
+   "disatt_coef": 0.2654699227844368,
+   "disatt_se": 0.01775795052631245
+  },
+  "rung1_uncapped|avg|ctrl": {
+   "coef": 0.1752592300436575,
+   "se": 0.01872924303905051,
+   "n_obs": 5106,
+   "n_children": 5106,
+   "n_mothers": 2377,
+   "sd_score_raw": 0.7855347598701058,
+   "disatt_coef": 0.18526378717879627,
+   "disatt_se": 0.01979838948021315
+  },
+  "rung1_age26_30|single|base": {
+   "coef": 0.22830550636836677,
+   "se": 0.013439130826134462,
+   "n_obs": 16176,
+   "n_children": 5710,
+   "n_mothers": 2488,
+   "sd_score_raw": 0.8279418526105519,
+   "disatt_coef": 0.24981201249358873,
+   "disatt_se": 0.01470510445080726
+  },
+  "rung1_age26_30|single|ctrl": {
+   "coef": 0.15881326124041806,
+   "se": 0.014407590441116731,
+   "n_obs": 16176,
+   "n_children": 5710,
+   "n_mothers": 2488,
+   "sd_score_raw": 0.8279418526105519,
+   "disatt_coef": 0.1737735590885245,
+   "disatt_se": 0.015764793502052187
+  },
+  "rung1_age26_30|single|lag": {
+   "coef": 0.16988443843645812,
+   "se": 0.015090563127601934,
+   "n_obs": 15203,
+   "n_children": 5544,
+   "n_mothers": 2441,
+   "sd_score_raw": 0.8270513576304532,
+   "share_lag_gap_2": 0.9387620864303098
+  },
+  "rung1_age26_30|single|ctrl_lag": {
+   "coef": 0.11474061872508656,
+   "se": 0.01524246118216733,
+   "n_obs": 15203,
+   "n_children": 5544,
+   "n_mothers": 2441,
+   "sd_score_raw": 0.8270513576304532,
+   "share_lag_gap_2": 0.9387620864303098
+  },
+  "rung1_age26_30|avg|base": {
+   "coef": 0.23848309649422883,
+   "se": 0.014534345288263858,
+   "n_obs": 5710,
+   "n_children": 5710,
+   "n_mothers": 2488,
+   "sd_score_raw": 0.7838420997884018,
+   "disatt_coef": 0.25209674619500055,
+   "disatt_se": 0.015364028768112815
+  },
+  "rung1_age26_30|avg|ctrl": {
+   "coef": 0.1685979151151571,
+   "se": 0.01614320763540647,
+   "n_obs": 5710,
+   "n_children": 5710,
+   "n_mothers": 2488,
+   "sd_score_raw": 0.7838420997884018,
+   "disatt_coef": 0.17822221549702397,
+   "disatt_se": 0.0170647319573643
+  },
+  "rung1_interview_age28_only|single|base": {
+   "coef": 0.23325923531855608,
+   "se": 0.018210017260105828,
+   "n_obs": 6637,
+   "n_children": 2276,
+   "n_mothers": 1574,
+   "sd_score_raw": 0.8465938582448457,
+   "disatt_coef": 0.25523238547573596,
+   "disatt_se": 0.019925411049658014
+  },
+  "rung1_interview_age28_only|single|ctrl": {
+   "coef": 0.1652299407558857,
+   "se": 0.020047037326611294,
+   "n_obs": 6637,
+   "n_children": 2276,
+   "n_mothers": 1574,
+   "sd_score_raw": 0.8465938582448457,
+   "disatt_coef": 0.1807946933957234,
+   "disatt_se": 0.021935479431733716
+  },
+  "rung1_interview_age28_only|single|lag": {
+   "coef": 0.15502120301487676,
+   "se": 0.02207293772027846,
+   "n_obs": 6179,
+   "n_children": 2206,
+   "n_mothers": 1540,
+   "sd_score_raw": 0.8430110324466747,
+   "share_lag_gap_2": 0.9383395371419323
+  },
+  "rung1_interview_age28_only|single|ctrl_lag": {
+   "coef": 0.10662425173939027,
+   "se": 0.022254419917362163,
+   "n_obs": 6179,
+   "n_children": 2206,
+   "n_mothers": 1540,
+   "sd_score_raw": 0.8430110324466747,
+   "share_lag_gap_2": 0.9383395371419323
+  },
+  "rung1_interview_age28_only|avg|base": {
+   "coef": 0.24303376558756584,
+   "se": 0.01978671492158286,
+   "n_obs": 2276,
+   "n_children": 2276,
+   "n_mothers": 1574,
+   "sd_score_raw": 0.801226242897817,
+   "disatt_coef": 0.25690718722123984,
+   "disatt_se": 0.02091622644517204
+  },
+  "rung1_interview_age28_only|avg|ctrl": {
+   "coef": 0.17466435588880103,
+   "se": 0.02265625728416502,
+   "n_obs": 2276,
+   "n_children": 2276,
+   "n_mothers": 1574,
+   "sd_score_raw": 0.801226242897817,
+   "disatt_coef": 0.18463495502658356,
+   "disatt_se": 0.023949574734044094
+  },
+  "rung5_age26_30|single|base": {
+   "coef": 0.1600224544502269,
+   "se": 0.0124431239256926,
+   "n_obs": 8871,
+   "n_children": 3131,
+   "n_mothers": 1881,
+   "sd_score_raw": 0.779017319035757,
+   "disatt_coef": 0.1750966589735905,
+   "disatt_se": 0.013615273144437341
+  },
+  "rung5_age26_30|single|ctrl": {
+   "coef": 0.10274340659461245,
+   "se": 0.013297134439064663,
+   "n_obs": 8871,
+   "n_children": 3131,
+   "n_mothers": 1881,
+   "sd_score_raw": 0.779017319035757,
+   "disatt_coef": 0.11242189284052878,
+   "disatt_se": 0.014549731924822316
+  },
+  "rung5_age26_30|single|lag": {
+   "coef": 0.12168749673575968,
+   "se": 0.014322940129727438,
+   "n_obs": 8399,
+   "n_children": 3038,
+   "n_mothers": 1838,
+   "sd_score_raw": 0.7789027074690932,
+   "share_lag_gap_2": 0.9397547327062745
+  },
+  "rung5_age26_30|single|ctrl_lag": {
+   "coef": 0.07724323139947842,
+   "se": 0.014991970283600326,
+   "n_obs": 8399,
+   "n_children": 3038,
+   "n_mothers": 1838,
+   "sd_score_raw": 0.7789027074690932,
+   "share_lag_gap_2": 0.9397547327062745
+  },
+  "rung5_age26_30|avg|base": {
+   "coef": 0.16908778893457765,
+   "se": 0.013447565918341226,
+   "n_obs": 3131,
+   "n_children": 3131,
+   "n_mothers": 1881,
+   "sd_score_raw": 0.7307521636485671,
+   "disatt_coef": 0.1787400534391568,
+   "disatt_se": 0.0142152113172459
+  },
+  "rung5_age26_30|avg|ctrl": {
+   "coef": 0.1102925023529906,
+   "se": 0.014777783103955361,
+   "n_obs": 3131,
+   "n_children": 3131,
+   "n_mothers": 1881,
+   "sd_score_raw": 0.7307521636485671,
+   "disatt_coef": 0.11658847684228314,
+   "disatt_se": 0.015621363070370717
+  },
+  "rung5_12_months|single|base": {
+   "coef": 0.1585805761107577,
+   "se": 0.01297191663886,
+   "n_obs": 7784,
+   "n_children": 2768,
+   "n_mothers": 1735,
+   "sd_score_raw": 0.7799609103322722,
+   "disatt_coef": 0.1735189548897804,
+   "disatt_se": 0.014193878426322895
+  },
+  "rung5_12_months|single|ctrl": {
+   "coef": 0.10160201268428182,
+   "se": 0.014210611633101767,
+   "n_obs": 7784,
+   "n_children": 2768,
+   "n_mothers": 1735,
+   "sd_score_raw": 0.7799609103322722,
+   "disatt_coef": 0.11117297898679297,
+   "disatt_se": 0.015549259180381421
+  },
+  "rung5_12_months|single|lag": {
+   "coef": 0.11984318243375136,
+   "se": 0.01490743894926759,
+   "n_obs": 7383,
+   "n_children": 2684,
+   "n_mothers": 1693,
+   "sd_score_raw": 0.7789445179571864,
+   "share_lag_gap_2": 0.9381010429364757
+  },
+  "rung5_12_months|single|ctrl_lag": {
+   "coef": 0.07553996395509444,
+   "se": 0.015860693460346364,
+   "n_obs": 7383,
+   "n_children": 2684,
+   "n_mothers": 1693,
+   "sd_score_raw": 0.7789445179571864,
+   "share_lag_gap_2": 0.9381010429364757
+  },
+  "rung5_12_months|avg|base": {
+   "coef": 0.16641025747739802,
+   "se": 0.013957015092970787,
+   "n_obs": 2768,
+   "n_children": 2768,
+   "n_mothers": 1735,
+   "sd_score_raw": 0.7307533641832196,
+   "disatt_coef": 0.17590967687112158,
+   "disatt_se": 0.014753742060782053
+  },
+  "rung5_12_months|avg|ctrl": {
+   "coef": 0.10779565481834652,
+   "se": 0.01577030826053506,
+   "n_obs": 2768,
+   "n_children": 2768,
+   "n_mothers": 1735,
+   "sd_score_raw": 0.7307533641832196,
+   "disatt_coef": 0.11394909841889869,
+   "disatt_se": 0.016670545868517087
+  },
+  "rung5_interview_age28_only|single|base": {
+   "coef": 0.15209486398987648,
+   "se": 0.017442154636612046,
+   "n_obs": 3663,
+   "n_children": 1251,
+   "n_mothers": 1023,
+   "sd_score_raw": 0.7854656781120937,
+   "disatt_coef": 0.1664222850672084,
+   "disatt_se": 0.01908521533846002
+  },
+  "rung5_interview_age28_only|single|ctrl": {
+   "coef": 0.09215006074532539,
+   "se": 0.01857033575305618,
+   "n_obs": 3663,
+   "n_children": 1251,
+   "n_mothers": 1023,
+   "sd_score_raw": 0.7854656781120937,
+   "disatt_coef": 0.1008306478997205,
+   "disatt_se": 0.020319671745750695
+  },
+  "rung5_interview_age28_only|single|lag": {
+   "coef": 0.1102855423937581,
+   "se": 0.019042844643419352,
+   "n_obs": 3430,
+   "n_children": 1212,
+   "n_mothers": 995,
+   "sd_score_raw": 0.7798691553567113,
+   "share_lag_gap_2": 0.9384839650145773
+  },
+  "rung5_interview_age28_only|single|ctrl_lag": {
+   "coef": 0.0668031097599453,
+   "se": 0.01913225182573219,
+   "n_obs": 3430,
+   "n_children": 1212,
+   "n_mothers": 995,
+   "sd_score_raw": 0.7798691553567113,
+   "share_lag_gap_2": 0.9384839650145773
+  },
+  "rung5_interview_age28_only|avg|base": {
+   "coef": 0.16053459115339663,
+   "se": 0.018905431341811194,
+   "n_obs": 1251,
+   "n_children": 1251,
+   "n_mothers": 1023,
+   "sd_score_raw": 0.7386269681816868,
+   "disatt_coef": 0.16969860202438028,
+   "disatt_se": 0.01998463537561003
+  },
+  "rung5_interview_age28_only|avg|ctrl": {
+   "coef": 0.09872861184877024,
+   "se": 0.020993320823985112,
+   "n_obs": 1251,
+   "n_children": 1251,
+   "n_mothers": 1023,
+   "sd_score_raw": 0.7386269681816868,
+   "disatt_coef": 0.10436446930328441,
+   "disatt_se": 0.022191710646806646
+  },
+  "rung1_lag_composite_cubic|single|lag": {
+   "coef": 0.16725561348816947,
+   "se": 0.01507849196032877,
+   "n_obs": 13633,
+   "n_children": 4969,
+   "n_mothers": 2334,
+   "sd_score_raw": 0.8263240840459206,
+   "share_lag_gap_2": 0.9380913958776498
+  },
+  "rung1_lag_composite_cubic|single|ctrl_lag": {
+   "coef": 0.11652469967163626,
+   "se": 0.01512991405562987,
+   "n_obs": 13633,
+   "n_children": 4969,
+   "n_mothers": 2334,
+   "sd_score_raw": 0.8263240840459206,
+   "share_lag_gap_2": 0.9380913958776498
+  }
+ },
+ "T6a.wage_sample_age28": {
+  "n": 5800,
+  "share_zero_earnings": 0.14655172413793102,
+  "share_positive": 0.853448275862069,
+  "share_fy_months_ge_11": 0.668448275862069,
+  "share_ft_hours_ge_30_of_known": 0.9091541135573581,
+  "share_hours_known": 0.7439655172413793,
+  "share_acs_style": 0.5587931034482758,
+  "n_acs_style": 3241,
+  "mean_earnings_2010usd": 28107.29222699709,
+  "mean_capped_earnings_2010usd": 27533.201241650662,
+  "share_uncapped_above_100k": 0.014655172413793103,
+  "corr_lw_learn_acs": 0.9518162109240974,
+  "weighted_share_inc0_months_ge_1": 0.021379310344827585,
+  "share_inc_positive_months_0": 0.04689655172413793
+ },
+ "T3": {
+  "nlsy97_main": {
+   "name": "NLSY97 r1/pooled",
+   "note": "",
+   "n_persons_origin_city": 2511,
+   "n_persons_origin_suburb": 3750,
+   "n_persons_2x2": 6221,
+   "n_person_years_2x2": 37502,
+   "matrix_3x3_rowpct": [
+    [
+     0.6673213540476999,
+     0.31912186132279297,
+     0.013556784629507209
+    ],
+    [
+     0.3032815379264422,
+     0.6771982003450611,
+     0.019520261728496677
+    ],
+    [
+     0.2998209204903167,
+     0.5262556568225256,
+     0.17392342268715782
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.32350758396461343,
+    "suburb_to_city": 0.30931953623141667,
+    "city_stay": 0.6764924160353866,
+    "suburb_stay": 0.6906804637685833,
+    "move_rate": 0.31404132393619394,
+    "origin_share_city": 0.3328003819531389,
+    "adult_share_city": 0.43151481087301186,
+    "city_to_nonMSA": 0.013556784629507209,
+    "suburb_to_nonMSA": 0.019520261728496677,
+    "nonMSA_to_city": 0.2998209204903167,
+    "nonMSA_to_suburb": 0.5262556568225256,
+    "weighted_n_2x2": 15900638.337908747
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.3340022434781127,
+     "suburb_to_city": 0.2795741098096994,
+     "city_stay": 0.6659977565218872,
+     "suburb_stay": 0.7204258901903006,
+     "move_rate": 0.3055162787147897,
+     "origin_share_city": 0.47663160862974,
+     "adult_share_city": 0.46375583415469984,
+     "city_to_nonMSA": 0.013331956035912468,
+     "suburb_to_nonMSA": 0.023766634641123534,
+     "nonMSA_to_city": 0.29284211113502817,
+     "nonMSA_to_suburb": 0.4861359664648585,
+     "weighted_n_2x2": 3844384.2821150827,
+     "n_person_years_2x2": 11353,
+     "n_persons_2x2": 1864
+    },
+    "2": {
+     "city_to_suburb": 0.3861868285809448,
+     "suburb_to_city": 0.287015725289513,
+     "city_stay": 0.6138131714190552,
+     "suburb_stay": 0.712984274710487,
+     "move_rate": 0.317756310067883,
+     "origin_share_city": 0.30997522219787466,
+     "adult_share_city": 0.38831483626721586,
+     "city_to_nonMSA": 0.017897706377109357,
+     "suburb_to_nonMSA": 0.02014250058490697,
+     "nonMSA_to_city": 0.30254899318451745,
+     "nonMSA_to_suburb": 0.5281048061360823,
+     "weighted_n_2x2": 3724282.443861112,
+     "n_person_years_2x2": 8103,
+     "n_persons_2x2": 1328
+    },
+    "3": {
+     "city_to_suburb": 0.2952847648209493,
+     "suburb_to_city": 0.34383702112764714,
+     "city_stay": 0.7047152351790507,
+     "suburb_stay": 0.656162978872353,
+     "move_rate": 0.3333021185344508,
+     "origin_share_city": 0.21698070068358494,
+     "adult_share_city": 0.42214062887396137,
+     "city_to_nonMSA": 0.007624668072781179,
+     "suburb_to_nonMSA": 0.019515850086971702,
+     "nonMSA_to_city": 0.3458174367302185,
+     "nonMSA_to_suburb": 0.547656650767728,
+     "weighted_n_2x2": 4309877.487888887,
+     "n_person_years_2x2": 7979,
+     "n_persons_2x2": 1335
+    }
+   },
+   "boot_B": 500,
+   "stats_se": {
+    "city_to_suburb": 0.008631977410796205,
+    "suburb_to_city": 0.006804016729483795,
+    "move_rate": 0.0053606802333032435,
+    "city_stay": 0.008631977410796207,
+    "suburb_stay": 0.006804016729483794,
+    "origin_share_city": 0.006097113456463982,
+    "adult_share_city": 0.005822868318450407
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.014512016738709667,
+     "suburb_to_city": 0.014599102013583855,
+     "move_rate": 0.010488876116241205,
+     "city_stay": 0.014512016738709667,
+     "suburb_stay": 0.014599102013583857,
+     "origin_share_city": 0.013346600651443295,
+     "adult_share_city": 0.011590160047139902
+    },
+    "2": {
+     "city_to_suburb": 0.02112115053268718,
+     "suburb_to_city": 0.012831690346553131,
+     "move_rate": 0.010847411528487342,
+     "city_stay": 0.02112115053268718,
+     "suburb_stay": 0.012831690346553135,
+     "origin_share_city": 0.012883869089666595,
+     "adult_share_city": 0.011976025745411945
+    },
+    "3": {
+     "city_to_suburb": 0.021587799463955237,
+     "suburb_to_city": 0.013324534254879818,
+     "move_rate": 0.011244144521792865,
+     "city_stay": 0.021587799463955237,
+     "suburb_stay": 0.013324534254879818,
+     "origin_share_city": 0.010912682795914567,
+     "adult_share_city": 0.012454146921668144
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.027785839819661096,
+     0.015561853691304304
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.03871747865716341,
+     0.02562968460862785
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.06426291131794776,
+     0.019735384991020972
+    ]
+   },
+   "tercile_cuts_se": [
+    543.075892836747,
+    724.6496716160159
+   ]
+  },
+  "nlsy97_origin_coverage": {
+   "n_eligible": 8417,
+   "weighted_shares": {
+    "not in MSA": 0.19616091340770414,
+    "MSA, suburb": 0.5326833492616397,
+    "MSA, central city": 0.26041499531680873,
+    "MSA, unknown": 0.010740742013847476,
+    "not in country": 0.0
+   },
+   "n": {
+    "not in MSA": 1494,
+    "MSA, suburb": 4136,
+    "MSA, central city": 2697,
+    "MSA, unknown": 90,
+    "not in country": 0
+   }
+  },
+  "nlsy97_origin_age12_parent": {
+   "name": "NLSY97 age12_parent/pooled",
+   "note": "",
+   "n_persons_origin_city": 2200,
+   "n_persons_origin_suburb": 3039,
+   "n_persons_2x2": 5202,
+   "n_person_years_2x2": 31805,
+   "matrix_3x3_rowpct": [
+    [
+     0.6492738844132961,
+     0.33452107397740566,
+     0.016205041609298153
+    ],
+    [
+     0.31399397100606824,
+     0.6654868732417153,
+     0.020519155752216384
+    ],
+    [
+     0.3016581315774389,
+     0.5732510678676093,
+     0.12509080055495198
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.34003129526564907,
+    "suburb_to_city": 0.3205718344060191,
+    "city_stay": 0.6599687047343509,
+    "suburb_stay": 0.6794281655939809,
+    "move_rate": 0.3274672224688496,
+    "origin_share_city": 0.3543463055102126,
+    "adult_share_city": 0.4408358615085922,
+    "city_to_nonMSA": 0.016205041609298153,
+    "suburb_to_nonMSA": 0.020519155752216384,
+    "nonMSA_to_city": 0.3016581315774389,
+    "nonMSA_to_suburb": 0.5732510678676093,
+    "weighted_n_2x2": 13446157.930277765
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.33246824921998464,
+     "suburb_to_city": 0.29949544890775814,
+     "city_stay": 0.6675317507800154,
+     "suburb_stay": 0.7005045510922417,
+     "move_rate": 0.3158017442044676,
+     "origin_share_city": 0.4945377748417382,
+     "adult_share_city": 0.4815033026966465,
+     "city_to_nonMSA": 0.01699297999019584,
+     "suburb_to_nonMSA": 0.025165312884710227,
+     "nonMSA_to_city": 0.28561744210992324,
+     "nonMSA_to_suburb": 0.5495043067144574,
+     "weighted_n_2x2": 3445260.664095237,
+     "n_person_years_2x2": 10392,
+     "n_persons_2x2": 1689
+    },
+    "2": {
+     "city_to_suburb": 0.40755816328483935,
+     "suburb_to_city": 0.29158123446592527,
+     "city_stay": 0.5924418367151607,
+     "suburb_stay": 0.7084187655340747,
+     "move_rate": 0.33023239868323706,
+     "origin_share_city": 0.333265974628985,
+     "adult_share_city": 0.3918478363019801,
+     "city_to_nonMSA": 0.01762280334487126,
+     "suburb_to_nonMSA": 0.02355635326334289,
+     "nonMSA_to_city": 0.3166556606677651,
+     "nonMSA_to_suburb": 0.5599860677395364,
+     "weighted_n_2x2": 3550713.845226189,
+     "n_person_years_2x2": 7782,
+     "n_persons_2x2": 1267
+    },
+    "3": {
+     "city_to_suburb": 0.3275181626931188,
+     "suburb_to_city": 0.35381208226966704,
+     "city_stay": 0.6724818373068812,
+     "suburb_stay": 0.646187917730333,
+     "move_rate": 0.34702478657931485,
+     "origin_share_city": 0.2581317582033616,
+     "adult_share_city": 0.4360708664236577,
+     "city_to_nonMSA": 0.007567368775871635,
+     "suburb_to_nonMSA": 0.017888847264389884,
+     "nonMSA_to_city": 0.32845517928980533,
+     "nonMSA_to_suburb": 0.5820910554186381,
+     "weighted_n_2x2": 4217850.900746035,
+     "n_person_years_2x2": 7842,
+     "n_persons_2x2": 1303
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.00983505390379467,
+    "suburb_to_city": 0.008044470590693333,
+    "move_rate": 0.006164850861305285,
+    "city_stay": 0.009835053903794671,
+    "suburb_stay": 0.00804447059069333,
+    "origin_share_city": 0.006831007901530495,
+    "adult_share_city": 0.00668715620223672
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.014917138178043472,
+     "suburb_to_city": 0.016454641996290334,
+     "move_rate": 0.011301121639333828,
+     "city_stay": 0.014917138178043474,
+     "suburb_stay": 0.016454641996290334,
+     "origin_share_city": 0.01357749958706729,
+     "adult_share_city": 0.011925243961246303
+    },
+    "2": {
+     "city_to_suburb": 0.02004066117308183,
+     "suburb_to_city": 0.014197581724662366,
+     "move_rate": 0.011536387482398327,
+     "city_stay": 0.020040661173081835,
+     "suburb_stay": 0.014197581724662373,
+     "origin_share_city": 0.014545570658927382,
+     "adult_share_city": 0.012903796518933258
+    },
+    "3": {
+     "city_to_suburb": 0.02219715939394274,
+     "suburb_to_city": 0.013851013679114291,
+     "move_rate": 0.011278975420857228,
+     "city_stay": 0.022197159393942744,
+     "suburb_stay": 0.013851013679114291,
+     "origin_share_city": 0.011156807273036388,
+     "adult_share_city": 0.012782264093280291
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.031223042374847243,
+     0.015271130038012067
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.004950086526865849,
+     0.025551987166362304
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.054316633361908895,
+     0.020828829461941586
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_origin_age12_youth": {
+   "name": "NLSY97 age12_youth/pooled",
+   "note": "",
+   "n_persons_origin_city": 205,
+   "n_persons_origin_suburb": 342,
+   "n_persons_2x2": 546,
+   "n_person_years_2x2": 3255,
+   "matrix_3x3_rowpct": [
+    [
+     0.7173819206823776,
+     0.27845795870376355,
+     0.004160120613858776
+    ],
+    [
+     0.2898201625817603,
+     0.6996409689279538,
+     0.010538868490285866
+    ],
+    [
+     0.2649371097291469,
+     0.5420807826467752,
+     0.19298210762407808
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.2796212166913937,
+    "suburb_to_city": 0.2929070716901778,
+    "city_stay": 0.7203787833086063,
+    "suburb_stay": 0.7070929283098222,
+    "move_rate": 0.28867649242084764,
+    "origin_share_city": 0.31842732513017574,
+    "adult_share_city": 0.42902574538965194,
+    "city_to_nonMSA": 0.004160120613858776,
+    "suburb_to_nonMSA": 0.010538868490285866,
+    "nonMSA_to_city": 0.2649371097291469,
+    "nonMSA_to_suburb": 0.5420807826467752,
+    "weighted_n_2x2": 1357021.7215992054
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.07000401287739974,
+     "suburb_to_city": 0.1224114262475039,
+     "city_stay": 0.9299959871226002,
+     "suburb_stay": 0.8775885737524961,
+     "move_rate": 0.10737512684667717,
+     "origin_share_city": 0.28691168737215683,
+     "adult_share_city": 0.35411687530388014,
+     "city_to_nonMSA": 0.061167198768173635,
+     "suburb_to_nonMSA": 0.00813568512028944,
+     "nonMSA_to_city": 0.0,
+     "nonMSA_to_suburb": 1.0,
+     "weighted_n_2x2": 31298.377904761903,
+     "n_person_years_2x2": 110,
+     "n_persons_2x2": 19
+    },
+    "2": {
+     "city_to_suburb": 0.0,
+     "suburb_to_city": 0.0,
+     "city_stay": 1.0,
+     "suburb_stay": 1.0,
+     "move_rate": 0.0,
+     "origin_share_city": 0.4715138133048672,
+     "adult_share_city": 0.4715138133048672,
+     "city_to_nonMSA": 0.0,
+     "suburb_to_nonMSA": 0.0,
+     "nonMSA_to_city": 0.0,
+     "nonMSA_to_suburb": 1.0,
+     "weighted_n_2x2": 6321.423500000001,
+     "n_person_years_2x2": 15,
+     "n_persons_2x2": 3
+    },
+    "3": {
+     "city_to_suburb": NaN,
+     "suburb_to_city": 0.16929480125121824,
+     "city_stay": NaN,
+     "suburb_stay": 0.8307051987487817,
+     "move_rate": 0.16929480125121824,
+     "origin_share_city": 0.0,
+     "adult_share_city": 0.16929480125121824,
+     "city_to_nonMSA": NaN,
+     "suburb_to_nonMSA": 0.0,
+     "nonMSA_to_city": 0.0,
+     "nonMSA_to_suburb": 1.0,
+     "weighted_n_2x2": 14071.725666666667,
+     "n_person_years_2x2": 24,
+     "n_persons_2x2": 4
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.03341108723076436,
+    "suburb_to_city": 0.021011836164587974,
+    "move_rate": 0.018391499421067554,
+    "city_stay": 0.033411087230764365,
+    "suburb_stay": 0.021011836164587974,
+    "origin_share_city": 0.02142250697237077,
+    "adult_share_city": 0.019059444352631506
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.033119341824211154,
+     "suburb_to_city": 0.09026270557987943,
+     "move_rate": 0.05949476823505845,
+     "city_stay": 0.03311934182421115,
+     "suburb_stay": 0.09026270557987942,
+     "origin_share_city": 0.12039483358300983,
+     "adult_share_city": 0.1173307017028475
+    },
+    "2": {
+     "city_to_suburb": 0.0,
+     "suburb_to_city": 0.1276097488641459,
+     "move_rate": 0.10254219780153093,
+     "city_stay": 0.0,
+     "suburb_stay": 0.1276097488641459,
+     "origin_share_city": 0.35755178831233864,
+     "adult_share_city": 0.3533158800064534
+    },
+    "3": {
+     "city_to_suburb": NaN,
+     "suburb_to_city": 0.153822502096588,
+     "move_rate": 0.153822502096588,
+     "city_stay": NaN,
+     "suburb_stay": 0.153822502096588,
+     "origin_share_city": 0.0,
+     "adult_share_city": 0.153822502096588
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.06191967440454106,
+     0.1692129412027023
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     NaN,
+     NaN
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.04688337500371434,
+     0.1851004722652108
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_same_region": {
+   "name": "NLSY97 r1/pooled",
+   "note": "",
+   "n_persons_origin_city": 2327,
+   "n_persons_origin_suburb": 3473,
+   "n_persons_2x2": 5768,
+   "n_person_years_2x2": 33167,
+   "matrix_3x3_rowpct": [
+    [
+     0.6877354411632142,
+     0.3021865115064753,
+     0.010078047330310688
+    ],
+    [
+     0.2805386677896455,
+     0.7025127674841214,
+     0.01694856472623306
+    ],
+    [
+     0.27809230914248473,
+     0.5286277692546598,
+     0.19327992160285554
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.3052629661272972,
+    "suburb_to_city": 0.28537537073176555,
+    "city_stay": 0.6947370338727029,
+    "suburb_stay": 0.7146246292682343,
+    "move_rate": 0.2920065775278832,
+    "origin_share_city": 0.33343431743425134,
+    "adult_share_city": 0.42187059746491395,
+    "city_to_nonMSA": 0.010078047330310688,
+    "suburb_to_nonMSA": 0.01694856472623306,
+    "nonMSA_to_city": 0.27809230914248473,
+    "nonMSA_to_suburb": 0.5286277692546598,
+    "weighted_n_2x2": 14646656.549527783
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.30884115191954337,
+     "suburb_to_city": 0.26643500781734036,
+     "city_stay": 0.6911588480804567,
+     "suburb_stay": 0.7335649921826597,
+     "move_rate": 0.2865642534416371,
+     "origin_share_city": 0.47467757445202513,
+     "adult_share_city": 0.4680418901253858,
+     "city_to_nonMSA": 0.01249262215012185,
+     "suburb_to_nonMSA": 0.020300838309094113,
+     "nonMSA_to_city": 0.2695260268944892,
+     "nonMSA_to_suburb": 0.4820623017658729,
+     "weighted_n_2x2": 3605983.7220714316,
+     "n_person_years_2x2": 10338,
+     "n_persons_2x2": 1756
+    },
+    "2": {
+     "city_to_suburb": 0.3572142067761378,
+     "suburb_to_city": 0.2801526947390739,
+     "city_stay": 0.6427857932238622,
+     "suburb_stay": 0.7198473052609261,
+     "move_rate": 0.30329196629461325,
+     "origin_share_city": 0.30027014710547334,
+     "adult_share_city": 0.3890405885664149,
+     "city_to_nonMSA": 0.015991249745936697,
+     "suburb_to_nonMSA": 0.018578140994449998,
+     "nonMSA_to_city": 0.2679738697713982,
+     "nonMSA_to_suburb": 0.5462886946666742,
+     "weighted_n_2x2": 3448757.2541269837,
+     "n_person_years_2x2": 7204,
+     "n_persons_2x2": 1237
+    },
+    "3": {
+     "city_to_suburb": 0.293179091018363,
+     "suburb_to_city": 0.30684123487224874,
+     "city_stay": 0.7068209089816371,
+     "suburb_stay": 0.6931587651277513,
+     "move_rate": 0.30380140173420034,
+     "origin_share_city": 0.22250044872597233,
+     "adult_share_city": 0.3958368918428558,
+     "city_to_nonMSA": 0.003661328046190663,
+     "suburb_to_nonMSA": 0.0172123511472238,
+     "nonMSA_to_city": 0.32636748738422555,
+     "nonMSA_to_suburb": 0.5545645207978127,
+     "weighted_n_2x2": 3867238.6992817484,
+     "n_person_years_2x2": 6657,
+     "n_persons_2x2": 1202
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.009751498797377798,
+    "suburb_to_city": 0.006970483107483724,
+    "move_rate": 0.0056499381662952096,
+    "city_stay": 0.009751498797377788,
+    "suburb_stay": 0.006970483107483727,
+    "origin_share_city": 0.006201001712891301,
+    "adult_share_city": 0.006386227116304507
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.014671441695403856,
+     "suburb_to_city": 0.014633674439939487,
+     "move_rate": 0.010235797872816609,
+     "city_stay": 0.014671441695403856,
+     "suburb_stay": 0.014633674439939483,
+     "origin_share_city": 0.013630884963448567,
+     "adult_share_city": 0.011847354588484519
+    },
+    "2": {
+     "city_to_suburb": 0.02083825851854303,
+     "suburb_to_city": 0.013571870891199798,
+     "move_rate": 0.01147608157878259,
+     "city_stay": 0.020838258518543023,
+     "suburb_stay": 0.013571870891199801,
+     "origin_share_city": 0.01370717129656568,
+     "adult_share_city": 0.012958547352979846
+    },
+    "3": {
+     "city_to_suburb": 0.02438979639522596,
+     "suburb_to_city": 0.012750817858977578,
+     "move_rate": 0.011200259384539913,
+     "city_stay": 0.024389796395225954,
+     "suburb_stay": 0.012750817858977574,
+     "origin_share_city": 0.011834112413108408,
+     "adult_share_city": 0.012763988257271984
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.01723714829256323,
+     0.014596343875560722
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.015662060901180386,
+     0.028252283959843257
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.04040622705490837,
+     0.01885397746112328
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_adult_first25_27": {
+   "name": "NLSY97 r1/first25_27",
+   "note": "",
+   "n_persons_origin_city": 2411,
+   "n_persons_origin_suburb": 3574,
+   "n_persons_2x2": 5923,
+   "n_person_years_2x2": 16174,
+   "matrix_3x3_rowpct": [
+    [
+     0.6961230940116465,
+     0.2938032666870025,
+     0.010073639301351122
+    ],
+    [
+     0.30212071082951064,
+     0.6795894154972315,
+     0.01828987367325797
+    ],
+    [
+     0.30354181185045825,
+     0.524059817097247,
+     0.17239837105229466
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.29679305284854557,
+    "suburb_to_city": 0.3077494086364919,
+    "city_stay": 0.7032069471514545,
+    "suburb_stay": 0.6922505913635082,
+    "move_rate": 0.30406941135030835,
+    "origin_share_city": 0.3358778555030222,
+    "adult_share_city": 0.44057483861540137,
+    "city_to_nonMSA": 0.010073639301351122,
+    "suburb_to_nonMSA": 0.01828987367325797,
+    "nonMSA_to_city": 0.30354181185045825,
+    "nonMSA_to_suburb": 0.524059817097247,
+    "weighted_n_2x2": 14865575.376666661
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.3177393210457085,
+     "suburb_to_city": 0.26703779352326246,
+     "city_stay": 0.6822606789542914,
+     "suburb_stay": 0.7329622064767376,
+     "move_rate": 0.2916920254792309,
+     "origin_share_city": 0.48626211399752733,
+     "adult_share_city": 0.4689449515731077,
+     "city_to_nonMSA": 0.010512693003237816,
+     "suburb_to_nonMSA": 0.024744468171179076,
+     "nonMSA_to_city": 0.29076517591369133,
+     "nonMSA_to_suburb": 0.4822135389354015,
+     "weighted_n_2x2": 3634585.9841666725,
+     "n_person_years_2x2": 4899,
+     "n_persons_2x2": 1787
+    },
+    "2": {
+     "city_to_suburb": 0.3593844662234275,
+     "suburb_to_city": 0.2759039749351499,
+     "city_stay": 0.6406155337765725,
+     "suburb_stay": 0.7240960250648502,
+     "move_rate": 0.3020053263220173,
+     "origin_share_city": 0.31266408455519673,
+     "adult_share_city": 0.3899361806070021,
+     "city_to_nonMSA": 0.012459555990213592,
+     "suburb_to_nonMSA": 0.01984857732449881,
+     "nonMSA_to_city": 0.32107332252817,
+     "nonMSA_to_suburb": 0.5144442843817528,
+     "weighted_n_2x2": 3511634.9091666667,
+     "n_person_years_2x2": 3506,
+     "n_persons_2x2": 1277
+    },
+    "3": {
+     "city_to_suburb": 0.27080235122066193,
+     "suburb_to_city": 0.348852858387327,
+     "city_stay": 0.729197648779338,
+     "suburb_stay": 0.651147141612673,
+     "move_rate": 0.3315717534963165,
+     "origin_share_city": 0.22140925816291282,
+     "adult_share_city": 0.4330647162741507,
+     "city_to_nonMSA": 0.0012930254797448746,
+     "suburb_to_nonMSA": 0.01693867467165196,
+     "nonMSA_to_city": 0.3531585683616938,
+     "nonMSA_to_suburb": 0.5545835501367108,
+     "weighted_n_2x2": 3996277.0708333366,
+     "n_person_years_2x2": 3438,
+     "n_persons_2x2": 1263
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.009783086045908563,
+    "suburb_to_city": 0.007857606891161927,
+    "move_rate": 0.0060160732855426505,
+    "city_stay": 0.009783086045908558,
+    "suburb_stay": 0.007857606891161923,
+    "origin_share_city": 0.006362849696684231,
+    "adult_share_city": 0.006842970192117303
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.016059842001893677,
+     "suburb_to_city": 0.015402506831146382,
+     "move_rate": 0.011317813041880441,
+     "city_stay": 0.016059842001893677,
+     "suburb_stay": 0.015402506831146382,
+     "origin_share_city": 0.01335981654656935,
+     "adult_share_city": 0.011758159200221788
+    },
+    "2": {
+     "city_to_suburb": 0.022811942127211243,
+     "suburb_to_city": 0.014586467447338228,
+     "move_rate": 0.012038165743375684,
+     "city_stay": 0.022811942127211247,
+     "suburb_stay": 0.014586467447338223,
+     "origin_share_city": 0.013942498900684382,
+     "adult_share_city": 0.014139384508590026
+    },
+    "3": {
+     "city_to_suburb": 0.02362964748415104,
+     "suburb_to_city": 0.01461639805605036,
+     "move_rate": 0.012661419129965183,
+     "city_stay": 0.023629647484151032,
+     "suburb_stay": 0.014616398056050355,
+     "origin_share_city": 0.011275513296932143,
+     "adult_share_city": 0.013782070918368297
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.039879728017085614,
+     0.017249106045678815
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.04693696982504658,
+     0.0291685432927522
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.08181506486406454,
+     0.021109535698408358
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_adult_near30": {
+   "name": "NLSY97 r1/near30",
+   "note": "",
+   "n_persons_origin_city": 2400,
+   "n_persons_origin_suburb": 3525,
+   "n_persons_2x2": 5865,
+   "n_person_years_2x2": 16179,
+   "matrix_3x3_rowpct": [
+    [
+     0.6513103105567642,
+     0.334349887238879,
+     0.014339802204356952
+    ],
+    [
+     0.3049364195858075,
+     0.6749178485625601,
+     0.020145731851632487
+    ],
+    [
+     0.3010105536743435,
+     0.5247497914221174,
+     0.17423965490353924
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.33921415107014363,
+    "suburb_to_city": 0.31120588999632204,
+    "city_stay": 0.6607858489298564,
+    "suburb_stay": 0.688794110003678,
+    "move_rate": 0.32061792282269985,
+    "origin_share_city": 0.3360448833853119,
+    "adult_share_city": 0.4286804465299837,
+    "city_to_nonMSA": 0.014339802204356952,
+    "suburb_to_nonMSA": 0.020145731851632487,
+    "nonMSA_to_city": 0.3010105536743435,
+    "nonMSA_to_suburb": 0.5247497914221174,
+    "weighted_n_2x2": 15042377.707833312
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.3482768354010005,
+     "suburb_to_city": 0.2868807929764451,
+     "city_stay": 0.6517231645989995,
+     "suburb_stay": 0.7131192070235549,
+     "move_rate": 0.3163881703990102,
+     "origin_share_city": 0.48060715735585563,
+     "adult_share_city": 0.46222664808492964,
+     "city_to_nonMSA": 0.013018469215536673,
+     "suburb_to_nonMSA": 0.026693946187089854,
+     "nonMSA_to_city": 0.29709503567765977,
+     "nonMSA_to_suburb": 0.4854189959290115,
+     "weighted_n_2x2": 3672547.3528333358,
+     "n_person_years_2x2": 4898,
+     "n_persons_2x2": 1772
+    },
+    "2": {
+     "city_to_suburb": 0.38178589376404465,
+     "suburb_to_city": 0.29360581269198105,
+     "city_stay": 0.6182141062359553,
+     "suburb_stay": 0.7063941873080188,
+     "move_rate": 0.3206391162209594,
+     "origin_share_city": 0.3065692750598162,
+     "adult_share_city": 0.39312074192216123,
+     "city_to_nonMSA": 0.02014893206488396,
+     "suburb_to_nonMSA": 0.018167232752584934,
+     "nonMSA_to_city": 0.3030546266160129,
+     "nonMSA_to_suburb": 0.525882463704597,
+     "weighted_n_2x2": 3561074.0561666656,
+     "n_person_years_2x2": 3493,
+     "n_persons_2x2": 1259
+    },
+    "3": {
+     "city_to_suburb": 0.31683395338649867,
+     "suburb_to_city": 0.3471023065101913,
+     "city_stay": 0.6831660466135013,
+     "suburb_stay": 0.6528976934898086,
+     "move_rate": 0.34040949067668735,
+     "origin_share_city": 0.22111595586828134,
+     "adult_share_city": 0.42141136163580434,
+     "city_to_nonMSA": 0.011757619449514117,
+     "suburb_to_nonMSA": 0.02012714151591079,
+     "nonMSA_to_city": 0.34369429298512966,
+     "nonMSA_to_suburb": 0.5393747698121323,
+     "weighted_n_2x2": 3994989.9305000016,
+     "n_person_years_2x2": 3433,
+     "n_persons_2x2": 1234
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.01049952110372202,
+    "suburb_to_city": 0.007787447625686793,
+    "move_rate": 0.006299811008185171,
+    "city_stay": 0.010499521103722018,
+    "suburb_stay": 0.00778744762568679,
+    "origin_share_city": 0.006050591537868275,
+    "adult_share_city": 0.006708407476766943
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.016663902505574178,
+     "suburb_to_city": 0.015612017584920987,
+     "move_rate": 0.01170126326450572,
+     "city_stay": 0.016663902505574178,
+     "suburb_stay": 0.015612017584920984,
+     "origin_share_city": 0.013251113283079983,
+     "adult_share_city": 0.01191957264705261
+    },
+    "2": {
+     "city_to_suburb": 0.021336566024657406,
+     "suburb_to_city": 0.015570753252384504,
+     "move_rate": 0.012344969027252359,
+     "city_stay": 0.02133656602465741,
+     "suburb_stay": 0.015570753252384504,
+     "origin_share_city": 0.013562274142734844,
+     "adult_share_city": 0.014125807994289809
+    },
+    "3": {
+     "city_to_suburb": 0.026137059890818767,
+     "suburb_to_city": 0.014387986641424086,
+     "move_rate": 0.012219422472188221,
+     "city_stay": 0.026137059890818763,
+     "suburb_stay": 0.014387986641424084,
+     "origin_share_city": 0.011316947765296397,
+     "adult_share_city": 0.013740674131226645
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.02402132027767717,
+     0.016312602260333604
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.03144288201450185,
+     0.03122436329627203
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.06022151353374622,
+     0.020769831070022268
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_adult_years_2004_2011": {
+   "name": "NLSY97 r1/pooled",
+   "note": "",
+   "n_persons_origin_city": 2474,
+   "n_persons_origin_suburb": 3664,
+   "n_persons_2x2": 6086,
+   "n_person_years_2x2": 25403,
+   "matrix_3x3_rowpct": [
+    [
+     0.6844012797565557,
+     0.304656348974066,
+     0.010942371269378416
+    ],
+    [
+     0.30127314670365085,
+     0.6792517904826699,
+     0.01947506281367922
+    ],
+    [
+     0.300874330743407,
+     0.5245705098188004,
+     0.17455515943779265
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.3080268936048435,
+    "suburb_to_city": 0.307256996000707,
+    "city_stay": 0.6919731063951565,
+    "suburb_stay": 0.692743003999293,
+    "move_rate": 0.3075155155232881,
+    "origin_share_city": 0.33578429286190553,
+    "adult_share_city": 0.43643862308209,
+    "city_to_nonMSA": 0.010942371269378416,
+    "suburb_to_nonMSA": 0.01947506281367922,
+    "nonMSA_to_city": 0.300874330743407,
+    "nonMSA_to_suburb": 0.5245705098188004,
+    "weighted_n_2x2": 15246656.456381014
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.32480198782847997,
+     "suburb_to_city": 0.27844123747934235,
+     "city_stay": 0.67519801217152,
+     "suburb_stay": 0.7215587625206576,
+     "move_rate": 0.30081707640957445,
+     "origin_share_city": 0.4826461772452385,
+     "adult_share_city": 0.4699343780806723,
+     "city_to_nonMSA": 0.011455420149222377,
+     "suburb_to_nonMSA": 0.025580893755023332,
+     "nonMSA_to_city": 0.28248046803243276,
+     "nonMSA_to_suburb": 0.4872498401939867,
+     "weighted_n_2x2": 3705628.710976191,
+     "n_person_years_2x2": 7651,
+     "n_persons_2x2": 1828
+    },
+    "2": {
+     "city_to_suburb": 0.36551560684556417,
+     "suburb_to_city": 0.2757333793112974,
+     "city_stay": 0.6344843931544359,
+     "suburb_stay": 0.7242666206887026,
+     "move_rate": 0.3035427780509588,
+     "origin_share_city": 0.3097428021492065,
+     "adult_share_city": 0.3868539236129399,
+     "city_to_nonMSA": 0.014245357776965202,
+     "suburb_to_nonMSA": 0.018523190267127346,
+     "nonMSA_to_city": 0.31423703522481083,
+     "nonMSA_to_suburb": 0.5168304654602481,
+     "weighted_n_2x2": 3589759.3614047654,
+     "n_person_years_2x2": 5483,
+     "n_persons_2x2": 1304
+    },
+    "3": {
+     "city_to_suburb": 0.27920357653966926,
+     "suburb_to_city": 0.3379616191715036,
+     "city_stay": 0.7207964234603307,
+     "suburb_stay": 0.6620383808284964,
+     "move_rate": 0.3250232397413652,
+     "origin_share_city": 0.22019759084228843,
+     "adult_share_city": 0.4222609207664823,
+     "city_to_nonMSA": 0.004586034737504003,
+     "suburb_to_nonMSA": 0.018650169695475543,
+     "nonMSA_to_city": 0.3520636514127093,
+     "nonMSA_to_suburb": 0.5505974176116265,
+     "weighted_n_2x2": 4108879.6598809552,
+     "n_person_years_2x2": 5414,
+     "n_persons_2x2": 1301
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.009825577436954357,
+    "suburb_to_city": 0.007439070236431591,
+    "move_rate": 0.005870402691263948,
+    "city_stay": 0.009825577436954357,
+    "suburb_stay": 0.007439070236431585,
+    "origin_share_city": 0.006191566995336479,
+    "adult_share_city": 0.006494120934626415
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.015220265535595977,
+     "suburb_to_city": 0.014993907975201804,
+     "move_rate": 0.010901151169384336,
+     "city_stay": 0.015220265535595976,
+     "suburb_stay": 0.01499390797520181,
+     "origin_share_city": 0.013222186980825043,
+     "adult_share_city": 0.01136447749402819
+    },
+    "2": {
+     "city_to_suburb": 0.02188433557394505,
+     "suburb_to_city": 0.013924451580128453,
+     "move_rate": 0.011513398296903081,
+     "city_stay": 0.021884335573945046,
+     "suburb_stay": 0.01392445158012845,
+     "origin_share_city": 0.013627735015862358,
+     "adult_share_city": 0.013504123230528542
+    },
+    "3": {
+     "city_to_suburb": 0.02252435252758996,
+     "suburb_to_city": 0.01354881441223158,
+     "move_rate": 0.01168382713268717,
+     "city_stay": 0.022524352527589955,
+     "suburb_stay": 0.013548814412231582,
+     "origin_share_city": 0.011037201101877392,
+     "adult_share_city": 0.01298402897805529
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.024206163331790764,
+     0.015694665165006613
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.0455984112888107,
+     0.026894158650770602
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.05952038169216123,
+     0.019717686224829122
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy97_adult_years_2013_2019": {
+   "name": "NLSY97 r1/pooled",
+   "note": "",
+   "n_persons_origin_city": 2300,
+   "n_persons_origin_suburb": 3376,
+   "n_persons_2x2": 5602,
+   "n_person_years_2x2": 12099,
+   "matrix_3x3_rowpct": [
+    [
+     0.6346326894155713,
+     0.3491987349745659,
+     0.016168575609862724
+    ],
+    [
+     0.30081570032551835,
+     0.6799209579818742,
+     0.0192633416926073
+    ],
+    [
+     0.30359906000606635,
+     0.5254895885320096,
+     0.1709113514619242
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.35493756991044384,
+    "suburb_to_city": 0.3067242340514548,
+    "city_stay": 0.6450624300895561,
+    "suburb_stay": 0.6932757659485452,
+    "move_rate": 0.32289459768646467,
+    "origin_share_city": 0.3353919272938059,
+    "adult_share_city": 0.42020013369778314,
+    "city_to_nonMSA": 0.016168575609862724,
+    "suburb_to_nonMSA": 0.0192633416926073,
+    "nonMSA_to_city": 0.30359906000606635,
+    "nonMSA_to_suburb": 0.5254895885320096,
+    "weighted_n_2x2": 14828948.262499994
+   },
+   "tercile_cuts": [
+    30500.0,
+    57538.44862627974
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.3601928164923761,
+     "suburb_to_city": 0.2791387757877395,
+     "city_stay": 0.6398071835076238,
+     "suburb_stay": 0.7208612242122605,
+     "move_rate": 0.31765060599685907,
+     "origin_share_city": 0.4751376967060524,
+     "adult_share_city": 0.45050593230640473,
+     "city_to_nonMSA": 0.015411387512251738,
+     "suburb_to_nonMSA": 0.023072796797682146,
+     "nonMSA_to_city": 0.2976343117713163,
+     "nonMSA_to_suburb": 0.4904379021708002,
+     "weighted_n_2x2": 3659619.284166666,
+     "n_person_years_2x2": 3702,
+     "n_persons_2x2": 1699
+    },
+    "2": {
+     "city_to_suburb": 0.42685657117023457,
+     "suburb_to_city": 0.3096790077205956,
+     "city_stay": 0.5731434288297654,
+     "suburb_stay": 0.6903209922794044,
+     "move_rate": 0.34620499218292144,
+     "origin_share_city": 0.3117148316368954,
+     "adult_share_city": 0.3918047753889526,
+     "city_to_nonMSA": 0.01582975410195814,
+     "suburb_to_nonMSA": 0.022516587746381274,
+     "nonMSA_to_city": 0.2901316600082815,
+     "nonMSA_to_suburb": 0.5461258479819648,
+     "weighted_n_2x2": 3546316.3666666686,
+     "n_person_years_2x2": 2620,
+     "n_persons_2x2": 1218
+    },
+    "3": {
+     "city_to_suburb": 0.32328944036335644,
+     "suburb_to_city": 0.3414525511436999,
+     "city_stay": 0.6767105596366436,
+     "suburb_stay": 0.6585474488563001,
+     "move_rate": 0.33736606324119334,
+     "origin_share_city": 0.22498832672038974,
+     "adult_share_city": 0.4168816894941375,
+     "city_to_nonMSA": 0.014328391286060806,
+     "suburb_to_nonMSA": 0.016263117084173613,
+     "nonMSA_to_city": 0.3541906831095289,
+     "nonMSA_to_suburb": 0.5206183263728554,
+     "weighted_n_2x2": 3960255.2333333343,
+     "n_person_years_2x2": 2565,
+     "n_persons_2x2": 1184
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.010761755242707319,
+    "suburb_to_city": 0.008326421945953294,
+    "move_rate": 0.006797871687373039,
+    "city_stay": 0.010761755242707317,
+    "suburb_stay": 0.008326421945953295,
+    "origin_share_city": 0.00628771921687859,
+    "adult_share_city": 0.006853403154355425
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.017663074131448086,
+     "suburb_to_city": 0.015612250053095147,
+     "move_rate": 0.011917182121215657,
+     "city_stay": 0.017663074131448086,
+     "suburb_stay": 0.015612250053095156,
+     "origin_share_city": 0.013632555011382417,
+     "adult_share_city": 0.012467585238865741
+    },
+    "2": {
+     "city_to_suburb": 0.022572549970926073,
+     "suburb_to_city": 0.016795032373205798,
+     "move_rate": 0.013116013816833074,
+     "city_stay": 0.02257254997092608,
+     "suburb_stay": 0.0167950323732058,
+     "origin_share_city": 0.013598330622708685,
+     "adult_share_city": 0.015172501779912452
+    },
+    "3": {
+     "city_to_suburb": 0.028906928421060577,
+     "suburb_to_city": 0.015506813208904879,
+     "move_rate": 0.013267151412272223,
+     "city_stay": 0.028906928421060584,
+     "suburb_stay": 0.015506813208904872,
+     "origin_share_city": 0.01164684801783612,
+     "adult_share_city": 0.01444302322836595
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.019715457244334267,
+     0.01592707138311793
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     -0.03690337612901967,
+     0.03414001895465213
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.06231377535596039,
+     0.02018875847912834
+    ]
+   },
+   "tercile_cuts_se": [
+    561.5587997350301,
+    711.9843416628979
+   ]
+  },
+  "nlsy79_main": {
+   "name": "NLSY79 1979 (ages 14-16) vs 25-34",
+   "note": "SMSA 'central city not known' excluded from the 2x2",
+   "n_persons_origin_city": 642,
+   "n_persons_origin_suburb": 913,
+   "n_persons_2x2": 1498,
+   "n_person_years_2x2": 8161,
+   "matrix_3x3_rowpct": [
+    [
+     0.5887469584734301,
+     0.3325667187018147,
+     0.07868632282475514
+    ],
+    [
+     0.13647437673685311,
+     0.7572077031836034,
+     0.1063179200795435
+    ],
+    [
+     0.11370388161991477,
+     0.32859373404645487,
+     0.5577023843336304
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.3609701309563394,
+    "suburb_to_city": 0.1527102084770461,
+    "city_stay": 0.6390298690436605,
+    "suburb_stay": 0.8472897915229538,
+    "move_rate": 0.21563924361181017,
+    "origin_share_city": 0.3021658434594919,
+    "adult_share_city": 0.29965939890309096,
+    "city_to_nonMSA": 0.07868632282475514,
+    "suburb_to_nonMSA": 0.1063179200795435,
+    "nonMSA_to_city": 0.11370388161991477,
+    "nonMSA_to_suburb": 0.32859373404645487,
+    "weighted_n_2x2": 5123761.947682539
+   },
+   "tercile_cuts": [
+    14000.0,
+    23000.0
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.2837690369754059,
+     "suburb_to_city": 0.16816092711414204,
+     "city_stay": 0.7162309630245941,
+     "suburb_stay": 0.831839072885858,
+     "move_rate": 0.2211095178010481,
+     "origin_share_city": 0.458000660597663,
+     "adult_share_city": 0.4191773656149139,
+     "city_to_nonMSA": 0.0744341182468714,
+     "suburb_to_nonMSA": 0.13761870830057302,
+     "nonMSA_to_city": 0.10961552636429327,
+     "nonMSA_to_suburb": 0.28180911593289093,
+     "weighted_n_2x2": 1436090.1082103166,
+     "n_person_years_2x2": 3236,
+     "n_persons_2x2": 593
+    },
+    "2": {
+     "city_to_suburb": 0.42862199013666946,
+     "suburb_to_city": 0.11198802865059264,
+     "city_stay": 0.5713780098633305,
+     "suburb_stay": 0.8880119713494073,
+     "move_rate": 0.22598099388631432,
+     "origin_share_city": 0.36001496712706293,
+     "adult_share_city": 0.27737529763539853,
+     "city_to_nonMSA": 0.11425548232743517,
+     "suburb_to_nonMSA": 0.1204663594347662,
+     "nonMSA_to_city": 0.11190512408156573,
+     "nonMSA_to_suburb": 0.3004763619084412,
+     "weighted_n_2x2": 1239459.836182539,
+     "n_person_years_2x2": 1827,
+     "n_persons_2x2": 329
+    },
+    "3": {
+     "city_to_suburb": 0.4073418906373294,
+     "suburb_to_city": 0.16835624101066185,
+     "city_stay": 0.5926581093626706,
+     "suburb_stay": 0.8316437589893382,
+     "move_rate": 0.20737788127557727,
+     "origin_share_city": 0.16328026526225847,
+     "adult_share_city": 0.2376363626264497,
+     "city_to_nonMSA": 0.03838180304867189,
+     "suburb_to_nonMSA": 0.07802781460383953,
+     "nonMSA_to_city": 0.10603050125592246,
+     "nonMSA_to_suburb": 0.38653504074882955,
+     "weighted_n_2x2": 1592370.1762500014,
+     "n_person_years_2x2": 1840,
+     "n_persons_2x2": 345
+    }
+   },
+   "boot_B": 500,
+   "stats_se": {
+    "city_to_suburb": 0.02178207263894323,
+    "suburb_to_city": 0.01176403298111256,
+    "move_rate": 0.010902403607466716,
+    "city_stay": 0.021782072638943238,
+    "suburb_stay": 0.011764032981112562,
+    "origin_share_city": 0.01517061215984003,
+    "adult_share_city": 0.01225699919531882
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.031330605675490474,
+     "suburb_to_city": 0.0247115196353989,
+     "move_rate": 0.02036692542446757,
+     "city_stay": 0.031330605675490474,
+     "suburb_stay": 0.0247115196353989,
+     "origin_share_city": 0.029574799540261265,
+     "adult_share_city": 0.02470791676979697
+    },
+    "2": {
+     "city_to_suburb": 0.04841263463392558,
+     "suburb_to_city": 0.023272288680424916,
+     "move_rate": 0.02574986599338291,
+     "city_stay": 0.04841263463392557,
+     "suburb_stay": 0.023272288680424916,
+     "origin_share_city": 0.03769646285596778,
+     "adult_share_city": 0.030555566217191337
+    },
+    "3": {
+     "city_to_suburb": 0.05427759553919263,
+     "suburb_to_city": 0.021646958848602134,
+     "move_rate": 0.021001779643133347,
+     "city_stay": 0.05427759553919263,
+     "suburb_stay": 0.021646958848602127,
+     "origin_share_city": 0.024875441298960493,
+     "adult_share_city": 0.02241203191974995
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     -0.013731636525470825,
+     0.0301352745013635
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     0.1235728536619235,
+     0.06306378592481195
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.00019531389651980535,
+     0.03384984762252086
+    ]
+   },
+   "tercile_cuts_se": [
+    406.98367154360113,
+    514.6152716700227
+   ]
+  },
+  "nlsy79_origin_coverage": {
+   "n_eligible": 3632,
+   "weighted_shares": {
+    "not in SMSA": 0.29062670098842497,
+    "SMSA, suburb": 0.3420210640809629,
+    "SMSA, central city not known": 0.206249251891646,
+    "SMSA, central city": 0.15348153174087842
+   },
+   "n": {
+    "not in SMSA": 1070,
+    "SMSA, suburb": 985,
+    "SMSA, central city not known": 823,
+    "SMSA, central city": 738
+   }
+  },
+  "nlsy79_adult_years_le_1996": {
+   "name": "NLSY79 1979 (ages 14-16) vs 25-34",
+   "note": "SMSA 'central city not known' excluded from the 2x2",
+   "n_persons_origin_city": 602,
+   "n_persons_origin_suburb": 876,
+   "n_persons_2x2": 1412,
+   "n_person_years_2x2": 7454,
+   "matrix_3x3_rowpct": [
+    [
+     0.5778395932113753,
+     0.33815255476781475,
+     0.08400785202080972
+    ],
+    [
+     0.11667354012748965,
+     0.7660656238845046,
+     0.11726083598800571
+    ],
+    [
+     0.08976080936886442,
+     0.3144554862117711,
+     0.5957837044193645
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.36916534220716596,
+    "suburb_to_city": 0.13217215785149455,
+    "city_stay": 0.630834657792834,
+    "suburb_stay": 0.8678278421485055,
+    "move_rate": 0.20314052226106835,
+    "origin_share_city": 0.2994531872404687,
+    "adult_share_city": 0.28149823281622866,
+    "city_to_nonMSA": 0.08400785202080972,
+    "suburb_to_nonMSA": 0.11726083598800571,
+    "nonMSA_to_city": 0.08976080936886442,
+    "nonMSA_to_suburb": 0.3144554862117711,
+    "weighted_n_2x2": 4764471.923281745
+   },
+   "tercile_cuts": [
+    14000.0,
+    23000.0
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.28365047642869956,
+     "suburb_to_city": 0.1495556822710849,
+     "city_stay": 0.7163495235713004,
+     "suburb_stay": 0.8504443177289152,
+     "move_rate": 0.21013697665733005,
+     "origin_share_city": 0.4517796143155122,
+     "adult_share_city": 0.4056215852901039,
+     "city_to_nonMSA": 0.0765703765546633,
+     "suburb_to_nonMSA": 0.15235615899031407,
+     "nonMSA_to_city": 0.07886480012750734,
+     "nonMSA_to_suburb": 0.2805551104160586,
+     "weighted_n_2x2": 1349557.4595396826,
+     "n_person_years_2x2": 2962,
+     "n_persons_2x2": 564
+    },
+    "2": {
+     "city_to_suburb": 0.4464983527757173,
+     "suburb_to_city": 0.09253846428344094,
+     "city_stay": 0.5535016472242827,
+     "suburb_stay": 0.9074615357165592,
+     "move_rate": 0.21619617231379515,
+     "origin_share_city": 0.34935514460998734,
+     "adult_share_city": 0.2535783237196188,
+     "city_to_nonMSA": 0.12920575787023328,
+     "suburb_to_nonMSA": 0.12664366874748112,
+     "nonMSA_to_city": 0.08014609797940982,
+     "nonMSA_to_suburb": 0.295859869338698,
+     "weighted_n_2x2": 1159385.5210952382,
+     "n_person_years_2x2": 1663,
+     "n_persons_2x2": 312
+    },
+    "3": {
+     "city_to_suburb": 0.43839473735699874,
+     "suburb_to_city": 0.1468603506340134,
+     "city_stay": 0.5616052626430013,
+     "suburb_stay": 0.8531396493659865,
+     "move_rate": 0.19501117787644903,
+     "origin_share_city": 0.16516345733235344,
+     "adult_share_city": 0.21536105421242052,
+     "city_to_nonMSA": 0.03796681582966032,
+     "suburb_to_nonMSA": 0.08725555948703184,
+     "nonMSA_to_city": 0.08867314527701525,
+     "nonMSA_to_suburb": 0.33802221565247864,
+     "weighted_n_2x2": 1470366.101265874,
+     "n_person_years_2x2": 1679,
+     "n_persons_2x2": 322
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.021729735316518877,
+    "suburb_to_city": 0.011182568595206152,
+    "move_rate": 0.010900048382041625,
+    "city_stay": 0.021729735316518884,
+    "suburb_stay": 0.011182568595206149,
+    "origin_share_city": 0.015562193296322043,
+    "adult_share_city": 0.01253666036790757
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.03328619071294528,
+     "suburb_to_city": 0.021133798267965173,
+     "move_rate": 0.019798927934639353,
+     "city_stay": 0.033286190712945286,
+     "suburb_stay": 0.02113379826796517,
+     "origin_share_city": 0.030916110581141295,
+     "adult_share_city": 0.025511643710569583
+    },
+    "2": {
+     "city_to_suburb": 0.047932866538161464,
+     "suburb_to_city": 0.02149762477476459,
+     "move_rate": 0.026281959774680293,
+     "city_stay": 0.047932866538161464,
+     "suburb_stay": 0.02149762477476459,
+     "origin_share_city": 0.03984864238727491,
+     "adult_share_city": 0.026914335017808856
+    },
+    "3": {
+     "city_to_suburb": 0.06044846520878526,
+     "suburb_to_city": 0.020729626240001357,
+     "move_rate": 0.020245911679364764,
+     "city_stay": 0.060448465208785274,
+     "suburb_stay": 0.020729626240001357,
+     "origin_share_city": 0.027494874951453044,
+     "adult_share_city": 0.024598143099862836
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     -0.015125798780881022,
+     0.02832485813282446
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     0.15474426092829918,
+     0.07018618271836766
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     -0.002695331637071502,
+     0.029468650232030078
+    ]
+   },
+   "tercile_cuts_se": [
+    396.77765738523215,
+    532.3737824385447
+   ]
+  },
+  "nlsy79_adult_years_1987_1990": {
+   "name": "NLSY79 1979 (ages 14-16) vs 25-34",
+   "note": "SMSA 'central city not known' excluded from the 2x2",
+   "n_persons_origin_city": 485,
+   "n_persons_origin_suburb": 718,
+   "n_persons_2x2": 1119,
+   "n_person_years_2x2": 2434,
+   "matrix_3x3_rowpct": [
+    [
+     0.6935234370950185,
+     0.24166282079807444,
+     0.06481374210690696
+    ],
+    [
+     0.1158096747197721,
+     0.7773473968992473,
+     0.10684292838098056
+    ],
+    [
+     0.08544414567139844,
+     0.2818477228677218,
+     0.6327081314608798
+    ]
+   ],
+   "stats": {
+    "city_to_suburb": 0.25841143275835055,
+    "suburb_to_city": 0.12966327916974865,
+    "city_stay": 0.7415885672416495,
+    "suburb_stay": 0.8703367208302514,
+    "move_rate": 0.16825586740207044,
+    "origin_share_city": 0.299752556884345,
+    "adult_share_city": 0.31308944889149026,
+    "city_to_nonMSA": 0.06481374210690696,
+    "suburb_to_nonMSA": 0.10684292838098056,
+    "nonMSA_to_city": 0.08544414567139844,
+    "nonMSA_to_suburb": 0.2818477228677218,
+    "weighted_n_2x2": 3723309.621666668
+   },
+   "tercile_cuts": [
+    14000.0,
+    23000.0
+   ],
+   "tercile": {
+    "1": {
+     "city_to_suburb": 0.18248417711244644,
+     "suburb_to_city": 0.14202176629061575,
+     "city_stay": 0.8175158228875536,
+     "suburb_stay": 0.8579782337093843,
+     "move_rate": 0.1604439729232172,
+     "origin_share_city": 0.45529186863631255,
+     "adult_share_city": 0.44956871757135863,
+     "city_to_nonMSA": 0.03830584241356526,
+     "suburb_to_nonMSA": 0.1447670184684985,
+     "nonMSA_to_city": 0.07696492625814472,
+     "nonMSA_to_suburb": 0.23163034122533507,
+     "weighted_n_2x2": 1048295.7608333332,
+     "n_person_years_2x2": 972,
+     "n_persons_2x2": 452
+    },
+    "2": {
+     "city_to_suburb": 0.3283210238389831,
+     "suburb_to_city": 0.08788390062332187,
+     "city_stay": 0.6716789761610169,
+     "suburb_stay": 0.9121160993766781,
+     "move_rate": 0.17234871322390388,
+     "origin_share_city": 0.35129688573432527,
+     "adult_share_city": 0.2929692925667493,
+     "city_to_nonMSA": 0.1287465858553454,
+     "suburb_to_nonMSA": 0.113637308693666,
+     "nonMSA_to_city": 0.06851000819569807,
+     "nonMSA_to_suburb": 0.27751411787095814,
+     "weighted_n_2x2": 950775.8733333331,
+     "n_person_years_2x2": 550,
+     "n_persons_2x2": 256
+    },
+    "3": {
+     "city_to_suburb": 0.31927643839323017,
+     "suburb_to_city": 0.14418774812903276,
+     "city_stay": 0.6807235616067698,
+     "suburb_stay": 0.8558122518709672,
+     "move_rate": 0.1738041121627705,
+     "origin_share_city": 0.16915064010729977,
+     "adult_share_city": 0.23494312441928275,
+     "city_to_nonMSA": 0.002212922063472815,
+     "suburb_to_nonMSA": 0.07469216021012808,
+     "nonMSA_to_city": 0.09446212188110845,
+     "nonMSA_to_suburb": 0.287241395486954,
+     "weighted_n_2x2": 1137490.8033333337,
+     "n_person_years_2x2": 544,
+     "n_persons_2x2": 249
+    }
+   },
+   "boot_B": 250,
+   "stats_se": {
+    "city_to_suburb": 0.024172727547757993,
+    "suburb_to_city": 0.0142891366639235,
+    "move_rate": 0.012693157543955445,
+    "city_stay": 0.024172727547757993,
+    "suburb_stay": 0.014289136663923504,
+    "origin_share_city": 0.017150334694797358,
+    "adult_share_city": 0.015941103260100946
+   },
+   "tercile_se": {
+    "1": {
+     "city_to_suburb": 0.031849887057997114,
+     "suburb_to_city": 0.02754053455397223,
+     "move_rate": 0.021268691601966035,
+     "city_stay": 0.03184988705799712,
+     "suburb_stay": 0.02754053455397223,
+     "origin_share_city": 0.032598663032978634,
+     "adult_share_city": 0.030497764897932128
+    },
+    "2": {
+     "city_to_suburb": 0.05355164883483901,
+     "suburb_to_city": 0.023514899249486337,
+     "move_rate": 0.02552577782024715,
+     "city_stay": 0.05355164883483901,
+     "suburb_stay": 0.023514899249486337,
+     "origin_share_city": 0.04160589464417031,
+     "adult_share_city": 0.03478480738793504
+    },
+    "3": {
+     "city_to_suburb": 0.06796103914228091,
+     "suburb_to_city": 0.026881978155232696,
+     "move_rate": 0.025019554784431002,
+     "city_stay": 0.06796103914228091,
+     "suburb_stay": 0.026881978155232696,
+     "origin_share_city": 0.030709930755200465,
+     "adult_share_city": 0.030534918824175344
+    }
+   },
+   "tercile_diff": {
+    "move_rate_T3_minus_T1": [
+     0.013360139239553315,
+     0.03371004946939981
+    ],
+    "city_to_suburb_T3_minus_T1": [
+     0.13679226128078373,
+     0.07749321315628284
+    ],
+    "suburb_to_city_T3_minus_T1": [
+     0.0021659818384170137,
+     0.03900130812056721
+    ]
+   },
+   "tercile_cuts_se": [
+    396.77765738523215,
+    532.3737824385447
+   ]
+  },
+  "nlsy97_switch_pairs": [
+   {
+    "from": 1998,
+    "to": 1999,
+    "gap_years": 1,
+    "n": 1062,
+    "switch_rate": 0.06829993502087621,
+    "se_approx": 0.008578791831646606,
+    "share_city_at_to": 0.32111166833853594
+   },
+   {
+    "from": 1999,
+    "to": 2000,
+    "gap_years": 1,
+    "n": 2146,
+    "switch_rate": 0.08580145123358157,
+    "se_approx": 0.0066577498460299225,
+    "share_city_at_to": 0.3518845202686095
+   },
+   {
+    "from": 2000,
+    "to": 2001,
+    "gap_years": 1,
+    "n": 3379,
+    "switch_rate": 0.0848917789614771,
+    "se_approx": 0.005266403644058767,
+    "share_city_at_to": 0.3522203770780877
+   },
+   {
+    "from": 2001,
+    "to": 2002,
+    "gap_years": 1,
+    "n": 4571,
+    "switch_rate": 0.09790523444751235,
+    "se_approx": 0.0048327752279331,
+    "share_city_at_to": 0.3631670792042017
+   },
+   {
+    "from": 2002,
+    "to": 2003,
+    "gap_years": 1,
+    "n": 5854,
+    "switch_rate": 0.08883348326301545,
+    "se_approx": 0.004093754397688773,
+    "share_city_at_to": 0.3657594138251093
+   },
+   {
+    "from": 2003,
+    "to": 2004,
+    "gap_years": 1,
+    "n": 5746,
+    "switch_rate": 0.16748298895652777,
+    "se_approx": 0.0054385440713640605,
+    "share_city_at_to": 0.4289260272442023
+   },
+   {
+    "from": 2004,
+    "to": 2005,
+    "gap_years": 1,
+    "n": 6381,
+    "switch_rate": 0.12704724016664862,
+    "se_approx": 0.004585698414276441,
+    "share_city_at_to": 0.42638455829793764
+   },
+   {
+    "from": 2005,
+    "to": 2006,
+    "gap_years": 1,
+    "n": 6372,
+    "switch_rate": 0.1147258238174471,
+    "se_approx": 0.0043895072434805915,
+    "share_city_at_to": 0.42365431895310157
+   },
+   {
+    "from": 2006,
+    "to": 2007,
+    "gap_years": 1,
+    "n": 6378,
+    "switch_rate": 0.1164847668805896,
+    "se_approx": 0.004415729801924914,
+    "share_city_at_to": 0.43410707528678555
+   },
+   {
+    "from": 2007,
+    "to": 2008,
+    "gap_years": 1,
+    "n": 6374,
+    "switch_rate": 0.12176203204711977,
+    "se_approx": 0.004508755703582279,
+    "share_city_at_to": 0.43479646893154833
+   },
+   {
+    "from": 2008,
+    "to": 2009,
+    "gap_years": 1,
+    "n": 6368,
+    "switch_rate": 0.09758116535091409,
+    "se_approx": 0.0041023988321359445,
+    "share_city_at_to": 0.42689349543091715
+   },
+   {
+    "from": 2009,
+    "to": 2010,
+    "gap_years": 1,
+    "n": 6458,
+    "switch_rate": 0.10163356619044168,
+    "se_approx": 0.004156766925741947,
+    "share_city_at_to": 0.4161508133916419
+   },
+   {
+    "from": 2010,
+    "to": 2011,
+    "gap_years": 1,
+    "n": 6665,
+    "switch_rate": 0.08511994606781514,
+    "se_approx": 0.0037827068929062405,
+    "share_city_at_to": 0.4189504892724486
+   },
+   {
+    "from": 2011,
+    "to": 2013,
+    "gap_years": 2,
+    "n": 6340,
+    "switch_rate": 0.16027882745261224,
+    "se_approx": 0.005099130851508397,
+    "share_city_at_to": 0.41637024065427813
+   },
+   {
+    "from": 2013,
+    "to": 2015,
+    "gap_years": 2,
+    "n": 6251,
+    "switch_rate": 0.11692907070647379,
+    "se_approx": 0.004500561750543736,
+    "share_city_at_to": 0.40736575982834483
+   },
+   {
+    "from": 2015,
+    "to": 2017,
+    "gap_years": 2,
+    "n": 5955,
+    "switch_rate": 0.1122133920720625,
+    "se_approx": 0.004512931987896401,
+    "share_city_at_to": 0.4006081651993888
+   },
+   {
+    "from": 2017,
+    "to": 2019,
+    "gap_years": 2,
+    "n": 5834,
+    "switch_rate": 0.08355951481608971,
+    "se_approx": 0.003993793771979893,
+    "share_city_at_to": 0.38133829705838723
+   },
+   {
+    "from": 2019,
+    "to": 2021,
+    "gap_years": 2,
+    "n": 5853,
+    "switch_rate": 0.08655317678410776,
+    "se_approx": 0.004067279281724257,
+    "share_city_at_to": 0.36868548483104296
+   },
+   {
+    "from": 2021,
+    "to": 2023,
+    "gap_years": 2,
+    "n": 5703,
+    "switch_rate": 0.06672631126519858,
+    "se_approx": 0.0036619016602876813,
+    "share_city_at_to": 0.359242522956719
+   }
+  ],
+  "nlsy79_switch_pairs": [
+   {
+    "from": 1979,
+    "to": 1980,
+    "gap_years": 1,
+    "n": 1931,
+    "switch_rate": 0.05472659321851964,
+    "se_approx": 0.006220162991852701,
+    "share_city_at_to": 0.36094038059849437
+   },
+   {
+    "from": 1980,
+    "to": 1981,
+    "gap_years": 1,
+    "n": 2469,
+    "switch_rate": 0.08175558649219675,
+    "se_approx": 0.006627036889421713,
+    "share_city_at_to": 0.34648504593915963
+   },
+   {
+    "from": 1981,
+    "to": 1982,
+    "gap_years": 1,
+    "n": 3017,
+    "switch_rate": 0.06910499665653211,
+    "se_approx": 0.005521070839089238,
+    "share_city_at_to": 0.3550994615822459
+   },
+   {
+    "from": 1982,
+    "to": 1983,
+    "gap_years": 1,
+    "n": 3031,
+    "switch_rate": 0.0497471343362748,
+    "se_approx": 0.004719112567584759,
+    "share_city_at_to": 0.2995138663781552
+   },
+   {
+    "from": 1983,
+    "to": 1984,
+    "gap_years": 1,
+    "n": 3261,
+    "switch_rate": 0.05205940982514085,
+    "se_approx": 0.004656735901947554,
+    "share_city_at_to": 0.33147012116781605
+   },
+   {
+    "from": 1984,
+    "to": 1985,
+    "gap_years": 1,
+    "n": 3325,
+    "switch_rate": 0.03163531320490941,
+    "se_approx": 0.0036287442086471427,
+    "share_city_at_to": 0.31520172644968314
+   },
+   {
+    "from": 1985,
+    "to": 1986,
+    "gap_years": 1,
+    "n": 3138,
+    "switch_rate": 0.04780839665307724,
+    "se_approx": 0.004561671850623961,
+    "share_city_at_to": 0.31272913542835357
+   },
+   {
+    "from": 1986,
+    "to": 1987,
+    "gap_years": 1,
+    "n": 3105,
+    "switch_rate": 0.06398356322393994,
+    "se_approx": 0.0052409919349959205,
+    "share_city_at_to": 0.2996760416463664
+   },
+   {
+    "from": 1987,
+    "to": 1988,
+    "gap_years": 1,
+    "n": 3246,
+    "switch_rate": 0.03213765310708685,
+    "se_approx": 0.003698496881026453,
+    "share_city_at_to": 0.2924143669296889
+   },
+   {
+    "from": 1988,
+    "to": 1989,
+    "gap_years": 1,
+    "n": 3171,
+    "switch_rate": 0.050143308597942096,
+    "se_approx": 0.004630233486832049,
+    "share_city_at_to": 0.2835998074866981
+   },
+   {
+    "from": 1989,
+    "to": 1990,
+    "gap_years": 1,
+    "n": 3260,
+    "switch_rate": 0.03815311554330176,
+    "se_approx": 0.004002740287826602,
+    "share_city_at_to": 0.27482329847396797
+   },
+   {
+    "from": 1990,
+    "to": 1991,
+    "gap_years": 1,
+    "n": 3379,
+    "switch_rate": 0.024095696765842046,
+    "se_approx": 0.0031094015193166426,
+    "share_city_at_to": 0.26276210899285923
+   },
+   {
+    "from": 1991,
+    "to": 1992,
+    "gap_years": 1,
+    "n": 3470,
+    "switch_rate": 0.014790362152712492,
+    "se_approx": 0.002421962232995923,
+    "share_city_at_to": 0.27063994619075493
+   },
+   {
+    "from": 1992,
+    "to": 1993,
+    "gap_years": 1,
+    "n": 3241,
+    "switch_rate": 0.05018397110872726,
+    "se_approx": 0.004530018727113787,
+    "share_city_at_to": 0.2501755199848044
+   },
+   {
+    "from": 1993,
+    "to": 1994,
+    "gap_years": 1,
+    "n": 3764,
+    "switch_rate": 0.03210921635542634,
+    "se_approx": 0.0034057904500821995,
+    "share_city_at_to": 0.22577463133926706
+   },
+   {
+    "from": 1994,
+    "to": 1996,
+    "gap_years": 2,
+    "n": 3533,
+    "switch_rate": 0.05016694471464738,
+    "se_approx": 0.00435745810920031,
+    "share_city_at_to": 0.21839652560006786
+   },
+   {
+    "from": 1996,
+    "to": 1998,
+    "gap_years": 2,
+    "n": 3833,
+    "switch_rate": 0.08276728092356266,
+    "se_approx": 0.005271747790981885,
+    "share_city_at_to": 0.20993841390294157
+   }
+  ],
+  "nlsy79_unknown_share_adult": [
+   {
+    "year": 1982,
+    "n": 108,
+    "unknown_share_of_smsa_residents": 0.40982999437520645
+   },
+   {
+    "year": 1983,
+    "n": 762,
+    "unknown_share_of_smsa_residents": 0.37509157563234286
+   },
+   {
+    "year": 1984,
+    "n": 1539,
+    "unknown_share_of_smsa_residents": 0.4062799744385761
+   },
+   {
+    "year": 1985,
+    "n": 2259,
+    "unknown_share_of_smsa_residents": 0.3977993534629117
+   },
+   {
+    "year": 1986,
+    "n": 3124,
+    "unknown_share_of_smsa_residents": 0.3879046002784052
+   },
+   {
+    "year": 1987,
+    "n": 4342,
+    "unknown_share_of_smsa_residents": 0.3799988294207982
+   },
+   {
+    "year": 1988,
+    "n": 5373,
+    "unknown_share_of_smsa_residents": 0.4023139130825983
+   },
+   {
+    "year": 1989,
+    "n": 6256,
+    "unknown_share_of_smsa_residents": 0.40585629904249254
+   },
+   {
+    "year": 1990,
+    "n": 6514,
+    "unknown_share_of_smsa_residents": 0.39797610782948006
+   },
+   {
+    "year": 1991,
+    "n": 6561,
+    "unknown_share_of_smsa_residents": 0.4040271596610375
+   },
+   {
+    "year": 1992,
+    "n": 6162,
+    "unknown_share_of_smsa_residents": 0.376699873772908
+   },
+   {
+    "year": 1993,
+    "n": 5759,
+    "unknown_share_of_smsa_residents": 0.35903603866377
+   },
+   {
+    "year": 1994,
+    "n": 4913,
+    "unknown_share_of_smsa_residents": 0.34928054044542384
+   },
+   {
+    "year": 1996,
+    "n": 3268,
+    "unknown_share_of_smsa_residents": 0.32694357843382105
+   },
+   {
+    "year": 1998,
+    "n": 1325,
+    "unknown_share_of_smsa_residents": 0.0
+   }
+  ]
+ }
+}

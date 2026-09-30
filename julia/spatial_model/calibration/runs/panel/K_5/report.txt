@@ -1,0 +1,62 @@
+spatial_diagnose.jl  2026-09-29 17:46:44
+  options: consistency = true, external = Pair{Symbol, Any}[:σ => 0.2353], max-iter = 60, measure = Pair{Symbol, Any}[:K => 5.0], out = julia/spatial_model/runs/panel/K_5, polish = true, theta = julia/spatial_model/runs/polish-noincome, workers = 16
+  measurement: Measurement(0.11332868530700327, 5.0, :within, 0.45, :log_median_market, 20, (0.24439828166912048, 0.7556017183308795), 0.18, 600, 5.5, 4.0)
+  solver: (Nz = 5, nϵT = 48, nXO = 48, damping = 0.75, tol = 1.0e-6, maxit = 120, hh_tol = 1.0e-7, hh_maxit = 1000)
+  workers: 16
+
+polish: 60 iterations, 19.5 minutes, criterion 8.11771
+
+ϑ = (logκ̃ = -0.52495, δκ = -0.00559, ΔB = 0.04394, β = 0.09994, λ = 0.02179, r_m = 1.00000, ωf = 0.96654, γ = 0.60710)
+  moment                  target       model  (m−t)/se  param  source
+  male_teach_share       0.01945     0.01909     -0.18  logκ̃   ACS 2009–13, men 25–34 (wages_occ_shares_v2.xlsx: moments_shares)
+  female_teach_share     0.05987     0.05977     -0.02  ωf     ACS 2009–13, women 25–34 (wages_occ_shares_v2.xlsx: moments_shares)
+  teacher_p9010          2.77278     2.73463     -0.28  γ      ACS 2009–13 (wages_occ_shares_v2.xlsx: 90_10_hr_wages_weighted)
+  gap_salary             0.00860    -0.01072     -2.10  δκ     district_audit.md, variant 28 (spatial_moments.json: 0.01623 on 176 CZs)
+  gap_pupils             0.37640     0.24712     -1.12  ΔB     spatial_moments.json: gap_pupils_locale
+  cfr_effect             0.01334     0.01409     +0.18  β      CFR (2014b) Table 3 col. 2: 1.34% earnings at 28 per teacher-VA SD-year
+  wtp_share              0.00595     0.00594     -0.01  λ      BFM (2007) Table 7 col. 4: $19.70/month (SE $7.40) per school-average SD
+  gap_income             0.11220    -0.01434    -7.53*  r_m    district_bootstrap.md: pm_ftyr_all (ACS 2014–18 school districts, B20005)
+  gap_teachers_pp       -0.01770    -0.00010     +1.34  none   district_audit.md, FTE variant 11 (spatial_moments.json: −0.01216)
+  move_rate              0.21560     0.25117     +0.71  r_m    NLSY79 (nlsy_extensions.json T3/nlsy79_main): city↔suburb, ages 14–16 → 25–34
+  * validation: not in the criterion
+  criterion over 9 active targets = 8.1177
+  validation: SEDA growth gap -0.0016 SD/grade [data 0.0031 (0.0030)];  Δlog Q = -0.0008
+              score-level gap -0.0125 SD [0.2887];  child-poverty gap +0.0073 [−0.0888] (poor shares (0.1759, 0.1832);
+              provisional: relative line, home-production output counted as income)
+  income gaps: mean log -0.0148, log mean -0.0153, log median -0.0152;  market workers: mean log -0.0138, log median -0.0143
+  occupations: teaching share 0.0394 (male 0.0191, female 0.0598);  teacher 90/10 men 2.603, women 2.777 [2.597, 2.830]
+  ability (§4 check): wage slope 0.2131 [NLSY 0.2127];  mother–child ρ 0.5766 [0.5766];  c = 1.8760;  s_T/s_O = 0.7555 [1.176]
+  mobility: gross move rate 0.2512;  P(1→2) = 0.2864, P(2→1) = 0.2237;  by parental-income tercile (0.2402, 0.2522, 0.2611) [NLSY79 0.221, 0.226, 0.207]
+  CFR pieces: sd(log h_T) = 0.6604;  non-teachers 0.01418;  analytic 0.01435
+  WTP share by location (0.0060, 0.0059);  students/teacher (25.3604, 25.3630);  t = (0.0164, 0.0165);  M = (0.8771, 1.1229)
+  levels: mean C = 0.229805, mean h = 0.487961;  stationarity dev 1.3e-05
+  consumption support: min C = -4.008e-02;  500 (node, l′) pairs at the floor, chosen by a population share 2.7e-229
+
+===== External-block consistency: Table 2 in the full equilibrium (§4) =====
+  pooled non-teacher 90/10: GE 3.5854  first stage 3.7372  data 3.7374
+  by gender (GE / first stage / data): men 3.521 / 3.646 / 3.821;  women 3.666 / 3.850 / 3.633
+  shares among non-teachers: max |GE − target| 0.0015 (men), 0.0076 (women); home production GE 0.2308, 0.3632 vs 0.2293, 0.3556
+  teachers' 90/10: GE 2.735 (men 2.603, women 2.777) vs data 2.773 (2.597, 2.830)
+  NLSY moments: latent wage slope 0.2131 vs 0.2127 (SE 0.0077);  mother–child ρ 0.5766 (all parents 0.5766) vs 0.5766 (SE 0.0140);  c = 1.876
+  occupation                  sh m GE  target | sh f GE  target |   m GE    1st   data |   f GE    1st   data
+  Executives                   0.0702  0.0702 |  0.0623  0.0629 |   3.59   3.72   4.15 |   3.65   3.84   3.59
+  Management related           0.0318  0.0319 |  0.0394  0.0401 |   3.40   3.52   3.38 |   3.54   3.71   2.97
+  Architects, engineers, CS    0.0461  0.0462 |  0.0133  0.0139 |   3.48   3.60   2.92 |   3.34   3.48   2.99
+  Scientists, arts             0.0313  0.0314 |  0.0363  0.0371 |   3.39   3.51   3.94 |   3.52   3.69   3.24
+  Doctors and lawyers          0.0139  0.0140 |  0.0129  0.0135 |   3.25   3.36   6.59 |   3.33   3.48   5.48
+  Nurses, therapists           0.0157  0.0158 |  0.0938  0.0939 |   3.27   3.38   5.62 |   3.78   3.98   4.53
+  Postsecondary teachers       0.0077  0.0078 |  0.0074  0.0078 |   3.17   3.27   4.23 |   3.26   3.39   3.97
+  Other teachers, librarians   0.0045  0.0046 |  0.0149  0.0155 |   3.11   3.21   3.31 |   3.35   3.50   3.58
+  Technicians                  0.0393  0.0395 |  0.0326  0.0333 |   3.44   3.57   3.90 |   3.50   3.66   3.44
+  Sales                        0.0792  0.0791 |  0.0676  0.0681 |   3.63   3.76   4.71 |   3.68   3.86   4.62
+  Administrative support       0.0626  0.0626 |  0.1415  0.1407 |   3.56   3.69   3.27 |   3.93   4.15   2.80
+  Fire, police, guards         0.0320  0.0322 |  0.0075  0.0079 |   3.40   3.52   3.51 |   3.26   3.39   3.50
+  Food, cleaning, personal     0.0579  0.0579 |  0.0735  0.0740 |   3.54   3.67   3.50 |   3.70   3.89   3.86
+  Farm, extraction             0.0294  0.0295 |  0.0044  0.0047 |   3.38   3.50   4.51 |   3.20   3.32   4.19
+  Mechanics, construction      0.1205  0.1201 |  0.0030  0.0032 |   3.77   3.91   3.66 |   3.16   3.28   4.00
+  Precision manufacturing      0.0163  0.0165 |  0.0048  0.0051 |   3.28   3.39   3.19 |   3.21   3.34   3.31
+  Manufacturing operators      0.0261  0.0263 |  0.0073  0.0077 |   3.36   3.48   3.52 |   3.25   3.39   3.23
+  Fabricators, handlers        0.0433  0.0434 |  0.0107  0.0112 |   3.47   3.59   3.39 |   3.30   3.45   3.24
+  Vehicle operators            0.0416  0.0417 |  0.0035  0.0037 |   3.46   3.58   3.47 |   3.17   3.30   3.56
+  Home production              0.2308  0.2293 |  0.3632  0.3556 |
+=============================================================================
