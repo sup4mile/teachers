@@ -1,0 +1,419 @@
+# nlsy_ba_slopes_targets.toml -- NLSY79 inputs for the joint estimation of the ability scale s_z with the college decision (DESIGN_v2.md section M3, task D3b)
+# and for checking the teacher wage curvature gamma. Generated 2026-10-05T03:14:22 by data/spatial/nlsy_ba_slopes.py; see nlsy_ba_slopes.md (definitions, SEs, caveats).
+# role: target (M3), target_by_gender, validation. value, se: point estimate and household-bootstrap standard error (B = 500, seed 20260929).
+# model_moment: the name of the model-side moment (M3 spec) that the data moment is the counterpart of ("none" where the model has no counterpart yet).
+# convention: 'obs/sqrt(R)' = observed slope / sqrt(R_comp_pop), the project's latent slope (the pipeline of the 0.2127 wage_slope target); it is the `value` of every slope in this file.
+# 'eiv' = classical errors-in-variables correction of the regression itself (error variance 1 - R_comp_pop in afqt_c units), carried in the alt_eiv* fields. A BA-conditional and an
+# unconditional slope must be on one convention: wage_slope_ba (obs/sqrt(R)) goes with the wage_slope 0.2127 (0.0077); the EIV pair is wage_slope_ba alt_eiv with alt_unconditional_eiv
+# (it needs an amendment of the pre-registered V12 before any M3 result). alt_*: alternative definitions or versions. Nothing here is fitted; no value was chosen to match a model output.
+
+[source]
+nlsy79 = "NLSY79 block A, ages 25-34 wage sample of nlsy_ability.py block C (>= 48 weeks, >= 30 hours/week, wage income >= $1,000 in 2010 dollars, highest grade >= 9), 1979 weights, household bootstrap"
+acs = "ACS 2009-13 BA shares of all persons and of non-teachers (education_targets.toml ba_share_all and ba_share_nonteacher, T2 convention for the latter)"
+
+[meta]
+generated = "2026-10-05T03:14:22"
+script = "data/spatial/nlsy_ba_slopes.py"
+nlsy_B = 500
+nlsy_seed = 20260929
+eta = 0.08
+gamma_baseline = 0.6194
+value_convention = "obs/sqrt(R)"
+ba_proxy = "highest grade completed >= 16 at some round at 25-34 (the extract has no degree variable)"
+sealed_set = "not used; NLSY97 not read (see nlsy_ba_slopes.md, Definitions and caveats)"
+
+[moment.wage_slope_ba]
+role = "target"
+value = 0.1607538554168599
+se = 0.008267534072077897
+scale = 0.009266790746990558
+scale_rule = "bootstrap SE in quadrature with half the spread of the three disattenuation versions (convention, split-half IV, EIV); the existing wage_slope target uses the bare SE (0.0077)"
+n_person_years = 37870
+n_persons = 7219
+units = "log hourly-wage points per SD of latent AFQT"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "wage_slope_ba"
+definition = "latent wage-AFQT slope in a regression of the log hourly wage on latent AFQT, a BA indicator (highest grade >= 16 at 25-34), a female dummy and age and survey-year dummies; NLSY79 wage sample, 1979 weights; latent slope = observed slope / sqrt(R_comp_pop), the pipeline of the 0.2127 wage_slope target"
+model = "weighted OLS slope of log wage on the standardized adult score with a BA (d = 1) dummy and a female dummy, over market workers (teachers included, home producers excluded); wage_slope_ba in spatial_moments.jl (spec M3_SPEC_v2.md)"
+alt_eiv = 0.16912554368519406
+alt_eiv_se = 0.008731108881405741
+alt_split_half_iv = 0.16345335109391665
+alt_split_half_iv_se = 0.008466151169337814
+alt_unconditional_convention = 0.21266045167782338
+alt_unconditional_eiv = 0.21519675049012718
+alt_unconditional_eiv_se = 0.007512822019571009
+alt_ba_at_round = 0.15927489586351373
+alt_ba_at_round_eiv = 0.16746335058007228
+ba_coefficient_eiv = 0.17361183072184852
+ba_coefficient_uncorrected = 0.19793438983870731
+conditional_reliability = 0.8705101151728517
+pairing = "same convention as the wage_slope target 0.2127 (0.0077): 0.1608 pairs with 0.2127. If EIV is preferred, switch BOTH to the EIV values (alt_eiv with alt_unconditional_eiv); that needs an amendment of the pre-registered V12 before any M3 result"
+note = "convention value; with the BA control the reliability of afqt_c given the controls falls to the conditional_reliability, so EIV and the split-half IV are 5% and 2% higher; the three versions span 0.0084 (SE 0.0083)"
+
+[moment.wage_slope_ba_m]
+role = "target_by_gender"
+value = 0.14814878601224948
+se = 0.011714157245239472
+scale = 0.011714157245239472
+scale_rule = "bootstrap SE, as the existing wage_slope target (0.2127, SE 0.0077)"
+n_person_years = 21075
+n_persons = 3756
+units = "log hourly-wage points per SD of latent AFQT"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "wage_slope_ba"
+definition = "as wage_slope_ba, men only (no female dummy)"
+model = "weighted OLS slope of log wage on the standardized adult score with a BA (d = 1) dummy, over market workers (teachers included, home producers excluded); wage_slope_ba in spatial_moments.jl (spec M3_SPEC_v2.md), men only"
+alt_eiv = 0.154485102059415
+alt_eiv_se = 0.012262526297405466
+alt_unconditional_convention = 0.19036387169472274
+alt_unconditional_eiv = 0.19099206283016476
+conditional_reliability = 0.8782802625169216
+
+[moment.wage_slope_ba_f]
+role = "target_by_gender"
+value = 0.18248571511075706
+se = 0.011422848918371545
+scale = 0.011422848918371545
+scale_rule = "bootstrap SE, as the existing wage_slope target (0.2127, SE 0.0077)"
+n_person_years = 16795
+n_persons = 3463
+units = "log hourly-wage points per SD of latent AFQT"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "wage_slope_ba"
+definition = "as wage_slope_ba, women only (no female dummy)"
+model = "weighted OLS slope of log wage on the standardized adult score with a BA (d = 1) dummy, over market workers (teachers included, home producers excluded); wage_slope_ba in spatial_moments.jl (spec M3_SPEC_v2.md), women only"
+alt_eiv = 0.19517548039671184
+alt_eiv_se = 0.012308258942395553
+alt_unconditional_convention = 0.24681647925356653
+alt_unconditional_eiv = 0.2535282588537646
+conditional_reliability = 0.8562986253923722
+
+[moment.wage_slope_within_nonba]
+role = "validation"
+value = 0.1657629357275828
+se = 0.00987555332268853
+n_person_years = 28216
+n_persons = 5546
+units = "log hourly-wage points per SD of latent AFQT"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "none"
+definition = "slope within non-BA workers in the regression with BA, AFQT x BA, a female dummy and the common controls; n_* are the non-BA workers' counts, n_*_regression those of the whole interacted regression"
+model = "the same slope over d = 0 market workers (no model counterpart yet)"
+alt_eiv = 0.1721370677522283
+alt_eiv_se = 0.01029792457181036
+alt_separate_samples = 0.16568749270911032
+alt_separate_samples_eiv = 0.17209172104606618
+n_person_years_regression = 37870
+n_persons_regression = 7219
+
+[moment.wage_slope_within_ba]
+role = "validation"
+value = 0.14416060227620034
+se = 0.015200944378212766
+n_person_years = 9654
+n_persons = 1673
+units = "log hourly-wage points per SD of latent AFQT"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "none"
+definition = "slope within BA workers in the same interacted regression; n_* are the BA workers' counts, n_*_regression those of the whole interacted regression"
+model = "the same slope over d = 1 market workers (teachers included; no model counterpart yet)"
+alt_eiv = 0.15856081569389877
+alt_eiv_se = 0.016822329496655544
+alt_separate_samples = 0.14961736813983623
+alt_separate_samples_eiv = 0.16500207991542004
+diff_ba_minus_nonba = -0.02160233345138246
+diff_se = 0.018408206977117373
+diff_ba_minus_nonba_eiv = -0.013576252058329547
+diff_se_eiv = 0.020027135333361847
+n_person_years_regression = 37870
+n_persons_regression = 7219
+
+[moment.ba_coefficient_given_afqt]
+role = "validation"
+value = 0.17361183072184852
+se = 0.017738710073207722
+n_person_years = 37870
+n_persons = 7219
+units = "log hourly-wage points"
+convention = "eiv"
+source = "nlsy79"
+model_moment = "none"
+definition = "coefficient of the BA indicator in the wage_slope_ba regression (premium at given LATENT AFQT, so errors-in-variables corrected: the uncorrected coefficient mixes in the ability the noisy score leaves out)"
+model = "BA minus non-BA log wage at the same z over market workers (credential premium rho_c plus the return to the extra schooling time), ability held fixed; no model counterpart yet"
+alt_uncorrected = 0.19793438983870731
+alt_uncorrected_se = 0.01701841661263974
+
+[moment.teacher_slope_ratio]
+role = "validation"
+value = 0.5564574415007337
+se = 0.31882786195024626
+units = "ratio"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "teacher_slope_ratio"
+definition = "slope of the log wage on latent AFQT among all K-12 teachers, in a regression with a BA indicator (the slope of wage_slope_ba), over the same slope among non-teacher BA workers (nlsy_teachers.py spec c80-emp-all-maj, person-level majority rule); all K-12 teachers (BA control) / non-teacher BA workers (main)"
+model = "ratio of teachers' to non-teacher BA workers' log-wage slopes on log z in the model (not yet a model moment); closed form gamma (1 - eta) / (1 - gamma eta), which has no credential margin"
+alt_eiv = 0.5968538714189717
+alt_eiv_se = 0.3484329335553345
+ci95_lo = -0.03629339265228212
+ci95_hi = 1.2165632185762854
+teacher_slope = 0.0832281174569674
+teacher_slope_se = 0.045068568706085665
+comparison_slope = 0.14956780384229557
+comparison_slope_se = 0.016177039466994506
+teacher_slope_eiv = 0.09821699336091454
+teacher_slope_eiv_se = 0.05426746053208731
+comparison_slope_eiv = 0.16455785589094293
+comparison_slope_eiv_se = 0.017942446807244855
+n_teacher_persons = 147
+n_teacher_person_years = 844
+n_comparison_persons = 1540
+n_comparison_person_years = 8892
+ba_control_in_teacher_slope = true
+delta_method_se = 0.31113430999536273
+delta_method_se_eiv = 0.34035033538228937
+alt_no_ba_control = 0.752736493084696
+alt_no_ba_control_se = 0.28883023741647706
+alt_ba_teachers_only = 0.4786698423785967
+alt_ba_teachers_only_se = 0.31824735080695526
+alt_vs_all_nonteachers_ba_control = 0.5182805934405517
+alt_vs_all_nonteachers_ba_control_se = 0.2883346388108964
+baseline_implied_ratio = 0.5995572614177735
+note = "small teacher sample (147 persons): a weak check, not a target"
+
+[moment.gamma_implied]
+role = "validation"
+value = 0.5769288410388446
+se = 0.316028076539102
+units = "gamma"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "none"
+definition = "teacher wage curvature solving ratio = gamma (1 - eta) / (1 - gamma eta) at eta = 0.08 for the slope ratio of teacher_slope_ratio"
+model = "gamma (internal parameter, Table 3), checked against, not targeted"
+alt_eiv = 0.6167449381499392
+alt_eiv_se = 0.3429454120970625
+ci95_lo = -0.039614295435436014
+ci95_hi = 1.1958451236836753
+eta = 0.08
+baseline_gamma = 0.6194
+baseline_implied_ratio = 0.5995572614177735
+delta_method_se = 0.3076920841854873
+delta_method_se_eiv = 0.3343406383778641
+range_over_definitions_lo = 0.21166497043977262
+range_over_definitions_hi = 0.7349795731775526
+alt_no_ba_control = 0.7679269172946915
+alt_no_ba_control_se = 0.2746013036722315
+alt_ba_teachers_only = 0.4995022910276943
+alt_ba_teachers_only_se = 0.31920022983044555
+
+[moment.teacher_slope_ratio_ba_teachers]
+role = "validation"
+value = 0.4786698423785967
+se = 0.31824735080695526
+units = "ratio"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "teacher_slope_ratio"
+definition = "slope of the log wage on latent AFQT among K-12 teachers with a BA over the same slope among non-teacher BA workers (nlsy_teachers.py spec c80-emp-all-maj, person-level majority rule); K-12 teachers with a BA / non-teacher BA workers"
+model = "ratio of teachers' to non-teacher BA workers' log-wage slopes on log z in the model (not yet a model moment); closed form gamma (1 - eta) / (1 - gamma eta), which has no credential margin"
+alt_eiv = 0.5083096698199963
+alt_eiv_se = 0.34362652527330706
+ci95_lo = -0.12646223538823745
+ci95_hi = 1.1640402132698235
+teacher_slope = 0.07159359709010449
+teacher_slope_se = 0.04541614889842678
+comparison_slope = 0.14956780384229557
+comparison_slope_se = 0.016177039466994506
+teacher_slope_eiv = 0.08364634939421173
+teacher_slope_eiv_se = 0.05403983156678209
+comparison_slope_eiv = 0.16455785589094293
+comparison_slope_eiv_se = 0.017942446807244855
+n_teacher_persons = 130
+n_teacher_person_years = 759
+n_comparison_persons = 1540
+n_comparison_person_years = 8892
+ba_control_in_teacher_slope = false
+delta_method_se = 0.3112149217217047
+delta_method_se_eiv = 0.3364802025128927
+note = "small teacher sample (147 persons): a weak check, not a target"
+
+[moment.gamma_implied_ba_teachers]
+role = "validation"
+value = 0.4995022910276943
+se = 0.31920022983044555
+units = "gamma"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "none"
+definition = "teacher wage curvature solving ratio = gamma (1 - eta) / (1 - gamma eta) at eta = 0.08 for the slope ratio of teacher_slope_ratio_ba_teachers"
+model = "gamma (internal parameter, Table 3), checked against, not targeted"
+alt_eiv = 0.529122836390444
+alt_eiv_se = 0.3430040446308032
+ci95_lo = -0.13898765109989594
+ci95_hi = 1.1489603272130569
+eta = 0.08
+baseline_gamma = 0.6194
+baseline_implied_ratio = 0.5995572614177735
+delta_method_se = 0.3117820262402114
+delta_method_se_eiv = 0.3354313207288136
+
+[moment.teacher_slope_ratio_no_ba_control]
+role = "validation"
+value = 0.752736493084696
+se = 0.28883023741647706
+units = "ratio"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "teacher_slope_ratio"
+definition = "slope of the log wage on latent AFQT among all K-12 teachers WITHOUT a BA control (it contains the credential composition of the teachers) over the same slope among non-teacher BA workers (the first version of this file) (nlsy_teachers.py spec c80-emp-all-maj, person-level majority rule); all K-12 teachers, no BA control / non-teacher BA workers (first version)"
+model = "ratio of teachers' to non-teacher BA workers' log-wage slopes on log z in the model (not yet a model moment); closed form gamma (1 - eta) / (1 - gamma eta), which has no credential margin"
+alt_eiv = 0.7558646122656368
+alt_eiv_se = 0.29295956341138696
+ci95_lo = 0.2651669008737696
+ci95_hi = 1.4219806066801657
+teacher_slope = 0.11258514414262928
+teacher_slope_se = 0.039052528314179234
+comparison_slope = 0.14956780384229557
+comparison_slope_se = 0.016177039466994506
+teacher_slope_eiv = 0.12438345993827213
+teacher_slope_eiv_se = 0.04366837255320165
+comparison_slope_eiv = 0.16455785589094293
+comparison_slope_eiv_se = 0.017942446807244855
+n_teacher_persons = 147
+n_teacher_person_years = 844
+n_comparison_persons = 1540
+n_comparison_person_years = 8892
+ba_control_in_teacher_slope = false
+delta_method_se = 0.2781517166646568
+delta_method_se_eiv = 0.2822851328476433
+note = "small teacher sample (147 persons): a weak check, not a target"
+
+[moment.gamma_implied_no_ba_control]
+role = "validation"
+value = 0.7679269172946915
+se = 0.2746013036722315
+units = "gamma"
+convention = "obs/sqrt(R)"
+source = "nlsy79"
+model_moment = "none"
+definition = "teacher wage curvature solving ratio = gamma (1 - eta) / (1 - gamma eta) at eta = 0.08 for the slope ratio of teacher_slope_ratio_no_ba_control"
+model = "gamma (internal parameter, Table 3), checked against, not targeted"
+alt_eiv = 0.7709213468191072
+alt_eiv_se = 0.27810499743964584
+ci95_lo = 0.281725027702633
+ci95_hi = 1.3755432835137718
+eta = 0.08
+baseline_gamma = 0.6194
+baseline_implied_ratio = 0.5995572614177735
+delta_method_se = 0.2663320369153014
+delta_method_se_eiv = 0.27015185223897137
+
+[moment.ba_logit_shift]
+role = "validation"
+value = 0.5428101099919806
+se = 0.04810540331350267
+units = "log-odds"
+convention = "cell shift of the weighted D3 tercile shares"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "common logit shift of the D3 tercile shares of P(BA | AFQT tercile) of all persons of the D3 primary sample (persons observed at 25-34, highest grade >= 9; teachers included; NLSY79 share 0.2582) that moves the weighted NLSY79 BA share to the ACS 2009-13 all-persons BA share 0.3391 (education_targets.toml ba_share_all): like for like (all persons to all persons)"
+model = "cohort adjustment of the BA level before comparing P(d = 1 | tercile of z) over ALL adults (teachers and non-teachers, home production included) with the data; the model's ba_share and ba_share_by_z are over all adults"
+alt_individual_logit = 0.5802758350040393
+alt_individual_logit_se = 0.053112095589543384
+alt_nonteachers = 0.5418528787568804
+alt_nonteachers_se = 0.049577744240829814
+alt_nonteachers_individual_logit = 0.5816469016733725
+alt_nonteachers_individual_logit_se = 0.05495561877704578
+alt_mixed_population = 0.4396687175317383
+alt_mixed_population_se = 0.048372276578335746
+alt_mixed_population_individual_logit = 0.4707834187239973
+mixed_population_note = "NOT like for like: the NLSY79 all-persons share contains the K-12 teachers (92% with a BA), the ACS non-teacher share does not; this is the version of the first release of this file and of the task text, and it understates the shift by 0.10"
+target_share = 0.33906579987668034
+target_share_se = 0.0011209155701027013
+nlsy79_share = 0.2582069078010625
+nlsy79_share_nonteachers = 0.24461573212296067
+target_share_nonteachers = 0.3231209468159507
+nlsy79_teacher_weight_share = 0.020186730225302926
+nlsy79_teacher_ba_share = 0.9178884972717227
+shift_se_from_acs_target = 0.007196829107064854
+
+[moment.p_ba_afqt_tercile_1_at_acs_share]
+role = "validation"
+value = 0.0681588299419014
+se = 0.0061446624762700516
+units = "share"
+convention = "weighted, cell-shifted to the ACS share"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 1 of own AFQT (observed score; cut points -0.403, 0.494) among ALL persons of the D3 primary sample, the D3 NLSY79 share shifted by ba_logit_shift to the ACS all-persons BA share 0.3391 (like for like)"
+model = "P(d = 1 | tercile of the observed score x = sqrt(R) theta + sqrt(1 - R) u, theta = standardized log z, R = 0.916; terciles of x over ALL adults, teachers and non-teachers) at the model's own BA share of all adults"
+nlsy79_unshifted = 0.04077205660107285
+alt_individual_logit = 0.05707491056549668
+alt_individual_logit_se = 0.0036387101777857153
+alt_nonteachers = 0.06397712972694682
+alt_nonteachers_se = 0.005999408803231654
+alt_mixed_population = 0.06189264402818258
+alt_mixed_population_se = 0.005675014131232696
+mixed_population_note = "NOT like for like (all persons shifted to the non-teacher share); see ba_logit_shift"
+
+[moment.p_ba_afqt_tercile_2_at_acs_share]
+role = "validation"
+value = 0.25660821531756367
+se = 0.008857975066151073
+units = "share"
+convention = "weighted, cell-shifted to the ACS share"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 2 of own AFQT (observed score; cut points -0.403, 0.494) among ALL persons of the D3 primary sample, the D3 NLSY79 share shifted by ba_logit_shift to the ACS all-persons BA share 0.3391 (like for like)"
+model = "P(d = 1 | tercile of the observed score x = sqrt(R) theta + sqrt(1 - R) u, theta = standardized log z, R = 0.916; terciles of x over ALL adults, teachers and non-teachers) at the model's own BA share of all adults"
+nlsy79_unshifted = 0.1670774965106247
+alt_individual_logit = 0.2771882048418141
+alt_individual_logit_se = 0.003681247541631113
+alt_nonteachers = 0.23696560873495023
+alt_nonteachers_se = 0.008575323502823622
+alt_mixed_population = 0.23743132766025343
+alt_mixed_population_se = 0.00860892963017641
+mixed_population_note = "NOT like for like (all persons shifted to the non-teacher share); see ba_logit_shift"
+
+[moment.p_ba_afqt_tercile_3_at_acs_share]
+role = "validation"
+value = 0.6924661428519764
+se = 0.008642095434422964
+units = "share"
+convention = "weighted, cell-shifted to the ACS share"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 3 of own AFQT (observed score; cut points -0.403, 0.494) among ALL persons of the D3 primary sample, the D3 NLSY79 share shifted by ba_logit_shift to the ACS all-persons BA share 0.3391 (like for like)"
+model = "P(d = 1 | tercile of the observed score x = sqrt(R) theta + sqrt(1 - R) u, theta = standardized log z, R = 0.916; terciles of x over ALL adults, teachers and non-teachers) at the model's own BA share of all adults"
+nlsy79_unshifted = 0.5668140096594423
+alt_individual_logit = 0.6829579843451132
+alt_individual_logit_se = 0.006963578800272424
+alt_nonteachers = 0.6785353023892792
+alt_nonteachers_se = 0.00882348774693388
+alt_mixed_population = 0.670076874039121
+alt_mixed_population_se = 0.008569857206732645
+mixed_population_note = "NOT like for like (all persons shifted to the non-teacher share); see ba_logit_shift"
+
+[moment.p_ba_afqt_top_minus_bottom_at_acs_share]
+role = "validation"
+value = 0.624307312910075
+se = 0.012091104522449209
+units = "share difference"
+convention = "weighted, cell-shifted to the ACS share"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "top minus bottom AFQT tercile of the shifted shares (all persons, like for like)"
+model = "as p_ba_afqt_tercile_q_at_acs_share"
+nlsy79_unshifted = 0.5260419530583694
+alt_individual_logit = 0.6258830737796166
+alt_nonteachers = 0.6145581726623324
+alt_nonteachers_se = 0.01222500048166591
+alt_mixed_population = 0.6081842300109384
+alt_mixed_population_se = 0.011703377056833384
+mixed_population_note = "NOT like for like (all persons shifted to the non-teacher share); see ba_logit_shift"

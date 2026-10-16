@@ -50,3 +50,25 @@
 !/panel/*/
 !/panel/*/report.txt
 !/panel/*/theta.toml
+
+# Designated candidates from the 2026-10 experiments (calibration_log.md): C4′, the development candidate
+# (exp-c3/c4p, and its re-solve on the 2026-10-15 code), and S1·R·E, the diagnostic benchmark. The other
+# experiment runs (exp-*/, panel-exact/) and their working logs (experiments-2026-10*/) stay local.
+!/exp-c3/
+!/exp-c3/c4p/
+!/exp-c3/c4p/report.txt
+!/exp-c3/c4p/theta.toml
+!/exp-c3/c4p/moments.toml
+!/exp-1015/
+!/exp-1015/reeval/
+!/exp-1015/reeval/c4p/
+!/exp-1015/reeval/c4p/report.txt
+!/exp-1015/reeval/c4p/theta.toml
+!/exp-1015/reeval/c4p/moments.toml
+!/exp-1015/audit/
+!/exp-1015/audit/README.md
+!/exp-1015b/
+!/exp-1015b/s1_r_e_fit/
+!/exp-1015b/s1_r_e_fit/report.txt
+!/exp-1015b/s1_r_e_fit/theta.toml
+!/exp-1015b/s1_r_e_fit/moments.toml

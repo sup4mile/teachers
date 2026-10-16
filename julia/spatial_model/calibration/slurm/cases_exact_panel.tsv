@@ -1,0 +1,20 @@
+# Focused sensitivity panel at the exactly identified baseline (2026-10 experiment 3): one input
+# per case, LM refit from runs/exact-polish-base with the baseline frozen reference (panel.sh with
+# PANEL_CASES set to this file, PANEL_OUT=julia/spatial_model/calibration/runs/panel-exact).
+# σ follows the FOO map (1−η)(K/3)·24.357·0.0063 for the K cases, as in panel_cases.tsv.
+sigma_0.15	--external sigma=0.15
+sigma_0.30	--external sigma=0.30
+sigma_0.60	--external sigma=0.60
+sigma_0.85	--external sigma=0.85
+K_5	--measure K=5 --external sigma=0.2353
+K_9	--measure K=9 --external sigma=0.4235
+thetanu_0.143	--external theta_nu=0.142857
+thetanu_0.20	--external theta_nu=0.20
+thetanu_0.30	--external theta_nu=0.30
+thetanu_0.40	--external theta_nu=0.40
+thetanu_0.50	--external theta_nu=0.50
+wtp_us	--wtp-consumption 2365
+wtp_west	--wtp-consumption 2705
+wtp_parents	--target wtp_share=0.0074345 --target-se wtp_share=0.0027926
+wtp_sd_0.41	--measure wtp_score_sd=0.41
+wtp_sd_0.49	--measure wtp_score_sd=0.49

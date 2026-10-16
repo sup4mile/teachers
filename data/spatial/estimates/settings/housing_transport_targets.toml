@@ -1,0 +1,1442 @@
+# housing_transport_targets.toml -- evidence for income-driven demand and an endogenous housing market (DESIGN.md M1, M1b).
+# Generated 2026-10-05T02:56:00 by data/spatial/housing_transport.py; see housing_transport.md for definitions, sources and caveats.
+# value / se: estimate and bootstrap (whole-CZ, B = 1999, seed 20260929) or sampling SE; lo / hi: plausible range used for sensitivity runs.
+# Log gaps are suburb minus city (locale partition, 188 CZs, CZ weights = partitioned pupils); h-type quantities are in units of mean
+# consumption (CE 2018 mean expenditures per consumer unit $61,224.13; for hmin the mean expenditure per EQUIVALENT ADULT, see housing_demand.hmin), the model's Cbar.
+
+[meta]
+generated = "2026-10-05T02:56:00"
+script = "data/spatial/housing_transport.py"
+year = 2018
+B = 1999
+seed = 20260929
+n_cz = 188
+ce_mean_expenditures = 61224.13
+
+[gap_housing_cost]
+value = 0.11373859486120103
+se = 0.016864733314845462
+n_cz = 188
+note = "log gap of the pooled median monthly housing cost (B25104), the target for a_H; = housing_costs.md"
+
+[validation_lower_tail]
+use = "housing_cost_profile.renters and cheap_units.renters"
+do_not_use = "housing_cost_profile.all_units and housing_cost_profile.owners below the median: the bottom of those distributions is mostly outright owners whose cash costs are not the price of the housing consumed"
+note = "gross rent is the price of the unit; see tail_composition"
+
+[housing_cost_profile.all_units.p10]
+value = 0.11104317932212282
+se = 0.032800961753886644
+n_cz = 188
+city_usd = 480.15836836965826
+suburb_usd = 543.1466868363314
+usd_gap = 62.98831846667316
+usd_gap_se = 20.379222866911103
+minus_median_gap = -0.002695415539078236
+minus_median_gap_se = 0.020770533539667818
+
+[housing_cost_profile.all_units.p25]
+value = 0.08186119035619153
+se = 0.018046630563417848
+n_cz = 188
+city_usd = 805.5132633727043
+suburb_usd = 876.5466803541723
+usd_gap = 71.03341698146802
+usd_gap_se = 16.600267011638167
+minus_median_gap = -0.03187740450500949
+minus_median_gap_se = 0.0053097467812434984
+
+[housing_cost_profile.all_units.p50]
+value = 0.11373859486120103
+se = 0.016864733314845462
+n_cz = 188
+city_usd = 1223.7922234504842
+suburb_usd = 1364.674912291624
+usd_gap = 140.88268884113947
+usd_gap_se = 22.39885861588523
+
+[housing_cost_profile.all_units.p75]
+value = 0.11943063793768673
+se = 0.01845653865608197
+n_cz = 188
+city_usd = 1782.169257304882
+suburb_usd = 1993.0280002502468
+usd_gap = 210.85874294536507
+usd_gap_se = 36.21624113883347
+minus_median_gap = 0.005692043076485668
+minus_median_gap_se = 0.00487685542350397
+
+[housing_cost_profile.all_units.p90]
+value = 0.11114051621974412
+se = 0.02005412574101812
+n_cz = 188
+city_usd = 2540.6524194649137
+suburb_usd = 2815.9253515909813
+usd_gap = 275.27293212606804
+usd_gap_se = 57.9711751779461
+minus_median_gap = -0.002598078641456908
+minus_median_gap_se = 0.010289870339967986
+
+[housing_cost_profile.renters.p10]
+value = 0.1976260553106035
+se = 0.027441299264387667
+n_cz = 188
+city_usd = 558.6507571210406
+suburb_usd = 673.5544904083977
+usd_gap = 114.90373328735717
+usd_gap_se = 15.935981557699854
+minus_median_gap = 0.14035906621315855
+minus_median_gap_se = 0.02298971225530204
+
+[housing_cost_profile.renters.p25]
+value = 0.08915040024324758
+se = 0.012267224243723356
+n_cz = 188
+city_usd = 837.3600309749914
+suburb_usd = 914.7561955047498
+usd_gap = 77.39616452975831
+usd_gap_se = 11.204863912218903
+minus_median_gap = 0.03188341114580261
+minus_median_gap_se = 0.007128154504450769
+
+[housing_cost_profile.renters.p50]
+value = 0.057266989097444966
+se = 0.012657163899464665
+n_cz = 188
+city_usd = 1132.9224099199453
+suburb_usd = 1191.855115641285
+usd_gap = 58.93270572133975
+usd_gap_se = 15.090205143689
+
+[housing_cost_profile.renters.p75]
+value = 0.03788115467624961
+se = 0.013220618818402962
+n_cz = 188
+city_usd = 1504.448713293798
+suburb_usd = 1547.2263043450419
+usd_gap = 42.77759105124367
+usd_gap_se = 21.169937934706148
+minus_median_gap = -0.019385834421195357
+minus_median_gap_se = 0.003583839266150383
+
+[housing_cost_profile.renters.p90]
+value = 0.023403450454057225
+se = 0.013091600088788577
+n_cz = 188
+city_usd = 1950.9957848587767
+suburb_usd = 1973.236889654136
+usd_gap = 22.241104795359195
+usd_gap_se = 27.07085876174604
+minus_median_gap = -0.03386353864338774
+minus_median_gap_se = 0.006969545128991505
+
+[housing_cost_profile.owners.p10]
+value = 0.10584263227498784
+se = 0.028827255389764685
+n_cz = 188
+city_usd = 454.6102822544894
+suburb_usd = 511.9090618883003
+usd_gap = 57.298779633810945
+usd_gap_se = 17.26979080538047
+minus_median_gap = 0.017862055566629464
+minus_median_gap_se = 0.013851284289863508
+
+[housing_cost_profile.owners.p25]
+value = 0.08891728315452124
+se = 0.028377068878310336
+n_cz = 188
+city_usd = 777.5728636457784
+suburb_usd = 844.5342340343464
+usd_gap = 66.96137038856794
+usd_gap_se = 23.39817028806016
+minus_median_gap = 0.0009367064461628454
+minus_median_gap_se = 0.008307490745861372
+
+[housing_cost_profile.owners.p50]
+value = 0.08798057670835839
+se = 0.024645663744366237
+n_cz = 188
+city_usd = 1402.3171413475054
+suburb_usd = 1512.5272887377603
+usd_gap = 110.2101473902548
+usd_gap_se = 37.91634731761653
+
+[housing_cost_profile.owners.p75]
+value = 0.058795728306050746
+se = 0.0224729794316664
+n_cz = 188
+city_usd = 2129.523646351243
+suburb_usd = 2213.190125554043
+usd_gap = 83.66647920280006
+usd_gap_se = 50.67995749192014
+minus_median_gap = -0.029184848402307666
+minus_median_gap_se = 0.01203248790431047
+
+[housing_cost_profile.owners.p90]
+value = 0.03410208077502852
+se = 0.024806316508321342
+n_cz = 188
+city_usd = 2998.51625529392
+suburb_usd = 3040.7798922667257
+usd_gap = 42.263636972805934
+usd_gap_se = 86.5436590982998
+minus_median_gap = -0.05387849593332988
+minus_median_gap_se = 0.019045584273352924
+
+[cheap_units.all_units.q10]
+city = 0.11936570598775381
+suburb = 0.09497177019564247
+gap = -0.024393935792111358
+se = 0.0067202757983780325
+
+[cheap_units.all_units.q25]
+city = 0.2797781316019922
+suburb = 0.23799499088091405
+gap = -0.04178314072107815
+se = 0.009243193207504361
+
+[cheap_units.all_units.q50]
+city = 0.5509666285234537
+suburb = 0.4713746336604663
+gap = -0.07959199486298738
+se = 0.011581791056678559
+
+[cheap_units.renters.q10]
+city = 0.1207607266406614
+suburb = 0.08261967693535112
+gap = -0.038141049705310244
+se = 0.004275474936826106
+
+[cheap_units.renters.q25]
+city = 0.28354673109907924
+suburb = 0.21821191857222796
+gap = -0.06533481252685135
+se = 0.009110442643566674
+
+[cheap_units.renters.q50]
+city = 0.5272205007666584
+suburb = 0.46640147294634793
+gap = -0.060819027820310484
+se = 0.012539668039305988
+
+[cheap_units.owners.q10]
+city = 0.12210086097893597
+suburb = 0.09390914405291755
+gap = -0.028191716926018406
+se = 0.0071704694323638405
+
+[cheap_units.owners.q25]
+city = 0.277141752356297
+suburb = 0.2407377971489831
+gap = -0.03640395520731391
+se = 0.009841390446807936
+
+[cheap_units.owners.q50]
+city = 0.5386440382401714
+suburb = 0.4842212218655219
+gap = -0.054422816374649435
+se = 0.014221139527336654
+
+[tail_composition.occupancy.rent]
+city = 0.4837978199673618
+suburb = 0.30211999118937466
+gap = -0.1816778287779871
+se = 0.009602067164607939
+label = "renters (B25063 gross rent, cash renters)"
+
+[tail_composition.occupancy.own_mort]
+city = 0.33956540318110584
+suburb = 0.4772399066631934
+gap = 0.1376745034820875
+se = 0.0073018788315396725
+label = "owners with a mortgage (B25087)"
+
+[tail_composition.occupancy.own_nomort]
+city = 0.17663677685153237
+suburb = 0.22064010214743204
+gap = 0.044003325295899655
+se = 0.0043693574319667965
+label = "owners without a mortgage (B25087)"
+
+[tail_composition.below_q10.rent]
+city = 0.3659677563641038
+suburb = 0.19268926302367134
+gap = -0.17327849334043244
+se = 0.013215492650309963
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q10.own_mort]
+city = 0.03078153640523465
+suburb = 0.03560173881270919
+gap = 0.004820202407474543
+se = 0.0033171883926926987
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q10.own_nomort]
+city = 0.6032507072306614
+suburb = 0.7717089981636195
+gap = 0.16845829093295792
+se = 0.012770355807893482
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q25.rent]
+city = 0.44828244956630997
+suburb = 0.2537183392600655
+gap = -0.19456411030624457
+se = 0.010618940253248681
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q25.own_mort]
+city = 0.07304299294207581
+suburb = 0.08504181363789387
+gap = 0.011998820695818079
+se = 0.00497137114035032
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q25.own_nomort]
+city = 0.47867455749161425
+suburb = 0.6612398471020406
+gap = 0.18256528961042648
+se = 0.009913058373961633
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q50.rent]
+city = 0.5532413209399049
+suburb = 0.37394360297424317
+gap = -0.1792977179656616
+se = 0.008460542302320451
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q50.own_mort]
+city = 0.1547697311208508
+suburb = 0.2024000956139983
+gap = 0.04763036449314755
+se = 0.006476765489600754
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[tail_composition.below_q50.own_nomort]
+city = 0.2919889479392445
+suburb = 0.4236563014117586
+gap = 0.13166735347251404
+se = 0.007250163014956276
+note = "share of the units below the CZ-pooled all-units percentile that belong to the group"
+
+[housing_demand.alphaH]
+value = 0.1783312551143662
+se = 0.0071543984418242605
+se_resid = 0.001506978264696769
+lo = 0.12257400804832606
+hi = 0.2737644837792178
+decile_fit = 0.17835411344429047
+cu_level = 0.20114398408373593
+scale = "sqrt"
+note = "Stone-Geary NLS on CE 2018 quintile means of shelter + utilities / total expenditures, expenditure per equivalent adult (square-root scale)"
+
+[housing_demand.hmin]
+value = 0.09710527242759284
+se = 0.006594942498265401
+se_resid = 0.0012452732296663316
+lo = 0.03573494334072224
+hi = 0.14027887344287265
+decile_fit = 0.09678084525995329
+cu_level = 0.07246251061631494
+scale = "sqrt"
+h_usd_per_equivalent_adult = 3798.5163955175367
+h_usd_mean_size_cu = 5945.185822792359
+mean_exp_per_equivalent_adult = 39117.50928200036
+note = "subsistence housing expenditure per equivalent adult over mean expenditure per equivalent adult (= that of a household of any size if housing and consumption scale together with size): the model's hmin in units of Cbar at R = 1"
+
+[housing_demand.by_scale.none]
+alphaH = 0.20114398408373593
+hmin = 0.07246251061631494
+h_usd = 4436.454170099646
+rmse_pp = 0.43914859040605364
+mean_exp_per_unit = 61224.13
+note = "quintiles, shelter + utilities; none = consumer-unit level (the first version's central values)"
+
+[housing_demand.by_scale.sqrt]
+alphaH = 0.1783312551143662
+hmin = 0.09710527242759284
+h_usd = 3798.5163955175367
+rmse_pp = 0.0902712420310703
+mean_exp_per_unit = 39117.50928200036
+note = "quintiles, shelter + utilities; none = consumer-unit level (the first version's central values)"
+
+[housing_demand.by_scale.oecd_modified]
+alphaH = 0.16979837617373633
+hmin = 0.10623899524717269
+h_usd = 4005.2707301967616
+rmse_pp = 0.042748079506748984
+mean_exp_per_unit = 37700.57050029709
+note = "quintiles, shelter + utilities; none = consumer-unit level (the first version's central values)"
+
+[housing_demand.by_scale.per_adult]
+alphaH = 0.1541406236845631
+hmin = 0.1225906185121547
+h_usd = 3950.3870459788304
+rmse_pp = 0.27757526414132266
+mean_exp_per_unit = 32224.219878515047
+note = "quintiles, shelter + utilities; none = consumer-unit level (the first version's central values)"
+
+[housing_demand.by_scale.per_capita]
+alphaH = 0.14097700305472208
+hmin = 0.135598972420175
+h_usd = 3347.6898856635903
+rmse_pp = 0.5079935588056227
+mean_exp_per_unit = 24688.16559531322
+note = "quintiles, shelter + utilities; none = consumer-unit level (the first version's central values)"
+
+[housing_demand.housing_share]
+aggregate = 0.2580033973605122
+aggregate_se = 0.004368159459014605
+mean_of_group_shares = 0.27565131579723534
+mean_of_group_shares_deciles = 0.2759083036076531
+by_income_tercile = [0.3155639816963634, 0.2718907716389401, 0.2327657743397212]
+by_income_tercile_se = [0.00586662337405213, 0.0036332836284927584, 0.003760938588571855]
+by_income_tercile_mean_of_group_shares = [0.31874804456642836, 0.27258658418325143, 0.23635162408742844]
+by_income_tercile_from_quintiles = [0.31133159689348217, 0.27241408592662236, 0.23318739326791646]
+by_income_tercile_from_quintiles_se = [0.005709468971021584, 0.0034815237018781457, 0.004186158347355856]
+one_person_cu = 0.31709479868096546
+two_plus_cu = 0.24592658782793236
+model_moment = "sum_i R H_i / sum_i Y'_i over adults (ratio of aggregates); by tercile of pre-tax income: the same ratio within the tercile"
+definition = "ratio of aggregates: aggregate shelter + utilities / aggregate total expenditures, CE 2018, consumer-unit weights (sum R H / sum Y' over adults in the model)"
+note = "shelter + utilities / total expenditures, CE 2018; terciles of income before taxes built from the CE deciles (fractional weights; the quintile-based values are in the JSON)"
+
+[housing_demand.model_definitions]
+note = "Preferences (1 - aH) log c + aH log(H - hmin) over non-housing consumption c and housing H; Y' is the household's outlay on c and housing (income after taxes, education goods, moving, residence-charge and other fixed goods costs), C = Y' - R hmin the supernumerary expenditure. Then H = hmin + aH C / R, R H = R hmin + aH C, c = (1 - aH) C and Y' = C + R hmin (DESIGN_v2: the line of DESIGN.md M1b 'Y' = (1 + aH) C + R hmin' double counts aH C; it holds only for preferences log c + aH log(H - hmin), whose marginal housing share is aH / (1 + aH)). aH is the MARGINAL budget share of housing, the quantity estimated by the Stone-Geary fit s(y) = aH + (1 - aH) h / y; hmin is h over mean expenditure per equivalent adult (units of Cbar at R = 1). `housing_share` must be computed as a RATIO OF AGGREGATES, sum_i R H_i / sum_i Y'_i over the adults (and `housing_share_by_income` as the same ratio within terciles of pre-tax income): the CE targets are aggregate shelter + utilities over aggregate expenditures. A mean over adults of R H_i / Y'_i (M1B_SPEC) is a different moment: because the share falls with expenditure it is larger (the consumer-unit-weighted mean of the five CE quintile shares, 0.276, is a lower bound for a household-level mean of ratios, against the aggregate 0.258). Units: dollar amounts per household (r_car, the housing-cost gap) are divided by the mean expenditure per consumer unit, $61,224, as in housing_costs.md, which is unit-free if per-household costs and consumption scale together with household size; hmin is already a ratio of two amounts in the same unit (h per equivalent adult over mean expenditure per equivalent adult), so the dollar h per equivalent adult must not be divided by $61,224 (a household of mean size has h = hmin x $61,224)."
+
+[housing_demand.fits.quintiles.shelter]
+alphaH = 0.15620756735801977
+alphaH_se = 0.005279773798144559
+hmin = 0.04198026955070481
+hmin_se = 0.004801553379310324
+h_usd = 2570.2054804073928
+share_at_mean = 0.19163020112517504
+elasticity_at_mean = 0.8151510901769768
+rmse_pp = 0.259086739619713
+r2 = 0.9860627416677981
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.quintiles.utilities]
+alphaH = 0.04493641672571623
+alphaH_se = 0.0014057315874845774
+hmin = 0.023521448373173385
+hmin_se = 0.001380654709834424
+h_usd = 1440.0802129874558
+share_at_mean = 0.06740089549280028
+elasticity_at_mean = 0.666703556342457
+rmse_pp = 0.5446834428611186
+r2 = 0.8655577341016186
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.quintiles.shelter_utilities]
+alphaH = 0.20114398408373593
+alphaH_se = 0.005693024669307314
+hmin = 0.07246251061631494
+hmin_se = 0.0053575338858904776
+h_usd = 4436.454170099646
+share_at_mean = 0.2590310966179753
+elasticity_at_mean = 0.7765244664056202
+rmse_pp = 0.43914859040605364
+r2 = 0.9850221548043953
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.quintiles.shelter_utilities_ex_phone]
+alphaH = 0.18146857171860467
+alphaH_se = 0.005479651129402655
+hmin = 0.06591684817108157
+hmin_se = 0.00496196638956522
+h_usd = 4035.7016816165597
+share_at_mean = 0.23542358359988796
+elasticity_at_mean = 0.7708173027686893
+rmse_pp = 0.1949454863409284
+r2 = 0.9965627465323766
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.quintiles.housing]
+alphaH = 0.2734047100481334
+alphaH_se = 0.007873800795120895
+hmin = 0.07610010003909476
+hmin_se = 0.008046919859093962
+h_usd = 4659.162417806542
+share_at_mean = 0.3286986843014055
+elasticity_at_mean = 0.8317791433488995
+rmse_pp = 0.3319918541852119
+r2 = 0.9905653347327454
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.deciles.shelter]
+alphaH = 0.155652984015146
+alphaH_se = 0.004769817321483834
+hmin = 0.04218766924512131
+hmin_se = 0.004429233814004482
+h_usd = 2582.903346260309
+share_at_mean = 0.19127401665362018
+elasticity_at_mean = 0.8137696208733849
+rmse_pp = 0.7672657266969207
+r2 = 0.8915587198679802
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.deciles.utilities]
+alphaH = 0.04617307553677589
+alphaH_se = 0.0013130588116592107
+hmin = 0.022619945304718343
+hmin_se = 0.001262815690202186
+h_usd = 1384.8864719289654
+share_at_mean = 0.06774858839830172
+elasticity_at_mean = 0.6815356102376492
+rmse_pp = 0.699067564057122
+r2 = 0.7841775769619561
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.deciles.shelter_utilities]
+alphaH = 0.2018260595519218
+alphaH_se = 0.005196136439966987
+hmin = 0.07165924944616837
+hmin_se = 0.005035752209616438
+h_usd = 4387.27520379464
+share_at_mean = 0.25902260505192176
+elasticity_at_mean = 0.7791831894805676
+rmse_pp = 1.030631692657761
+r2 = 0.9215567517269166
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.deciles.shelter_utilities_ex_phone]
+alphaH = 0.18171507777987556
+alphaH_se = 0.00501522660311002
+hmin = 0.06542286814439417
+hmin_se = 0.004609578172749271
+h_usd = 4005.4581842452476
+share_at_mean = 0.2352496243508286
+elasticity_at_mean = 0.7724351453538698
+rmse_pp = 0.9467046117107216
+r2 = 0.9242284522062629
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits.deciles.housing]
+alphaH = 0.2737644837792178
+alphaH_se = 0.0073972160733326055
+hmin = 0.07550898097302987
+hmin_se = 0.007742812508728362
+h_usd = 4622.971667260307
+share_at_mean = 0.32860178755547137
+elasticity_at_mean = 0.8331192773350435
+rmse_pp = 0.8583187359015673
+r2 = 0.9396500080032955
+note = "consumer-unit level, no household-size adjustment"
+
+[housing_demand.fits_equivalized.sqrt.quintiles.shelter]
+alphaH = 0.1431978913175103
+alphaH_se = 0.006649682410412557
+hmin = 0.056075612241869875
+hmin_se = 0.006157763814142119
+h_usd = 2193.538282365198
+mean_exp_per_equivalent_adult = 39117.50928200036
+share_at_mean = 0.19124359413200603
+elasticity_at_mean = 0.7487722240707725
+rmse_pp = 0.38790100506403613
+r2 = 0.9687587222456824
+
+[housing_demand.fits_equivalized.sqrt.quintiles.utilities]
+alphaH = 0.035133363796856026
+alphaH_se = 0.0017573088262523922
+hmin = 0.03289849945249726
+hmin_se = 0.0017375382368684717
+h_usd = 1286.9073576969454
+mean_exp_per_equivalent_adult = 39117.50928200036
+share_at_mean = 0.06687602829971803
+elasticity_at_mean = 0.5253506329562361
+rmse_pp = 0.41248545182112895
+r2 = 0.9228981591442135
+
+[housing_demand.fits_equivalized.sqrt.quintiles.shelter_utilities]
+alphaH = 0.1783312551143662
+alphaH_se = 0.0071543984418242605
+hmin = 0.09710527242759284
+hmin_se = 0.006594942498265401
+h_usd = 3798.5163955175367
+mean_exp_per_equivalent_adult = 39117.50928200036
+share_at_mean = 0.2581196224317239
+elasticity_at_mean = 0.6908860838797221
+rmse_pp = 0.0902712420310703
+r2 = 0.9993671144394357
+
+[housing_demand.fits_equivalized.sqrt.quintiles.shelter_utilities_ex_phone]
+alphaH = 0.1608379778196963
+alphaH_se = 0.00687660709883278
+hmin = 0.08800445512165216
+hmin_se = 0.006303694956206029
+h_usd = 3442.5150900786125
+mean_exp_per_equivalent_adult = 39117.50928200036
+share_at_mean = 0.2346879743404577
+elasticity_at_mean = 0.685326882520071
+rmse_pp = 0.1813886441227294
+r2 = 0.9970241887638993
+
+[housing_demand.fits_equivalized.sqrt.quintiles.housing]
+alphaH = 0.2520875996551265
+alphaH_se = 0.009760548863348349
+hmin = 0.10138323213357663
+hmin_se = 0.010070633136998186
+h_usd = 3965.8595240243812
+mean_exp_per_equivalent_adult = 39117.50928200036
+share_at_mean = 0.3279133761548713
+elasticity_at_mean = 0.7687627830591064
+rmse_pp = 0.24705967910895496
+r2 = 0.9947751312344005
+
+[housing_demand.fits_equivalized.oecd_modified.quintiles.shelter]
+alphaH = 0.1381348731105804
+alphaH_se = 0.00722068664753929
+hmin = 0.061550372771220926
+hmin_se = 0.006735477757598187
+h_usd = 2320.484167980981
+mean_exp_per_equivalent_adult = 37700.57050029709
+share_at_mean = 0.1911829929491398
+elasticity_at_mean = 0.7225269935350801
+rmse_pp = 0.3989732777407508
+r2 = 0.9669497616678825
+
+[housing_demand.fits_equivalized.oecd_modified.quintiles.utilities]
+alphaH = 0.03166350306315604
+alphaH_se = 0.0018952839222741219
+hmin = 0.03630108607959102
+hmin_se = 0.0018871448590370439
+h_usd = 1368.5716549809745
+mean_exp_per_equivalent_adult = 37700.57050029709
+share_at_mean = 0.06681516959247003
+elasticity_at_mean = 0.47389691976063575
+rmse_pp = 0.402321279280185
+r2 = 0.9266511206725323
+
+[housing_demand.fits_equivalized.oecd_modified.quintiles.shelter_utilities]
+alphaH = 0.16979837617373633
+alphaH_se = 0.007633565008598728
+hmin = 0.10623899524717269
+hmin_se = 0.006995465235389823
+h_usd = 4005.2707301967616
+mean_exp_per_equivalent_adult = 37700.57050029709
+share_at_mean = 0.2579981625416098
+elasticity_at_mean = 0.6581379281968776
+rmse_pp = 0.042748079506748984
+r2 = 0.9998580747825299
+
+[housing_demand.fits_equivalized.oecd_modified.quintiles.shelter_utilities_ex_phone]
+alphaH = 0.15306767434610477
+alphaH_se = 0.007318327384778799
+hmin = 0.09626406016503707
+hmin_se = 0.006708825754338321
+h_usd = 3629.2099868968207
+mean_exp_per_equivalent_adult = 37700.57050029709
+share_at_mean = 0.23459681869856608
+elasticity_at_mean = 0.6524712278506288
+rmse_pp = 0.23700902097954393
+r2 = 0.9949194007123937
+
+[housing_demand.fits_equivalized.oecd_modified.quintiles.housing]
+alphaH = 0.24412932484197497
+alphaH_se = 0.010405086227080211
+hmin = 0.11072499701088272
+hmin_se = 0.010637026304360324
+h_usd = 4174.395555953969
+mean_exp_per_equivalent_adult = 37700.57050029709
+share_at_mean = 0.3278231030894612
+elasticity_at_mean = 0.7446983526824629
+rmse_pp = 0.30028138982006647
+r2 = 0.9922815787905014
+
+[housing_demand.fits_equivalized.per_adult.quintiles.shelter]
+alphaH = 0.12893954837702531
+alphaH_se = 0.008180173573895803
+hmin = 0.07138184679937964
+hmin_se = 0.007664224389088409
+h_usd = 2300.2243265976854
+mean_exp_per_equivalent_adult = 32224.219878515047
+share_at_mean = 0.19111745208777495
+elasticity_at_mean = 0.6746612984240024
+rmse_pp = 0.4631279177768353
+r2 = 0.9554662874899579
+
+[housing_demand.fits_equivalized.per_adult.quintiles.utilities]
+alphaH = 0.025201075307537867
+alphaH_se = 0.0021972785262747876
+hmin = 0.042589829917142226
+hmin_se = 0.0021623171591959893
+h_usd = 1372.4240438385493
+mean_exp_per_equivalent_adult = 32224.219878515047
+share_at_mean = 0.06671759571360296
+elasticity_at_mean = 0.3777275700359156
+rmse_pp = 0.3938542735192415
+r2 = 0.929705944497276
+
+[housing_demand.fits_equivalized.per_adult.quintiles.shelter_utilities]
+alphaH = 0.1541406236845631
+alphaH_se = 0.00877205662184101
+hmin = 0.1225906185121547
+hmin_se = 0.007913957808011638
+h_usd = 3950.3870459788304
+mean_exp_per_equivalent_adult = 32224.219878515047
+share_at_mean = 0.25783504780137795
+elasticity_at_mean = 0.5978264979837211
+rmse_pp = 0.27757526414132266
+r2 = 0.9940160511171001
+
+[housing_demand.fits_equivalized.per_adult.quintiles.shelter_utilities_ex_phone]
+alphaH = 0.13894126318639521
+alphaH_se = 0.008208635020642317
+hmin = 0.11097463157046807
+hmin_se = 0.007438001623336939
+h_usd = 3576.0709286639603
+mean_exp_per_equivalent_adult = 32224.219878515047
+share_at_mean = 0.23449693926481763
+elasticity_at_mean = 0.5925077897476893
+rmse_pp = 0.43351701521140645
+r2 = 0.9830020132621949
+
+[housing_demand.fits_equivalized.per_adult.quintiles.housing]
+alphaH = 0.2296398995200344
+alphaH_se = 0.01202427400157992
+hmin = 0.12732024779584972
+hmin_se = 0.012030878163854961
+h_usd = 4102.795659960482
+mean_exp_per_equivalent_adult = 32224.219878515047
+share_at_mean = 0.32772233840517934
+elasticity_at_mean = 0.7007148204713444
+rmse_pp = 0.48106455438303153
+r2 = 0.9801902790565735
+
+[housing_demand.fits_equivalized.per_capita.quintiles.shelter]
+alphaH = 0.12257400804832606
+alphaH_se = 0.009068929819243855
+hmin = 0.07809742140315196
+hmin_se = 0.008313843516803
+h_usd = 1928.0820721679745
+mean_exp_per_equivalent_adult = 24688.16559531322
+share_at_mean = 0.19109871549185456
+elasticity_at_mean = 0.6414172263421137
+rmse_pp = 0.6705200569260107
+r2 = 0.9066508162737125
+
+[housing_demand.fits_equivalized.per_capita.quintiles.utilities]
+alphaH = 0.01840299500639608
+alphaH_se = 0.002241774872870965
+hmin = 0.048857044167389924
+hmin_se = 0.002196682768610687
+h_usd = 1206.1907969020544
+mean_exp_per_equivalent_adult = 24688.16559531322
+share_at_mean = 0.06636092323394625
+elasticity_at_mean = 0.2773167416842419
+rmse_pp = 0.26057791399100155
+r2 = 0.9692303411002474
+
+[housing_demand.fits_equivalized.per_capita.quintiles.shelter_utilities]
+alphaH = 0.14097700305472208
+alphaH_se = 0.009559338196175077
+hmin = 0.135598972420175
+hmin_se = 0.008503283542845224
+h_usd = 3347.6898856635903
+mean_exp_per_equivalent_adult = 24688.16559531322
+share_at_mean = 0.2574596387258009
+elasticity_at_mean = 0.5475693345661262
+rmse_pp = 0.5079935588056227
+r2 = 0.979957921323371
+
+[housing_demand.fits_equivalized.per_capita.quintiles.shelter_utilities_ex_phone]
+alphaH = 0.1276125637597609
+alphaH_se = 0.008958976099706613
+hmin = 0.12224698387152054
+hmin_se = 0.007942816107055268
+h_usd = 3018.0537813476835
+mean_exp_per_equivalent_adult = 24688.16559531322
+share_at_mean = 0.23425929660753855
+elasticity_at_mean = 0.5447491971836403
+rmse_pp = 0.6925597030939502
+r2 = 0.9566189932078131
+
+[housing_demand.fits_equivalized.per_capita.quintiles.housing]
+alphaH = 0.21769468991815474
+alphaH_se = 0.01322922388647744
+hmin = 0.14027887344287265
+hmin_se = 0.012943915724438601
+h_usd = 3463.2280570816265
+mean_exp_per_equivalent_adult = 24688.16559531322
+share_at_mean = 0.32743559750481316
+elasticity_at_mean = 0.6648473518978177
+rmse_pp = 0.6948909075110832
+r2 = 0.9586662413983572
+
+[housing_demand.theta_profile.quintiles]
+theta = [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+alphaH = [0.20114398408373593, 0.1993063588075293, 0.19738539786717466, 0.19537604021065658, 0.19327287125028955, 0.19107010221576906, 0.18876155068977285, 0.18634062342183533, 0.18380030294071964, 0.18113314005683467, 0.17833125511436623, 0.17538635188478557, 0.1722897493791685, 0.1690324387165072, 0.16560517467926894, 0.16199861492859227, 0.15820352431990614, 0.15421106772039056, 0.15001322265014905, 0.1456033535333359, 0.14097700305472208]
+hmin = [0.07246251061631494, 0.07447782342561815, 0.0765792181305913, 0.07877134271643459, 0.08105911537147893, 0.08344773304266462, 0.08594267736390664, 0.08854971679958527, 0.09127490347515863, 0.09412456268381386, 0.09710527242759286, 0.10022382952831142, 0.10348719776864522, 0.10690243211967192, 0.11047657127720485, 0.11421648833477412, 0.11812868629762935, 0.12221902107449419, 0.12649232930085452, 0.13095193151451218, 0.135598972420175]
+rmse_pp = [0.43914859040605364, 0.408748885391953, 0.3773436479139421, 0.3448810355170252, 0.3113122949608621, 0.2765980477795635, 0.24072162586725876, 0.20371953063369214, 0.165758956749864, 0.1273676602628908, 0.09027124203107169, 0.06105708294484684, 0.05923784204854557, 0.09017823433904827, 0.13543817068582, 0.18712628726263347, 0.2432553285764789, 0.303339276253125, 0.36735851231861705, 0.43548510503691806, 0.507993558805624]
+best_theta = 0.58
+best_alphaH = 0.17354716439579795
+best_hmin = 0.10216402257774768
+best_rmse_pp = 0.055260002236581916
+note = "shelter + utilities, persons as the size measure; best on a 0.01 grid (two degrees of freedom: suggestive)"
+
+[housing_demand.fits_equivalized.sqrt.deciles.shelter]
+alphaH = 0.14263151823395176
+alphaH_se = 0.006073400061085568
+hmin = 0.05624432078121141
+hmin_se = 0.005669399866008277
+h_usd = 2213.745373541239
+mean_exp_per_equivalent_adult = 39359.44719027966
+share_at_mean = 0.1908536261501016
+elasticity_at_mean = 0.7473345993529913
+rmse_pp = 0.8882363884738887
+r2 = 0.854668364889588
+
+[housing_demand.fits_equivalized.sqrt.deciles.utilities]
+alphaH = 0.03572259521033881
+alphaH_se = 0.001650549581081564
+hmin = 0.03245692093749965
+hmin_se = 0.001604891050532592
+h_usd = 1277.4864655985996
+mean_exp_per_equivalent_adult = 39359.44719027966
+share_at_mean = 0.0670200706994142
+elasticity_at_mean = 0.5330133919218777
+rmse_pp = 0.5566932290769169
+r2 = 0.8631357131990323
+
+[housing_demand.fits_equivalized.sqrt.deciles.shelter_utilities]
+alphaH = 0.17835411344429047
+alphaH_se = 0.006565318491317857
+hmin = 0.09678084525995329
+hmin_se = 0.006217964193010019
+h_usd = 3809.2405680397587
+mean_exp_per_equivalent_adult = 39359.44719027966
+share_at_mean = 0.2578736968495157
+elasticity_at_mean = 0.6916336005698575
+rmse_pp = 0.9613463416946265
+r2 = 0.9317491068998485
+
+[housing_demand.fits_equivalized.sqrt.deciles.shelter_utilities_ex_phone]
+alphaH = 0.1605909386090115
+alphaH_se = 0.006333912097777867
+hmin = 0.08784697967426212
+hmin_se = 0.005838007956727625
+h_usd = 3457.6085573146906
+mean_exp_per_equivalent_adult = 39359.44719027966
+share_at_mean = 0.2343304893634171
+elasticity_at_mean = 0.6853181549070858
+rmse_pp = 0.9894325973671702
+r2 = 0.9172344506620386
+
+[housing_demand.fits_equivalized.sqrt.deciles.housing]
+alphaH = 0.25181763435891175
+alphaH_se = 0.009259636207590348
+hmin = 0.10129293982471106
+hmin_se = 0.009658122519320113
+h_usd = 3986.8341157788905
+mean_exp_per_equivalent_adult = 39359.44719027966
+share_at_mean = 0.32760322569970446
+elasticity_at_mean = 0.7686665289118334
+rmse_pp = 0.864610039127545
+r2 = 0.9387620591034899
+
+[housing_demand.fits_equivalized.oecd_modified.deciles.shelter]
+alphaH = 0.1381564418198897
+alphaH_se = 0.006634412195460878
+hmin = 0.06109743190500951
+hmin_se = 0.006214614552214738
+h_usd = 2322.0075864964438
+mean_exp_per_equivalent_adult = 38004.994876160374
+share_at_mean = 0.1908128699285701
+elasticity_at_mean = 0.7240415275531882
+rmse_pp = 0.932975846488241
+r2 = 0.8396592764833377
+
+[housing_demand.fits_equivalized.oecd_modified.deciles.utilities]
+alphaH = 0.0320473007064592
+alphaH_se = 0.0017674433127653501
+hmin = 0.03596595516798677
+hmin_se = 0.001708960182477069
+h_usd = 1366.885941875551
+mean_exp_per_equivalent_adult = 38004.994876160374
+share_at_mean = 0.06686064409398246
+elasticity_at_mean = 0.4793148666263521
+rmse_pp = 0.5214255242107805
+r2 = 0.8799276990105726
+
+[housing_demand.fits_equivalized.oecd_modified.deciles.shelter_utilities]
+alphaH = 0.17020374252634876
+alphaH_se = 0.007062997651563225
+hmin = 0.10541114244418137
+hmin_se = 0.006569340280344505
+h_usd = 4006.1499284813244
+mean_exp_per_equivalent_adult = 38004.994876160374
+share_at_mean = 0.25767351402255245
+elasticity_at_mean = 0.6605403088167299
+rmse_pp = 0.9813120094234306
+r2 = 0.9288847386481919
+
+[housing_demand.fits_equivalized.oecd_modified.deciles.shelter_utilities_ex_phone]
+alphaH = 0.15327378267943878
+alphaH_se = 0.006806252668272292
+hmin = 0.09555935582988244
+hmin_se = 0.006306833739315541
+h_usd = 3631.732828683868
+mean_exp_per_equivalent_adult = 38004.994876160374
+share_at_mean = 0.23418639457086465
+elasticity_at_mean = 0.6544948222133299
+rmse_pp = 1.032183930850082
+r2 = 0.9099276776078803
+
+[housing_demand.fits_equivalized.oecd_modified.deciles.housing]
+alphaH = 0.24420300336623338
+alphaH_se = 0.009987430211750331
+hmin = 0.11012988564523671
+hmin_se = 0.010256551244319609
+h_usd = 4185.485739659349
+mean_exp_per_equivalent_adult = 38004.994876160374
+share_at_mean = 0.32743884017652347
+elasticity_at_mean = 0.7457973013665167
+rmse_pp = 0.9041355018269218
+r2 = 0.9330351228086828
+
+[housing_demand.fits_equivalized.per_adult.deciles.shelter]
+alphaH = 0.13072762838890606
+alphaH_se = 0.007564055657648801
+hmin = 0.06915761361363458
+hmin_se = 0.007117388651452685
+h_usd = 2252.2754555903784
+mean_exp_per_equivalent_adult = 32567.281285517598
+share_at_mean = 0.19084443118979386
+elasticity_at_mean = 0.6849957715501694
+rmse_pp = 1.0614551908954935
+r2 = 0.7924578228306501
+
+[housing_demand.fits_equivalized.per_adult.deciles.utilities]
+alphaH = 0.024489597641932388
+alphaH_se = 0.0018840756946727213
+hmin = 0.043038316511068125
+hmin_se = 0.0018108799780004081
+h_usd = 1401.640959871092
+mean_exp_per_equivalent_adult = 32567.281285517598
+share_at_mean = 0.06647392309845833
+elasticity_at_mean = 0.3684090918729055
+rmse_pp = 0.40755096734661933
+r2 = 0.9266462844232808
+
+[housing_demand.fits_equivalized.per_adult.deciles.shelter_utilities]
+alphaH = 0.15521722603083846
+alphaH_se = 0.007879225155625332
+hmin = 0.12086080753954967
+hmin_se = 0.0072313378092666
+h_usd = 3936.10791553532
+mean_exp_per_equivalent_adult = 32567.281285517598
+share_at_mean = 0.25731835428825217
+elasticity_at_mean = 0.6032108609592677
+rmse_pp = 1.0638887502454368
+r2 = 0.9164125616331732
+
+[housing_demand.fits_equivalized.per_adult.deciles.shelter_utilities_ex_phone]
+alphaH = 0.14013169924112878
+alphaH_se = 0.0075872485343028845
+hmin = 0.10912974582707777
+hmin_se = 0.006868807231211794
+h_usd = 3554.059128967482
+mean_exp_per_equivalent_adult = 32567.281285517598
+share_at_mean = 0.23396890834770567
+elasticity_at_mean = 0.5989329959725948
+rmse_pp = 1.1604387682949346
+r2 = 0.8861529892036765
+
+[housing_demand.fits_equivalized.per_adult.deciles.housing]
+alphaH = 0.23034008563544184
+alphaH_se = 0.01096697537512806
+hmin = 0.1257985706785781
+hmin_se = 0.010982265310075338
+h_usd = 4096.917436605319
+mean_exp_per_equivalent_adult = 32567.281285517598
+share_at_mean = 0.3271622027711001
+elasticity_at_mean = 0.7040546972860429
+rmse_pp = 1.0238042835500523
+r2 = 0.9141354464686263
+
+[housing_demand.fits_equivalized.per_capita.deciles.shelter]
+alphaH = 0.12442445588329946
+alphaH_se = 0.008509298839009723
+hmin = 0.0759787047727317
+hmin_se = 0.007975825229724315
+h_usd = 1898.7582128935785
+mean_exp_per_equivalent_adult = 24990.663088732083
+share_at_mean = 0.19094955165596617
+elasticity_at_mean = 0.6516090496377547
+rmse_pp = 1.1793319341309414
+r2 = 0.7438023422321556
+
+[housing_demand.fits_equivalized.per_capita.deciles.utilities]
+alphaH = 0.018173455201550327
+alphaH_se = 0.0021086302181442342
+hmin = 0.04899610268281965
+hmin_se = 0.00200873070351145
+h_usd = 1224.4450948072679
+mean_exp_per_equivalent_adult = 24990.663088732083
+share_at_mean = 0.06627912940721319
+elasticity_at_mean = 0.27419574403118974
+rmse_pp = 0.39104142145021253
+r2 = 0.9324689058612886
+
+[housing_demand.fits_equivalized.per_capita.deciles.shelter_utilities]
+alphaH = 0.14259791108484982
+alphaH_se = 0.008816565319937741
+hmin = 0.1336954638440046
+hmin_se = 0.007979036686458087
+h_usd = 3341.1382934172807
+mean_exp_per_equivalent_adult = 24990.663088732083
+share_at_mean = 0.2572286810631793
+elasticity_at_mean = 0.5543624081710607
+rmse_pp = 1.2457687793590926
+r2 = 0.8853897478221249
+
+[housing_demand.fits_equivalized.per_capita.deciles.shelter_utilities_ex_phone]
+alphaH = 0.12933369442760953
+alphaH_se = 0.008346762703296868
+hmin = 0.12021239640717409
+hmin_se = 0.007422824451648746
+h_usd = 3004.1874977007947
+mean_exp_per_equivalent_adult = 24990.663088732083
+share_at_mean = 0.23399857749144748
+elasticity_at_mean = 0.5527114558306946
+rmse_pp = 1.3539763553448732
+r2 = 0.8450115504186976
+
+[housing_demand.fits_equivalized.per_capita.deciles.housing]
+alphaH = 0.21902587391526046
+alphaH_se = 0.012174258730980238
+hmin = 0.1384716030205222
+hmin_se = 0.012057497438405795
+h_usd = 3460.4971784425256
+mean_exp_per_equivalent_adult = 24990.663088732083
+share_at_mean = 0.32716861307176576
+elasticity_at_mean = 0.6694586985555863
+rmse_pp = 1.2397462798175138
+r2 = 0.8740942225724306
+
+[housing_demand.theta_profile.deciles]
+theta = [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+alphaH = [0.2018260595519218, 0.1999082060959975, 0.1979074512819399, 0.19581941157839572, 0.193639504455505, 0.19136295996198782, 0.18898484037278035, 0.18650007052563455, 0.18390348222818295, 0.18118987709674347, 0.17835411344429047, 0.17539122444219352, 0.17229657683052044, 0.1690660820562592, 0.16569647500859447, 0.16218567964260291, 0.15853328589074614, 0.1547411684924014, 0.1508142858017898, 0.14676170519930667, 0.14259791108484976]
+hmin = [0.07165924944616837, 0.07373835621726146, 0.07590267006851392, 0.078156156880431, 0.08050291087431366, 0.08294713603368747, 0.08549311957529745, 0.08814519523387543, 0.09090769353650738, 0.09378487550106818, 0.09678084525995322, 0.09989943593724414, 0.10314406163601607, 0.10651752655251784, 0.1100217799429955, 0.1136576028334101, 0.11742420888155375, 0.12131873757674289, 0.12533561291700768, 0.12946573481509224, 0.13369546384400466]
+rmse_pp = [1.030631692657761, 1.0168158791955535, 1.003941632487509, 0.9921862163477313, 0.9817503994793298, 0.9728600882978996, 0.9657675230572536, 0.9607518294101289, 0.9581187057483411, 0.9581990441529628, 0.961346341694627, 0.9679328667159872, 0.9783446986740839, 0.9929759413326509, 1.0122225813496606, 1.0364765793988733, 1.0661207919845792, 1.1015252007415348, 1.1430446759748918, 1.191018159788018, 1.2457687793590924]
+best_theta = 0.42
+best_alphaH = 0.1828323725062754
+best_hmin = 0.09204456984932129
+best_rmse_pp = 0.9578059006670198
+note = "shelter + utilities, persons as the size measure; best on a 0.01 grid (two degrees of freedom: suggestive)"
+
+[housing_demand.shares.shelter]
+by_quintile = [0.24072881548543507, 0.20546437149719776, 0.19853467107425235, 0.18904688200662512, 0.17523004520925065]
+se_by_quintile = [0.007513849732638361, 0.005810071830625793, 0.0043972042105298, 0.004167900348402244, 0.004983766732305657]
+aggregate = 0.19186920162027962
+aggregate_se = 0.0037402673221240057
+by_tercile = [0.22302073918368634, 0.19710459959627438, 0.1790762380794843]
+se_by_tercile = [0.004721575172071527, 0.002949613138954015, 0.0036866588234998237]
+by_tercile_from_deciles = [0.22698008804799535, 0.1958312152620098, 0.1788429962879626]
+se_by_tercile_from_deciles = [0.004818678590624138, 0.0030464008159029783, 0.003525898280264705]
+
+[housing_demand.shares.utilities]
+by_quintile = [0.09148073790673888, 0.08516813450760609, 0.0764561464555665, 0.06701769105032475, 0.049132437005918454]
+se_by_quintile = [0.0029989289438958444, 0.0018012904357005614, 0.0013900688677302624, 0.0011237858018760599, 0.0009302306965234138]
+aggregate = 0.06613419574023259
+aggregate_se = 0.0010089043572848416
+by_tercile = [0.08831085770979581, 0.07530948633034792, 0.05411115518843219]
+se_by_tercile = [0.0017374224255940018, 0.0009022843343353897, 0.0007636053624022677]
+by_tercile_from_deciles = [0.08858389364836806, 0.07605955637693029, 0.05392277805175862]
+se_by_tercile_from_deciles = [0.0016985283552245348, 0.0009429003205386538, 0.0007255667851119952]
+
+[housing_demand.shares.shelter_utilities]
+by_quintile = [0.33220955339217395, 0.29063250600480384, 0.27499081752981885, 0.25606457305694985, 0.22436248221516908]
+se_by_quintile = [0.009230237822347281, 0.0069378018885329976, 0.005292907844550924, 0.004708913194780501, 0.005419472269492575]
+aggregate = 0.2580033973605122
+aggregate_se = 0.004368159459014605
+by_tercile = [0.31133159689348217, 0.27241408592662236, 0.23318739326791646]
+se_by_tercile = [0.005709468971021584, 0.0034815237018781457, 0.004186158347355856]
+by_tercile_from_deciles = [0.3155639816963634, 0.2718907716389401, 0.2327657743397212]
+se_by_tercile_from_deciles = [0.00586662337405213, 0.0036332836284927584, 0.003760938588571855]
+
+[housing_demand.shares.shelter_utilities_ex_phone]
+by_quintile = [0.30565551725444146, 0.2634107285828663, 0.24800402095536353, 0.23096729397809956, 0.20653976646096597]
+se_by_quintile = [0.008625254986124292, 0.006573084345283276, 0.0049662256746461535, 0.00449373837529598, 0.005252507899591834]
+aggregate = 0.23500588004704037
+aggregate_se = 0.00414011013848914
+by_tercile = [0.28444225379289284, 0.24588588722223712, 0.21333965731526694]
+se_by_tercile = [0.005437750080828616, 0.00326019631391288, 0.004101054482329086]
+by_tercile_from_deciles = [0.2888189074978924, 0.24510986478529315, 0.21293259626081273]
+se_by_tercile_from_deciles = [0.005424121683795167, 0.003433064919622948, 0.003661151482063826]
+
+[housing_demand.shares.housing]
+by_quintile = [0.3997499905299443, 0.3576110888710969, 0.34526087881072515, 0.3213753598241021, 0.29887776664618076]
+se_by_quintile = [0.011944270676327445, 0.00837315829560306, 0.008361389464093306, 0.005158466820082501, 0.007248237519632272]
+aggregate = 0.32815562524500197
+aggregate_se = 0.005843626958528389
+by_tercile = [0.37858989833919104, 0.3408873307602509, 0.3051404216769459]
+se_by_tercile = [0.00723668828876537, 0.005249177170971048, 0.005500519873678378]
+by_tercile_from_deciles = [0.38229338099835514, 0.3409390790608567, 0.30455312942269763]
+se_by_tercile_from_deciles = [0.007376884077215459, 0.005627413388368991, 0.005074754227239817]
+
+[housing_demand.size_check.one_person]
+people = 1.0
+expenditures = 36087.0
+share = 0.31709479868096546
+share_se = 0.006675809566048722
+predicted_cu_level = 0.29935353608642107
+predicted_sqrt_scale = 0.26482007932065643
+excess_over_sqrt_scale_pp = 5.227471936030903
+implied_subsistence_share_given_aH = 0.1688801532616571
+implied_subsistence_usd = 6094.378090753419
+note = "CE Table 1400; one-point cross-check, not a fit"
+
+[housing_demand.size_check.two_plus]
+people = 3.1
+expenditures = 71623.0
+share = 0.24592658782793236
+share_se = 0.004833212135310248
+predicted_cu_level = 0.25062652604820124
+predicted_sqrt_scale = 0.25505664634760483
+excess_over_sqrt_scale_pp = -0.9130058519672468
+implied_subsistence_share_given_aH = 0.08226591693344086
+implied_subsistence_usd = 5892.131768523835
+note = "CE Table 1400; one-point cross-check, not a fit"
+
+[housing_demand.acs_check]
+alpha_income = 0.1958757721153945
+h_share_of_mean_income = 0.03887705123840406
+share_cost_burdened_30plus = 0.31906539772311787
+mean_burden_by_income_bin = [0.6294715977600628, 0.5192545617027068, 0.3991737144994555, 0.29579578129929873, 0.2317128344367701, 0.1897998650434801, 0.15353010888530666]
+note = "ACS 2018 1-year, Stone-Geary form on household income (no size adjustment), mean burdens by 7 income bins"
+
+[housing_supply.eps_city]
+value = 1.9252029050625952
+lo = 0.7062821227621237
+hi = 3.372942678572547
+no_horizon_conversion = 1.2640591369689271
+note = "long-run elasticity of housing supply with respect to rent, central city (one horizon convention, delta = 3.5%)"
+
+[housing_supply.eps_suburb]
+value = 2.6870364106735853
+lo = 1.0953859457597124
+hi = 4.69544434662425
+no_horizon_conversion = 1.7642675051800327
+note = "long-run elasticity of housing supply with respect to rent, suburb (one horizon convention, delta = 3.5%)"
+
+[housing_supply.derivation]
+ratio_suburb_city = 1.3957159547223
+ratio_lo = 1.2515656187686275
+ratio_hi = 1.7250554646715965
+ratio_lo_matched_split = 1.2786396756713918
+ratio_hi_matched_split = 1.4705393760047685
+city_share = 0.42131321295119484
+metro_anchor = 2.366065888690747
+metro_anchor_lo = 1.0026239880373187
+metro_anchor_hi = 3.8639679147946038
+depreciation = 0.035
+longrun_factor_30y = 1.523032308186955
+longrun_factor_10y = 3.336472666654564
+ten_year_units_city = 0.2361640220712039
+ten_year_units_suburb = 0.34728849365136455
+ten_year_space_city = 0.4387138212604048
+ten_year_space_suburb = 0.5878153212534672
+note = "eps_c = anchor / (s + (1 - s) ratio), eps_s = ratio x eps_c; anchor = Saiz population-weighted mean over 95 MSAs x 30-year factor (low: Baum-Snow and Han tracts x 10-year factor; high: Saiz unweighted mean over 269 MSAs x 30-year factor)"
+
+[housing_supply.anchors.saiz_pop95]
+years = 30
+role = "central"
+label = "Saiz (2010), population-weighted mean over the 95 MSAs of Table VI"
+published = 1.5535231104239373
+long_run = 2.366065888690747
+
+[housing_supply.anchors.saiz_pop269]
+years = 30
+role = ""
+label = "Saiz (2010), population-weighted mean over all 269 MSAs"
+published = 1.7570985241470543
+long_run = 2.6761178209435803
+
+[housing_supply.anchors.saiz_mean269]
+years = 30
+role = "high"
+label = "Saiz (2010), unweighted mean over all 269 MSAs"
+published = 2.537022946935604
+long_run = 3.8639679147946038
+
+[housing_supply.anchors.saiz_p25_95]
+years = 30
+role = "dispersion"
+label = "Saiz (2010), 25th percentile of the 95 MSAs (dispersion across metros)"
+published = 1.0935609936714172
+long_run = 1.6655287243345986
+
+[housing_supply.anchors.saiz_p75_95]
+years = 30
+role = "dispersion"
+label = "Saiz (2010), 75th percentile of the 95 MSAs (dispersion across metros)"
+published = 2.372803211212158
+long_run = 3.6138559516458724
+
+[housing_supply.anchors.saiz_method_2000_10]
+years = 10
+role = "period check"
+label = "Saiz's method on 2000-10 data (Baum-Snow and Han, Online Appendix D), mean over metros"
+published = 1.25
+published_range = [0.803, 1.3]
+long_run = 4.170590833318205
+long_run_range = [2.679187551323615, 4.337414466650934]
+
+[housing_supply.anchors.saiz_pop95_period_refreshed]
+years = 10
+role = "period check"
+label = "Saiz's population-weighted mean x (1.25 / 2.54), 10-year equivalent"
+published = 0.7645290897755598
+long_run = 2.5508304108984485
+
+[housing_supply.anchors.bsh_metro_regions]
+years = 10
+role = "reference"
+label = "Baum-Snow and Han, metro-region aggregates of the tract elasticities (units, FMM-IV, mean)"
+published_range = [0.38, 0.41]
+long_run_range = [1.2678596133287343, 1.3679537933283712]
+
+[housing_supply.anchors.bsh_tracts]
+years = 10
+role = "low"
+label = "Baum-Snow and Han, tract elasticities, housing-unit-weighted mean (units, FMM linear)"
+published = 0.3005041815740802
+long_run = 1.0026239880373187
+
+[housing_supply.period_check]
+saiz_1970_2000_mean = 2.54
+saiz_method_2000_2010_mean = 1.25
+observed_ratio = 0.4921259842519685
+predicted_ratio_delta35 = 0.45647977980112714
+implied_delta = 0.04481127980695793
+table_a8_means_2000_2010 = [0.803, 0.91, 0.803, 1.27, 0.949, 1.253, 0.855, 1.3, 1.011]
+table_a8_means_1970_2000 = [1.54, 2.19, 2.56, 2.54]
+note = "Baum-Snow and Han, Online Appendix D (pp. 17-18) and Table A8 (p. 26): Saiz's method on 2000-10 data"
+
+[housing_supply.delta_sensitivity]
+delta = [0.015, 0.02, 0.035]
+factor_30y = [2.743168837548889, 2.2001441152509242, 1.523032308186955]
+factor_10y = [7.129130626101096, 5.466655793407689, 3.336472666654564]
+metro_anchor = [4.261576184926967, 3.4179747293055374, 2.366065888690747]
+eps_city = [3.4675276333521037, 2.7811122715313465, 1.9252029050625952]
+eps_suburb = [4.839683641309988, 3.8816427692502775, 2.6870364106735853]
+bsh_tracts_metro = [2.14233356413122, 1.6427529251451818, 1.0026239880373187]
+
+[housing_supply.saiz]
+pop_weighted_mean_95 = 1.5535231104239373
+mean_95 = 1.868454837171655
+p25_95 = 1.0935609936714172
+p75_95 = 2.372803211212158
+pop_weighted_mean_269 = 1.7570985241470543
+mean_269 = 2.537022946935604
+horizon_years = 30
+
+[transport.r_car]
+value = 0.013240770549971508
+se = 0.0016714491595521133
+lo = 0.0065115358647061345
+hi = 0.04061361345284718
+extensive_margin = 0.0031180806255083553
+single_adult = 0.016938061380391885
+single_adult_se = 0.0022066174801899964
+first_version_no_size_adjustment = 0.018868918034661283
+unadjusted_upper = 0.05454609434988241
+annual_usd = 810.654657451627
+note = "size-standardized, income-adjusted extra vehicles x CE private-vehicle spending per vehicle / mean expenditures per consumer unit"
+
+[transport.extra_vehicles.vehicles_raw_pooled]
+value = 0.3773914760390401
+se = 0.029697754180310138
+label = "extra vehicles, raw (not adjusted)"
+
+[transport.extra_vehicles.vehicles_income_adjusted]
+value = 0.24543697555133054
+se = 0.025009311940958606
+label = "extra vehicles, income-adjusted (not size-adjusted: first version)"
+
+[transport.extra_vehicles.vehicles_size_standardized]
+value = 0.28099594867294214
+se = 0.027270224630882477
+label = "extra vehicles, size-standardized"
+
+[transport.extra_vehicles.vehicles_size_standardized_income_adjusted]
+value = 0.17222898905938624
+se = 0.021741332796862092
+label = "extra vehicles, size-standardized and income-adjusted"
+
+[transport.extra_vehicles.vehicles_one_person_raw]
+value = 0.16936648324481227
+se = 0.015061939854250988
+label = "extra vehicles, one-person households, raw"
+
+[transport.extra_vehicles.vehicles_one_person_income_adjusted]
+value = 0.1298628267879888
+se = 0.0169179681890273
+label = "extra vehicles, one-person households, income-adjusted"
+
+[transport.extra_vehicles.vehicles_size_controls_regression]
+value = 0.0846986385701463
+se = 0.01431429714031876
+label = "extra vehicles, income and household-size shares as controls"
+
+[transport.extra_vehicles.vehicles_raw_regression]
+value = 0.36860743241889277
+se = 0.029245663202780926
+label = "extra vehicles, regression without controls"
+
+[transport.extra_vehicles.no_vehicle_share_raw_pooled]
+value = 0.07953602141545005
+se = 0.01028568880077006
+label = "fewer zero-vehicle households, raw"
+
+[transport.extra_vehicles.no_vehicle_share_income_adjusted]
+value = 0.04917738666030541
+se = 0.008287786251342046
+label = "fewer zero-vehicle households, income-adjusted (not size-adjusted)"
+
+[transport.extra_vehicles.no_vehicle_share_size_standardized_income_adjusted]
+value = 0.04055835511311072
+se = 0.0074282536512221
+label = "fewer zero-vehicle households, size-standardized and income-adjusted"
+
+[transport.household_size]
+classes = ["1 person", "2 persons", "3 persons", "4 or more persons"]
+national_class_shares = [0.27358481756146225, 0.32355105826148156, 0.16071340503521367, 0.2421507191418425]
+share_city = [0.31842864985254876, 0.31368485330675205, 0.1519063574325344, 0.21598013940816482]
+share_suburb = [0.23627076914205275, 0.3265483366287243, 0.1684861519503618, 0.2686947422788612]
+vehicles_city = [0.8988185546019388, 1.6453603431941686, 1.8979941308858854, 2.157830279906732]
+vehicles_suburb = [1.0681850378467512, 1.930750713826238, 2.2605685075684554, 2.507761085438575]
+vehicles_gap = [0.16936648324481227, 0.2853903706320697, 0.36257437668256987, 0.34993080553184314]
+vehicles_gap_se = [0.015061939854250988, 0.03053328062123364, 0.03674441311427699, 0.03368263827781495]
+vehicles_gap_income_adjusted = [0.1298628267879888, 0.1669984218236309, 0.19345522626863956, 0.21299596888598474]
+vehicles_gap_income_adjusted_se = [0.0169179681890273, 0.02488383032369607, 0.02608235210026258, 0.022843557656322993]
+four_plus_vehicles_city = 4.368942305088214
+four_plus_vehicles_suburb = 4.361934214487626
+standardized_gap = 0.28099594867294214
+standardized_gap_se = 0.027270224630882477
+standardized_gap_income_adjusted = 0.17222898905938624
+standardized_gap_income_adjusted_se = 0.021741332796862092
+note = "B08201 household-size classes; suburb minus city; standardized = within-class gaps averaged with household-size shares"
+
+[transport.locations.zero_vehicle_share]
+city = 0.13262606912741434
+suburb = 0.05309004771196431
+gap = -0.07953602141545005
+se = 0.01028568880077006
+n_cz = 188
+
+[transport.locations.vehicles_per_hh]
+city = 1.5624596309958663
+suburb = 1.9398511070349065
+gap = 0.3773914760390401
+se = 0.029697754180310138
+n_cz = 188
+
+[transport.locations.zero_vehicle_share_owners]
+city = 0.04527284277877193
+suburb = 0.022110244506119443
+gap = -0.023162598272652483
+se = 0.004970913865351302
+n_cz = 188
+
+[transport.locations.zero_vehicle_share_renters]
+city = 0.21733493203013374
+suburb = 0.1239713958367038
+gap = -0.0933635361934299
+se = 0.011514839084843012
+n_cz = 188
+
+[transport.locations.vehicles_per_owner_hh]
+city = 1.9171908924715666
+suburb = 2.163808976644546
+gap = 0.24661808417297879
+se = 0.029203886361918195
+n_cz = 188
+
+[transport.locations.vehicles_per_renter_hh]
+city = 1.198584695155811
+suburb = 1.4390711212269884
+gap = 0.24048642607117712
+se = 0.020839466273798967
+n_cz = 188
+
+[transport.regressions.veh_per_hh_households_no_controls]
+suburb = 0.36860743241889277
+se_boot = 0.029245663202780926
+se_cluster = 0.031062189138417164
+n = 3200
+
+[transport.regressions.veh_per_hh_households_log_income]
+suburb = 0.24543697555133054
+se_boot = 0.025009311940958606
+se_cluster = 0.026190333797958088
+n = 3200
+
+[transport.regressions.veh_per_hh_households_log_income_size_shares]
+suburb = 0.0846986385701463
+se_boot = 0.01431429714031876
+se_cluster = 0.014863050405476154
+n = 3200
+
+[transport.regressions.zero_share_households_no_controls]
+suburb = -0.07864212495232104
+se_boot = 0.010403842439015315
+se_cluster = 0.011060081606699804
+n = 3200
+
+[transport.regressions.zero_share_households_log_income]
+suburb = -0.04917738666030541
+se_boot = 0.008287786251342046
+se_cluster = 0.008743479366836587
+n = 3200
+
+[transport.regressions.zero_share_households_log_income_size_shares]
+suburb = -0.026827725154761582
+se_boot = 0.006316127835308851
+se_cluster = 0.006580174095121668
+n = 3200
+
+[transport.cost_per_vehicle_year]
+ce_private_vehicle_spending_per_vehicle = 4706.842105263158
+ce_ownership_like_per_vehicle = 3128.947368421053
+aaa_ownership_per_vehicle_year = 5960.0
+aaa_total_per_vehicle_year_15k_miles = 8849.0
+aaa_total_per_vehicle_year_10k_miles = 7531.0
+ce_vehicles_rounding_bound = 0.026315789473684213
+
+[wtp_income.elasticity]
+value = 0.3791881157948197
+se = 0.09067541899441342
+se_with_mean_mwtp = 0.1690728396309184
+note = "BFM (2007) Table 8: 1.38 (0.33) per $10,000 at mean income $54,103 and mean MWTP $19.69"
+
+[wtp_income.elasticity_with_college]
+value = 0.5075061549226575
+se = 0.09726353770585124
+lo = 0.49041888237295045
+hi = 0.5384326592599072
+note = "adds 13.03 x slope of the householder college share (bachelor's or more) on income, 1990 Bay Area PUMS; lo / hi over the slope measures and the variants"
+
+[wtp_income.variants.bachelors]
+value = 0.5075061549226575
+se = 0.09726353770585124
+slope_per_10k = 1.8469948414001305
+
+[wtp_income.variants.associate_plus]
+value = 0.506831496591808
+se = 0.09719670324083758
+slope_per_10k = 1.8445395205243147
+
+[wtp_income.variants.bachelors_children]
+value = 0.5304496340586933
+se = 0.0978969841811575
+slope_per_10k = 1.9304942969180399
+
+[wtp_income.variants.associate_plus_children]
+value = 0.5297749757278437
+se = 0.0978305824657898
+slope_per_10k = 1.9280389760422239
+

@@ -1,0 +1,6636 @@
+{
+ "meta": {
+  "generated": "2026-10-05T02:08:08",
+  "script": "data/spatial/commuting_all.py",
+  "imports": "data/spatial/teacher_residence.py (unchanged)",
+  "year": 2018,
+  "pums_vintage": "ACS 2018 1-year PUMS",
+  "replicate_weights": 80,
+  "se_formula": "sqrt(4/80 * sum_r (x_r - x)^2) over the 80 successive-difference replicate weights; derived statistics (ratios, differences, logs) are evaluated on every replicate",
+  "pc_cut": 0.5,
+  "metro_cut": 0.5,
+  "powpuma_classes": {
+   "n_powpuma_by_class": {
+    "city": 146,
+    "other": 313,
+    "suburb": 523
+   },
+   "n_puma_by_class": {
+    "city": 733,
+    "other": 345,
+    "suburb": 1273
+   },
+   "pop_by_class_2010": {
+    "city": 95951361.0,
+    "other": 45139802.0,
+    "suburb": 167654375.0
+   }
+  },
+  "classes": [
+   "city",
+   "suburb",
+   "other"
+  ],
+  "universes": {
+   "all": "all workers with a US POWPUMA of residence and of work",
+   "metro_pow": "residents of metropolitan areas: residence POWPUMA class city or suburb (rows city and suburb of the matrix)",
+   "metro_puma": "residents of metropolitan PUMAs: residence PUMA class city or suburb (the `metro` flag of the commute block of teacher_residence.py), cells on the POWPUMA classes",
+   "away": "workers who work away from home (JWTR != 11)"
+  },
+  "groups": {
+   "all": "employed persons 16+ with a US POWPUMA of residence and of work",
+   "nonteacher": "all of the above except OCCP 2310-2330 (elementary/middle, secondary and special-education teachers; OCCP 2300 preschool/kindergarten teachers stay in)",
+   "k12": "OCCP 2310-2330 (`k12` of teacher_residence.py), recomputed here as a check on the code",
+   "pub_k12": "OCCP 2310-2330 employed by a local or state government (COW 3-4), recomputed as a check"
+  },
+  "layout": "groups.<group>.universes.<universe>: res[a], work[b], x['a->b'] (joint shares), work_given_live[a][b] = P(work b | live a), live_given_work[b][a] = P(live a | work b), p_work_suburb_given_live_city, p_work_city_given_live_suburb, share_cross_city_suburb, share_cross_class, gap_res, gap_work, net_commute_gap, block{share_of_group, city_share_jobs, city_share_residents, net_inflow_to_city}, marginal{city_share_residents, city_share_jobs}, n_sample, n_cells, workers_millions; each statistic is {value, se}. differences.<universe>.<group>_minus_nonteacher.<statistic>; class_cuts[i].groups.<group>; headline = the main statistics of groups.<group>.universes.all and .metro_pow",
+  "methods": [
+   "Data and sample: the ACS 2018 1-year PUMS cached by teacher_residence.py (employed persons 16+, ESR 1-2, in households; 80 replicate weights), restricted as in its `flows_block` to persons with a US place-of-work POWPUMA (POWSP 1-56, POWPUMA > 1). Workers at home carry their own POWPUMA as the place of work (checked: all of them do), so they count as working where they live; persons employed but not at work last week and workplaces abroad or in Puerto Rico are out.",
+   "Classes: `teacher_residence.build_puma_geo()` at the main cut (0.5 / 0.5): a POWPUMA is `city` if at least half of its 2010 population lives in principal cities of OMB (Sept. 2018) metropolitan areas, `suburb` if at least half lives in metropolitan counties and it is not `city`, `other` otherwise. Residence class = class of the POWPUMA that contains the residence PUMA; workplace class = class of the place-of-work POWPUMA (one geography at both ends).",
+   "Groups: all workers; non-teachers = everyone except OCCP 2310-2330 (the `k12` flag of teacher_residence.py). K-12 and public K-12 (COW 3-4) teachers are recomputed by the same code as a check and reproduce `flows.k12` / `flows.pub_k12` of teacher_residence.json.",
+   "Estimator: person-weighted cell shares; every probability is a ratio of cells. Standard errors from the 80 ACS replicate weights, SE = sqrt(4/80 sum_r (x_r - x)^2), with derived statistics and between-group differences evaluated on every replicate (covariances respected). Sampling error only.",
+   "Definitions: `block` = workers who live AND work in a city or suburb POWPUMA (the closed two-location system); crossing share = (city->suburb + suburb->city) / block (`share_metro_cross` of teacher_residence.py); `marginal` = workers who live (work) in a city or suburb POWPUMA, whatever the other end. Caveat: a POWPUMA is a whole county or group of counties, so city-suburb commuting inside one county is invisible and the crossing probabilities are lower bounds; workers at home count as non-crossers (see `away`); the classes depend on the cuts (`class_cuts`)."
+  ]
+ },
+ "sample": {
+  "n_employed_in_households": 1474819,
+  "weighted_employed_millions": 155.715523,
+  "n_us_powpuma": 1445532,
+  "weighted_us_powpuma_millions": 152.559429,
+  "n_unclassified_dropped": 0,
+  "n_sample": 1445532,
+  "weighted_sample_millions": 152.559429,
+  "n_not_in_sample_no_workplace": 29287,
+  "weighted_not_in_sample_millions": 3.156094,
+  "work_at_home_share_of_sample": 0.052816971411186915,
+  "n_work_at_home": 79987,
+  "n_work_at_home_other_powpuma": 0,
+  "work_at_home_other_powpuma_share": 0.0,
+  "k12_share_of_sample": 0.03028160258780203,
+  "occp_codes_in_2310_2330": [
+   2310,
+   2320,
+   2330
+  ],
+  "national_check": {
+   "mean_travel_time_all_persons": 27.14575945541727,
+   "work_at_home_share_all_persons": 0.05235237634611575,
+   "published_mean_travel_time": 27.1,
+   "published_work_at_home_share": 0.053
+  }
+ },
+ "headline": {
+  "all": {
+   "all_workers": {
+    "res": {
+     "city": {
+      "value": 0.3119106915377875,
+      "se": 0.00027523910739714157
+     },
+     "suburb": {
+      "value": 0.5701217064728265,
+      "se": 0.00027614990708177574
+     },
+     "other": {
+      "value": 0.11796760198938605,
+      "se": 0.00021005181505326433
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.3524583852499867,
+      "se": 0.00039530348104887847
+     },
+     "suburb": {
+      "value": 0.5398087587231334,
+      "se": 0.00039494497252124555
+     },
+     "other": {
+      "value": 0.10773285602687986,
+      "se": 0.00022164905578666766
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.28083573910072773,
+      "se": 0.00034222708389003323
+     },
+     "city->suburb": {
+      "value": 0.0283557825848968,
+      "se": 0.0001701035450053913
+     },
+     "city->other": {
+      "value": 0.002719169852162989,
+      "se": 5.0909250703571025e-05
+     },
+     "suburb->city": {
+      "value": 0.06487404983667053,
+      "se": 0.00020925413064366917
+     },
+     "suburb->suburb": {
+      "value": 0.4973577739334617,
+      "se": 0.00035575934671401306
+     },
+     "suburb->other": {
+      "value": 0.007889882702694175,
+      "se": 8.451373967408526e-05
+     },
+     "other->city": {
+      "value": 0.006748596312588453,
+      "se": 7.368246253850162e-05
+     },
+     "other->suburb": {
+      "value": 0.014095202204774901,
+      "se": 0.00010765631143145456
+     },
+     "other->other": {
+      "value": 0.0971238034720227,
+      "se": 0.00020352610245542372
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.09090994106388797,
+     "se": 0.000558872166555195
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.11378982610226682,
+     "se": 0.00036905896771545184
+    },
+    "share_cross_city_suburb": {
+     "value": 0.106985695193658,
+     "se": 0.00032063571415216676
+    },
+    "share_cross_class": {
+     "value": 0.12468268349378786,
+     "se": 0.0003672551592315961
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.8714233454557567,
+      "se": 0.00024252168603481204
+     },
+     "city_share_jobs": {
+      "value": 0.3967185303677985,
+      "se": 0.0004205621660971827
+     },
+     "city_share_residents": {
+      "value": 0.3548120707322989,
+      "se": 0.0002967351471454795
+     },
+     "net_inflow_to_city": {
+      "value": 0.04190645963549964,
+      "se": 0.00030540230406722363
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.35362725024759706,
+      "se": 0.000290946261072582
+     },
+     "city_share_jobs": {
+      "value": 0.39501441651269037,
+      "se": 0.00042591889087024987
+     }
+    }
+   },
+   "metropolitan_residents": {
+    "res": {
+     "city": {
+      "value": 0.35362725024759706,
+      "se": 0.00029094626107258064
+     },
+     "suburb": {
+      "value": 0.646372749752403,
+      "se": 0.0002909462610725675
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.39194681478495774,
+      "se": 0.00041580304071115885
+     },
+     "suburb": {
+      "value": 0.5960252227742232,
+      "se": 0.0004244209236413712
+     },
+     "other": {
+      "value": 0.012027962440818982,
+      "se": 0.00011433003594826322
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.3183961719933878,
+      "se": 0.00036343425448116264
+     },
+     "city->suburb": {
+      "value": 0.03214823247859381,
+      "se": 0.00019454856054867812
+     },
+     "city->other": {
+      "value": 0.003082845775615453,
+      "se": 5.776661546178951e-05
+     },
+     "suburb->city": {
+      "value": 0.07355064279156996,
+      "se": 0.0002384111524844836
+     },
+     "suburb->suburb": {
+      "value": 0.5638769902956294,
+      "se": 0.00037956980317519043
+     },
+     "suburb->other": {
+      "value": 0.008945116665203529,
+      "se": 9.605153228261361e-05
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.09090994106388797,
+     "se": 0.000558872166555195
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.11378982610226682,
+     "se": 0.00036905896771545184
+    },
+    "share_cross_city_suburb": {
+     "value": 0.106985695193658,
+     "se": 0.00032063571415216676
+    },
+    "share_cross_class": {
+     "value": 0.11772683771098269,
+     "se": 0.00035433362506193713
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.987972037559181,
+      "se": 0.00011433003594824594
+     },
+     "city_share_jobs": {
+      "value": 0.3967185303677985,
+      "se": 0.0004205621660971827
+     },
+     "city_share_residents": {
+      "value": 0.3548120707322989,
+      "se": 0.0002967351471454795
+     },
+     "net_inflow_to_city": {
+      "value": 0.04190645963549964,
+      "se": 0.00030540230406722363
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.35362725024759706,
+      "se": 0.000290946261072582
+     },
+     "city_share_jobs": {
+      "value": 0.3967185303677985,
+      "se": 0.0004205621660971929
+     }
+    }
+   }
+  },
+  "nonteacher": {
+   "all_workers": {
+    "res": {
+     "city": {
+      "value": 0.3127866535608752,
+      "se": 0.0002845000060555138
+     },
+     "suburb": {
+      "value": 0.5695136365877758,
+      "se": 0.00028956947820203384
+     },
+     "other": {
+      "value": 0.11769970985134923,
+      "se": 0.00022105434079157493
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.3538438654915346,
+      "se": 0.0004018188052175307
+     },
+     "suburb": {
+      "value": 0.5389449017685823,
+      "se": 0.00040868983747152643
+     },
+     "other": {
+      "value": 0.10721123273988316,
+      "se": 0.00023441680461582453
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.2815950770748228,
+      "se": 0.00035051127695466837
+     },
+     "city->suburb": {
+      "value": 0.028485642645514626,
+      "se": 0.0001772694019463294
+     },
+     "city->other": {
+      "value": 0.0027059338405377845,
+      "se": 5.277289799344439e-05
+     },
+     "suburb->city": {
+      "value": 0.06539287953736012,
+      "se": 0.0002104833543982409
+     },
+     "suburb->suburb": {
+      "value": 0.49626168259044223,
+      "se": 0.0003756186042392709
+     },
+     "suburb->other": {
+      "value": 0.007859074459973334,
+      "se": 8.54021015520251e-05
+     },
+     "other->city": {
+      "value": 0.006855908879351745,
+      "se": 7.574633833393893e-05
+     },
+     "other->suburb": {
+      "value": 0.014197576532625444,
+      "se": 0.00010895123314386334
+     },
+     "other->other": {
+      "value": 0.09664622443937204,
+      "se": 0.00021387374370419483
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.0910705182629242,
+     "se": 0.0005781125081772897
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.11482232441203627,
+     "se": 0.00037299759146551027
+    },
+    "share_cross_city_suburb": {
+     "value": 0.10769154826892598,
+     "se": 0.00033093943867108875
+    },
+    "share_cross_class": {
+     "value": 0.125497015895363,
+     "se": 0.00037575343121069095
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.8717352818481398,
+      "se": 0.0002549230010876413
+     },
+     "city_share_jobs": {
+      "value": 0.3980428047796163,
+      "se": 0.00042994104618216707
+     },
+     "city_share_residents": {
+      "value": 0.3557051391369001,
+      "se": 0.00030989390023217586
+     },
+     "net_inflow_to_city": {
+      "value": 0.042337665642716175,
+      "se": 0.0003086982105494098
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.35451269488778764,
+      "se": 0.0003015678894382734
+     },
+     "city_share_jobs": {
+      "value": 0.39633548098667,
+      "se": 0.00043456754764330366
+     }
+    }
+   },
+   "metropolitan_residents": {
+    "res": {
+     "city": {
+      "value": 0.35451269488778764,
+      "se": 0.00030156788943826597
+     },
+     "suburb": {
+      "value": 0.6454873051122124,
+      "se": 0.00030156788943825366
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.39327648475976584,
+      "se": 0.00042320881673110674
+     },
+     "suburb": {
+      "value": 0.5947491246404859,
+      "se": 0.000436934810980534
+     },
+     "other": {
+      "value": 0.011974390599748204,
+      "se": 0.00011846165752886629
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.3191601320083204,
+      "se": 0.0003735149097650941
+     },
+     "city->suburb": {
+      "value": 0.032285654854216736,
+      "se": 0.0002024386195166713
+     },
+     "city->other": {
+      "value": 0.0030669080252505483,
+      "se": 5.985910585089439e-05
+     },
+     "suburb->city": {
+      "value": 0.07411635275144549,
+      "se": 0.00024067518437245004
+     },
+     "suburb->suburb": {
+      "value": 0.5624634697862693,
+      "se": 0.00039463150462217423
+     },
+     "suburb->other": {
+      "value": 0.008907482574497656,
+      "se": 9.706767407320829e-05
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.0910705182629242,
+     "se": 0.0005781125081772897
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.11482232441203627,
+     "se": 0.00037299759146551027
+    },
+    "share_cross_city_suburb": {
+     "value": 0.10769154826892598,
+     "se": 0.00033093943867108875
+    },
+    "share_cross_class": {
+     "value": 0.11837639820541046,
+     "se": 0.00036458054723593445
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.9880256094002519,
+      "se": 0.00011846165752890653
+     },
+     "city_share_jobs": {
+      "value": 0.3980428047796163,
+      "se": 0.00042994104618216707
+     },
+     "city_share_residents": {
+      "value": 0.3557051391369001,
+      "se": 0.00030989390023217586
+     },
+     "net_inflow_to_city": {
+      "value": 0.042337665642716175,
+      "se": 0.0003086982105494098
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.35451269488778764,
+      "se": 0.0003015678894382734
+     },
+     "city_share_jobs": {
+      "value": 0.3980428047796163,
+      "se": 0.00042994104618216165
+     }
+    }
+   }
+  },
+  "k12": {
+   "all_workers": {
+    "res": {
+     "city": {
+      "value": 0.28385945195231604,
+      "se": 0.002606021641562412
+     },
+     "suburb": {
+      "value": 0.5895941420130639,
+      "se": 0.002901172343300794
+     },
+     "other": {
+      "value": 0.12654640603462014,
+      "se": 0.001708852200986064
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.3080906647641082,
+      "se": 0.002793278830013193
+     },
+     "suburb": {
+      "value": 0.5674723534464248,
+      "se": 0.0029535016228569937
+     },
+     "other": {
+      "value": 0.12443698178946715,
+      "se": 0.0018128686964759093
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.25651919240546667,
+      "se": 0.002666646707482678
+     },
+     "city->suburb": {
+      "value": 0.024197228244681963,
+      "se": 0.0008735101472086808
+     },
+     "city->other": {
+      "value": 0.0031430313021673937,
+      "se": 0.0002994702986014093
+     },
+     "suburb->city": {
+      "value": 0.04825938406976665,
+      "se": 0.0011279726034127862
+     },
+     "suburb->suburb": {
+      "value": 0.5324582920612052,
+      "se": 0.002780491981016429
+     },
+     "suburb->other": {
+      "value": 0.00887646588209217,
+      "se": 0.0005279615429448854
+     },
+     "other->city": {
+      "value": 0.0033120882888748823,
+      "se": 0.00027892122937947316
+     },
+     "other->suburb": {
+      "value": 0.01081683314053766,
+      "se": 0.00044579624587006296
+     },
+     "other->other": {
+      "value": 0.11241748460520759,
+      "se": 0.001746670690859977
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.08524369394170013,
+     "se": 0.003112052972755666
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.08185187170448065,
+     "se": 0.0018624046297509402
+    },
+    "share_cross_city_suburb": {
+     "value": 0.0841116140923534,
+     "se": 0.001547358997734713
+    },
+    "share_cross_class": {
+     "value": 0.09860503092812056,
+     "se": 0.0013700695653224538
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.8614340967811205,
+      "se": 0.0017732559416619937
+     },
+     "city_share_jobs": {
+      "value": 0.35380370664927807,
+      "se": 0.0031408764183986164
+     },
+     "city_share_residents": {
+      "value": 0.3258710349393973,
+      "se": 0.0029811900060402736
+     },
+     "net_inflow_to_city": {
+      "value": 0.02793267170988076,
+      "se": 0.0017166173827970858
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.32498515538029493,
+      "se": 0.0029603789880784655
+     },
+     "city_share_jobs": {
+      "value": 0.35187720170477377,
+      "se": 0.0031036057398657994
+     }
+    }
+   },
+   "metropolitan_residents": {
+    "res": {
+     "city": {
+      "value": 0.32498515538029493,
+      "se": 0.0029603789880784702
+     },
+     "suburb": {
+      "value": 0.6750148446197051,
+      "se": 0.0029603789880784568
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.3489350534257616,
+      "se": 0.00312956641580213
+     },
+     "suburb": {
+      "value": 0.6373040584545934,
+      "se": 0.0030868499453620478
+     },
+     "other": {
+      "value": 0.013760888119645159,
+      "se": 0.0006802807915476456
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.2936838249653295,
+      "se": 0.0030343313972142827
+     },
+     "city->suburb": {
+      "value": 0.02770293512083372,
+      "se": 0.0009980849836133062
+     },
+     "city->other": {
+      "value": 0.003598395294131642,
+      "se": 0.000343664535263339
+     },
+     "suburb->city": {
+      "value": 0.05525122846043203,
+      "se": 0.0012783605751485534
+     },
+     "suburb->suburb": {
+      "value": 0.6096011233337596,
+      "se": 0.002936096583472223
+     },
+     "suburb->other": {
+      "value": 0.010162492825513517,
+      "se": 0.0006024715241240773
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.08524369394170013,
+     "se": 0.003112052972755666
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.08185187170448065,
+     "se": 0.0018624046297509402
+    },
+    "share_cross_city_suburb": {
+     "value": 0.0841116140923534,
+     "se": 0.001547358997734713
+    },
+    "share_cross_class": {
+     "value": 0.09671505170091088,
+     "se": 0.001463701805318245
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.9862391118803548,
+      "se": 0.0006802807915476202
+     },
+     "city_share_jobs": {
+      "value": 0.35380370664927807,
+      "se": 0.0031408764183986164
+     },
+     "city_share_residents": {
+      "value": 0.3258710349393973,
+      "se": 0.0029811900060402736
+     },
+     "net_inflow_to_city": {
+      "value": 0.02793267170988076,
+      "se": 0.0017166173827970858
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.32498515538029493,
+      "se": 0.0029603789880784655
+     },
+     "city_share_jobs": {
+      "value": 0.35380370664927807,
+      "se": 0.0031408764183986173
+     }
+    }
+   }
+  },
+  "pub_k12": {
+   "all_workers": {
+    "res": {
+     "city": {
+      "value": 0.2693810964107509,
+      "se": 0.0030815017236886888
+     },
+     "suburb": {
+      "value": 0.5919519639533506,
+      "se": 0.0033290342299206583
+     },
+     "other": {
+      "value": 0.1386669396358987,
+      "se": 0.00206857005794818
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.2905087310822975,
+      "se": 0.0031138168404725402
+     },
+     "suburb": {
+      "value": 0.5729083758136594,
+      "se": 0.003370781322948141
+     },
+     "other": {
+      "value": 0.13658289310404328,
+      "se": 0.002283794391252359
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.24282911768518825,
+      "se": 0.0030360757146439456
+     },
+     "city->suburb": {
+      "value": 0.023298107838987794,
+      "se": 0.0010029383967159722
+     },
+     "city->other": {
+      "value": 0.0032538708865748485,
+      "se": 0.00033435643578058535
+     },
+     "suburb->city": {
+      "value": 0.04435402679164408,
+      "se": 0.0011979263398177486
+     },
+     "suburb->suburb": {
+      "value": 0.5384946380241034,
+      "se": 0.0033154552196801835
+     },
+     "suburb->other": {
+      "value": 0.009103299137603158,
+      "se": 0.0006929873452651327
+     },
+     "other->city": {
+      "value": 0.0033255866054651673,
+      "se": 0.0003565207734870525
+     },
+     "other->suburb": {
+      "value": 0.011115629950568256,
+      "se": 0.0005179364048067969
+     },
+     "other->other": {
+      "value": 0.12422572307986528,
+      "se": 0.0021692573086687377
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.08648753809904672,
+     "se": 0.0036570170045941023
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.07492842239330665,
+     "se": 0.001987428599757165
+    },
+    "share_cross_city_suburb": {
+     "value": 0.07968675600851807,
+     "se": 0.0019102000520315372
+    },
+    "share_cross_class": {
+     "value": 0.09445052121084319,
+     "se": 0.001636801347091978
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.8489758903399235,
+      "se": 0.002162383480515261
+     },
+     "city_share_jobs": {
+      "value": 0.33827008251299856,
+      "se": 0.0035102778583097826
+     },
+     "city_share_residents": {
+      "value": 0.3134685313827001,
+      "se": 0.003552492413153097
+     },
+     "net_inflow_to_city": {
+      "value": 0.02480155113029848,
+      "se": 0.001737399665466568
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.312749050056059,
+      "se": 0.003498696925150094
+     },
+     "city_share_jobs": {
+      "value": 0.33646395092482717,
+      "se": 0.00349486857878445
+     }
+    }
+   },
+   "metropolitan_residents": {
+    "res": {
+     "city": {
+      "value": 0.3127490500560591,
+      "se": 0.0034986969251501157
+     },
+     "suburb": {
+      "value": 0.687250949943941,
+      "se": 0.003498696925150099
+     }
+    },
+    "work": {
+     "city": {
+      "value": 0.33341706906667984,
+      "se": 0.0034874024990955454
+     },
+     "suburb": {
+      "value": 0.6522363667610889,
+      "se": 0.003475489073717706
+     },
+     "other": {
+      "value": 0.014346564172231357,
+      "se": 0.0008556553721105356
+     }
+    },
+    "x": {
+     "city->city": {
+      "value": 0.28192243959907903,
+      "se": 0.0034653653761943038
+     },
+     "city->suburb": {
+      "value": 0.027048895382164075,
+      "se": 0.0011613987921771385
+     },
+     "city->other": {
+      "value": 0.0037777150748159803,
+      "se": 0.00038823669924701606
+     },
+     "suburb->city": {
+      "value": 0.051494629467600854,
+      "se": 0.0013857860975205018
+     },
+     "suburb->suburb": {
+      "value": 0.6251874713789247,
+      "se": 0.003551362252416816
+     },
+     "suburb->other": {
+      "value": 0.010568849097415378,
+      "se": 0.0008041826765939877
+     }
+    },
+    "p_work_suburb_given_live_city": {
+     "value": 0.08648753809904672,
+     "se": 0.0036570170045941023
+    },
+    "p_work_city_given_live_suburb": {
+     "value": 0.07492842239330665,
+     "se": 0.001987428599757165
+    },
+    "share_cross_city_suburb": {
+     "value": 0.07968675600851807,
+     "se": 0.0019102000520315372
+    },
+    "share_cross_class": {
+     "value": 0.09289008902199625,
+     "se": 0.001911722203536174
+    },
+    "block": {
+     "share_of_group": {
+      "value": 0.9856534358277688,
+      "se": 0.000855655372110572
+     },
+     "city_share_jobs": {
+      "value": 0.33827008251299856,
+      "se": 0.0035102778583097826
+     },
+     "city_share_residents": {
+      "value": 0.3134685313827001,
+      "se": 0.003552492413153097
+     },
+     "net_inflow_to_city": {
+      "value": 0.02480155113029848,
+      "se": 0.001737399665466568
+     }
+    },
+    "marginal": {
+     "city_share_residents": {
+      "value": 0.312749050056059,
+      "se": 0.003498696925150094
+     },
+     "city_share_jobs": {
+      "value": 0.33827008251299856,
+      "se": 0.0035102778583097887
+     }
+    }
+   }
+  }
+ },
+ "groups": {
+  "all": {
+   "label": "all workers",
+   "definition": "employed persons 16+ with a US POWPUMA of residence and of work",
+   "universes": {
+    "all": {
+     "res": {
+      "city": {
+       "value": 0.3119106915377875,
+       "se": 0.00027523910739714157
+      },
+      "suburb": {
+       "value": 0.5701217064728265,
+       "se": 0.00027614990708177574
+      },
+      "other": {
+       "value": 0.11796760198938605,
+       "se": 0.00021005181505326433
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3524583852499867,
+       "se": 0.00039530348104887847
+      },
+      "suburb": {
+       "value": 0.5398087587231334,
+       "se": 0.00039494497252124555
+      },
+      "other": {
+       "value": 0.10773285602687986,
+       "se": 0.00022164905578666766
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.28083573910072773,
+       "se": 0.00034222708389003323
+      },
+      "city->suburb": {
+       "value": 0.0283557825848968,
+       "se": 0.0001701035450053913
+      },
+      "city->other": {
+       "value": 0.002719169852162989,
+       "se": 5.0909250703571025e-05
+      },
+      "suburb->city": {
+       "value": 0.06487404983667053,
+       "se": 0.00020925413064366917
+      },
+      "suburb->suburb": {
+       "value": 0.4973577739334617,
+       "se": 0.00035575934671401306
+      },
+      "suburb->other": {
+       "value": 0.007889882702694175,
+       "se": 8.451373967408526e-05
+      },
+      "other->city": {
+       "value": 0.006748596312588453,
+       "se": 7.368246253850162e-05
+      },
+      "other->suburb": {
+       "value": 0.014095202204774901,
+       "se": 0.00010765631143145456
+      },
+      "other->other": {
+       "value": 0.0971238034720227,
+       "se": 0.00020352610245542372
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9003722755258773,
+        "se": 0.0005792736759126672
+       },
+       "suburb": {
+        "value": 0.09090994106388797,
+        "se": 0.000558872166555195
+       },
+       "other": {
+        "value": 0.008717783410234804,
+        "se": 0.0001638323546856306
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11378982610226682,
+        "se": 0.00036905896771545184
+       },
+       "suburb": {
+        "value": 0.8723712293125382,
+        "se": 0.0004201833353416522
+       },
+       "other": {
+        "value": 0.013838944585194858,
+        "se": 0.00014808264914466417
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.0572072009499324,
+        "se": 0.0006097911450605384
+       },
+       "suburb": {
+        "value": 0.11948367150875115,
+        "se": 0.000878756022111664
+       },
+       "other": {
+        "value": 0.8233091275413165,
+        "se": 0.001018438000945259
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.7967911982049755,
+        "se": 0.000574518348406073
+       },
+       "suburb": {
+        "value": 0.18406158727265798,
+        "se": 0.0005249237771557899
+       },
+       "other": {
+        "value": 0.019147214522366673,
+        "se": 0.00020578058779026687
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05252931177324674,
+        "se": 0.0003001013150286972
+       },
+       "suburb": {
+        "value": 0.9213592145298171,
+        "se": 0.0003981134693735046
+       },
+       "other": {
+        "value": 0.026111473696936244,
+        "se": 0.00019547521517187223
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.025239930996394853,
+        "se": 0.0004638324375269058
+       },
+       "suburb": {
+        "value": 0.07323562183040623,
+        "se": 0.0007457389104290471
+       },
+       "other": {
+        "value": 0.9015244471731989,
+        "se": 0.0008718075453912667
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.09090994106388797,
+      "se": 0.000558872166555195
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11378982610226682,
+      "se": 0.00036905896771545184
+     },
+     "share_cross_city_suburb": {
+      "value": 0.106985695193658,
+      "se": 0.00032063571415216676
+     },
+     "share_cross_class": {
+      "value": 0.12468268349378786,
+      "se": 0.0003672551592315961
+     },
+     "gap_res": {
+      "value": 0.6031329564018348,
+      "se": 0.0012729226688995834
+     },
+     "gap_work": {
+      "value": 0.42628236706474576,
+      "se": 0.0017822623696433202
+     },
+     "net_commute_gap": {
+      "value": 0.17685058933708908,
+      "se": 0.0013516873279507343
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8714233454557567,
+       "se": 0.00024252168603481204
+      },
+      "city_share_jobs": {
+       "value": 0.3967185303677985,
+       "se": 0.0004205621660971827
+      },
+      "city_share_residents": {
+       "value": 0.3548120707322989,
+       "se": 0.0002967351471454795
+      },
+      "net_inflow_to_city": {
+       "value": 0.04190645963549964,
+       "se": 0.00030540230406722363
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.35362725024759706,
+       "se": 0.000290946261072582
+      },
+      "city_share_jobs": {
+       "value": 0.39501441651269037,
+       "se": 0.00042591889087024987
+      }
+     },
+     "n_sample": 1445532,
+     "workers_millions": {
+      "value": 152.559429,
+      "se": 0.10526153954650293
+     },
+     "n_cells": {
+      "city->city": 373643,
+      "city->suburb": 37343,
+      "city->other": 3712,
+      "suburb->city": 90815,
+      "suburb->suburb": 702294,
+      "suburb->other": 13568,
+      "other->city": 12679,
+      "other->suburb": 27627,
+      "other->other": 183851
+     },
+     "share_of_all_workers": {
+      "value": 1.0,
+      "se": 0.0
+     }
+    },
+    "away": {
+     "res": {
+      "city": {
+       "value": 0.31219684180605706,
+       "se": 0.000299109331616239
+      },
+      "suburb": {
+       "value": 0.5689739419124628,
+       "se": 0.0002958105475282862
+      },
+      "other": {
+       "value": 0.1188292162814802,
+       "se": 0.0002212762238530502
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3550055624950355,
+       "se": 0.0004146039305792964
+      },
+      "suburb": {
+       "value": 0.5369706787259848,
+       "se": 0.00040431439654363475
+      },
+      "other": {
+       "value": 0.10802375877897964,
+       "se": 0.0002275766416458665
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.2793890829050581,
+       "se": 0.00035976358313231786
+      },
+      "city->suburb": {
+       "value": 0.029936962264984258,
+       "se": 0.00017954617454134028
+      },
+      "city->other": {
+       "value": 0.0028707966360147093,
+       "se": 5.364888398182601e-05
+      },
+      "suburb->city": {
+       "value": 0.06849156697130114,
+       "se": 0.00021738731877184048
+      },
+      "suburb->suburb": {
+       "value": 0.4921525353383035,
+       "se": 0.00037109954998471956
+      },
+      "suburb->other": {
+       "value": 0.008329839602858104,
+       "se": 8.908523787294539e-05
+      },
+      "other->city": {
+       "value": 0.0071249126186762836,
+       "se": 7.774174037998537e-05
+      },
+      "other->suburb": {
+       "value": 0.014881181122697087,
+       "se": 0.00011280961601058764
+      },
+      "other->other": {
+       "value": 0.09682312254010683,
+       "se": 0.00021022372756242607
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.8949132261838196,
+        "se": 0.000606348078007195
+       },
+       "suburb": {
+        "value": 0.09589130399846164,
+        "se": 0.0005863702743183447
+       },
+       "other": {
+        "value": 0.009195469817718738,
+        "se": 0.0001723842798062754
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.12037733528021331,
+        "se": 0.0003817388341505141
+       },
+       "suburb": {
+        "value": 0.8649825573453445,
+        "se": 0.0004362865600486777
+       },
+       "other": {
+        "value": 0.014640107374442218,
+        "se": 0.0001567555551605094
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.059959266261581136,
+        "se": 0.0006388453606545738
+       },
+       "suburb": {
+        "value": 0.12523166935181035,
+        "se": 0.000905274432337336
+       },
+       "other": {
+        "value": 0.8148090643866085,
+        "se": 0.0010469174158639306
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.7869991696509407,
+        "se": 0.0005918306186966707
+       },
+       "suburb": {
+        "value": 0.19293096843309024,
+        "se": 0.00053863770429557
+       },
+       "other": {
+        "value": 0.02006986191596905,
+        "se": 0.0002160202959873802
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05575157722952884,
+        "se": 0.00031932978217045956
+       },
+       "suburb": {
+        "value": 0.9165352128834731,
+        "se": 0.0004211624971463511
+       },
+       "other": {
+        "value": 0.027713209886998182,
+        "se": 0.00020590018560227855
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.026575604001046277,
+        "se": 0.00048759083535790013
+       },
+       "suburb": {
+        "value": 0.07711118088291341,
+        "se": 0.0007848707397426952
+       },
+       "other": {
+        "value": 0.8963132151160403,
+        "se": 0.0009159706908723002
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.09589130399846164,
+      "se": 0.0005863702743183447
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.12037733528021331,
+      "se": 0.0003817388341505141
+     },
+     "share_cross_city_suburb": {
+      "value": 0.11314012270586345,
+      "se": 0.0003336008393477535
+     },
+     "share_cross_class": {
+      "value": 0.13163525921653152,
+      "se": 0.00038026157222085594
+     },
+     "gap_res": {
+      "value": 0.600200744691984,
+      "se": 0.00138174104128144
+     },
+     "gap_work": {
+      "value": 0.41381003266533467,
+      "se": 0.0018490398528656841
+     },
+     "net_commute_gap": {
+      "value": 0.18639071202664936,
+      "se": 0.001419538604755502
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8699701474796471,
+       "se": 0.0002530776334931034
+      },
+      "city_share_jobs": {
+       "value": 0.3998765370101368,
+       "se": 0.00043905917590736945
+      },
+      "city_share_residents": {
+       "value": 0.35555937875130256,
+       "se": 0.00032394643398632656
+      },
+      "net_inflow_to_city": {
+       "value": 0.04431715825883424,
+       "se": 0.00032037315794024394
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.3542977678953378,
+       "se": 0.00031609091432428874
+      },
+      "city_share_jobs": {
+       "value": 0.3979988996221141,
+       "se": 0.000443014118454639
+      }
+     },
+     "n_sample": 1365545,
+     "workers_millions": {
+      "value": 144.501702,
+      "se": 0.11033868783840055
+     },
+     "n_cells": {
+      "city->city": 350873,
+      "city->suburb": 37343,
+      "city->other": 3712,
+      "suburb->city": 90815,
+      "suburb->suburb": 655677,
+      "suburb->other": 13568,
+      "other->city": 12679,
+      "other->suburb": 27627,
+      "other->other": 173251
+     },
+     "share_of_all_workers": {
+      "value": 0.9471830285888131,
+      "se": 0.00022732415976467783
+     }
+    },
+    "metro_puma": {
+     "res": {
+      "city": {
+       "value": 0.35609437522416365,
+       "se": 0.0002935031437087545
+      },
+      "suburb": {
+       "value": 0.6404834160382702,
+       "se": 0.0002920440319882298
+      },
+      "other": {
+       "value": 0.003422208737566197,
+       "se": 4.6288687233764465e-05
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3945863173672465,
+       "se": 0.00041699353050818447
+      },
+      "suburb": {
+       "value": 0.5912861664850408,
+       "se": 0.00042279847379637995
+      },
+      "other": {
+       "value": 0.01412751614771262,
+       "se": 0.00012017520102144009
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.32061750292254576,
+       "se": 0.00036438258410046316
+      },
+      "city->suburb": {
+       "value": 0.032372518664810716,
+       "se": 0.00019626178928864414
+      },
+      "city->other": {
+       "value": 0.0031043536368071402,
+       "se": 5.81737230690837e-05
+      },
+      "suburb->city": {
+       "value": 0.07365014365928052,
+       "se": 0.00024045882111584354
+      },
+      "suburb->suburb": {
+       "value": 0.5582622225931301,
+       "se": 0.0003775095022834887
+      },
+      "suburb->other": {
+       "value": 0.008571049785859578,
+       "se": 9.514950137109814e-05
+      },
+      "other->city": {
+       "value": 0.0003186707854202159,
+       "se": 1.916829565988531e-05
+      },
+      "other->suburb": {
+       "value": 0.0006514252271000797,
+       "se": 2.2670057504455107e-05
+      },
+      "other->other": {
+       "value": 0.002452112725045901,
+       "se": 4.224797211318678e-05
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9003722755258772,
+        "se": 0.0005792736759126551
+       },
+       "suburb": {
+        "value": 0.09090994106388794,
+        "se": 0.0005588721665551961
+       },
+       "other": {
+        "value": 0.0087177834102348,
+        "se": 0.00016383235468563046
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11499149207460474,
+        "se": 0.00037533177921213694
+       },
+       "suburb": {
+        "value": 0.8716263506809875,
+        "se": 0.00042604012673936676
+       },
+       "other": {
+        "value": 0.013382157244407777,
+        "se": 0.00014779708288592327
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.09311845356541515,
+        "se": 0.005426385943135382
+       },
+       "suburb": {
+        "value": 0.19035227744855787,
+        "se": 0.0062217922801145525
+       },
+       "other": {
+        "value": 0.716529268986027,
+        "se": 0.007363121282799612
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8125408530680069,
+        "se": 0.0005473815707541631
+       },
+       "suburb": {
+        "value": 0.1866515396445777,
+        "se": 0.0005393833144984267
+       },
+       "other": {
+        "value": 0.0008076072874154554,
+        "se": 4.8530264788619516e-05
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05474932528398619,
+        "se": 0.00031596803038614317
+       },
+       "suburb": {
+        "value": 0.9441489658244081,
+        "se": 0.0003287663826172403
+       },
+       "other": {
+        "value": 0.0011017088916058049,
+        "se": 3.826488229835215e-05
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.2197381057185884,
+        "se": 0.0036137722446451578
+       },
+       "suburb": {
+        "value": 0.6066919121693811,
+        "se": 0.003735938913702914
+       },
+       "other": {
+        "value": 0.17356998211203048,
+        "se": 0.002894705749047907
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.09090994106388794,
+      "se": 0.0005588721665551961
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11499149207460474,
+      "se": 0.00037533177921213694
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10764788839291552,
+      "se": 0.00032484060783613994
+     },
+     "share_cross_class": {
+      "value": 0.1186681617592783,
+      "se": 0.0003665739694982006
+     },
+     "gap_res": {
+      "value": 0.5870274341258734,
+      "se": 0.0012765758966779865
+     },
+     "gap_work": {
+      "value": 0.40446218916895527,
+      "se": 0.0017543466638561974
+     },
+     "net_commute_gap": {
+      "value": 0.18256524495691817,
+      "se": 0.0013085429805464593
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9849023878397671,
+       "se": 0.0001221660297452892
+      },
+      "city_share_jobs": {
+       "value": 0.4003113927326261,
+       "se": 0.0004202168555424922
+      },
+      "city_share_residents": {
+       "value": 0.3584010212033155,
+       "se": 0.0002974453178822695
+      },
+      "net_inflow_to_city": {
+       "value": 0.041910371529310604,
+       "se": 0.0003086735260026381
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.35731718923123335,
+       "se": 0.00029314372680352437
+      },
+      "city_share_jobs": {
+       "value": 0.4002407246679654,
+       "se": 0.00042113065480554965
+      }
+     },
+     "n_sample": 1207838,
+     "workers_millions": {
+      "value": 133.630072,
+      "se": 0.08710486968275655
+     },
+     "n_cells": {
+      "city->city": 373643,
+      "city->suburb": 37343,
+      "city->other": 3712,
+      "suburb->city": 90170,
+      "suburb->suburb": 685837,
+      "suburb->other": 12659,
+      "other->city": 384,
+      "other->suburb": 823,
+      "other->other": 3267
+     },
+     "share_of_all_workers": {
+      "value": 0.8759214220708705,
+      "se": 0.0002325457875562193
+     }
+    },
+    "metro_pow": {
+     "res": {
+      "city": {
+       "value": 0.35362725024759706,
+       "se": 0.00029094626107258064
+      },
+      "suburb": {
+       "value": 0.646372749752403,
+       "se": 0.0002909462610725675
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.39194681478495774,
+       "se": 0.00041580304071115885
+      },
+      "suburb": {
+       "value": 0.5960252227742232,
+       "se": 0.0004244209236413712
+      },
+      "other": {
+       "value": 0.012027962440818982,
+       "se": 0.00011433003594826322
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.3183961719933878,
+       "se": 0.00036343425448116264
+      },
+      "city->suburb": {
+       "value": 0.03214823247859381,
+       "se": 0.00019454856054867812
+      },
+      "city->other": {
+       "value": 0.003082845775615453,
+       "se": 5.776661546178951e-05
+      },
+      "suburb->city": {
+       "value": 0.07355064279156996,
+       "se": 0.0002384111524844836
+      },
+      "suburb->suburb": {
+       "value": 0.5638769902956294,
+       "se": 0.00037956980317519043
+      },
+      "suburb->other": {
+       "value": 0.008945116665203529,
+       "se": 9.605153228261361e-05
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9003722755258773,
+        "se": 0.0005792736759126672
+       },
+       "suburb": {
+        "value": 0.09090994106388797,
+        "se": 0.000558872166555195
+       },
+       "other": {
+        "value": 0.008717783410234804,
+        "se": 0.0001638323546856306
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11378982610226682,
+        "se": 0.00036905896771545184
+       },
+       "suburb": {
+        "value": 0.8723712293125382,
+        "se": 0.0004201833353416522
+       },
+       "other": {
+        "value": 0.013838944585194858,
+        "se": 0.00014808264914466417
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8123453488659588,
+        "se": 0.0005388235488002444
+       },
+       "suburb": {
+        "value": 0.18765465113404134,
+        "se": 0.0005388235488001975
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05393770473161954,
+        "se": 0.0003111174781007086
+       },
+       "suburb": {
+        "value": 0.9460622952683805,
+        "se": 0.0003111174781007271
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.25630656819755937,
+        "se": 0.004025885698682225
+       },
+       "suburb": {
+        "value": 0.7436934318024405,
+        "se": 0.004025885698682279
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.09090994106388797,
+      "se": 0.000558872166555195
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11378982610226682,
+      "se": 0.00036905896771545184
+     },
+     "share_cross_city_suburb": {
+      "value": 0.106985695193658,
+      "se": 0.00032063571415216676
+     },
+     "share_cross_class": {
+      "value": 0.11772683771098269,
+      "se": 0.00035433362506193713
+     },
+     "gap_res": {
+      "value": 0.6031329564018348,
+      "se": 0.0012729226688995834
+     },
+     "gap_work": {
+      "value": 0.4191568322442797,
+      "se": 0.001757218655780022
+     },
+     "net_commute_gap": {
+      "value": 0.18397612415755515,
+      "se": 0.0012907408569992312
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.987972037559181,
+       "se": 0.00011433003594824594
+      },
+      "city_share_jobs": {
+       "value": 0.3967185303677985,
+       "se": 0.0004205621660971827
+      },
+      "city_share_residents": {
+       "value": 0.3548120707322989,
+       "se": 0.0002967351471454795
+      },
+      "net_inflow_to_city": {
+       "value": 0.04190645963549964,
+       "se": 0.00030540230406722363
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.35362725024759706,
+       "se": 0.000290946261072582
+      },
+      "city_share_jobs": {
+       "value": 0.3967185303677985,
+       "se": 0.0004205621660971929
+      }
+     },
+     "n_sample": 1221375,
+     "workers_millions": {
+      "value": 134.562359,
+      "se": 0.08553546096707493
+     },
+     "n_cells": {
+      "city->city": 373643,
+      "city->suburb": 37343,
+      "city->other": 3712,
+      "suburb->city": 90815,
+      "suburb->suburb": 702294,
+      "suburb->other": 13568,
+      "other->city": 0,
+      "other->suburb": 0,
+      "other->other": 0
+     },
+     "share_of_group": {
+      "value": 0.882032398010614,
+      "se": 0.00021005181505325733
+     }
+    }
+   }
+  },
+  "nonteacher": {
+   "label": "non-teacher workers",
+   "definition": "all of the above except OCCP 2310-2330 (elementary/middle, secondary and special-education teachers; OCCP 2300 preschool/kindergarten teachers stay in)",
+   "universes": {
+    "all": {
+     "res": {
+      "city": {
+       "value": 0.3127866535608752,
+       "se": 0.0002845000060555138
+      },
+      "suburb": {
+       "value": 0.5695136365877758,
+       "se": 0.00028956947820203384
+      },
+      "other": {
+       "value": 0.11769970985134923,
+       "se": 0.00022105434079157493
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3538438654915346,
+       "se": 0.0004018188052175307
+      },
+      "suburb": {
+       "value": 0.5389449017685823,
+       "se": 0.00040868983747152643
+      },
+      "other": {
+       "value": 0.10721123273988316,
+       "se": 0.00023441680461582453
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.2815950770748228,
+       "se": 0.00035051127695466837
+      },
+      "city->suburb": {
+       "value": 0.028485642645514626,
+       "se": 0.0001772694019463294
+      },
+      "city->other": {
+       "value": 0.0027059338405377845,
+       "se": 5.277289799344439e-05
+      },
+      "suburb->city": {
+       "value": 0.06539287953736012,
+       "se": 0.0002104833543982409
+      },
+      "suburb->suburb": {
+       "value": 0.49626168259044223,
+       "se": 0.0003756186042392709
+      },
+      "suburb->other": {
+       "value": 0.007859074459973334,
+       "se": 8.54021015520251e-05
+      },
+      "other->city": {
+       "value": 0.006855908879351745,
+       "se": 7.574633833393893e-05
+      },
+      "other->suburb": {
+       "value": 0.014197576532625444,
+       "se": 0.00010895123314386334
+      },
+      "other->other": {
+       "value": 0.09664622443937204,
+       "se": 0.00021387374370419483
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9002784289836016,
+        "se": 0.0005973040469134352
+       },
+       "suburb": {
+        "value": 0.0910705182629242,
+        "se": 0.0005781125081772897
+       },
+       "other": {
+        "value": 0.008651052753474182,
+        "se": 0.00016946982987720211
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11482232441203627,
+        "se": 0.00037299759146551027
+       },
+       "suburb": {
+        "value": 0.8713780508642068,
+        "se": 0.0004316083428639349
+       },
+       "other": {
+        "value": 0.013799624723756832,
+        "se": 0.00015019918092621255
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.058249157011606295,
+        "se": 0.000630962311412045
+       },
+       "suburb": {
+        "value": 0.12062541658391941,
+        "se": 0.000891560259950202
+       },
+       "other": {
+        "value": 0.8211254264044743,
+        "se": 0.0010222586296830755
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.7958173209634453,
+        "se": 0.0005827985319773332
+       },
+       "suburb": {
+        "value": 0.18480715907430242,
+        "se": 0.0005302285822773669
+       },
+       "other": {
+        "value": 0.019375519962252296,
+        "se": 0.0002099547384726763
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05285446165653884,
+        "se": 0.00031359419690624635
+       },
+       "suburb": {
+        "value": 0.920802258193607,
+        "se": 0.00041376951982635294
+       },
+       "other": {
+        "value": 0.02634328014985425,
+        "se": 0.00019907747516244924
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.02523927550672741,
+        "se": 0.0004828500465123659
+       },
+       "suburb": {
+        "value": 0.07330458067804416,
+        "se": 0.0007528112829739699
+       },
+       "other": {
+        "value": 0.9014561438152284,
+        "se": 0.0009045244488567543
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.0910705182629242,
+      "se": 0.0005781125081772897
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11482232441203627,
+      "se": 0.00037299759146551027
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10769154826892598,
+      "se": 0.00033093943867108875
+     },
+     "share_cross_class": {
+      "value": 0.125497015895363,
+      "se": 0.00037575343121069095
+     },
+     "gap_res": {
+      "value": 0.5992613873264091,
+      "se": 0.001317890289993912
+     },
+     "gap_work": {
+      "value": 0.4207575847144124,
+      "se": 0.0018163307589723397
+     },
+     "net_commute_gap": {
+      "value": 0.17850380261199672,
+      "se": 0.0013836632546018284
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8717352818481398,
+       "se": 0.0002549230010876413
+      },
+      "city_share_jobs": {
+       "value": 0.3980428047796163,
+       "se": 0.00042994104618216707
+      },
+      "city_share_residents": {
+       "value": 0.3557051391369001,
+       "se": 0.00030989390023217586
+      },
+      "net_inflow_to_city": {
+       "value": 0.042337665642716175,
+       "se": 0.0003086982105494098
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.35451269488778764,
+       "se": 0.0003015678894382734
+      },
+      "city_share_jobs": {
+       "value": 0.39633548098667,
+       "se": 0.00043456754764330366
+      }
+     },
+     "n_sample": 1396928,
+     "workers_millions": {
+      "value": 147.939685,
+      "se": 0.09856124871012949
+     },
+     "n_cells": {
+      "city->city": 362170,
+      "city->suburb": 36231,
+      "city->other": 3566,
+      "suburb->city": 88648,
+      "suburb->suburb": 677020,
+      "suburb->other": 13079,
+      "other->city": 12462,
+      "other->suburb": 26944,
+      "other->other": 176808
+     },
+     "share_of_all_workers": {
+      "value": 0.969718397412198,
+      "se": 0.0001897558126273532
+     }
+    },
+    "away": {
+     "res": {
+      "city": {
+       "value": 0.3131164436900244,
+       "se": 0.0003155773777096361
+      },
+      "suburb": {
+       "value": 0.5683040340030919,
+       "se": 0.0003167056726645123
+      },
+      "other": {
+       "value": 0.1185795223068838,
+       "se": 0.00023084926878050004
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.35651566710714255,
+       "se": 0.00042199050091396104
+      },
+      "suburb": {
+       "value": 0.5359915780516898,
+       "se": 0.0004200750703088399
+      },
+      "other": {
+       "value": 0.1074927548411677,
+       "se": 0.00023731705969943433
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.2801456175429267,
+       "se": 0.0003744898219687988
+      },
+      "city->suburb": {
+       "value": 0.03011053871462971,
+       "se": 0.0001873182822020937
+      },
+      "city->other": {
+       "value": 0.0028602874324679863,
+       "se": 5.56542527470947e-05
+      },
+      "suburb->city": {
+       "value": 0.0691230615883908,
+       "se": 0.00021889293763609975
+      },
+      "suburb->suburb": {
+       "value": 0.49087359565185157,
+       "se": 0.0003939840861397381
+      },
+      "suburb->other": {
+       "value": 0.00830737676284956,
+       "se": 9.012376257108597e-05
+      },
+      "other->city": {
+       "value": 0.007246987975825068,
+       "se": 8.0000684040653e-05
+      },
+      "other->suburb": {
+       "value": 0.015007443685208578,
+       "se": 0.00011427732338368118
+      },
+      "other->other": {
+       "value": 0.09632509064585015,
+       "se": 0.00021676236533448378
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.89470107108224,
+        "se": 0.0006261530913128267
+       },
+       "suburb": {
+        "value": 0.09616402881874263,
+        "se": 0.000607834361578344
+       },
+       "other": {
+        "value": 0.00913490009901742,
+        "se": 0.00017839697651699912
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.1216304257097966,
+        "se": 0.00038536298363703943
+       },
+       "suburb": {
+        "value": 0.8637517354824564,
+        "se": 0.0004479855427065496
+       },
+       "other": {
+        "value": 0.014617838807746985,
+        "se": 0.00015916970681678337
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.06111500396392105,
+        "se": 0.000659718084595879
+       },
+       "suburb": {
+        "value": 0.12656016311458326,
+        "se": 0.0009164082570319041
+       },
+       "other": {
+        "value": 0.8123248329214956,
+        "se": 0.0010436419657003186
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.7857876760819473,
+        "se": 0.000606754101305738
+       },
+       "suburb": {
+        "value": 0.19388506022546675,
+        "se": 0.0005496169050822881
+       },
+       "other": {
+        "value": 0.020327263692585924,
+        "se": 0.0002207822612258744
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05617726088921106,
+        "se": 0.00033414812731118984
+       },
+       "suburb": {
+        "value": 0.9158233370683911,
+        "se": 0.0004385552096810421
+       },
+       "other": {
+        "value": 0.02799940204239794,
+        "se": 0.0002100736307730438
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.026609118323317454,
+        "se": 0.0005075814442487048
+       },
+       "suburb": {
+        "value": 0.07728313201317258,
+        "se": 0.0007926572838407144
+       },
+       "other": {
+        "value": 0.8961077496635099,
+        "se": 0.000949454713431074
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.09616402881874263,
+      "se": 0.000607834361578344
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.1216304257097966,
+      "se": 0.00038536298363703943
+     },
+     "share_cross_city_suburb": {
+      "value": 0.11402847398352192,
+      "se": 0.00034527036101132484
+     },
+     "share_cross_class": {
+      "value": 0.13265569615937156,
+      "se": 0.0003892959842353844
+     },
+     "gap_res": {
+      "value": 0.5960814007219238,
+      "se": 0.0014664695662070556
+     },
+     "gap_work": {
+      "value": 0.40774026246391026,
+      "se": 0.0018910681796786516
+     },
+     "net_commute_gap": {
+      "value": 0.18834113825801357,
+      "se": 0.0014571249271204995
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8702528134977988,
+       "se": 0.00026457038713509503
+      },
+      "city_share_jobs": {
+       "value": 0.40134162592075423,
+       "se": 0.0004510394865165988
+      },
+      "city_share_residents": {
+       "value": 0.356512672461864,
+       "se": 0.00034576422110389336
+      },
+      "net_inflow_to_city": {
+       "value": 0.0448289534588902,
+       "se": 0.00032428913336646627
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.3552407183794089,
+       "se": 0.00033587536454620905
+      },
+      "city_share_jobs": {
+       "value": 0.39945408739365057,
+       "se": 0.00045364819381402653
+      }
+     },
+     "n_sample": 1317763,
+     "workers_millions": {
+      "value": 139.956214,
+      "se": 0.10238786431945927
+     },
+     "n_cells": {
+      "city->city": 339619,
+      "city->suburb": 36231,
+      "city->other": 3566,
+      "suburb->city": 88648,
+      "suburb->suburb": 630888,
+      "suburb->other": 13079,
+      "other->city": 12462,
+      "other->suburb": 26944,
+      "other->other": 166326
+     },
+     "share_of_all_workers": {
+      "value": 0.9173881609113783,
+      "se": 0.00025865830404400876
+     }
+    },
+    "metro_puma": {
+     "res": {
+      "city": {
+       "value": 0.35696518504826036,
+       "se": 0.0003042164369365605
+      },
+      "suburb": {
+       "value": 0.6396248214944923,
+       "se": 0.00030355507503167554
+      },
+      "other": {
+       "value": 0.0034099934572473225,
+       "se": 4.614201705703836e-05
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.39590158343501597,
+       "se": 0.00042384045824083274
+      },
+      "suburb": {
+       "value": 0.5900443347980561,
+       "se": 0.00043532309017120963
+      },
+      "other": {
+       "value": 0.014054081766928008,
+       "se": 0.00012629065319323202
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.32136805599708845,
+       "se": 0.00037435108463950177
+      },
+      "city->suburb": {
+       "value": 0.03250900440416571,
+       "se": 0.00020423933537029089
+      },
+      "city->other": {
+       "value": 0.0030881246470061733,
+       "se": 6.0272796722951876e-05
+      },
+      "suburb->city": {
+       "value": 0.07420898178756667,
+       "se": 0.00024316253783014224
+      },
+      "suburb->suburb": {
+       "value": 0.5568841408207982,
+       "se": 0.0003933708229415914
+      },
+      "suburb->other": {
+       "value": 0.008531698886127483,
+       "se": 9.601474869950679e-05
+      },
+      "other->city": {
+       "value": 0.00032454565036083266,
+       "se": 1.950512218090104e-05
+      },
+      "other->suburb": {
+       "value": 0.0006511895730921377,
+       "se": 2.3087024047282724e-05
+      },
+      "other->other": {
+       "value": 0.0024342582337943523,
+       "se": 4.2639611516503474e-05
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9002784289836016,
+        "se": 0.000597304046913391
+       },
+       "suburb": {
+        "value": 0.0910705182629242,
+        "se": 0.0005781125081772896
+       },
+       "other": {
+        "value": 0.008651052753474182,
+        "se": 0.00016946982987720247
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11601954660573734,
+        "se": 0.0003794908028123373
+       },
+       "suburb": {
+        "value": 0.8706418545791119,
+        "se": 0.0004382101188813729
+       },
+       "other": {
+        "value": 0.01333859881515081,
+        "se": 0.00014980898670545256
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.09517486013677526,
+        "se": 0.005536969504228743
+       },
+       "suburb": {
+        "value": 0.19096505059508323,
+        "se": 0.006453360692249826
+       },
+       "other": {
+        "value": 0.7138600892681416,
+        "se": 0.007446028760106298
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8117372333011605,
+        "se": 0.000554521474558567
+       },
+       "suburb": {
+        "value": 0.18744300324261642,
+        "se": 0.0005463195177365804
+       },
+       "other": {
+        "value": 0.0008197634562229635,
+        "se": 4.9236123470723284e-05
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05509586735595383,
+        "se": 0.0003303992620390123
+       },
+       "suburb": {
+        "value": 0.9438005044339473,
+        "se": 0.00034495365958154515
+       },
+       "other": {
+        "value": 0.0011036282100988374,
+        "se": 3.9044039388911635e-05
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.21973151275333633,
+        "se": 0.0036777381898448393
+       },
+       "suburb": {
+        "value": 0.6070619929225282,
+        "se": 0.0037117604015171435
+       },
+       "other": {
+        "value": 0.17320649432413548,
+        "se": 0.0028916310497417936
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.0910705182629242,
+      "se": 0.0005781125081772896
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11601954660573734,
+      "se": 0.0003794908028123373
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10834641294993413,
+      "se": 0.0003352322881051085
+     },
+     "share_cross_class": {
+      "value": 0.11931354494831892,
+      "se": 0.0003775654002423666
+     },
+     "gap_res": {
+      "value": 0.5832435318958894,
+      "se": 0.0013233311459903405
+     },
+     "gap_work": {
+      "value": 0.39903202411478056,
+      "se": 0.0017895269545403082
+     },
+     "net_commute_gap": {
+      "value": 0.18421150778110884,
+      "se": 0.001336918374472428
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.984970183009619,
+       "se": 0.00012920292121393814
+      },
+      "city_share_jobs": {
+       "value": 0.4016132108445683,
+       "se": 0.00042920276837523914
+      },
+      "city_share_residents": {
+       "value": 0.35927692686083906,
+       "se": 0.00031152918296419057
+      },
+      "net_inflow_to_city": {
+       "value": 0.04233628398372921,
+       "se": 0.0003126182957284547
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.3581865990073491,
+       "se": 0.00030420985005609946
+      },
+      "city_share_jobs": {
+       "value": 0.40154492869600483,
+       "se": 0.0004300434857778623
+      }
+     },
+     "n_sample": 1167750,
+     "workers_millions": {
+      "value": 129.630454,
+      "se": 0.08580552774792542
+     },
+     "n_cells": {
+      "city->city": 362170,
+      "city->suburb": 36231,
+      "city->other": 3566,
+      "suburb->city": 88015,
+      "suburb->suburb": 661262,
+      "suburb->other": 12194,
+      "other->city": 380,
+      "other->suburb": 798,
+      "other->other": 3134
+     },
+     "share_of_all_workers": {
+      "value": 0.8497046354309572,
+      "se": 0.00030345311444400323
+     }
+    },
+    "metro_pow": {
+     "res": {
+      "city": {
+       "value": 0.35451269488778764,
+       "se": 0.00030156788943826597
+      },
+      "suburb": {
+       "value": 0.6454873051122124,
+       "se": 0.00030156788943825366
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.39327648475976584,
+       "se": 0.00042320881673110674
+      },
+      "suburb": {
+       "value": 0.5947491246404859,
+       "se": 0.000436934810980534
+      },
+      "other": {
+       "value": 0.011974390599748204,
+       "se": 0.00011846165752886629
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.3191601320083204,
+       "se": 0.0003735149097650941
+      },
+      "city->suburb": {
+       "value": 0.032285654854216736,
+       "se": 0.0002024386195166713
+      },
+      "city->other": {
+       "value": 0.0030669080252505483,
+       "se": 5.985910585089439e-05
+      },
+      "suburb->city": {
+       "value": 0.07411635275144549,
+       "se": 0.00024067518437245004
+      },
+      "suburb->suburb": {
+       "value": 0.5624634697862693,
+       "se": 0.00039463150462217423
+      },
+      "suburb->other": {
+       "value": 0.008907482574497656,
+       "se": 9.706767407320829e-05
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9002784289836016,
+        "se": 0.0005973040469134352
+       },
+       "suburb": {
+        "value": 0.0910705182629242,
+        "se": 0.0005781125081772897
+       },
+       "other": {
+        "value": 0.008651052753474182,
+        "se": 0.00016946982987720211
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.11482232441203627,
+        "se": 0.00037299759146551027
+       },
+       "suburb": {
+        "value": 0.8713780508642068,
+        "se": 0.0004316083428639349
+       },
+       "other": {
+        "value": 0.013799624723756832,
+        "se": 0.00015019918092621255
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8115413567207821,
+        "se": 0.0005448094061938052
+       },
+       "suburb": {
+        "value": 0.18845864327921788,
+        "se": 0.0005448094061938398
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.05428449327055803,
+        "se": 0.00032521445990771065
+       },
+       "suburb": {
+        "value": 0.9457155067294419,
+        "se": 0.0003252144599077007
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.2561222635676373,
+        "se": 0.0040862887659920315
+       },
+       "suburb": {
+        "value": 0.7438777364323627,
+        "se": 0.004086288765992034
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.0910705182629242,
+      "se": 0.0005781125081772897
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11482232441203627,
+      "se": 0.00037299759146551027
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10769154826892598,
+      "se": 0.00033093943867108875
+     },
+     "share_cross_class": {
+      "value": 0.11837639820541046,
+      "se": 0.00036458054723593445
+     },
+     "gap_res": {
+      "value": 0.5992613873264091,
+      "se": 0.001317890289993912
+     },
+     "gap_work": {
+      "value": 0.4136267892968025,
+      "se": 0.0017943410269949198
+     },
+     "net_commute_gap": {
+      "value": 0.18563459802960658,
+      "se": 0.0013141141461747489
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9880256094002519,
+       "se": 0.00011846165752890653
+      },
+      "city_share_jobs": {
+       "value": 0.3980428047796163,
+       "se": 0.00042994104618216707
+      },
+      "city_share_residents": {
+       "value": 0.3557051391369001,
+       "se": 0.00030989390023217586
+      },
+      "net_inflow_to_city": {
+       "value": 0.042337665642716175,
+       "se": 0.0003086982105494098
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.35451269488778764,
+       "se": 0.0003015678894382734
+      },
+      "city_share_jobs": {
+       "value": 0.3980428047796163,
+       "se": 0.00042994104618216165
+      }
+     },
+     "n_sample": 1180714,
+     "workers_millions": {
+      "value": 130.527227,
+      "se": 0.08399453285750211
+     },
+     "n_cells": {
+      "city->city": 362170,
+      "city->suburb": 36231,
+      "city->other": 3566,
+      "suburb->city": 88648,
+      "suburb->suburb": 677020,
+      "suburb->other": 13079,
+      "other->city": 0,
+      "other->suburb": 0,
+      "other->other": 0
+     },
+     "share_of_group": {
+      "value": 0.8823002901486507,
+      "se": 0.0002210543407915616
+     }
+    }
+   }
+  },
+  "k12": {
+   "label": "K-12 teachers (reference)",
+   "definition": "OCCP 2310-2330 (`k12` of teacher_residence.py), recomputed here as a check on the code",
+   "universes": {
+    "all": {
+     "res": {
+      "city": {
+       "value": 0.28385945195231604,
+       "se": 0.002606021641562412
+      },
+      "suburb": {
+       "value": 0.5895941420130639,
+       "se": 0.002901172343300794
+      },
+      "other": {
+       "value": 0.12654640603462014,
+       "se": 0.001708852200986064
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3080906647641082,
+       "se": 0.002793278830013193
+      },
+      "suburb": {
+       "value": 0.5674723534464248,
+       "se": 0.0029535016228569937
+      },
+      "other": {
+       "value": 0.12443698178946715,
+       "se": 0.0018128686964759093
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.25651919240546667,
+       "se": 0.002666646707482678
+      },
+      "city->suburb": {
+       "value": 0.024197228244681963,
+       "se": 0.0008735101472086808
+      },
+      "city->other": {
+       "value": 0.0031430313021673937,
+       "se": 0.0002994702986014093
+      },
+      "suburb->city": {
+       "value": 0.04825938406976665,
+       "se": 0.0011279726034127862
+      },
+      "suburb->suburb": {
+       "value": 0.5324582920612052,
+       "se": 0.002780491981016429
+      },
+      "suburb->other": {
+       "value": 0.00887646588209217,
+       "se": 0.0005279615429448854
+      },
+      "other->city": {
+       "value": 0.0033120882888748823,
+       "se": 0.00027892122937947316
+      },
+      "other->suburb": {
+       "value": 0.01081683314053766,
+       "se": 0.00044579624587006296
+      },
+      "other->other": {
+       "value": 0.11241748460520759,
+       "se": 0.001746670690859977
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9036838147935193,
+        "se": 0.003191292051299313
+       },
+       "suburb": {
+        "value": 0.08524369394170013,
+        "se": 0.003112052972755666
+       },
+       "other": {
+        "value": 0.011072491264780479,
+        "se": 0.0010547433708826784
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.08185187170448065,
+        "se": 0.0018624046297509402
+       },
+       "suburb": {
+        "value": 0.9030929144635349,
+        "se": 0.0017917455178991508
+       },
+       "other": {
+        "value": 0.015055213831984595,
+        "se": 0.00088868703554483
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.026172914685295545,
+        "se": 0.0021477485962308764
+       },
+       "suburb": {
+        "value": 0.08547720539434701,
+        "se": 0.0037827743307332884
+       },
+       "other": {
+        "value": 0.8883498799203574,
+        "se": 0.003928880045694797
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8326094287922434,
+        "se": 0.0035459300151692527
+       },
+       "suburb": {
+        "value": 0.15664020234665918,
+        "se": 0.003517702824891226
+       },
+       "other": {
+        "value": 0.01075036886109745,
+        "se": 0.0009027433823959063
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.042640364940644514,
+        "se": 0.0014876334982707724
+       },
+       "suburb": {
+        "value": 0.9382982075292849,
+        "se": 0.0016152446228297728
+       },
+       "other": {
+        "value": 0.019061427530070642,
+        "se": 0.000777988704460085
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.025258016202008467,
+        "se": 0.0023422687406933532
+       },
+       "suburb": {
+        "value": 0.07133302137711854,
+        "se": 0.004178162755803412
+       },
+       "other": {
+        "value": 0.903408962420873,
+        "se": 0.004583205587412635
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08524369394170013,
+      "se": 0.003112052972755666
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08185187170448065,
+      "se": 0.0018624046297509402
+     },
+     "share_cross_city_suburb": {
+      "value": 0.0841116140923534,
+      "se": 0.001547358997734713
+     },
+     "share_cross_class": {
+      "value": 0.09860503092812056,
+      "se": 0.0013700695653224538
+     },
+     "gap_res": {
+      "value": 0.7309551771262714,
+      "se": 0.013492874135933742
+     },
+     "gap_work": {
+      "value": 0.6107979260013067,
+      "se": 0.01360737011558066
+     },
+     "net_commute_gap": {
+      "value": 0.12015725112496478,
+      "se": 0.0075932133614000094
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8614340967811205,
+       "se": 0.0017732559416619937
+      },
+      "city_share_jobs": {
+       "value": 0.35380370664927807,
+       "se": 0.0031408764183986164
+      },
+      "city_share_residents": {
+       "value": 0.3258710349393973,
+       "se": 0.0029811900060402736
+      },
+      "net_inflow_to_city": {
+       "value": 0.02793267170988076,
+       "se": 0.0017166173827970858
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.32498515538029493,
+       "se": 0.0029603789880784655
+      },
+      "city_share_jobs": {
+       "value": 0.35187720170477377,
+       "se": 0.0031036057398657994
+      }
+     },
+     "n_sample": 48604,
+     "workers_millions": {
+      "value": 4.619744,
+      "se": 0.0299456369059
+     },
+     "n_cells": {
+      "city->city": 11473,
+      "city->suburb": 1112,
+      "city->other": 146,
+      "suburb->city": 2167,
+      "suburb->suburb": 25274,
+      "suburb->other": 489,
+      "other->city": 217,
+      "other->suburb": 683,
+      "other->other": 7043
+     },
+     "share_of_all_workers": {
+      "value": 0.03028160258780203,
+      "se": 0.00018975581262731893
+     }
+    },
+    "away": {
+     "res": {
+      "city": {
+       "value": 0.2838821706272242,
+       "se": 0.002603727566335316
+      },
+      "suburb": {
+       "value": 0.589600500540316,
+       "se": 0.002889305452681705
+      },
+      "other": {
+       "value": 0.1265173288324598,
+       "se": 0.0017285924676038364
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3085092293720718,
+       "se": 0.002801265038073969
+      },
+      "suburb": {
+       "value": 0.5671173260164805,
+       "se": 0.002960495088719944
+      },
+      "other": {
+       "value": 0.12437344461144766,
+       "se": 0.001835747498645989
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.256095275138775,
+       "se": 0.0026777468758863877
+      },
+      "city->suburb": {
+       "value": 0.02459251899906017,
+       "se": 0.0008875233935434452
+      },
+      "city->other": {
+       "value": 0.003194376489389038,
+       "se": 0.0003043706389819215
+      },
+      "suburb->city": {
+       "value": 0.049047759008493695,
+       "se": 0.0011429053271463708
+      },
+      "suburb->suburb": {
+       "value": 0.531531267929868,
+       "se": 0.002778530879514716
+      },
+      "suburb->other": {
+       "value": 0.009021473601954289,
+       "se": 0.0005352020277072369
+      },
+      "other->city": {
+       "value": 0.0033661952248031455,
+       "se": 0.000283390335547925
+      },
+      "other->suburb": {
+       "value": 0.010993539087552316,
+       "se": 0.0004508142692488799
+      },
+      "other->other": {
+       "value": 0.11215759452010433,
+       "se": 0.0017760185640702908
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9021182083148956,
+        "se": 0.003251807114764317
+       },
+       "suburb": {
+        "value": 0.08662931858215739,
+        "se": 0.0031657776694805494
+       },
+       "other": {
+        "value": 0.011252473102946954,
+        "se": 0.0010736011155075915
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.08318812308257172,
+        "se": 0.0018908728139988222
+       },
+       "suburb": {
+        "value": 0.9015108831196162,
+        "se": 0.001810841796019868
+       },
+       "other": {
+        "value": 0.015300993797812107,
+        "se": 0.0009007546627734372
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.026606594178579437,
+        "se": 0.0021811046372087156
+       },
+       "suburb": {
+        "value": 0.08689354406233535,
+        "se": 0.0038593128969826654
+       },
+       "other": {
+        "value": 0.8864998617590851,
+        "se": 0.004006979882296353
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8301057172909276,
+        "se": 0.003590504321870043
+       },
+       "suburb": {
+        "value": 0.15898311732301712,
+        "se": 0.0035588659138462648
+       },
+       "other": {
+        "value": 0.010911165386055301,
+        "se": 0.000917079195541728
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.04336407630463667,
+        "se": 0.0015123047218550186
+       },
+       "suburb": {
+        "value": 0.9372509770833941,
+        "se": 0.0016332730187716997
+       },
+       "other": {
+        "value": 0.019384946611969395,
+        "se": 0.0007857341273884233
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.0256837502520616,
+        "se": 0.002380396940540559
+       },
+       "suburb": {
+        "value": 0.07253536822219628,
+        "se": 0.004256187203195502
+       },
+       "other": {
+        "value": 0.9017808815257422,
+        "se": 0.004666233536176081
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08662931858215739,
+      "se": 0.0031657776694805494
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08318812308257172,
+      "se": 0.0018908728139988222
+     },
+     "share_cross_city_suburb": {
+      "value": 0.08550228129714386,
+      "se": 0.0015720262722609165
+     },
+     "share_cross_class": {
+      "value": 0.10021586241125258,
+      "se": 0.0013727927142872553
+     },
+     "gap_res": {
+      "value": 0.7308859299117617,
+      "se": 0.013446817878651976
+     },
+     "gap_work": {
+      "value": 0.6088144466879786,
+      "se": 0.013620679097192584
+     },
+     "net_commute_gap": {
+      "value": 0.12207148322378314,
+      "se": 0.007706645255974551
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8612668210761969,
+       "se": 0.0017852995525423085
+      },
+      "city_share_jobs": {
+       "value": 0.35429558724435345,
+       "se": 0.00314837939399744
+      },
+      "city_share_residents": {
+       "value": 0.32590108810542756,
+       "se": 0.0029769871577026725
+      },
+      "net_inflow_to_city": {
+       "value": 0.02839449913892591,
+       "se": 0.0017441008879355592
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.325000346312278,
+       "se": 0.002950364973637217
+      },
+      "city_share_jobs": {
+       "value": 0.352329686067108,
+       "se": 0.003108557922815927
+      }
+     },
+     "n_sample": 47782,
+     "workers_millions": {
+      "value": 4.545488,
+      "se": 0.029549412814809026
+     },
+     "n_cells": {
+      "city->city": 11254,
+      "city->suburb": 1112,
+      "city->other": 146,
+      "suburb->city": 2167,
+      "suburb->suburb": 24789,
+      "suburb->other": 489,
+      "other->city": 217,
+      "other->suburb": 683,
+      "other->other": 6925
+     },
+     "share_of_all_workers": {
+      "value": 0.02979486767743474,
+      "se": 0.00018742839276716404
+     }
+    },
+    "metro_puma": {
+     "res": {
+      "city": {
+       "value": 0.32787081166251375,
+       "se": 0.0029320175364259135
+      },
+      "suburb": {
+       "value": 0.6683110737075391,
+       "se": 0.0029875526041237156
+      },
+      "other": {
+       "value": 0.00381811462994716,
+       "se": 0.0003636776481187156
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.35195761195194136,
+       "se": 0.0031340702612937484
+      },
+      "suburb": {
+       "value": 0.6315348115745053,
+       "se": 0.003097344353575969
+      },
+      "other": {
+       "value": 0.016507576473553227,
+       "se": 0.0007517962549545243
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.29629154584262796,
+       "se": 0.003026794846673432
+      },
+      "city->suburb": {
+       "value": 0.02794891912177613,
+       "se": 0.0010030235047978975
+      },
+      "city->other": {
+       "value": 0.0036303466981096695,
+       "se": 0.0003467406699789318
+      },
+      "suburb->city": {
+       "value": 0.05553780386026866,
+       "se": 0.0012845311105934367
+      },
+      "suburb->suburb": {
+       "value": 0.6029268295122184,
+       "se": 0.0029328394796006006
+      },
+      "suburb->other": {
+       "value": 0.009846440335051998,
+       "se": 0.0006137843577200558
+      },
+      "other->city": {
+       "value": 0.00012826224904478376,
+       "se": 6.022568882052614e-05
+      },
+      "other->suburb": {
+       "value": 0.0006590629405108188,
+       "se": 0.00015060222044106317
+      },
+      "other->other": {
+       "value": 0.0030307894403915573,
+       "se": 0.00032779111498493343
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9036838147935194,
+        "se": 0.0031912920512993264
+       },
+       "suburb": {
+        "value": 0.08524369394170014,
+        "se": 0.0031120529727556674
+       },
+       "other": {
+        "value": 0.01107249126478048,
+        "se": 0.0010547433708826782
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.08310172619490766,
+        "se": 0.0018898064516132203
+       },
+       "suburb": {
+        "value": 0.9021649546631131,
+        "se": 0.0017987609050127583
+       },
+       "other": {
+        "value": 0.014733319141979262,
+        "se": 0.0009118365742660587
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.03359308493222447,
+        "se": 0.015176987745828832
+       },
+       "suburb": {
+        "value": 0.17261476000261936,
+        "se": 0.03694906330928883
+       },
+       "other": {
+        "value": 0.7937921550651561,
+        "se": 0.03975038578727811
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8418387208601857,
+        "se": 0.003534142467417773
+       },
+       "suburb": {
+        "value": 0.15779685386617567,
+        "se": 0.0035203146920256426
+       },
+       "other": {
+        "value": 0.00036442527363862655,
+        "se": 0.00017113527489360348
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.04425554792790525,
+        "se": 0.001531522419053861
+       },
+       "suburb": {
+        "value": 0.954700862821856,
+        "se": 0.001568803171328377
+       },
+       "other": {
+        "value": 0.001043589250238925,
+        "se": 0.00023818741223764224
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.2199200290803344,
+        "se": 0.018837650815766254
+       },
+       "suburb": {
+        "value": 0.5964800678541136,
+        "se": 0.02441513646189071
+       },
+       "other": {
+        "value": 0.18359990306555188,
+        "se": 0.018084795034717657
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08524369394170014,
+      "se": 0.0031120529727556674
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08310172619490766,
+      "se": 0.0018898064516132203
+     },
+     "share_cross_city_suburb": {
+      "value": 0.08495602915191539,
+      "se": 0.0015620044393619213
+     },
+     "share_cross_class": {
+      "value": 0.09775083520476202,
+      "se": 0.0014826268352181693
+     },
+     "gap_res": {
+      "value": 0.7121340804290087,
+      "se": 0.013389237866981162
+     },
+     "gap_work": {
+      "value": 0.5846423177322791,
+      "se": 0.013716543155797095
+     },
+     "net_commute_gap": {
+      "value": 0.12749176269672957,
+      "se": 0.007624092397077125
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9827050983368911,
+       "se": 0.0007735254877133262
+      },
+      "city_share_jobs": {
+       "value": 0.35802129275438277,
+       "se": 0.003149038224071183
+      },
+      "city_share_residents": {
+       "value": 0.32994686352308705,
+       "se": 0.002968857524436358
+      },
+      "net_inflow_to_city": {
+       "value": 0.028074429231295696,
+       "se": 0.0017281287352287197
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.3291274580251168,
+       "se": 0.0029568664137743592
+      },
+      "city_share_jobs": {
+       "value": 0.35786509741473066,
+       "se": 0.0031523349512991828
+      }
+     },
+     "n_sample": 40088,
+     "workers_millions": {
+      "value": 3.999618,
+      "se": 0.025602540681541743
+     },
+     "n_cells": {
+      "city->city": 11473,
+      "city->suburb": 1112,
+      "city->other": 146,
+      "suburb->city": 2155,
+      "suburb->suburb": 24575,
+      "suburb->other": 465,
+      "other->city": 4,
+      "other->suburb": 25,
+      "other->other": 133
+     },
+     "share_of_all_workers": {
+      "value": 0.026216786639913288,
+      "se": 0.0001641151597776254
+     }
+    },
+    "metro_pow": {
+     "res": {
+      "city": {
+       "value": 0.32498515538029493,
+       "se": 0.0029603789880784702
+      },
+      "suburb": {
+       "value": 0.6750148446197051,
+       "se": 0.0029603789880784568
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3489350534257616,
+       "se": 0.00312956641580213
+      },
+      "suburb": {
+       "value": 0.6373040584545934,
+       "se": 0.0030868499453620478
+      },
+      "other": {
+       "value": 0.013760888119645159,
+       "se": 0.0006802807915476456
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.2936838249653295,
+       "se": 0.0030343313972142827
+      },
+      "city->suburb": {
+       "value": 0.02770293512083372,
+       "se": 0.0009980849836133062
+      },
+      "city->other": {
+       "value": 0.003598395294131642,
+       "se": 0.000343664535263339
+      },
+      "suburb->city": {
+       "value": 0.05525122846043203,
+       "se": 0.0012783605751485534
+      },
+      "suburb->suburb": {
+       "value": 0.6096011233337596,
+       "se": 0.002936096583472223
+      },
+      "suburb->other": {
+       "value": 0.010162492825513517,
+       "se": 0.0006024715241240773
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9036838147935193,
+        "se": 0.003191292051299313
+       },
+       "suburb": {
+        "value": 0.08524369394170013,
+        "se": 0.003112052972755666
+       },
+       "other": {
+        "value": 0.011072491264780479,
+        "se": 0.0010547433708826784
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.08185187170448065,
+        "se": 0.0018624046297509402
+       },
+       "suburb": {
+        "value": 0.9030929144635349,
+        "se": 0.0017917455178991508
+       },
+       "other": {
+        "value": 0.015055213831984595,
+        "se": 0.00088868703554483
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8416575579954246,
+        "se": 0.0035454322670183725
+       },
+       "suburb": {
+        "value": 0.15834244200457528,
+        "se": 0.003545432267018355
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.04346894508723343,
+        "se": 0.0015137174327546066
+       },
+       "suburb": {
+        "value": 0.9565310549127666,
+        "se": 0.001513717432754625
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.2614944081257766,
+        "se": 0.022108715530603885
+       },
+       "suburb": {
+        "value": 0.7385055918742234,
+        "se": 0.022108715530603895
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08524369394170013,
+      "se": 0.003112052972755666
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08185187170448065,
+      "se": 0.0018624046297509402
+     },
+     "share_cross_city_suburb": {
+      "value": 0.0841116140923534,
+      "se": 0.001547358997734713
+     },
+     "share_cross_class": {
+      "value": 0.09671505170091088,
+      "se": 0.001463701805318245
+     },
+     "gap_res": {
+      "value": 0.7309551771262714,
+      "se": 0.013492874135933742
+     },
+     "gap_work": {
+      "value": 0.6023610589521351,
+      "se": 0.013735949373225628
+     },
+     "net_commute_gap": {
+      "value": 0.12859411817413635,
+      "se": 0.007594779931005747
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9862391118803548,
+       "se": 0.0006802807915476202
+      },
+      "city_share_jobs": {
+       "value": 0.35380370664927807,
+       "se": 0.0031408764183986164
+      },
+      "city_share_residents": {
+       "value": 0.3258710349393973,
+       "se": 0.0029811900060402736
+      },
+      "net_inflow_to_city": {
+       "value": 0.02793267170988076,
+       "se": 0.0017166173827970858
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.32498515538029493,
+       "se": 0.0029603789880784655
+      },
+      "city_share_jobs": {
+       "value": 0.35380370664927807,
+       "se": 0.0031408764183986173
+      }
+     },
+     "n_sample": 40661,
+     "workers_millions": {
+      "value": 4.035132,
+      "se": 0.025695102799950034
+     },
+     "n_cells": {
+      "city->city": 11473,
+      "city->suburb": 1112,
+      "city->other": 146,
+      "suburb->city": 2167,
+      "suburb->suburb": 25274,
+      "suburb->other": 489,
+      "other->city": 0,
+      "other->suburb": 0,
+      "other->other": 0
+     },
+     "share_of_group": {
+      "value": 0.8734535939653798,
+      "se": 0.001708852200986021
+     }
+    }
+   }
+  },
+  "pub_k12": {
+   "label": "public K-12 teachers (reference)",
+   "definition": "OCCP 2310-2330 employed by a local or state government (COW 3-4), recomputed as a check",
+   "universes": {
+    "all": {
+     "res": {
+      "city": {
+       "value": 0.2693810964107509,
+       "se": 0.0030815017236886888
+      },
+      "suburb": {
+       "value": 0.5919519639533506,
+       "se": 0.0033290342299206583
+      },
+      "other": {
+       "value": 0.1386669396358987,
+       "se": 0.00206857005794818
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.2905087310822975,
+       "se": 0.0031138168404725402
+      },
+      "suburb": {
+       "value": 0.5729083758136594,
+       "se": 0.003370781322948141
+      },
+      "other": {
+       "value": 0.13658289310404328,
+       "se": 0.002283794391252359
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.24282911768518825,
+       "se": 0.0030360757146439456
+      },
+      "city->suburb": {
+       "value": 0.023298107838987794,
+       "se": 0.0010029383967159722
+      },
+      "city->other": {
+       "value": 0.0032538708865748485,
+       "se": 0.00033435643578058535
+      },
+      "suburb->city": {
+       "value": 0.04435402679164408,
+       "se": 0.0011979263398177486
+      },
+      "suburb->suburb": {
+       "value": 0.5384946380241034,
+       "se": 0.0033154552196801835
+      },
+      "suburb->other": {
+       "value": 0.009103299137603158,
+       "se": 0.0006929873452651327
+      },
+      "other->city": {
+       "value": 0.0033255866054651673,
+       "se": 0.0003565207734870525
+      },
+      "other->suburb": {
+       "value": 0.011115629950568256,
+       "se": 0.0005179364048067969
+      },
+      "other->other": {
+       "value": 0.12422572307986528,
+       "se": 0.0021692573086687377
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.901433400192728,
+        "se": 0.0037943869543899922
+       },
+       "suburb": {
+        "value": 0.08648753809904672,
+        "se": 0.0036570170045941023
+       },
+       "other": {
+        "value": 0.012079061708225298,
+        "se": 0.0012440295673896388
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.07492842239330665,
+        "se": 0.001987428599757165
+       },
+       "suburb": {
+        "value": 0.9096931352803823,
+        "se": 0.002083970919602273
+       },
+       "other": {
+        "value": 0.015378442326311048,
+        "se": 0.0011702225504943429
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.023982548502168174,
+        "se": 0.002523081020739208
+       },
+       "suburb": {
+        "value": 0.08016063511428785,
+        "se": 0.00412559465827548
+       },
+       "other": {
+        "value": 0.895856816383544,
+        "se": 0.004225334963800554
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8358754546912319,
+        "se": 0.004195992227022494
+       },
+       "suburb": {
+        "value": 0.15267708693780752,
+        "se": 0.004088291112683942
+       },
+       "other": {
+        "value": 0.011447458370960527,
+        "se": 0.0012127799686647797
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.040666376723676304,
+        "se": 0.0017477089236659646
+       },
+       "suburb": {
+        "value": 0.9399315156796569,
+        "se": 0.0017173130001966672
+       },
+       "other": {
+        "value": 0.019402107596666832,
+        "se": 0.0008836015584795609
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.023823414577228075,
+        "se": 0.0024251963163263533
+       },
+       "suburb": {
+        "value": 0.06665036104242306,
+        "se": 0.0048742643168022196
+       },
+       "other": {
+        "value": 0.9095262243803489,
+        "se": 0.005114211769797359
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08648753809904672,
+      "se": 0.0036570170045941023
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.07492842239330665,
+      "se": 0.001987428599757165
+     },
+     "share_cross_city_suburb": {
+      "value": 0.07968675600851807,
+      "se": 0.0019102000520315372
+     },
+     "share_cross_class": {
+      "value": 0.09445052121084319,
+      "se": 0.001636801347091978
+     },
+     "gap_res": {
+      "value": 0.7872983973319644,
+      "se": 0.016281162675629637
+     },
+     "gap_work": {
+      "value": 0.6790921701339327,
+      "se": 0.0156624300217219
+     },
+     "net_commute_gap": {
+      "value": 0.10820622719803163,
+      "se": 0.007961491385646372
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8489758903399235,
+       "se": 0.002162383480515261
+      },
+      "city_share_jobs": {
+       "value": 0.33827008251299856,
+       "se": 0.0035102778583097826
+      },
+      "city_share_residents": {
+       "value": 0.3134685313827001,
+       "se": 0.003552492413153097
+      },
+      "net_inflow_to_city": {
+       "value": 0.02480155113029848,
+       "se": 0.001737399665466568
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.312749050056059,
+       "se": 0.003498696925150094
+      },
+      "city_share_jobs": {
+       "value": 0.33646395092482717,
+       "se": 0.00349486857878445
+      }
+     },
+     "n_sample": 34338,
+     "workers_millions": {
+      "value": 3.262883,
+      "se": 0.025185649859592665
+     },
+     "n_cells": {
+      "city->city": 7618,
+      "city->suburb": 766,
+      "city->other": 105,
+      "suburb->city": 1417,
+      "suburb->suburb": 18072,
+      "suburb->other": 353,
+      "other->city": 147,
+      "other->suburb": 491,
+      "other->other": 5369
+     },
+     "share_of_all_workers": {
+      "value": 0.02138761937815066,
+      "se": 0.00016141375657133283
+     }
+    },
+    "away": {
+     "res": {
+      "city": {
+       "value": 0.26956551923776656,
+       "se": 0.003083418266253221
+      },
+      "suburb": {
+       "value": 0.591862187038783,
+       "se": 0.003282573241274506
+      },
+      "other": {
+       "value": 0.13857229372345048,
+       "se": 0.0020712403490552047
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.2909312763790563,
+       "se": 0.0030907314292691525
+      },
+      "suburb": {
+       "value": 0.5726039650173965,
+       "se": 0.0033278137367241684
+      },
+      "other": {
+       "value": 0.13646475860354723,
+       "se": 0.002268814260873445
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.24271428208365797,
+       "se": 0.00303532829763233
+      },
+      "city->suburb": {
+       "value": 0.023560692982341955,
+       "se": 0.0010150785380371669
+      },
+      "city->other": {
+       "value": 0.0032905441717665917,
+       "se": 0.00033840388505108193
+      },
+      "suburb->city": {
+       "value": 0.04485392612097624,
+       "se": 0.001206734399225769
+      },
+      "suburb->suburb": {
+       "value": 0.5378023615550882,
+       "se": 0.0032746296509323595
+      },
+      "suburb->other": {
+       "value": 0.009205899362718572,
+       "se": 0.0007004794093620951
+      },
+      "other->city": {
+       "value": 0.003363068174422086,
+       "se": 0.00036078108475924684
+      },
+      "other->suburb": {
+       "value": 0.011240910479966329,
+       "se": 0.0005223747804462793
+      },
+      "other->other": {
+       "value": 0.12396831506906207,
+       "se": 0.00217768786799067
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.9003906833854933,
+        "se": 0.0038356954063626
+       },
+       "suburb": {
+        "value": 0.08740247287176432,
+        "se": 0.003695276095895403
+       },
+       "other": {
+        "value": 0.012206843742742233,
+        "se": 0.0012577329078940658
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.075784409112855,
+        "se": 0.0020031291232990947
+       },
+       "suburb": {
+        "value": 0.9086614643280929,
+        "se": 0.002097256079834205
+       },
+       "other": {
+        "value": 0.01555412655905206,
+        "se": 0.0011829055704073246
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.0242694126225101,
+        "se": 0.0025552402851236646
+       },
+       "suburb": {
+        "value": 0.08111946607739552,
+        "se": 0.004174785101387126
+       },
+       "other": {
+        "value": 0.8946111213000945,
+        "se": 0.004280269448882231
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.834266721352516,
+        "se": 0.004249469464884289
+       },
+       "suburb": {
+        "value": 0.15417361336749424,
+        "se": 0.004136306045119124
+       },
+       "other": {
+        "value": 0.011559665279989773,
+        "se": 0.0012256451255820368
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.04114657672974051,
+        "se": 0.0017699109140380473
+       },
+       "suburb": {
+        "value": 0.9392222101339256,
+        "se": 0.0017358351890808922
+       },
+       "other": {
+        "value": 0.01963121313633379,
+        "se": 0.000891380657947555
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.024112776114792893,
+        "se": 0.002465914014903208
+       },
+       "suburb": {
+        "value": 0.06745990288572039,
+        "se": 0.004953948881325705
+       },
+       "other": {
+        "value": 0.9084273209994868,
+        "se": 0.005222457369847616
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08740247287176432,
+      "se": 0.003695276095895403
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.075784409112855,
+      "se": 0.0020031291232990947
+     },
+     "share_cross_city_suburb": {
+      "value": 0.0805891149329778,
+      "se": 0.0019325442110186798
+     },
+     "share_cross_class": {
+      "value": 0.0955150412921918,
+      "se": 0.0016479573409919415
+     },
+     "gap_res": {
+      "value": 0.7864623407630748,
+      "se": 0.016195086224686867
+     },
+     "gap_work": {
+      "value": 0.6771072415904716,
+      "se": 0.015498144694388316
+     },
+     "net_commute_gap": {
+      "value": 0.10935509917260311,
+      "se": 0.00804744972197618
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.8489312627420644,
+       "se": 0.002139789946719072
+      },
+      "city_share_jobs": {
+       "value": 0.33874145154671687,
+       "se": 0.0034769659950229462
+      },
+      "city_share_residents": {
+       "value": 0.3136590519778087,
+       "se": 0.0035392753874359147
+      },
+      "net_inflow_to_city": {
+       "value": 0.025082399568908238,
+       "se": 0.0017559206488510948
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.31292877774147915,
+       "se": 0.003480995744176762
+      },
+      "city_share_jobs": {
+       "value": 0.336907241803567,
+       "se": 0.003460330176850425
+      }
+     },
+     "n_sample": 33928,
+     "workers_millions": {
+      "value": 3.226518,
+      "se": 0.02503533863961101
+     },
+     "n_cells": {
+      "city->city": 7523,
+      "city->suburb": 766,
+      "city->other": 105,
+      "suburb->city": 1417,
+      "suburb->suburb": 17823,
+      "suburb->other": 353,
+      "other->city": 147,
+      "other->suburb": 491,
+      "other->other": 5303
+     },
+     "share_of_all_workers": {
+      "value": 0.021149253252645564,
+      "se": 0.00016037495184198467
+     }
+    },
+    "metro_puma": {
+     "res": {
+      "city": {
+       "value": 0.315670975770494,
+       "se": 0.0034398889232096605
+      },
+      "suburb": {
+       "value": 0.6799582677151215,
+       "se": 0.003478679202550772
+      },
+      "other": {
+       "value": 0.00437075651438453,
+       "se": 0.0004781784335862228
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.33649438032764517,
+       "se": 0.003461053624385171
+      },
+      "suburb": {
+       "value": 0.6459730320372502,
+       "se": 0.00342876156708442
+      },
+      "other": {
+       "value": 0.017532587635104683,
+       "se": 0.0009731231120167575
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.28455636103095266,
+       "se": 0.0034394813833020215
+      },
+      "city->suburb": {
+       "value": 0.02730160554371385,
+       "se": 0.0011654894521059547
+      },
+      "city->other": {
+       "value": 0.0038130091958274897,
+       "se": 0.00039173658051529925
+      },
+      "suburb->city": {
+       "value": 0.05175377951921678,
+       "se": 0.0013911381934216898
+      },
+      "suburb->suburb": {
+       "value": 0.6180156334454454,
+       "se": 0.0034762463138766206
+      },
+      "suburb->other": {
+       "value": 0.010188854750459253,
+       "se": 0.0008100111533782671
+      },
+      "other->city": {
+       "value": 0.00018423977747569957,
+       "se": 8.646837968619164e-05
+      },
+      "other->suburb": {
+       "value": 0.0006557930480908916,
+       "se": 0.00016546514638952008
+      },
+      "other->other": {
+       "value": 0.0035307236888179384,
+       "se": 0.0004601463280571421
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.901433400192728,
+        "se": 0.003794386954390027
+       },
+       "suburb": {
+        "value": 0.0864875380990467,
+        "se": 0.0036570170045940992
+       },
+       "other": {
+        "value": 0.012079061708225296,
+        "se": 0.001244029567389639
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.07611317043489467,
+        "se": 0.002012603765203035
+       },
+       "suburb": {
+        "value": 0.9089023000222892,
+        "se": 0.002082218959688568
+       },
+       "other": {
+        "value": 0.014984529542816035,
+        "se": 0.001187290469230415
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.04215283483976993,
+        "se": 0.01885535758010266
+       },
+       "suburb": {
+        "value": 0.15004108463434676,
+        "se": 0.03840609001107779
+       },
+       "other": {
+        "value": 0.8078060805258833,
+        "se": 0.042664866095417954
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.8456496680683928,
+        "se": 0.004114185919039534
+       },
+       "suburb": {
+        "value": 0.15380280487544556,
+        "se": 0.004101756661679703
+       },
+       "other": {
+        "value": 0.0005475270561615471,
+        "se": 0.00025712165831241404
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.04226431165030353,
+        "se": 0.0017916439345953248
+       },
+       "suburb": {
+        "value": 0.9567204864518359,
+        "se": 0.0018073898561214784
+       },
+       "other": {
+        "value": 0.0010152018978604592,
+        "se": 0.00025567403878664496
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.21748125691343353,
+        "se": 0.020953498924424562
+       },
+       "suburb": {
+        "value": 0.5811381047974107,
+        "se": 0.030799050910417288
+       },
+       "other": {
+        "value": 0.20138063828915562,
+        "se": 0.02286379360373054
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.0864875380990467,
+      "se": 0.0036570170045940992
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.07611317043489467,
+      "se": 0.002012603765203035
+     },
+     "share_cross_city_suburb": {
+      "value": 0.08053502450189481,
+      "se": 0.0019219568197870365
+     },
+     "share_cross_class": {
+      "value": 0.09389728183478396,
+      "se": 0.0019111355932351101
+     },
+     "gap_res": {
+      "value": 0.7673309700508042,
+      "se": 0.015983650749205502
+     },
+     "gap_work": {
+      "value": 0.6521763082571224,
+      "se": 0.015463283000538832
+     },
+     "net_commute_gap": {
+      "value": 0.11515466179368183,
+      "se": 0.00803217971507911
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9816273795393287,
+       "se": 0.000975347778193299
+      },
+      "city_share_jobs": {
+       "value": 0.34260468642184533,
+       "se": 0.003476946484920462
+      },
+      "city_share_residents": {
+       "value": 0.31769485354108545,
+       "se": 0.0035021905881058427
+      },
+      "net_inflow_to_city": {
+       "value": 0.02490983288075988,
+       "se": 0.0017543668665190467
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.31705675364190394,
+       "se": 0.0034603759968476096
+      },
+      "city_share_jobs": {
+       "value": 0.3424992789508104,
+       "se": 0.003480321760965403
+      }
+     },
+     "n_sample": 27914,
+     "workers_millions": {
+      "value": 2.784415,
+      "se": 0.022375450662500632
+     },
+     "n_cells": {
+      "city->city": 7618,
+      "city->suburb": 766,
+      "city->other": 105,
+      "suburb->city": 1408,
+      "suburb->suburb": 17554,
+      "suburb->other": 334,
+      "other->city": 4,
+      "other->suburb": 16,
+      "other->other": 109
+     },
+     "share_of_all_workers": {
+      "value": 0.018251346496583963,
+      "se": 0.00014464526516996148
+     }
+    },
+    "metro_pow": {
+     "res": {
+      "city": {
+       "value": 0.3127490500560591,
+       "se": 0.0034986969251501157
+      },
+      "suburb": {
+       "value": 0.687250949943941,
+       "se": 0.003498696925150099
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.33341706906667984,
+       "se": 0.0034874024990955454
+      },
+      "suburb": {
+       "value": 0.6522363667610889,
+       "se": 0.003475489073717706
+      },
+      "other": {
+       "value": 0.014346564172231357,
+       "se": 0.0008556553721105356
+      }
+     },
+     "x": {
+      "city->city": {
+       "value": 0.28192243959907903,
+       "se": 0.0034653653761943038
+      },
+      "city->suburb": {
+       "value": 0.027048895382164075,
+       "se": 0.0011613987921771385
+      },
+      "city->other": {
+       "value": 0.0037777150748159803,
+       "se": 0.00038823669924701606
+      },
+      "suburb->city": {
+       "value": 0.051494629467600854,
+       "se": 0.0013857860975205018
+      },
+      "suburb->suburb": {
+       "value": 0.6251874713789247,
+       "se": 0.003551362252416816
+      },
+      "suburb->other": {
+       "value": 0.010568849097415378,
+       "se": 0.0008041826765939877
+      }
+     },
+     "work_given_live": {
+      "city": {
+       "city": {
+        "value": 0.901433400192728,
+        "se": 0.0037943869543899922
+       },
+       "suburb": {
+        "value": 0.08648753809904672,
+        "se": 0.0036570170045941023
+       },
+       "other": {
+        "value": 0.012079061708225298,
+        "se": 0.0012440295673896388
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.07492842239330665,
+        "se": 0.001987428599757165
+       },
+       "suburb": {
+        "value": 0.9096931352803823,
+        "se": 0.002083970919602273
+       },
+       "other": {
+        "value": 0.015378442326311048,
+        "se": 0.0011702225504943429
+       }
+      }
+     },
+     "live_given_work": {
+      "city": {
+       "city": {
+        "value": 0.845554909315988,
+        "se": 0.004129176003607293
+       },
+       "suburb": {
+        "value": 0.15444509068401197,
+        "se": 0.004129176003607305
+       }
+      },
+      "suburb": {
+       "city": {
+        "value": 0.041471001558047074,
+        "se": 0.0017719449663241296
+       },
+       "suburb": {
+        "value": 0.9585289984419529,
+        "se": 0.0017719449663241476
+       }
+      },
+      "other": {
+       "city": {
+        "value": 0.2633184523809524,
+        "se": 0.025932261709314113
+       },
+       "suburb": {
+        "value": 0.7366815476190477,
+        "se": 0.025932261709314113
+       }
+      }
+     },
+     "p_work_suburb_given_live_city": {
+      "value": 0.08648753809904672,
+      "se": 0.0036570170045941023
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.07492842239330665,
+      "se": 0.001987428599757165
+     },
+     "share_cross_city_suburb": {
+      "value": 0.07968675600851807,
+      "se": 0.0019102000520315372
+     },
+     "share_cross_class": {
+      "value": 0.09289008902199625,
+      "se": 0.001911722203536174
+     },
+     "gap_res": {
+      "value": 0.7872983973319644,
+      "se": 0.016281162675629637
+     },
+     "gap_work": {
+      "value": 0.6710128559704561,
+      "se": 0.01569045022445383
+     },
+     "net_commute_gap": {
+      "value": 0.11628554136150826,
+      "se": 0.008019993411672295
+     },
+     "block": {
+      "share_of_group": {
+       "value": 0.9856534358277688,
+       "se": 0.000855655372110572
+      },
+      "city_share_jobs": {
+       "value": 0.33827008251299856,
+       "se": 0.0035102778583097826
+      },
+      "city_share_residents": {
+       "value": 0.3134685313827001,
+       "se": 0.003552492413153097
+      },
+      "net_inflow_to_city": {
+       "value": 0.02480155113029848,
+       "se": 0.001737399665466568
+      }
+     },
+     "marginal": {
+      "city_share_residents": {
+       "value": 0.312749050056059,
+       "se": 0.003498696925150094
+      },
+      "city_share_jobs": {
+       "value": 0.33827008251299856,
+       "se": 0.0035102778583097887
+      }
+     },
+     "n_sample": 28331,
+     "workers_millions": {
+      "value": 2.810429,
+      "se": 0.022048244016247644
+     },
+     "n_cells": {
+      "city->city": 7618,
+      "city->suburb": 766,
+      "city->other": 105,
+      "suburb->city": 1417,
+      "suburb->suburb": 18072,
+      "suburb->other": 353,
+      "other->city": 0,
+      "other->suburb": 0,
+      "other->other": 0
+     },
+     "share_of_group": {
+      "value": 0.8613330603641013,
+      "se": 0.0020685700579481953
+     }
+    }
+   }
+  }
+ },
+ "differences": {
+  "all": {
+   "k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.0058268243212240695,
+     "se": 0.003230715631813119
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.03297045270755562,
+     "se": 0.0018682472770184708
+    },
+    "share_cross_city_suburb": {
+     "value": -0.023579934176572573,
+     "se": 0.001601445502932481
+    },
+    "share_cross_class": {
+     "value": -0.026891984967242433,
+     "se": 0.0014085865371722313
+    },
+    "block.city_share_jobs": {
+     "value": -0.04423909813033822,
+     "se": 0.003196399818422728
+    },
+    "block.city_share_residents": {
+     "value": -0.02983410419750282,
+     "se": 0.0030558520385465335
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.014404993932835414,
+     "se": 0.0017311450117525032
+    },
+    "marginal.city_share_residents": {
+     "value": -0.029527539507492706,
+     "se": 0.0030268100300519184
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.04445827928189622,
+     "se": 0.0031561186358820483
+    },
+    "gap_res": {
+     "value": 0.13169378979986235,
+     "se": 0.01378008474302134
+    },
+    "gap_work": {
+     "value": 0.1900403412868943,
+     "se": 0.013821034722765297
+    },
+    "net_commute_gap": {
+     "value": -0.05834655148703194,
+     "se": 0.007763009103680737
+    }
+   },
+   "pub_k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.004582980163877481,
+     "se": 0.0037995727983945373
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.039893902018729624,
+     "se": 0.002027208661977372
+    },
+    "share_cross_city_suburb": {
+     "value": -0.028004792260407904,
+     "se": 0.00198434059139327
+    },
+    "share_cross_class": {
+     "value": -0.03104649468451981,
+     "se": 0.0017180422456695855
+    },
+    "block.city_share_jobs": {
+     "value": -0.05977272226661773,
+     "se": 0.0035873527717673616
+    },
+    "block.city_share_residents": {
+     "value": -0.04223660775420002,
+     "se": 0.003622420274327654
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.017536114512417697,
+     "se": 0.001769638733244908
+    },
+    "marginal.city_share_residents": {
+     "value": -0.04176364483172862,
+     "se": 0.0035678686980112773
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.059871530061842815,
+     "se": 0.0035660529978565896
+    },
+    "gap_res": {
+     "value": 0.18803701000555528,
+     "se": 0.016579879903994704
+    },
+    "gap_work": {
+     "value": 0.25833458541952037,
+     "se": 0.015952253919380703
+    },
+    "net_commute_gap": {
+     "value": -0.07029757541396509,
+     "se": 0.008219404961780684
+    }
+   }
+  },
+  "away": {
+   "k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.00953471023658524,
+     "se": 0.003296625860144354
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.03844230262722488,
+     "se": 0.0018923693608041438
+    },
+    "share_cross_city_suburb": {
+     "value": -0.028526192686378057,
+     "se": 0.001632590335275231
+    },
+    "share_cross_class": {
+     "value": -0.032439833748118985,
+     "se": 0.0014126040963003477
+    },
+    "block.city_share_jobs": {
+     "value": -0.04704603867640078,
+     "se": 0.0032158526231130485
+    },
+    "block.city_share_residents": {
+     "value": -0.03061158435643646,
+     "se": 0.00308452963126883
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.016434454319964292,
+     "se": 0.0017606798480684926
+    },
+    "marginal.city_share_residents": {
+     "value": -0.030240372067130927,
+     "se": 0.0030504025158463633
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.04712440132654255,
+     "se": 0.0031702111761687203
+    },
+    "gap_res": {
+     "value": 0.13480452918983787,
+     "se": 0.013880087136393179
+    },
+    "gap_work": {
+     "value": 0.2010741842240683,
+     "se": 0.013871211599756662
+    },
+    "net_commute_gap": {
+     "value": -0.06626965503423043,
+     "se": 0.00790184361943126
+    }
+   },
+   "pub_k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.008761555946978306,
+     "se": 0.0038533511059669337
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.0458460165969416,
+     "se": 0.002044446408426258
+    },
+    "share_cross_city_suburb": {
+     "value": -0.033439359050544126,
+     "se": 0.0020166306279993432
+    },
+    "share_cross_class": {
+     "value": -0.03714065486717977,
+     "se": 0.0017382662423972833
+    },
+    "block.city_share_jobs": {
+     "value": -0.06260017437403737,
+     "se": 0.003567453476294365
+    },
+    "block.city_share_residents": {
+     "value": -0.04285362048405533,
+     "se": 0.0036355081366168406
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.019746553889981963,
+     "se": 0.0017921693270943448
+    },
+    "marginal.city_share_residents": {
+     "value": -0.04231194063792976,
+     "se": 0.003576597031685554
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.06254684559008356,
+     "se": 0.0035415935541490756
+    },
+    "gap_res": {
+     "value": 0.19038094004115091,
+     "se": 0.01660823539894278
+    },
+    "gap_work": {
+     "value": 0.2693669791265614,
+     "se": 0.01582828619714632
+    },
+    "net_commute_gap": {
+     "value": -0.07898603908541046,
+     "se": 0.008336773831840935
+    }
+   }
+  },
+  "metro_pow": {
+   "k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.0058268243212240695,
+     "se": 0.003230715631813119
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.03297045270755562,
+     "se": 0.0018682472770184708
+    },
+    "share_cross_city_suburb": {
+     "value": -0.023579934176572573,
+     "se": 0.001601445502932481
+    },
+    "share_cross_class": {
+     "value": -0.02166134650449958,
+     "se": 0.0015178840620484575
+    },
+    "block.city_share_jobs": {
+     "value": -0.04423909813033822,
+     "se": 0.003196399818422728
+    },
+    "block.city_share_residents": {
+     "value": -0.02983410419750282,
+     "se": 0.0030558520385465335
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.014404993932835414,
+     "se": 0.0017311450117525032
+    },
+    "marginal.city_share_residents": {
+     "value": -0.029527539507492706,
+     "se": 0.0030268100300519184
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.04423909813033822,
+     "se": 0.0031963998184227358
+    },
+    "gap_res": {
+     "value": 0.13169378979986235,
+     "se": 0.01378008474302134
+    },
+    "gap_work": {
+     "value": 0.18873426965533258,
+     "se": 0.013962131800333387
+    },
+    "net_commute_gap": {
+     "value": -0.05704047985547023,
+     "se": 0.00771442724094519
+    }
+   },
+   "pub_k12_minus_nonteacher": {
+    "p_work_suburb_given_live_city": {
+     "value": -0.004582980163877481,
+     "se": 0.0037995727983945373
+    },
+    "p_work_city_given_live_suburb": {
+     "value": -0.039893902018729624,
+     "se": 0.002027208661977372
+    },
+    "share_cross_city_suburb": {
+     "value": -0.028004792260407904,
+     "se": 0.00198434059139327
+    },
+    "share_cross_class": {
+     "value": -0.025486309183414213,
+     "se": 0.001984588516742126
+    },
+    "block.city_share_jobs": {
+     "value": -0.05977272226661773,
+     "se": 0.0035873527717673616
+    },
+    "block.city_share_residents": {
+     "value": -0.04223660775420002,
+     "se": 0.003622420274327654
+    },
+    "block.net_inflow_to_city": {
+     "value": -0.017536114512417697,
+     "se": 0.001769638733244908
+    },
+    "marginal.city_share_residents": {
+     "value": -0.04176364483172862,
+     "se": 0.0035678686980112773
+    },
+    "marginal.city_share_jobs": {
+     "value": -0.05977272226661773,
+     "se": 0.0035873527717673777
+    },
+    "gap_res": {
+     "value": 0.18803701000555528,
+     "se": 0.016579879903994704
+    },
+    "gap_work": {
+     "value": 0.2573860666736536,
+     "se": 0.016004841886113817
+    },
+    "net_commute_gap": {
+     "value": -0.06934905666809832,
+     "se": 0.008220593562305464
+    }
+   }
+  }
+ },
+ "class_cuts": [
+  {
+   "pc_cut": 0.25,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_powpuma_by_class": {
+    "city": 347,
+    "other": 310,
+    "suburb": 325
+   },
+   "n_puma_by_class": {
+    "city": 990,
+    "other": 342,
+    "suburb": 1019
+   },
+   "groups": {
+    "all": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.055086862266403414,
+      "se": 0.00034666549538089994
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.22219448157540778,
+      "se": 0.0006528450793118476
+     },
+     "share_cross_city_suburb": {
+      "value": 0.11599500199747906,
+      "se": 0.00036412948741001934
+     },
+     "share_cross_class": {
+      "value": 0.132458879352518,
+      "se": 0.00037466605168199826
+     },
+     "block.city_share_jobs": {
+      "value": 0.6882750880962912,
+      "se": 0.0003656878891320906
+     },
+     "block.city_share_residents": {
+      "value": 0.6440604027215918,
+      "se": 0.00030359407504797805
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.044214685374699435,
+      "se": 0.00031384141765993163
+     },
+     "marginal.city_share_residents": {
+      "value": 0.6437708374612493,
+      "se": 0.0002903811156512573
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.6882660448885425,
+      "se": 0.0003653109587082367
+     },
+     "gap_res": {
+      "value": -0.5917685815730369,
+      "se": 0.001266142204613851
+     },
+     "gap_work": {
+      "value": -0.7920253402676316,
+      "se": 0.0017026852270568672
+     },
+     "net_commute_gap": {
+      "value": 0.2002567586945947,
+      "se": 0.0015223185724311688
+     },
+     "res": {
+      "city": {
+       "value": 0.5689303281280634,
+       "se": 0.0003056392816907117
+      },
+      "suburb": {
+       "value": 0.31481633298457085,
+       "se": 0.00025788715986307676
+      },
+      "other": {
+       "value": 0.11625333888736562,
+       "se": 0.00021135780459632863
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.615236643288695,
+       "se": 0.0003561529877570573
+      },
+      "suburb": {
+       "value": 0.27865700126604426,
+       "se": 0.00033681819262084935
+      },
+      "other": {
+       "value": 0.10610635544526058,
+       "se": 0.00022645158387081277
+      }
+     }
+    },
+    "nonteacher": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.05503681079196729,
+      "se": 0.00036286761455104873
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.2242019296877283,
+      "se": 0.0006709735859526178
+     },
+     "share_cross_city_suburb": {
+      "value": 0.11648322684266028,
+      "se": 0.0003748144101457953
+     },
+     "share_cross_class": {
+      "value": 0.13307899094147724,
+      "se": 0.000384484306924235
+     },
+     "block.city_share_jobs": {
+      "value": 0.68985933184083,
+      "se": 0.000386966705755928
+     },
+     "block.city_share_residents": {
+      "value": 0.6452146301422634,
+      "se": 0.00030963136726342425
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.04464470169856672,
+      "se": 0.00032038855657605413
+     },
+     "marginal.city_share_residents": {
+      "value": 0.6449163279101113,
+      "se": 0.0002973246791051643
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.6898345076695295,
+      "se": 0.0003882363542502336
+     },
+     "gap_res": {
+      "value": -0.5967671264791681,
+      "se": 0.0012982966344720424
+     },
+     "gap_work": {
+      "value": -0.799345723605627,
+      "se": 0.001814598650852492
+     },
+     "net_commute_gap": {
+      "value": 0.20257859712645887,
+      "se": 0.001583756265580345
+     },
+     "res": {
+      "city": {
+       "value": 0.5701096497535465,
+       "se": 0.0003134603100149821
+      },
+      "suburb": {
+       "value": 0.31389595699085066,
+       "se": 0.0002653222592302337
+      },
+      "other": {
+       "value": 0.11599439325560278,
+       "se": 0.0002212902455452338
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.6169921884043487,
+       "se": 0.0003752302558782004
+      },
+      "suburb": {
+       "value": 0.2774139068905007,
+       "se": 0.00035927345058116614
+      },
+      "other": {
+       "value": 0.1055939047051506,
+       "se": 0.00023830297131832807
+      }
+     }
+    },
+    "k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.05680719719753986,
+      "se": 0.0015771324608604021
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.16358436270654267,
+      "se": 0.003721940563246831
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10017702247741717,
+      "se": 0.0017132589038671372
+     },
+     "share_cross_class": {
+      "value": 0.112600828097834,
+      "se": 0.0016305571085844382
+     },
+     "block.city_share_jobs": {
+      "value": 0.6369472309557935,
+      "se": 0.002742292270455433
+     },
+     "block.city_share_residents": {
+      "value": 0.6066646292744184,
+      "se": 0.0030545454580107882
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.030282601681375084,
+      "se": 0.0021005283893314403
+     },
+     "marginal.city_share_residents": {
+      "value": 0.6067300880853037,
+      "se": 0.0030073531309484846
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.6370699412000943,
+      "se": 0.0027797935360820156
+     },
+     "gap_res": {
+      "value": -0.4335878518426236,
+      "se": 0.012604346464613824
+     },
+     "gap_work": {
+      "value": -0.5626693071289797,
+      "se": 0.012023446016995072
+     },
+     "net_commute_gap": {
+      "value": 0.12908145528635606,
+      "se": 0.00884851680673785
+     },
+     "res": {
+      "city": {
+       "value": 0.5311644974266972,
+       "se": 0.0027297456327249384
+      },
+      "suburb": {
+       "value": 0.3442898567539673,
+       "se": 0.002772907784697593
+      },
+      "other": {
+       "value": 0.12454564581933544,
+       "se": 0.0016752904360138568
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.5590182053377849,
+       "se": 0.002624538895032459
+      },
+      "suburb": {
+       "value": 0.3184650491455804,
+       "se": 0.0025580607403814207
+      },
+      "other": {
+       "value": 0.12251674551663469,
+       "se": 0.0017699283707214106
+      }
+     }
+    },
+    "pub_k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.05853654192123403,
+      "se": 0.0018804121282878284
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.14933443965821622,
+      "se": 0.003870748262116057
+     },
+     "share_cross_city_suburb": {
+      "value": 0.0964285354164656,
+      "se": 0.001983697488486667
+     },
+     "share_cross_class": {
+      "value": 0.10882155443514219,
+      "se": 0.0017890657137803125
+     },
+     "block.city_share_jobs": {
+      "value": 0.6229845824972523,
+      "se": 0.0034266602208532244
+     },
+     "block.city_share_residents": {
+      "value": 0.5975639971132696,
+      "se": 0.0035603198953873473
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.025420585383982678,
+      "se": 0.002101076581579765
+     },
+     "marginal.city_share_residents": {
+      "value": 0.5978573786611101,
+      "se": 0.0035057107089193945
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.6229836717739369,
+      "se": 0.0034452204528389527
+     },
+     "gap_res": {
+      "value": -0.3965454231337747,
+      "se": 0.014580904018452493
+     },
+     "gap_work": {
+      "value": -0.502231811958808,
+      "se": 0.01467350425204053
+     },
+     "net_commute_gap": {
+      "value": 0.10568638882503323,
+      "se": 0.009181601603499774
+     },
+     "res": {
+      "city": {
+       "value": 0.5161784838745368,
+       "se": 0.0033085399381141316
+      },
+      "suburb": {
+       "value": 0.3472021522071126,
+       "se": 0.0030953285796883213
+      },
+      "other": {
+       "value": 0.13661936391835072,
+       "se": 0.002015381017043098
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.5391652106434709,
+       "se": 0.003239242824267037
+      },
+      "suburb": {
+       "value": 0.3262911970793927,
+       "se": 0.003126259806457762
+      },
+      "other": {
+       "value": 0.1345435922771365,
+       "se": 0.0022277270579580443
+      }
+     }
+    }
+   }
+  },
+  {
+   "pc_cut": 0.5,
+   "metro_cut": 0.5,
+   "main": true,
+   "n_powpuma_by_class": {
+    "city": 146,
+    "other": 313,
+    "suburb": 523
+   },
+   "n_puma_by_class": {
+    "city": 733,
+    "other": 345,
+    "suburb": 1273
+   },
+   "groups": {
+    "all": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.09090994106388797,
+      "se": 0.000558872166555195
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11378982610226682,
+      "se": 0.00036905896771545184
+     },
+     "share_cross_city_suburb": {
+      "value": 0.106985695193658,
+      "se": 0.00032063571415216676
+     },
+     "share_cross_class": {
+      "value": 0.12468268349378786,
+      "se": 0.0003672551592315961
+     },
+     "block.city_share_jobs": {
+      "value": 0.3967185303677985,
+      "se": 0.0004205621660971827
+     },
+     "block.city_share_residents": {
+      "value": 0.3548120707322989,
+      "se": 0.0002967351471454795
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.04190645963549964,
+      "se": 0.00030540230406722363
+     },
+     "marginal.city_share_residents": {
+      "value": 0.35362725024759706,
+      "se": 0.000290946261072582
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.39501441651269037,
+      "se": 0.00042591889087024987
+     },
+     "gap_res": {
+      "value": 0.6031329564018348,
+      "se": 0.0012729226688995834
+     },
+     "gap_work": {
+      "value": 0.42628236706474576,
+      "se": 0.0017822623696433202
+     },
+     "net_commute_gap": {
+      "value": 0.17685058933708908,
+      "se": 0.0013516873279507343
+     },
+     "res": {
+      "city": {
+       "value": 0.3119106915377875,
+       "se": 0.00027523910739714157
+      },
+      "suburb": {
+       "value": 0.5701217064728265,
+       "se": 0.00027614990708177574
+      },
+      "other": {
+       "value": 0.11796760198938605,
+       "se": 0.00021005181505326433
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3524583852499867,
+       "se": 0.00039530348104887847
+      },
+      "suburb": {
+       "value": 0.5398087587231334,
+       "se": 0.00039494497252124555
+      },
+      "other": {
+       "value": 0.10773285602687986,
+       "se": 0.00022164905578666766
+      }
+     }
+    },
+    "nonteacher": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.0910705182629242,
+      "se": 0.0005781125081772897
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11482232441203627,
+      "se": 0.00037299759146551027
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10769154826892598,
+      "se": 0.00033093943867108875
+     },
+     "share_cross_class": {
+      "value": 0.125497015895363,
+      "se": 0.00037575343121069095
+     },
+     "block.city_share_jobs": {
+      "value": 0.3980428047796163,
+      "se": 0.00042994104618216707
+     },
+     "block.city_share_residents": {
+      "value": 0.3557051391369001,
+      "se": 0.00030989390023217586
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.042337665642716175,
+      "se": 0.0003086982105494098
+     },
+     "marginal.city_share_residents": {
+      "value": 0.35451269488778764,
+      "se": 0.0003015678894382734
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.39633548098667,
+      "se": 0.00043456754764330366
+     },
+     "gap_res": {
+      "value": 0.5992613873264091,
+      "se": 0.001317890289993912
+     },
+     "gap_work": {
+      "value": 0.4207575847144124,
+      "se": 0.0018163307589723397
+     },
+     "net_commute_gap": {
+      "value": 0.17850380261199672,
+      "se": 0.0013836632546018284
+     },
+     "res": {
+      "city": {
+       "value": 0.3127866535608752,
+       "se": 0.0002845000060555138
+      },
+      "suburb": {
+       "value": 0.5695136365877758,
+       "se": 0.00028956947820203384
+      },
+      "other": {
+       "value": 0.11769970985134923,
+       "se": 0.00022105434079157493
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3538438654915346,
+       "se": 0.0004018188052175307
+      },
+      "suburb": {
+       "value": 0.5389449017685823,
+       "se": 0.00040868983747152643
+      },
+      "other": {
+       "value": 0.10721123273988316,
+       "se": 0.00023441680461582453
+      }
+     }
+    },
+    "k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.08524369394170013,
+      "se": 0.003112052972755666
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08185187170448065,
+      "se": 0.0018624046297509402
+     },
+     "share_cross_city_suburb": {
+      "value": 0.0841116140923534,
+      "se": 0.001547358997734713
+     },
+     "share_cross_class": {
+      "value": 0.09860503092812056,
+      "se": 0.0013700695653224538
+     },
+     "block.city_share_jobs": {
+      "value": 0.35380370664927807,
+      "se": 0.0031408764183986164
+     },
+     "block.city_share_residents": {
+      "value": 0.3258710349393973,
+      "se": 0.0029811900060402736
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.02793267170988076,
+      "se": 0.0017166173827970858
+     },
+     "marginal.city_share_residents": {
+      "value": 0.32498515538029493,
+      "se": 0.0029603789880784655
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.35187720170477377,
+      "se": 0.0031036057398657994
+     },
+     "gap_res": {
+      "value": 0.7309551771262714,
+      "se": 0.013492874135933742
+     },
+     "gap_work": {
+      "value": 0.6107979260013067,
+      "se": 0.01360737011558066
+     },
+     "net_commute_gap": {
+      "value": 0.12015725112496478,
+      "se": 0.0075932133614000094
+     },
+     "res": {
+      "city": {
+       "value": 0.28385945195231604,
+       "se": 0.002606021641562412
+      },
+      "suburb": {
+       "value": 0.5895941420130639,
+       "se": 0.002901172343300794
+      },
+      "other": {
+       "value": 0.12654640603462014,
+       "se": 0.001708852200986064
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3080906647641082,
+       "se": 0.002793278830013193
+      },
+      "suburb": {
+       "value": 0.5674723534464248,
+       "se": 0.0029535016228569937
+      },
+      "other": {
+       "value": 0.12443698178946715,
+       "se": 0.0018128686964759093
+      }
+     }
+    },
+    "pub_k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.08648753809904672,
+      "se": 0.0036570170045941023
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.07492842239330665,
+      "se": 0.001987428599757165
+     },
+     "share_cross_city_suburb": {
+      "value": 0.07968675600851807,
+      "se": 0.0019102000520315372
+     },
+     "share_cross_class": {
+      "value": 0.09445052121084319,
+      "se": 0.001636801347091978
+     },
+     "block.city_share_jobs": {
+      "value": 0.33827008251299856,
+      "se": 0.0035102778583097826
+     },
+     "block.city_share_residents": {
+      "value": 0.3134685313827001,
+      "se": 0.003552492413153097
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.02480155113029848,
+      "se": 0.001737399665466568
+     },
+     "marginal.city_share_residents": {
+      "value": 0.312749050056059,
+      "se": 0.003498696925150094
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.33646395092482717,
+      "se": 0.00349486857878445
+     },
+     "gap_res": {
+      "value": 0.7872983973319644,
+      "se": 0.016281162675629637
+     },
+     "gap_work": {
+      "value": 0.6790921701339327,
+      "se": 0.0156624300217219
+     },
+     "net_commute_gap": {
+      "value": 0.10820622719803163,
+      "se": 0.007961491385646372
+     },
+     "res": {
+      "city": {
+       "value": 0.2693810964107509,
+       "se": 0.0030815017236886888
+      },
+      "suburb": {
+       "value": 0.5919519639533506,
+       "se": 0.0033290342299206583
+      },
+      "other": {
+       "value": 0.1386669396358987,
+       "se": 0.00206857005794818
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.2905087310822975,
+       "se": 0.0031138168404725402
+      },
+      "suburb": {
+       "value": 0.5729083758136594,
+       "se": 0.003370781322948141
+      },
+      "other": {
+       "value": 0.13658289310404328,
+       "se": 0.002283794391252359
+      }
+     }
+    }
+   }
+  },
+  {
+   "pc_cut": 0.75,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_powpuma_by_class": {
+    "city": 50,
+    "other": 313,
+    "suburb": 619
+   },
+   "n_puma_by_class": {
+    "city": 542,
+    "other": 345,
+    "suburb": 1464
+   },
+   "groups": {
+    "all": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.13268075307013763,
+      "se": 0.001133099467951541
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.044753389014039496,
+      "se": 0.0002031036527432721
+     },
+     "share_cross_city_suburb": {
+      "value": 0.055110831454194105,
+      "se": 0.00022358304175445026
+     },
+     "share_cross_class": {
+      "value": 0.07947771618888277,
+      "se": 0.00028166986741664715
+     },
+     "block.city_share_jobs": {
+      "value": 0.1363313780416526,
+      "se": 0.0002820960881232703
+     },
+     "block.city_share_residents": {
+      "value": 0.11083459837870799,
+      "se": 0.00018027499946064157
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.025496779662944613,
+      "se": 0.00022066439317097432
+     },
+     "marginal.city_share_residents": {
+      "value": 0.1102565911467114,
+      "se": 0.00017791881108020587
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.13522859042850754,
+      "se": 0.00028944042569328007
+     },
+     "gap_res": {
+      "value": 2.088122820315556,
+      "se": 0.0018138260250822596
+     },
+     "gap_work": {
+      "value": 1.8554985966968212,
+      "se": 0.0024749991571751716
+     },
+     "net_commute_gap": {
+      "value": 0.23262422361873503,
+      "se": 0.002014226650358196
+     },
+     "res": {
+      "city": {
+       "value": 0.09724988548560967,
+       "se": 0.00015855476296083593
+      },
+      "suburb": {
+       "value": 0.7847825125250042,
+       "se": 0.0002443950941845443
+      },
+      "other": {
+       "value": 0.11796760198938605,
+       "se": 0.00021005181505326807
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.12066002816515524,
+       "se": 0.0002589968381964041
+      },
+      "suburb": {
+       "value": 0.7716071158079649,
+       "se": 0.00032665138785965717
+      },
+      "other": {
+       "value": 0.10773285602687986,
+       "se": 0.00022164905578667357
+      }
+     }
+    },
+    "nonteacher": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.13289212750673537,
+      "se": 0.0011983565385902837
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.04511140025381409,
+      "se": 0.00020607914233935958
+     },
+     "share_cross_city_suburb": {
+      "value": 0.05546801061748566,
+      "se": 0.00023346534538189792
+     },
+     "share_cross_class": {
+      "value": 0.07997191558167804,
+      "se": 0.00028816961722283194
+     },
+     "block.city_share_jobs": {
+      "value": 0.13676141223114072,
+      "se": 0.00028931278616976065
+     },
+     "block.city_share_residents": {
+      "value": 0.11099596032987222,
+      "se": 0.00019616543591206446
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.025765451901268478,
+      "se": 0.00022526667849604213
+     },
+     "marginal.city_share_residents": {
+      "value": 0.11041620458235889,
+      "se": 0.00019304867928480516
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.1356582958537757,
+      "se": 0.0002976752172057298
+     },
+     "gap_res": {
+      "value": 2.086496804038645,
+      "se": 0.0019655165024372715
+     },
+     "gap_work": {
+      "value": 1.8518289879807617,
+      "se": 0.0025383417526492393
+     },
+     "net_commute_gap": {
+      "value": 0.23466781605788323,
+      "se": 0.002076428396354762
+     },
+     "res": {
+      "city": {
+       "value": 0.09742024934012801,
+       "se": 0.00017128190732203336
+      },
+      "suburb": {
+       "value": 0.7848800408085226,
+       "se": 0.00026427094711104957
+      },
+      "other": {
+       "value": 0.11769970985134919,
+       "se": 0.00022105434079160743
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.12111420272390061,
+       "se": 0.0002664608669920596
+      },
+      "suburb": {
+       "value": 0.7716745645362161,
+       "se": 0.0003401782128298507
+      },
+      "other": {
+       "value": 0.10721123273988312,
+       "se": 0.00023441680461584762
+      }
+     }
+    },
+    "k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.12549697452754996,
+      "se": 0.005731354400903473
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.033241430646795155,
+      "se": 0.001071547920491756
+     },
+     "share_cross_city_suburb": {
+      "value": 0.04353597907329999,
+      "se": 0.0010523168074737701
+     },
+     "share_cross_class": {
+      "value": 0.063651795424162,
+      "se": 0.0010833458971225742
+     },
+     "block.city_share_jobs": {
+      "value": 0.12239556438390242,
+      "se": 0.002273981698373402
+     },
+     "block.city_share_residents": {
+      "value": 0.10560545581785125,
+      "se": 0.0020207083854345406
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.016790108566051152,
+      "se": 0.0012072785933614151
+     },
+     "marginal.city_share_residents": {
+      "value": 0.10509346410476782,
+      "se": 0.002026276720074642
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.12119725766692041,
+      "se": 0.002227127612609457
+     },
+     "gap_res": {
+      "value": 2.1418691951003908,
+      "se": 0.021551339094922344
+     },
+     "gap_work": {
+      "value": 1.9811410141797894,
+      "se": 0.020948029110039113
+     },
+     "net_commute_gap": {
+      "value": 0.16072818092060137,
+      "se": 0.012096871312132213
+     },
+     "res": {
+      "city": {
+       "value": 0.0917942639245811,
+       "se": 0.0017700124071856848
+      },
+      "suburb": {
+       "value": 0.7816593300407988,
+       "se": 0.0023925260033558706
+      },
+      "other": {
+       "value": 0.1265464060346201,
+       "se": 0.001708852200986082
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.10611583672168848,
+       "se": 0.001977027487741565
+      },
+      "suburb": {
+       "value": 0.7694471814888444,
+       "se": 0.0024272183652573674
+      },
+      "other": {
+       "value": 0.12443698178946712,
+       "se": 0.0018128686964759251
+      }
+     }
+    },
+    "pub_k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.12510337206154484,
+      "se": 0.008246911277644167
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.02933517844182792,
+      "se": 0.0012267407599187384
+     },
+     "share_cross_city_suburb": {
+      "value": 0.03908474359673211,
+      "se": 0.001316900446412145
+     },
+     "share_cross_class": {
+      "value": 0.05998039157395463,
+      "se": 0.0012868503181829745
+     },
+     "block.city_share_jobs": {
+      "value": 0.11105303076521539,
+      "se": 0.002738874885279109
+     },
+     "block.city_share_residents": {
+      "value": 0.09632472946010429,
+      "se": 0.002484811226351281
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.0147283013051111,
+      "se": 0.0014120324269912517
+     },
+     "marginal.city_share_residents": {
+      "value": 0.09594869680038173,
+      "se": 0.0024832392723481284
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.1099967379293625,
+      "se": 0.002670482126071668
+     },
+     "gap_res": {
+      "value": 2.243072469817439,
+      "se": 0.028636302577018796
+     },
+     "gap_work": {
+      "value": 2.0907744178022973,
+      "se": 0.02736465613914572
+     },
+     "net_commute_gap": {
+      "value": 0.15229805201514157,
+      "se": 0.015444769340923283
+     },
+     "res": {
+      "city": {
+       "value": 0.08264378465302005,
+       "se": 0.002130925856601591
+      },
+      "suburb": {
+       "value": 0.7786892757110813,
+       "se": 0.0029537293987942814
+      },
+      "other": {
+       "value": 0.1386669396358987,
+       "se": 0.0020685700579481767
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.09497306523096294,
+       "se": 0.0023209831465734543
+      },
+      "suburb": {
+       "value": 0.7684440416649939,
+       "se": 0.0030535007326247957
+      },
+      "other": {
+       "value": 0.13658289310404328,
+       "se": 0.0022837943912523565
+      }
+     }
+    }
+   }
+  },
+  {
+   "pc_cut": 0.9,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_powpuma_by_class": {
+    "city": 29,
+    "other": 313,
+    "suburb": 640
+   },
+   "n_puma_by_class": {
+    "city": 432,
+    "other": 345,
+    "suburb": 1574
+   },
+   "groups": {
+    "all": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.14327365484912485,
+      "se": 0.0015112620997534637
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.029601148438099165,
+      "se": 0.00019022301138141938
+     },
+     "share_cross_city_suburb": {
+      "value": 0.03777706208714524,
+      "se": 0.00022324411592215563
+     },
+     "share_cross_class": {
+      "value": 0.06437266489769056,
+      "se": 0.00026820116785024133
+     },
+     "block.city_share_jobs": {
+      "value": 0.0865088168652979,
+      "se": 0.0002478826418731794
+     },
+     "block.city_share_residents": {
+      "value": 0.06843327567891672,
+      "se": 0.0001621219638008477
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.01807554118638119,
+      "se": 0.00019101891375424444
+     },
+     "marginal.city_share_residents": {
+      "value": 0.06792788167454764,
+      "se": 0.00015847220225661396
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.08556228160775393,
+      "se": 0.00024918901025796004
+     },
+     "gap_res": {
+      "value": 2.618963613098451,
+      "se": 0.0025036422410287355
+     },
+     "gap_work": {
+      "value": 2.3690648103492773,
+      "se": 0.0031852769179204514
+     },
+     "net_commute_gap": {
+      "value": 0.24989880274917375,
+      "se": 0.002541913054908495
+     },
+     "res": {
+      "city": {
+       "value": 0.059914592365182484,
+       "se": 0.00013938414614669765
+      },
+      "suburb": {
+       "value": 0.8221178056454315,
+       "se": 0.00024926025077173666
+      },
+      "other": {
+       "value": 0.11796760198938605,
+       "se": 0.0002100518150532668
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.07634441264197443,
+       "se": 0.00022092484706124748
+      },
+      "suburb": {
+       "value": 0.8159227313311457,
+       "se": 0.00031787273751720114
+      },
+      "other": {
+       "value": 0.10773285602687986,
+       "se": 0.00022164905578667238
+      }
+     }
+    },
+    "nonteacher": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.14360509072651542,
+      "se": 0.0016260153498566866
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.02974384036914625,
+      "se": 0.00019439951491734706
+     },
+     "share_cross_city_suburb": {
+      "value": 0.037950550370772156,
+      "se": 0.0002298971742550514
+     },
+     "share_cross_class": {
+      "value": 0.06470132743624557,
+      "se": 0.00027189542282873207
+     },
+     "block.city_share_jobs": {
+      "value": 0.08674629292400066,
+      "se": 0.00025672242801112115
+     },
+     "block.city_share_residents": {
+      "value": 0.06858752313228404,
+      "se": 0.00017343214713661976
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.018158769791716607,
+      "se": 0.00019993962321169723
+     },
+     "marginal.city_share_residents": {
+      "value": 0.06808528154819377,
+      "se": 0.00016971483647836003
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.08579677710644583,
+      "se": 0.00025713202579082974
+     },
+     "gap_res": {
+      "value": 2.6164802468782415,
+      "se": 0.0026753948940205926
+     },
+     "gap_work": {
+      "value": 2.3660714483352803,
+      "se": 0.0032782937209463593
+     },
+     "net_commute_gap": {
+      "value": 0.2504087985429613,
+      "se": 0.0026632237677595275
+     },
+     "res": {
+      "city": {
+       "value": 0.06007166366482393,
+       "se": 0.00014906120952141907
+      },
+      "suburb": {
+       "value": 0.8222286264838267,
+       "se": 0.0002658952810092399
+      },
+      "other": {
+       "value": 0.11769970985134919,
+       "se": 0.00022105434079160822
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.07659839886775478,
+       "se": 0.00022788788042887542
+      },
+      "suburb": {
+       "value": 0.8161903683923619,
+       "se": 0.0003332834764180373
+      },
+      "other": {
+       "value": 0.10721123273988312,
+       "se": 0.00023441680461585014
+      }
+     }
+    },
+    "k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.13165689224738025,
+      "se": 0.007836637349009471
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.025011245302557477,
+      "se": 0.0009456242914911835
+     },
+     "share_cross_city_suburb": {
+      "value": 0.032154950051575475,
+      "se": 0.0009788202548557964
+     },
+     "share_cross_class": {
+      "value": 0.05384778896839304,
+      "se": 0.0010951738326940305
+     },
+     "block.city_share_jobs": {
+      "value": 0.07881309828488003,
+      "se": 0.0019278181662142476
+     },
+     "block.city_share_residents": {
+      "value": 0.06343468761346917,
+      "se": 0.0017085124428856816
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.015378410671410858,
+      "se": 0.001052365133845147
+     },
+     "marginal.city_share_residents": {
+      "value": 0.06283635826535537,
+      "se": 0.0016988695300009305
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.07790521195082076,
+      "se": 0.0018883709158488858
+     },
+     "gap_res": {
+      "value": 2.7023240521017824,
+      "se": 0.028827308558695197
+     },
+     "gap_work": {
+      "value": 2.4711551689696662,
+      "se": 0.026282193999738444
+     },
+     "net_commute_gap": {
+      "value": 0.23116888313211614,
+      "se": 0.01613333967694556
+     },
+     "res": {
+      "city": {
+       "value": 0.05488464295857086,
+       "se": 0.0014752148548931273
+      },
+      "suburb": {
+       "value": 0.818568951006809,
+       "se": 0.002300924001772609
+      },
+      "other": {
+       "value": 0.1265464060346201,
+       "se": 0.0017088522009860837
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.0682109225099919,
+       "se": 0.0016577111798954038
+      },
+      "suburb": {
+       "value": 0.807352095700541,
+       "se": 0.00235845996518042
+      },
+      "other": {
+       "value": 0.12443698178946712,
+       "se": 0.0018128686964759273
+      }
+     }
+    },
+    "pub_k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.1344826061413871,
+      "se": 0.010422467282263244
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.021908461362695437,
+      "se": 0.0010752533152826602
+     },
+     "share_cross_city_suburb": {
+      "value": 0.028660605052003366,
+      "se": 0.0011898240526222086
+     },
+     "share_cross_class": {
+      "value": 0.05113054927191696,
+      "se": 0.001210684655356544
+     },
+     "block.city_share_jobs": {
+      "value": 0.07015175215126913,
+      "se": 0.001956740181149032
+     },
+     "block.city_share_residents": {
+      "value": 0.056861661400327564,
+      "se": 0.001820527875776335
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.013290090750941567,
+      "se": 0.0011931878067181728
+     },
+     "marginal.city_share_residents": {
+      "value": 0.05632698780150647,
+      "se": 0.001802646497056493
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.06933160208133594,
+      "se": 0.0019217618237836822
+     },
+     "gap_res": {
+      "value": 2.8186059434237714,
+      "se": 0.033952156162274476
+     },
+     "gap_work": {
+      "value": 2.5970022146994927,
+      "se": 0.029841261799415788
+     },
+     "net_commute_gap": {
+      "value": 0.2216037287242787,
+      "se": 0.020941754218314183
+     },
+     "res": {
+      "city": {
+       "value": 0.048516296784162964,
+       "se": 0.0015315423525968917
+      },
+      "suburb": {
+       "value": 0.8128167635799384,
+       "se": 0.0027409035707363742
+      },
+      "other": {
+       "value": 0.13866693963589868,
+       "se": 0.002068570057948195
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.05986209128552877,
+       "se": 0.0016543429602658753
+      },
+      "suburb": {
+       "value": 0.803555015610428,
+       "se": 0.00278749621616508
+      },
+      "other": {
+       "value": 0.13658289310404326,
+       "se": 0.0022837943912523747
+      }
+     }
+    }
+   }
+  },
+  {
+   "pc_cut": 0.5,
+   "metro_cut": 0.9,
+   "main": false,
+   "n_powpuma_by_class": {
+    "city": 146,
+    "other": 434,
+    "suburb": 402
+   },
+   "n_puma_by_class": {
+    "city": 733,
+    "other": 460,
+    "suburb": 1158
+   },
+   "groups": {
+    "all": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.08494292424635312,
+      "se": 0.0005381079391467966
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.11836423878603437,
+      "se": 0.00041551079508720697
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10741235052069031,
+      "se": 0.0003489837045160214
+     },
+     "share_cross_class": {
+      "value": 0.13077975009987752,
+      "se": 0.0003513791876870881
+     },
+     "block.city_share_jobs": {
+      "value": 0.42660386585106647,
+      "se": 0.00042823733223908036
+     },
+     "block.city_share_residents": {
+      "value": 0.38569160062714053,
+      "se": 0.0003040135579732365
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.04091226522392593,
+      "se": 0.00031659180047545536
+     },
+     "marginal.city_share_residents": {
+      "value": 0.3845185196312581,
+      "se": 0.00029640922238838573
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.4258405799399264,
+      "se": 0.0004416260733913315
+     },
+     "gap_res": {
+      "value": 0.47041290313598316,
+      "se": 0.00125247417812298
+     },
+     "gap_work": {
+      "value": 0.29884204231814826,
+      "se": 0.0018062208090814584
+     },
+     "net_commute_gap": {
+      "value": 0.1715708608178349,
+      "se": 0.0013775930783011764
+     },
+     "res": {
+      "city": {
+       "value": 0.3119106915377875,
+       "se": 0.0002752391073971311
+      },
+      "suburb": {
+       "value": 0.4992613993068892,
+       "se": 0.00025675806553986563
+      },
+      "other": {
+       "value": 0.18882790915532333,
+       "se": 0.00024472242553509144
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3524583852499867,
+       "se": 0.00039530348104888064
+      },
+      "suburb": {
+       "value": 0.47521845404914304,
+       "se": 0.0003854960858714623
+      },
+      "other": {
+       "value": 0.17232316070087023,
+       "se": 0.0002817994545989011
+      }
+     }
+    },
+    "nonteacher": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.0851869206775299,
+      "se": 0.0005523084971232653
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.1193793207730941,
+      "se": 0.0004210281878369289
+     },
+     "share_cross_city_suburb": {
+      "value": 0.10810152633051502,
+      "se": 0.00035673196342096453
+     },
+     "share_cross_class": {
+      "value": 0.13163583523920575,
+      "se": 0.0003575060909139915
+     },
+     "block.city_share_jobs": {
+      "value": 0.42786154565048046,
+      "se": 0.0004419763262729028
+     },
+     "block.city_share_residents": {
+      "value": 0.3865975979821806,
+      "se": 0.0003213217222181958
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.041263947668299876,
+      "se": 0.00032252322419217065
+     },
+     "marginal.city_share_residents": {
+      "value": 0.38540409943307313,
+      "se": 0.0003103595379082858
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.4270920625463704,
+      "se": 0.0004510034580286826
+     },
+     "gap_res": {
+      "value": 0.46667258684048085,
+      "se": 0.0013102877776054978
+     },
+     "gap_work": {
+      "value": 0.29372544304342507,
+      "se": 0.0018431748773607107
+     },
+     "net_commute_gap": {
+      "value": 0.17294714379705578,
+      "se": 0.0014239641758191698
+     },
+     "res": {
+      "city": {
+       "value": 0.3127866535608752,
+       "se": 0.0002845000060555073
+      },
+      "suburb": {
+       "value": 0.4987943701515926,
+       "se": 0.0002680978802616359
+      },
+      "other": {
+       "value": 0.18841897628753235,
+       "se": 0.00024318853205466826
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3538438654915346,
+       "se": 0.00040181880521752695
+      },
+      "suburb": {
+       "value": 0.4746516663192842,
+       "se": 0.00039400919394643445
+      },
+      "other": {
+       "value": 0.17150446818918133,
+       "se": 0.00028010572413450974
+      }
+     }
+    },
+    "k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.07633308371931997,
+      "se": 0.003005220638223607
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.08683287084433429,
+      "se": 0.002017453527780645
+     },
+     "share_cross_city_suburb": {
+      "value": 0.08488863866082669,
+      "se": 0.0015562144616279561
+     },
+     "share_cross_class": {
+      "value": 0.1033650349456594,
+      "se": 0.001480557092385099
+     },
+     "block.city_share_jobs": {
+      "value": 0.3855002504743496,
+      "se": 0.0032443282057250285
+     },
+     "block.city_share_residents": {
+      "value": 0.35608170561949176,
+      "se": 0.003036469794292897
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.02941854485485787,
+      "se": 0.0018768145422890323
+     },
+     "marginal.city_share_residents": {
+      "value": 0.3556794171813253,
+      "se": 0.0030176133249007696
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.38441198982967895,
+      "se": 0.00316522476446047
+     },
+     "gap_res": {
+      "value": 0.5941665900406791,
+      "se": 0.013164083825453043
+     },
+     "gap_work": {
+      "value": 0.4708630574848067,
+      "se": 0.013374587771134924
+     },
+     "net_commute_gap": {
+      "value": 0.12330353255587234,
+      "se": 0.008038062718833505
+     },
+     "res": {
+      "city": {
+       "value": 0.283859451952316,
+       "se": 0.0026060216415623883
+      },
+      "suburb": {
+       "value": 0.5142172380114569,
+       "se": 0.0026676640329814445
+      },
+      "other": {
+       "value": 0.2019233100362271,
+       "se": 0.0022049052277264706
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.3080906647641081,
+       "se": 0.002793278830013187
+      },
+      "suburb": {
+       "value": 0.4933688966315017,
+       "se": 0.002747350262432275
+      },
+      "other": {
+       "value": 0.1985404386043902,
+       "se": 0.0023210325519370583
+      }
+     }
+    },
+    "pub_k12": {
+     "p_work_suburb_given_live_city": {
+      "value": 0.07619923113592329,
+      "se": 0.0034271650341804634
+     },
+     "p_work_city_given_live_suburb": {
+      "value": 0.07978270214876389,
+      "se": 0.002168864948034596
+     },
+     "share_cross_city_suburb": {
+      "value": 0.08034882396994135,
+      "se": 0.0018846320204123166
+     },
+     "share_cross_class": {
+      "value": 0.0993250447533669,
+      "se": 0.001747828704868023
+     },
+     "block.city_share_jobs": {
+      "value": 0.37114785408792117,
+      "se": 0.003610797792723966
+     },
+     "block.city_share_residents": {
+      "value": 0.34450175678861283,
+      "se": 0.0035706694972031856
+     },
+     "block.net_inflow_to_city": {
+      "value": 0.026646097299308346,
+      "se": 0.0019261149611874424
+     },
+     "marginal.city_share_residents": {
+      "value": 0.34448689438613017,
+      "se": 0.003558020883173222
+     },
+     "marginal.city_share_jobs": {
+      "value": 0.3701538884480572,
+      "se": 0.0034659487756590803
+     },
+     "gap_res": {
+      "value": 0.6433622490030566,
+      "se": 0.015755850250463537
+     },
+     "gap_work": {
+      "value": 0.5315566882753799,
+      "se": 0.014871995618328287
+     },
+     "net_commute_gap": {
+      "value": 0.11180556072767667,
+      "se": 0.008361628894134191
+     },
+     "res": {
+      "city": {
+       "value": 0.26938109641075086,
+       "se": 0.00308150172368866
+      },
+      "suburb": {
+       "value": 0.5125966821366258,
+       "se": 0.00303455960614129
+      },
+      "other": {
+       "value": 0.21802222145262334,
+       "se": 0.002716965820063839
+      }
+     },
+     "work": {
+      "city": {
+       "value": 0.29050873108229747,
+       "se": 0.0031138168404725333
+      },
+      "suburb": {
+       "value": 0.49432357825885875,
+       "se": 0.0029557065394954047
+      },
+      "other": {
+       "value": 0.21516769065884372,
+       "se": 0.0028955405882192817
+      }
+     }
+    }
+   }
+  }
+ ],
+ "reproduction": {
+  "checked": true,
+  "reference": "estimates/settings/teacher_residence.json",
+  "n_sample_reference": 1445532,
+  "n_sample_here": 1445532,
+  "k12": {
+   "gap_res": {
+    "here": 0.7309551771262714,
+    "here_se": 0.013492874135933742,
+    "reference": 0.7309551771262717,
+    "reference_se": 0.013492874135933766,
+    "abs_diff_value": 2.220446049250313e-16,
+    "abs_diff_se": 2.42861286636753e-17
+   },
+   "gap_work": {
+    "here": 0.6107979260013067,
+    "here_se": 0.01360737011558066,
+    "reference": 0.6107979260013074,
+    "reference_se": 0.01360737011558049,
+    "abs_diff_value": 7.771561172376096e-16,
+    "abs_diff_se": 1.700029006457271e-16
+   },
+   "net_commute_gap": {
+    "here": 0.12015725112496478,
+    "here_se": 0.0075932133614000094,
+    "reference": 0.12015725112496423,
+    "reference_se": 0.00759321336139994,
+    "abs_diff_value": 5.551115123125783e-16,
+    "abs_diff_se": 6.938893903907228e-17
+   },
+   "share_cross_class": {
+    "here": 0.09860503092812056,
+    "here_se": 0.0013700695653224538,
+    "reference": 0.09860503092812056,
+    "reference_se": 0.0013700695653224783,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 2.45029690981724e-17
+   },
+   "share_metro_cross": {
+    "here": 0.0841116140923534,
+    "here_se": 0.001547358997734713,
+    "reference": 0.08411161409235339,
+    "reference_se": 0.0015473589977347097,
+    "abs_diff_value": 1.3877787807814457e-17,
+    "abs_diff_se": 3.2526065174565133e-18
+   },
+   "live_city_given_work_city": {
+    "here": 0.8326094287922434,
+    "here_se": 0.0035459300151692527,
+    "reference": 0.8326094287922433,
+    "reference_se": 0.0035459300151692574,
+    "abs_diff_value": 1.1102230246251565e-16,
+    "abs_diff_se": 4.7704895589362195e-18
+   },
+   "live_suburb_given_work_city": {
+    "here": 0.15664020234665918,
+    "here_se": 0.003517702824891226,
+    "reference": 0.15664020234665915,
+    "reference_se": 0.0035177028248912336,
+    "abs_diff_value": 2.7755575615628914e-17,
+    "abs_diff_se": 7.806255641895632e-18
+   },
+   "live_other_given_work_city": {
+    "here": 0.01075036886109745,
+    "here_se": 0.0009027433823959063,
+    "reference": 0.010750368861097448,
+    "reference_se": 0.0009027433823959067,
+    "abs_diff_value": 1.734723475976807e-18,
+    "abs_diff_se": 4.336808689942018e-19
+   },
+   "live_city_given_work_suburb": {
+    "here": 0.042640364940644514,
+    "here_se": 0.0014876334982707724,
+    "reference": 0.04264036494064451,
+    "reference_se": 0.0014876334982707718,
+    "abs_diff_value": 6.938893903907228e-18,
+    "abs_diff_se": 6.505213034913027e-19
+   },
+   "live_suburb_given_work_suburb": {
+    "here": 0.9382982075292849,
+    "here_se": 0.0016152446228297728,
+    "reference": 0.9382982075292849,
+    "reference_se": 0.0016152446228297607,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 1.214306433183765e-17
+   },
+   "live_other_given_work_suburb": {
+    "here": 0.019061427530070642,
+    "here_se": 0.000777988704460085,
+    "reference": 0.019061427530070642,
+    "reference_se": 0.0007779887044600846,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 3.2526065174565133e-19
+   }
+  },
+  "pub_k12": {
+   "gap_res": {
+    "here": 0.7872983973319644,
+    "here_se": 0.016281162675629637,
+    "reference": 0.7872983973319645,
+    "reference_se": 0.016281162675629558,
+    "abs_diff_value": 1.1102230246251565e-16,
+    "abs_diff_se": 7.979727989493313e-17
+   },
+   "gap_work": {
+    "here": 0.6790921701339327,
+    "here_se": 0.0156624300217219,
+    "reference": 0.6790921701339334,
+    "reference_se": 0.015662430021721675,
+    "abs_diff_value": 6.661338147750939e-16,
+    "abs_diff_se": 2.255140518769849e-16
+   },
+   "net_commute_gap": {
+    "here": 0.10820622719803163,
+    "here_se": 0.007961491385646372,
+    "reference": 0.10820622719803108,
+    "reference_se": 0.007961491385646165,
+    "abs_diff_value": 5.551115123125783e-16,
+    "abs_diff_se": 2.0643209364124004e-16
+   },
+   "share_cross_class": {
+    "here": 0.09445052121084319,
+    "here_se": 0.001636801347091978,
+    "reference": 0.09445052121084341,
+    "reference_se": 0.0016368013470919522,
+    "abs_diff_value": 2.220446049250313e-16,
+    "abs_diff_se": 2.5804011705155006e-17
+   },
+   "share_metro_cross": {
+    "here": 0.07968675600851807,
+    "here_se": 0.0019102000520315372,
+    "reference": 0.07968675600851809,
+    "reference_se": 0.0019102000520315329,
+    "abs_diff_value": 1.3877787807814457e-17,
+    "abs_diff_se": 4.336808689942018e-18
+   },
+   "live_city_given_work_city": {
+    "here": 0.8358754546912319,
+    "here_se": 0.004195992227022494,
+    "reference": 0.8358754546912319,
+    "reference_se": 0.004195992227022505,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 1.1275702593849246e-17
+   },
+   "live_suburb_given_work_city": {
+    "here": 0.15267708693780752,
+    "here_se": 0.004088291112683942,
+    "reference": 0.15267708693780752,
+    "reference_se": 0.004088291112683944,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 1.734723475976807e-18
+   },
+   "live_other_given_work_city": {
+    "here": 0.011447458370960527,
+    "here_se": 0.0012127799686647797,
+    "reference": 0.011447458370960527,
+    "reference_se": 0.00121277996866478,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 4.336808689942018e-19
+   },
+   "live_city_given_work_suburb": {
+    "here": 0.040666376723676304,
+    "here_se": 0.0017477089236659646,
+    "reference": 0.040666376723676304,
+    "reference_se": 0.0017477089236659638,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 8.673617379884035e-19
+   },
+   "live_suburb_given_work_suburb": {
+    "here": 0.9399315156796569,
+    "here_se": 0.0017173130001966672,
+    "reference": 0.9399315156796568,
+    "reference_se": 0.0017173130001966954,
+    "abs_diff_value": 1.1102230246251565e-16,
+    "abs_diff_se": 2.8189256484623115e-17
+   },
+   "live_other_given_work_suburb": {
+    "here": 0.019402107596666832,
+    "here_se": 0.0008836015584795609,
+    "reference": 0.019402107596666832,
+    "reference_se": 0.0008836015584795595,
+    "abs_diff_value": 0.0,
+    "abs_diff_se": 1.4094628242311558e-18
+   }
+  },
+  "max_abs_diff": 7.771561172376096e-16
+ }
+}

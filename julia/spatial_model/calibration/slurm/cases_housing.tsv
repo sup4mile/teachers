@@ -1,0 +1,8 @@
+# Persistent residential sorting, residence-cost prototype rerun (2026-10-03): r_p box [0, 0.15], GE capped
+# at 60 iterations (--grid maxit=60) so that hard trial points fail fast; external discipline: the ACS
+# suburb–city gap in median monthly housing costs as a fixed cost, r_p = 0.028 (locale), 0.058 (upper end).
+housing_income	--free r_p --activate gap_income --grid maxit=60
+housing_nlsy	--free r_p --activate city_share_gradient --grid maxit=60
+housing_taste	--free r_p --free zeta --activate gap_income --activate city_share_gradient --grid maxit=60
+housing_acs	--fix r_p=0.028 --grid maxit=60
+housing_acs_hi	--fix r_p=0.058 --grid maxit=60

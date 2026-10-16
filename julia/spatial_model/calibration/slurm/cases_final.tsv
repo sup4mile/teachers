@@ -1,0 +1,56 @@
+# Re-evaluation of every 2026-10 experiment case at its estimate on the final code → runs/exp-final/
+# (panel.sh with PANEL_MAX_ITER=0, PANEL_OUT=julia/spatial_model/calibration/runs/exp-final; generated from
+# the experiment case lists by runs/experiments-2026-10/make_reeval.py). Prefixes: p0 baseline, p1 revenue,
+# p2 target tradeoffs, p3 focused panel, p4 teacher pay, p5/pc/pr3 sorting and combined specifications
+# (pr3_teacher_sel is the teacher block with ability selection), p6 hold-out half-A refits.
+p5_housing_acs	--fix r_p=0.028 --grid maxit=60 --theta julia/spatial_model/calibration/runs/exp-housing/housing_acs
+p3_sigma_0.15	--external sigma=0.15 --theta julia/spatial_model/calibration/runs/panel-exact/sigma_0.15
+p3_sigma_0.30	--external sigma=0.30 --theta julia/spatial_model/calibration/runs/panel-exact/sigma_0.30
+p3_sigma_0.60	--external sigma=0.60 --theta julia/spatial_model/calibration/runs/panel-exact/sigma_0.60
+p3_sigma_0.85	--external sigma=0.85 --theta julia/spatial_model/calibration/runs/panel-exact/sigma_0.85
+p3_K_5	--measure K=5 --external sigma=0.2353 --theta julia/spatial_model/calibration/runs/panel-exact/K_5
+p3_K_9	--measure K=9 --external sigma=0.4235 --theta julia/spatial_model/calibration/runs/panel-exact/K_9
+p3_thetanu_0.143	--external theta_nu=0.142857 --theta julia/spatial_model/calibration/runs/panel-exact/thetanu_0.143
+p3_thetanu_0.20	--external theta_nu=0.20 --theta julia/spatial_model/calibration/runs/panel-exact/thetanu_0.20
+p3_thetanu_0.30	--external theta_nu=0.30 --theta julia/spatial_model/calibration/runs/panel-exact/thetanu_0.30
+p3_thetanu_0.40	--external theta_nu=0.40 --theta julia/spatial_model/calibration/runs/panel-exact/thetanu_0.40
+p3_thetanu_0.50	--external theta_nu=0.50 --theta julia/spatial_model/calibration/runs/panel-exact/thetanu_0.50
+p3_wtp_us	--wtp-consumption 2365 --theta julia/spatial_model/calibration/runs/panel-exact/wtp_us
+p3_wtp_west	--wtp-consumption 2705 --theta julia/spatial_model/calibration/runs/panel-exact/wtp_west
+p3_wtp_parents	--target wtp_share=0.0074345 --target-se wtp_share=0.0027926 --theta julia/spatial_model/calibration/runs/panel-exact/wtp_parents
+p3_wtp_sd_0.41	--measure wtp_score_sd=0.41 --theta julia/spatial_model/calibration/runs/panel-exact/wtp_sd_0.41
+p3_wtp_sd_0.49	--measure wtp_score_sd=0.49 --theta julia/spatial_model/calibration/runs/panel-exact/wtp_sd_0.49
+p2_fte_diag	--activate gap_teachers_pp --theta julia/spatial_model/calibration/runs/exp-tradeoffs/fte_diag
+p2_income_diag	--activate gap_income --theta julia/spatial_model/calibration/runs/exp-tradeoffs/income_diag
+p2_pay_school_diag	--activate teacher_premium_m --activate teacher_premium_f --activate s_ratio --theta julia/spatial_model/calibration/runs/exp-tradeoffs/pay_school_diag
+p2_fte_corr	--activate gap_teachers_pp --weight corr --theta julia/spatial_model/calibration/runs/exp-tradeoffs/fte_corr
+p2_income_corr	--activate gap_income --weight corr --theta julia/spatial_model/calibration/runs/exp-tradeoffs/income_corr
+p2_fte_income_corr	--activate gap_teachers_pp --activate gap_income --weight corr --theta julia/spatial_model/calibration/runs/exp-tradeoffs/fte_income_corr
+p2_all_corr	--activate gap_teachers_pp --activate gap_income --activate teacher_premium_m --activate teacher_premium_f --activate s_ratio --weight corr --theta julia/spatial_model/calibration/runs/exp-tradeoffs/all_corr
+p4_school_req	--external sT_min=0.641748 --theta julia/spatial_model/calibration/runs/exp-teacher/school_req
+p4_school_req_pay	--external sT_min=0.641748 --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_pay
+p4_school_req_cT	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+p5_taste_income	--free zeta --activate gap_income --theta julia/spatial_model/calibration/runs/exp-sorting/taste_income
+p5_taste_nlsy	--free zeta --activate city_share_gradient --theta julia/spatial_model/calibration/runs/exp-sorting/taste_nlsy
+p1_rev_base	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --theta julia/spatial_model/calibration/runs/exp-revenue/rev_base
+p1_rev_moverate	--district revenue --theta julia/spatial_model/calibration/runs/exp-revenue/rev_moverate
+p1_rev_common	--district revenue_common --fix r_m=0.20593082667094165 --target move_rate=nan --theta julia/spatial_model/calibration/runs/exp-revenue/rev_common
+p1_locale_common	--district locale_common --theta julia/spatial_model/calibration/runs/exp-revenue/locale_common
+p1_rev_fte_corr	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --activate gap_teachers_pp --weight corr --theta julia/spatial_model/calibration/runs/exp-revenue/rev_fte_corr
+p1_rev_income_corr	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --activate gap_income --weight corr --theta julia/spatial_model/calibration/runs/exp-revenue/rev_income_corr
+pc_taste_afqt	--free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-combined/taste_afqt
+pc_teacher_taste_afqt	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-combined/teacher_taste_afqt
+pc_teacher_taste_income	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate gap_income --theta julia/spatial_model/calibration/runs/exp-combined/teacher_taste_income
+pc_teacher_housing_acs	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --fix r_p=0.028 --grid maxit=60 --theta julia/spatial_model/calibration/runs/exp-combined/teacher_housing_acs
+pc_rev_teacher	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-combined/rev_teacher
+pc_rev_teacher_taste_afqt	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-combined/rev_teacher_taste_afqt
+p6_hold_baseline	--district locale_holdout_A --theta julia/spatial_model/calibration/runs/exp-holdout/hold_baseline
+p6_hold_teacher	--district locale_holdout_A --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-holdout/hold_teacher
+p6_hold_teacher_sel	--district locale_holdout_A --external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --theta julia/spatial_model/calibration/runs/exp-holdout/hold_teacher_sel
+p6_hold_teacher_sel_taste_afqt	--district locale_holdout_A --external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-holdout/hold_teacher_sel_taste_afqt
+pr3_teacher_sel	--external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel
+pr3_teacher_sel_taste_afqt	--external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel_taste_afqt
+pr3_teacher_sel_taste_income	--external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate gap_income --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel_taste_income
+pr3_rev_teacher_sel_taste_afqt	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-round3/rev_teacher_sel_taste_afqt
+pr3_teacher_sel_taste_afqt_fte	--external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate city_share_gradient_z --activate gap_teachers_pp --weight corr --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel_taste_afqt_fte
+p0_baseline	--theta julia/spatial_model/calibration/runs/exact-polish-base

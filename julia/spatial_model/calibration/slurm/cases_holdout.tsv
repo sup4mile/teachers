@@ -1,0 +1,7 @@
+# Pre-registered hold-out test (2026-10 experiment 6): each chosen specification refitted on the district
+# targets of CZ half A (locale_holdout_A); predictions are compared with the sealed half-B moments only after
+# every hold-out refit has run (data/spatial/estimates/settings/sealed/holdout_B.json).
+hold_baseline	--district locale_holdout_A
+hold_teacher	--district locale_holdout_A --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+hold_teacher_sel	--district locale_holdout_A --external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel
+hold_teacher_sel_taste_afqt	--district locale_holdout_A --external sT_min=0.641748 --free c_T --free c_Tz --activate teacher_premium_m --activate teacher_premium_f --activate teacher_z_gap_market_sd --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-round3/teacher_sel_taste_afqt

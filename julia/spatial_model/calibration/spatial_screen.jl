@@ -3,8 +3,10 @@
 #
 # Evaluates points of TikTak's scrambled Sobol sequence (the sequence `spatial_estimate.jl`
 # screens, same seed) over THETA_BOUNDS and records every scalar field of
-# `model_moments` at each point, validation moments and diagnostics included, not only
-# the active targets TikTak journals. Output is one JSON line per point in
+# `model_moments` at each point (short vectors as name_1, name_2, …), validation moments
+# and diagnostics included, not only the active targets TikTak journals. ϑ is whatever
+# THETA_NAMES holds, and the header lists its names so that a longer ϑ is self-describing.
+# Output is one JSON line per point in
 # <run-dir>/screen.jsonl after a header line with the targets, bounds and problem id;
 # a rerun with the same run directory skips indices already recorded, so preempted
 # jobs resume. Plots: screen_plots.py.
@@ -18,6 +20,8 @@
 #   --n N           number of points [1024]
 #   --seed N        Sobol scrambling seed [0, as spatial_estimate.jl]
 #   --workers N     local worker processes [SLURM_CPUS_PER_TASK − 1]
+#   --floor-tol X   largest population share allowed at the consumption floor, with or without a feasible
+#                   location (as spatial_diagnose.jl); a point above it is recorded as failed [1e-8]
 #   --fix, --external, --measure, --reference: as in spatial_estimate.jl
 # =============================================================================
 
@@ -29,12 +33,13 @@ include(joinpath(HERE, "spatial_cli.jl"))
 
 const OPTS = parse_cli(ARGS, Dict{String,Any}(
         "workers" => default_workers(), "run-dir" => joinpath(HERE, "runs", "screen"), "first" => 513,
-        "n" => 1024, "seed" => 0, "reference" => nothing, "wtp-consumption" => nothing);
+        "n" => 1024, "seed" => 0, "reference" => nothing, "wtp-consumption" => nothing, "district" => nothing,
+        "floor-tol" => nothing);
     ints    = ("workers", "first", "n", "seed"),
-    floats  = ("wtp-consumption",),
-    strings = ("run-dir", "reference"),
+    floats  = ("wtp-consumption", "floor-tol"),
+    strings = ("run-dir", "reference", "district"),
     lists   = ("fix", "external", "measure", "target", "target-se"),
-    multi   = ("activate", "deactivate"),
+    multi   = ("activate", "deactivate", "free"),
     script  = "spatial_screen.jl")
 OPTS["workers"] > 0 && addprocs(OPTS["workers"]; exeflags = "--project=$(Base.active_project())")
 
@@ -74,8 +79,8 @@ end
 
 function main(opts)
     ref = frozen_reference(something(opts["reference"], REFERENCE_FILE), SOLVER)
-    (; base, meas, targets, active, bounds) = problem_setup(opts, ref)
-    model = SpatialModel(base, [t.key for t in active]; meas)
+    (; base, meas, targets, active, bounds, floor_tol) = problem_setup(opts, ref)
+    model = SpatialModel(base, [t.key for t in active]; meas, floor_tol)
     pid   = "spatial-" * problem_fingerprint(model, active, bounds)
 
     transform = BoxTransform(bounds)

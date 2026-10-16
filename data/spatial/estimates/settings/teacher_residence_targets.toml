@@ -1,0 +1,412 @@
+# teacher_residence_targets.toml -- residence-based against workplace-based teachers, for the M2 split.
+# Generated 2026-10-05T02:50:20 by data/spatial/teacher_residence.py; see teacher_residence.md.
+#
+# WHICH VALUE MAPS TO WHICH MODEL MOMENT (M2_SPEC_v2.md; all gaps are log(suburb) - log(city), location 2 = suburb)
+#   gap_teach_res_emp  (model: dlog teachers residing / market workers residing)  <-  [k12.gap_teach_res_emp]
+#   net_commute_gap    (model: dlog n_teach_res - dlog n_teach_work)               <-  [k12.net_commute_gap]
+#   dlog n_teach_res   (K-12 teacher residents)                                    <-  [k12.gap_k12_res]
+#   tau_k  (proportional commuting time cost, income x (1 - tau_k); spec v2)       <-  [tau_k.teachers]; [tau_k.other_workers] for non-teachers
+#   r_k    (commuting goods cost in units of mean consumption; spec v1)            <-  [r_k.per_adult] (the model's agents are adults); [r_k.per_cu] is per CE consumer unit
+# The [k12.*] values are K-12 (public-school) teachers: the district gap of the whole education, training and library group
+# (EDU, SOC 25-0000) plus a PUMS composition term (approximate; see the specification range spec_lo / spec_hi).
+# The [locale.*] tables are the EDU district gaps themselves: EDU PROXIES (gap_edu_res_emp, net_commute_gap_edu) that include
+# postsecondary teachers, aides, librarians and private-school staff. They are NOT the model counterparts and have a
+# different (negative) sign for the net gap; do not target them against a K-12 teacher object.
+# value / se / n_cz: pupil-weighted mean over CZs of the within-CZ gap, whole-CZ bootstrap SE (B = 1999, seed 20260929; the draws
+# of district_settings.py, so the correlations are valid). Residents are counted once (unified + elementary ACS records).
+
+[meta]
+generated = "2026-10-05T02:50:20"
+script = "data/spatial/teacher_residence.py"
+year = 2018
+B = 1999
+seed = 20260929
+n_cz = 188
+
+[k12]
+description = "K-12 (public-school) teachers: district EDU gap (residents counted once) plus the PUMS composition term, joint CZ bootstrap on the district_settings draws; approximate"
+n_cz = 188
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income", "k12_gap_teach_res_emp", "k12_net_commute_gap", "gap_edu_res", "gap_fte"]
+corr = [
+  [1.0, -0.11705014700401206, -0.3721887511107738, 0.2773254666436899, -0.005274385722293163, -0.06092511123380769, 0.9474252279173928, 0.9917341205129063],
+  [-0.11705014700401206, 1.0, 0.40584782469671077, 0.15333513265583207, -0.07750827058449886, -0.056935054008720544, -0.05075901469329429, -0.07467849416831726],
+  [-0.3721887511107738, 0.40584782469671077, 1.0, -0.07285405520636856, 0.522252736594284, 0.34925405073370996, -0.1966005179854151, -0.26613808103709785],
+  [0.2773254666436899, 0.15333513265583207, -0.07285405520636856, 1.0, 0.10187778360495878, 0.4657068876373194, 0.43664466814495895, 0.28640787129393386],
+  [-0.005274385722293163, -0.07750827058449886, 0.522252736594284, 0.10187778360495878, 1.0, 0.7636609791812803, 0.1337777823282261, 0.06024934575864814],
+  [-0.06092511123380769, -0.056935054008720544, 0.34925405073370996, 0.4657068876373194, 0.7636609791812803, 1.0, 0.187855768244954, -0.00906911805101936],
+  [0.9474252279173928, -0.05075901469329429, -0.1966005179854151, 0.43664466814495895, 0.1337777823282261, 0.187855768244954, 1.0, 0.9646060506707161],
+  [0.9917341205129063, -0.07467849416831726, -0.26613808103709785, 0.28640787129393386, 0.06024934575864814, -0.00906911805101936, 0.9646060506707161, 1.0],
+]
+# corr: bootstrap correlation (district and composition draws together) with the four adopted targets
+
+[k12.gap_teach_res_emp]
+label = "public K-12 teacher residents / employed residents (gap_teach_res_emp)"
+status = "inactive target / validation candidate: model gap_teach_res_emp"
+value = 0.29838831279106165
+se = 0.040661806337129416
+# se = sqrt(se_boot^2 + se_survey^2 + se_acs^2): conservative (the CZ bootstrap already holds part of the survey noise)
+se_boot = 0.03653260661883041
+se_survey = 0.017410189933589882
+se_acs = 0.003954293199590995
+ci95 = [0.218691172370288, 0.3780854532118353]
+spec_lo = 0.17746564596628303
+spec_hi = 0.3656468834114655
+n_spec = 15
+n_cz = 188
+n_cz_composition = 118
+weight_share_composition = 0.9348742409570497
+corr_district_vs_composition = 0.1524556418322624
+district_gap_edu = 0.027664095858414377
+composition_term = 0.27072421693264725
+
+[k12.net_commute_gap]
+label = "public K-12 teacher residents per K-12 FTE (net_commute_gap)"
+status = "inactive target / validation candidate: model net_commute_gap"
+value = 0.07518811242971601
+se = 0.03793487693220949
+# se = sqrt(se_boot^2 + se_survey^2 + se_acs^2): conservative (the CZ bootstrap already holds part of the survey noise)
+se_boot = 0.033449470769392156
+se_survey = 0.017410189933589882
+se_acs = 0.004131958323335903
+ci95 = [0.0008357536425854101, 0.1495404712168466]
+spec_lo = -0.04573455439506258
+spec_hi = 0.14244668305011987
+n_spec = 15
+n_cz = 188
+n_cz_composition = 118
+weight_share_composition = 0.9348742409570497
+corr_district_vs_composition = -0.23776125012905647
+district_gap_edu = -0.19553610450293124
+composition_term = 0.27072421693264725
+
+[k12.gap_k12_res]
+label = "public K-12 teacher residents (gap_edu_res + composition)"
+status = "memo: K-12 teacher residents gap (model: dlog n_teach_res)"
+value = 0.45585160274762854
+se = 0.11969190230589463
+# se = sqrt(se_boot^2 + se_survey^2 + se_acs^2): conservative (the CZ bootstrap already holds part of the survey noise)
+se_boot = 0.11834679414540288
+se_survey = 0.017410189933589882
+se_acs = 0.004131958323335903
+ci95 = [0.22125547422807507, 0.690447731267182]
+spec_lo = 0.33492893592284995
+spec_hi = 0.5231101733680323
+n_spec = 15
+n_cz = 188
+n_cz_composition = 118
+weight_share_composition = 0.9348742409570497
+corr_district_vs_composition = 0.17624441417206121
+district_gap_edu = 0.18512738581498128
+composition_term = 0.27072421693264725
+
+[k12.composition]
+# Delta log s, s = public K-12 teachers / EDU workers, suburban against city PUMAs of the same CZ (ACS 2018 1-year PUMS)
+delta_log_s = 0.2707242169326472
+se_survey = 0.017410189933589882
+se_cz_bootstrap = 0.02341829871003221
+n_cz = 118
+weight_share = 0.9348742409570497
+
+[k12.specifications]
+# the value of each K-12 moment under every specification (order of `names`; nan = not defined for that moment)
+names = ["headline", "earnings_rule", "no_overlap_sec", "unified", "nyc_dropped", "drop_ny_cz", "all_sector", "incl_prek", "national_classes", "powpuma_classes", "group_quarters", "cut_0.25_0.5", "cut_0.75_0.5", "cut_0.9_0.5", "cut_0.5_0.9", "per_cz_sum"]
+gap_teach_res_emp = [0.29838831279106165, 0.30001505218925784, 0.2966775262637274, 0.2921717319260065, 0.28458100638891975, 0.28534681975400283, 0.21234584657018113, 0.2929200002253239, 0.24912348295276224, 0.17746564596628303, 0.31698077567005684, 0.28094836079873786, 0.36508075918610267, 0.3656468834114655, 0.2971150933624182, 0.3009981880526531]
+net_commute_gap = [0.07518811242971601, 0.11812579215090852, 0.07156364213145397, 0.05465044062692134, 0.05883436568399536, 0.0749704563516844, -0.010854353791164478, 0.06971979986397825, 0.02592328259141663, -0.04573455439506258, 0.0937805753087112, 0.057748160437392226, 0.14188055882475703, 0.14244668305011987, 0.07391489300107257, 0.069640521566193]
+gap_k12_res = [0.45585160274762854, 0.49878928246882104, 0.4522271324493665, 0.36732056639389854, 0.7026759940936828, 0.4975742739133794, 0.3698091365267481, 0.45038329018189077, 0.40658677290932915, 0.33492893592284995, 0.4744440656266237, 0.43841165075530475, 0.5225440491426696, 0.5231101733680323, 0.4545783833189851, 0.47705710736386964]
+in_range = [true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true]
+labels = ["headline: residents counted once, public K-12 / EDU within CZs, PUMA classes 0.5 / 0.5", "earnings rule: every LEA takes its own layer's record (residents counted twice)", "residents once from unified + secondary records", "unified districts only", "New York City dropped from both counts (not in the range: the New York CZ keeps its weight with almost no city location left, so its gap is dominated by what remains; `drop_ny_cz` is the clean version)", "New York CZ left out", "composition: all-sector K-12 teachers / EDU", "composition: public K-12 plus preschool / kindergarten (OCCP 2300) / EDU", "composition: national city / suburb PUMA split (not CZ by CZ)", "composition: POWPUMA classes (county based, national)", "composition: group quarters included (as in C24010)", "composition: PUMA class cut pc >= 0.25, metro >= 0.5", "composition: PUMA class cut pc >= 0.75, metro >= 0.5", "composition: PUMA class cut pc >= 0.9, metro >= 0.5", "composition: PUMA class cut pc >= 0.5, metro >= 0.9", "district gap plus composition added CZ by CZ on the CZs that have both"]
+
+[k12.cross_checks]
+# computed without the district table
+gap_teach_res_emp_within_cz_pums = 0.31680761009679265
+gap_teach_res_emp_within_cz_pums_se = 0.041221208049169414
+gap_teach_res_emp_powpuma_classes_national = 0.18416544093012943
+gap_teach_res_emp_powpuma_classes_national_se = 0.016233163014056022
+net_commute_gap_powpuma_classes_national = 0.10820622719803108
+net_commute_gap_powpuma_classes_national_se = 0.007961491385646165
+
+[tau_k]
+# proportional time cost of working in the other location: income x (1 - tau_k) when r != w (M2_SPEC_v2.md)
+# tau_k = value-of-time share of the own wage x 2 x extra one-way hours x days / annual hours worked
+formula = "tau_k = vot_share * 2 * extra_one_way_minutes / 60 * days_per_year / annual_hours"
+[tau_k.teachers]
+description = "K-12 teachers (185 days)"
+central = 0.02274200805253845
+low = 0.012893257702591672
+high = 0.03506061533476715
+central_se_from_extra_minutes = 0.0004794773860466613
+central_with_2080_hours = 0.0245754337626702
+extra_one_way_minutes = [13.8, 16.578454776114818, 20.738228497709404]
+days_per_year = [180.0, 185.0, 190.0]
+annual_hours = 2247.686400790293
+value_of_time_share_of_own_wage = [0.35, 0.5, 0.6]
+
+[tau_k.other_workers]
+description = "other workers (250 days)"
+central = 0.033592497630693594
+low = 0.01941770296598674
+high = 0.04474199595286153
+central_se_from_extra_minutes = 0.00017849157249606276
+central_with_2080_hours = 0.036306130645597845
+extra_one_way_minutes = [15.589810201282187, 18.12402041828245, 19.342518299981034]
+days_per_year = [240.0, 250.0, 260.0]
+annual_hours = 2248.0243229620287
+value_of_time_share_of_own_wage = [0.35, 0.5, 0.6]
+
+[r_k]
+# goods cost of the extra commuting in units of mean consumption Cbar (M2_SPEC.md): annual time cost / Cbar
+# the model's agents are single adults and the cost is per worker: use [r_k.per_adult]; [r_k.per_cu] divides by CE
+# consumption per consumer unit (2.5 persons, 1.9 adults), the unit of r_p, and is NOT the per-adult number
+formula = "r_k = 2 * extra_one_way_minutes / 60 * days_per_year * value_of_hour / cbar"
+extra_one_way_minutes = [13.8, 16.578454776114818, 20.738228497709404]
+days_per_year = [180.0, 185.0, 190.0]
+value_of_hour_2018_usd = [10.064748520148344, 14.40848209200184, 17.268989566149266]
+annual_time_cost_central_usd = 1473.0339406540616
+
+[r_k.per_adult]
+cbar_usd = 32223.226315789474
+adults_per_consumer_unit = 1.9
+central = 0.045713421934173944
+central_se_from_extra_minutes = 0.0009637914121571731
+low = 0.025862127190533164
+high = 0.0703885318901758
+
+[r_k.per_cu]
+cbar_usd = 61224.13
+central = 0.024059695754828393
+central_se_from_extra_minutes = 0.0005072586379774596
+low = 0.013611645889754298
+high = 0.037046595731671475
+
+[locale]
+description = "EDU (SOC 25-0000) PROXIES, not the model counterparts: locale split (city vs suburb), the 188 CZs of the tracked moments; residents counted once (unified + elementary ACS records); matched sample of districts with a C24010 record and an audited K-12 FTE and pupil count"
+n_cz = 188
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income", "k12_gap_teach_res_emp", "k12_net_commute_gap", "k12_gap_k12_res", "gap_edu_res_emp", "gap_edu_res", "gap_fte", "net_commute_gap_edu"]
+corr = [
+  [1.0, -0.11705014700401206, -0.3721887511107738, 0.2773254666436899, -0.005274385722293163, -0.06092511123380769, 0.9366230369905821, -0.20133856068520342, 0.9474252279173928, 0.9917341205129063, -0.22654860736595286],
+  [-0.11705014700401206, 1.0, 0.40584782469671077, 0.15333513265583207, -0.07750827058449886, -0.056935054008720544, -0.08791733986218303, 0.07655381006778152, -0.05075901469329429, -0.07467849416831726, 0.09363391243572872],
+  [-0.3721887511107738, 0.40584782469671077, 1.0, -0.07285405520636856, 0.522252736594284, 0.34925405073370996, -0.1572567607176511, 0.6349345972914927, -0.1966005179854151, -0.26613808103709785, 0.2752591136412756],
+  [0.2773254666436899, 0.15333513265583207, -0.07285405520636856, 1.0, 0.10187778360495878, 0.4657068876373194, 0.4070921992548306, 0.17927705060176818, 0.43664466814495895, 0.28640787129393386, 0.5411034159341127],
+  [-0.005274385722293163, -0.07750827058449886, 0.522252736594284, 0.10187778360495878, 1.0, 0.7636609791812803, 0.2737881014121416, 0.7737171427527618, 0.1337777823282261, 0.06024934575864814, 0.26979812017783034],
+  [-0.06092511123380769, -0.056935054008720544, 0.34925405073370996, 0.4657068876373194, 0.7636609791812803, 1.0, 0.2739168190695853, 0.6686324089821755, 0.187855768244954, -0.00906911805101936, 0.7331814248861407],
+  [0.9366230369905821, -0.08791733986218303, -0.1572567607176511, 0.4070921992548306, 0.2737881014121416, 0.2739168190695853, 1.0, 0.05927608542281898, 0.9808467375935186, 0.9592296500273246, 0.020737437263970506],
+  [-0.20133856068520342, 0.07655381006778152, 0.6349345972914927, 0.17927705060176818, 0.7737171427527618, 0.6686324089821755, 0.05927608542281898, 1.0, 0.03077087219194344, -0.13485834002856695, 0.6245792746035025],
+  [0.9474252279173928, -0.05075901469329429, -0.1966005179854151, 0.43664466814495895, 0.1337777823282261, 0.187855768244954, 0.9808467375935186, 0.03077087219194344, 1.0, 0.9646060506707161, 0.07165679413149689],
+  [0.9917341205129063, -0.07467849416831726, -0.26613808103709785, 0.28640787129393386, 0.06024934575864814, -0.00906911805101936, 0.9592296500273246, -0.13485834002856695, 0.9646060506707161, 1.0, -0.19389677025112184],
+  [-0.22654860736595286, 0.09363391243572872, 0.2752591136412756, 0.5411034159341127, 0.26979812017783034, 0.7331814248861407, 0.020737437263970506, 0.6245792746035025, 0.07165679413149689, -0.19389677025112184, 1.0],
+]
+
+[locale.gap_edu_res_emp]
+label = "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+value = 0.027664095858414377
+se = 0.024695652249974574
+se_acs_sampling = 0.003954293199590995
+ci95 = [-0.02148053731170461, 0.07361475525309656]
+n_cz = 188
+
+[locale.net_commute_gap_edu]
+label = "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)"
+value = -0.19553610450293124
+se = 0.03009249461758321
+se_acs_sampling = 0.004131958323335903
+ci95 = [-0.25664687797050495, -0.13781780502786395]
+n_cz = 188
+
+[locale.gap_edu_res]
+label = "Delta log EDU residents (workers by residence)"
+value = 0.18512738581498128
+se = 0.11195272260511416
+se_acs_sampling = 0.004131958323335903
+ci95 = [-0.018594334944481237, 0.418989080088535]
+n_cz = 188
+
+[locale.gap_fte]
+label = "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+value = 0.3806634903179125
+se = 0.1138251111291022
+ci95 = [0.16616122549309764, 0.6051809672122811]
+n_cz = 188
+
+[locale.gap_edu_per_pupil]
+label = "Delta log (EDU residents per K-12 pupil)"
+value = -0.21402287147860813
+se = 0.03603099796648906
+ci95 = [-0.28882546670277603, -0.1463394932096883]
+n_cz = 188
+
+[locale.gap_emp_res]
+label = "Delta log employed residents"
+value = 0.1574632899565669
+se = 0.11389969305287481
+ci95 = [-0.05877595854697792, 0.38670471760864444]
+n_cz = 188
+
+[locale.level_edu_per_fte]
+label = "EDU residents per K-12 FTE, CZ-weighted mean of the location level (city = loc1, suburb = loc2)"
+loc1 = 3.993312088210154
+loc1_se = 0.1568234998865721
+loc2 = 3.1837133369949258
+loc2_se = 0.08956098756985426
+
+[locale.level_edu_share_emp]
+label = "EDU residents per employed resident, CZ-weighted mean of the location level (city = loc1, suburb = loc2)"
+loc1 = 0.06030332983083229
+loc1_se = 0.0014575376859024655
+loc2 = 0.0615953195835452
+loc2_se = 0.0014720978182752244
+
+[locale_earnings_rule]
+description = "earnings rule: every LEA takes its own layer's record (residents of overlapping elementary and secondary districts counted twice)"
+
+[locale_earnings_rule.gap_edu_res_emp]
+value = 0.029290835256610553
+se = 0.025378652365081605
+n_cz = 188
+
+[locale_earnings_rule.net_commute_gap_edu]
+value = -0.15259842478173874
+se = 0.0353938793247147
+n_cz = 188
+
+[locale_earnings_rule.gap_edu_res]
+value = 0.22806506553617378
+se = 0.11436116759619726
+n_cz = 188
+
+[locale_no_overlap_sec]
+description = "residents once from unified + secondary records (elementary residents dropped where a secondary LEA is present)"
+
+[locale_no_overlap_sec.gap_edu_res_emp]
+value = 0.025953309331080164
+se = 0.024634102366922282
+n_cz = 188
+
+[locale_no_overlap_sec.net_commute_gap_edu]
+value = -0.19916057480119329
+se = 0.029831681270944366
+n_cz = 188
+
+[locale_no_overlap_sec.gap_edu_res]
+value = 0.18150291551671927
+se = 0.11251700400212726
+n_cz = 188
+
+[locale_unified]
+description = "unified districts only"
+
+[locale_unified.gap_edu_res_emp]
+value = 0.02144751499335925
+se = 0.02418088877139043
+n_cz = 183
+
+[locale_unified.net_commute_gap_edu]
+value = -0.2160737763057259
+se = 0.029960861002908665
+n_cz = 183
+
+[locale_unified.gap_edu_res]
+value = 0.09659634946125131
+se = 0.12332501509041345
+n_cz = 183
+
+[locale_nyc_dropped]
+description = "New York City dropped from both the resident and the FTE / pupil counts"
+
+[locale_nyc_dropped.gap_edu_res_emp]
+value = 0.013856789456272507
+se = 0.021516314889771015
+n_cz = 188
+
+[locale_nyc_dropped.net_commute_gap_edu]
+value = -0.2118898512486519
+se = 0.03342326726142226
+n_cz = 188
+
+[locale_nyc_dropped.gap_edu_res]
+value = 0.4319517771610355
+se = 0.21831308027124208
+n_cz = 188
+
+[locale_drop_ny_cz]
+description = "New York CZ left out"
+
+[locale_drop_ny_cz.gap_edu_res_emp]
+value = 0.014622602821355586
+se = 0.022674142364070313
+n_cz = 187
+
+[locale_drop_ny_cz.net_commute_gap_edu]
+value = -0.19575376058096286
+se = 0.03178301096044825
+n_cz = 187
+
+[locale_drop_ny_cz.gap_edu_res]
+value = 0.22685005698073216
+se = 0.11053371650106729
+n_cz = 187
+
+[composition]
+# ACS 2018 1-year PUMS, employed 16+ in households; replicate-weight SEs. s = share of EDU workers who are K-12 teachers
+s_k12 = 0.5206136030003331
+s_k12_se = 0.001967186899909538
+s_public_k12 = 0.3687386049537311
+s_public_k12_se = 0.002080376593029302
+s_public_k12_city = 0.3101289305571548
+s_public_k12_city_se = 0.003732860355061864
+s_public_k12_suburb = 0.38700882761027566
+s_public_k12_suburb_se = 0.0024950008111877587
+delta_log_s_public_k12_national_classes = 0.22145938709434787
+delta_log_s_public_k12_national_classes_se = 0.013138222799232714
+delta_log_s_public_k12_within_cz = 0.2707242169326472
+delta_log_s_public_k12_within_cz_se = 0.017410189933589882
+delta_log_s_public_k12_within_cz_n_cz = 118
+delta_log_s_public_k12_within_cz_weight_share = 0.9348742409570497
+sd_s_public_k12_across_pumas = 0.09760859184532755
+sd_s_public_k12_across_pumas_se = 0.018762726794508123
+
+[pums_k12_flows]
+# K-12 teachers by residence and by workplace on the same POWPUMA classes (national, 2018 1-year PUMS)
+[pums_k12_flows.k12]
+net_commute_gap = 0.12015725112496423
+net_commute_gap_se = 0.00759321336139994
+gap_res_emp = 0.1278222207244366
+gap_res_emp_se = 0.013383351923309889
+share_work_in_other_class = 0.09860503092812056
+share_work_in_other_class_se = 0.0013700695653224783
+share_metro_city_suburb_cross = 0.08411161409235339
+share_metro_city_suburb_cross_se = 0.0015473589977347097
+
+[pums_k12_flows.pub_k12]
+net_commute_gap = 0.10820622719803108
+net_commute_gap_se = 0.007961491385646165
+gap_res_emp = 0.18416544093012943
+gap_res_emp_se = 0.016233163014056022
+share_work_in_other_class = 0.09445052121084341
+share_work_in_other_class_se = 0.0016368013470919522
+share_metro_city_suburb_cross = 0.07968675600851809
+share_metro_city_suburb_cross_se = 0.0019102000520315329
+
+[commute]
+# K-12 teachers (OCCP 2310, 2320, 2330) and other employed workers 25-64, one-way commute of commuters
+[commute.teachers]
+mean_minutes = 22.935228067805117
+mean_minutes_se = 0.12118394665011428
+share_over_30 = 0.18551517315589097
+share_over_30_se = 0.002406929571529834
+share_30_or_more = 0.3019313263302146
+share_30_or_more_se = 0.003222834659670026
+share_exactly_30 = 0.11641615317432362
+share_outside_residence_powpuma = 0.20656804370807771
+share_outside_residence_powpuma_se = 0.0022788759624860575
+
+[commute.other_workers]
+mean_minutes = 28.2029830507262
+mean_minutes_se = 0.027897676905103717
+share_over_30 = 0.270775394011789
+share_over_30_se = 0.0005981362886156911
+share_30_or_more = 0.4129201921305156
+share_30_or_more_se = 0.0006666347370270309
+share_exactly_30 = 0.14214479811872663
+share_outside_residence_powpuma = 0.27060980113805727
+share_outside_residence_powpuma_se = 0.000559041073782203
+

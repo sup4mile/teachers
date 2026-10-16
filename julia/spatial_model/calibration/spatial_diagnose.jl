@@ -23,9 +23,33 @@
 #   --out DIR              write report.txt and theta.toml to DIR
 #   --grid name=value      override a SOLVER setting (repeatable), e.g. Nz=9, nXO=96: the
 #                          §4 grid and quadrature checks; the frozen reference is unchanged
+#   --free name            release an extension parameter of ϑ (r_p, ζ/zeta, c_T, c_Tz, ρw/rho_w and the M3 entries
+#                          rho_c, c_C, c_Cz, rho_T0, vartheta_s, s_z, sigma_eps, dlogphi, c_T0, the peer
+#                          effect psi_a, ψ_a in Q_l = (2H̃_T/M_l)^σ ā_l^ψ_a, and the switches of 2026-10-15
+#                          kappa_c (commuting friction; split), theta_nu (σν/μ) and zeta_BA (BA suburban
+#                          amenity; college), and b_T (teachers' suburban workplace taste, closure R; split))
+#                          to its EXTENSION_BOUNDS (repeatable); they are fixed at 0
+#                          otherwise (for s_z, σ_ϵ, dlogφ, θ_ν: at the external block's s_z, σϵ, φ, θν)
+#   --district SCHEME      the four district targets of a partition scheme (locale, revenue,
+#                          ses, …) from data/spatial/estimates/settings/district_settings_targets.toml
+#   --weight diag|corr     criterion weights: diagonal [diag], or the bootstrap correlations of
+#                          the district targets of the --district scheme (default locale)
+#   --floor-tol X          largest population share allowed at the consumption floor, with or
+#                          without a feasible location (`floor_mass + infeasible_mass`); the
+#                          evaluation fails above it [1e-8]
 #   --fix, --external, --measure, --target, --target-se, --activate, --deactivate,
 #   --wtp-consumption, --reference:
-#                          as in spatial_estimate.jl
+#                          as in spatial_estimate.jl, which also describes the residence/workplace split:
+#                          --external split=1 --external τk=0.03 --external jobs_city=0.45 --fix ρw=0.1
+#                          M3 (joint education and occupation choice, model §3c; it composes with the split):
+#                          `--external college=1` turns it on, with `--external sBA=…`, `sT0=…` (the
+#                          non-BA teachers' schooling floor), `Fc=…`, `sigma_d=…`, `omega_z=…`;
+#                          `--fix rho_c=0.2 --fix c_C=0 --fix c_Cz=-0.5 --fix rho_T0=0.3
+#                          --fix vartheta_s=1.1 --fix c_T0=…` set its ϑ entries at a point; its
+#                          moments are in the report, and `--activate ba_share_nonteach` etc. move
+#                          them into the criterion (`--activate pooled_p9010` computes the pooled 90/10)
+#                          `--external move_util=1` (2026-10-15, candidate U): ϑ's r_m is a utility moving
+#                          cost (τmove, utils) instead of the goods cost r_m C̄
 # =============================================================================
 
 using Distributed
@@ -39,13 +63,13 @@ include(joinpath(HERE, "spatial_cli.jl"))
 const OPTS = parse_cli(ARGS, Dict{String,Any}(
         "workers" => default_workers(), "theta" => "theta0", "polish" => false, "max-iter" => 25,
         "jacobian" => false, "consistency" => false, "out" => nothing, "wtp-consumption" => nothing,
-        "reference" => nothing);
+        "reference" => nothing, "district" => nothing, "weight" => "diag", "floor-tol" => nothing);
     flags   = ("polish", "jacobian", "consistency"),
     ints    = ("workers", "max-iter"),
-    floats  = ("wtp-consumption",),
-    strings = ("theta", "out", "reference"),
+    floats  = ("wtp-consumption", "floor-tol"),
+    strings = ("theta", "out", "reference", "district", "weight"),
     lists   = ("fix", "external", "measure", "target", "target-se", "grid"),
-    multi   = ("activate", "deactivate"),
+    multi   = ("activate", "deactivate", "free"),
     script  = "spatial_diagnose.jl")
 OPTS["workers"] > 0 && addprocs(OPTS["workers"]; exeflags = "--project=$(Base.active_project())")
 
@@ -61,13 +85,15 @@ include(joinpath(HERE, "spatial_first_stage.jl"))   # ACS_WAGES, NLSY, RoyCells,
 # -----------------------------------------------------------------------------
 """
 ϑ from a --theta specification (see the header). A TOML file must list `theta_names`
-equal to `THETA_NAMES` (older files hold log κ̄ as `logκ`, not log κ̃); TikTak journals
-carry no names, so only their length is checked.
+equal to `THETA_NAMES` or to a leading part of it of at least eight names (files saved
+before some extension parameters existed, read with those extensions off; older files
+still hold log κ̄ as `logκ`, not log κ̃); TikTak journals carry no names, so only their
+length is checked. Short vectors are padded with the missing extensions off (`pad_theta`).
 """
 function read_theta(spec::AbstractString)
     spec == "theta0" && return copy(THETA0)
-    checklen(θ) = (length(θ) == length(THETA_NAMES) ||
-                   error("--theta $spec: $(length(θ)) values, ϑ has $(length(THETA_NAMES))"); θ)
+    checklen(θ) = (N_THETA_BASE ≤ length(θ) ≤ length(THETA_NAMES) ||
+                   error("--theta $spec: $(length(θ)) values, ϑ has $(length(THETA_NAMES))"); pad_theta(θ))
     if isdir(spec)
         isfile(joinpath(spec, "theta.toml")) && return read_theta(joinpath(spec, "theta.toml"))
         return checklen(load_estimates(spec; limit = 1)[1])
@@ -75,7 +101,8 @@ function read_theta(spec::AbstractString)
     if isfile(spec)
         d = TOML.parsefile(spec)
         names = get(d, "theta_names", nothing)
-        names == collect(string.(THETA_NAMES)) ||
+        (names isa AbstractVector && N_THETA_BASE ≤ length(names) ≤ length(THETA_NAMES) &&
+         names == collect(string.(THETA_NAMES[1:length(names)])) && length(d["theta"]) == length(names)) ||
             error("--theta $spec: theta_names $names differ from $(collect(string.(THETA_NAMES)))")
         return checklen(Float64.(d["theta"]))
     end
@@ -88,23 +115,27 @@ end
 """
     polish(model, targets, θ0, bounds; max_iter, h, tol, io) -> (; θ, f, r, iters)
 
-Levenberg–Marquardt on the standardized residuals r(ϑ) = (m(ϑ) − target)/se over the
-free parameters (those with lo < hi in `bounds`), in box-width units. After each
+Levenberg–Marquardt on the standardized residuals r(ϑ) = W(m(ϑ) − target)/se over the
+free parameters (those with lo < hi in `bounds`), in box-width units; `W` whitens
+correlated targets (`target_whitener`; the identity gives diagonal weights). After each
 accepted step it takes a forward-difference Jacobian (step `h` box widths, inward at
 an upper bound); every iteration tries four damping factors. These solves run in
-parallel with `pmap` (`std_residuals`, which is defined on every worker). A step is
-kept only if it lowers Σr²; steps are clipped to the box. Stops when the relative
+parallel with `pmap` (`std_residuals`, which is defined on every worker and logs the message and ϑ of a
+point that fails to solve, so that a zeroed Jacobian column or a failed start has its cause in the log).
+A step is kept only if it lowers Σr²; steps are clipped to the box. Stops when the relative
 improvement falls below `tol` or damping exceeds 1e8.
 """
-function polish(model::SpatialModel, targets, θ0, bounds; max_iter = 25, h = 1e-3, tol = 1e-6, io = stdout)
+function polish(model::SpatialModel, targets, θ0, bounds; max_iter = 25, h = 1e-3, tol = 1e-6, io = stdout,
+                W = Matrix{Float64}(I, length(active_targets(targets)), length(active_targets(targets))))
     act   = active_targets(targets)
     lo    = first.(bounds); hi = last.(bounds)
     width = hi .- lo
     free  = findall(lo .< hi)
+    whiten(v) = all(isfinite, v) ? W * v : v
     θ = clamp.(collect(Float64, θ0), lo, hi)
-    r = std_residuals(model, θ, act)
+    r = whiten(std_residuals(model, θ, act))
     f = sum(abs2, r)
-    isfinite(f) || error("polish: the start point fails to solve")
+    isfinite(f) || error("polish: the start point fails to solve (the failure and ϑ are logged above)")
     μ = 1e-2
     @printf(io, "\nLevenberg–Marquardt polish over %s: start criterion %.6g\n", join(THETA_NAMES[free], ", "), f)
     iters = 0
@@ -114,7 +145,7 @@ function polish(model::SpatialModel, targets, θ0, bounds; max_iter = 25, h = 1e
         if J === nothing                     # new point: new Jacobian
             steps = [(θ[j] + h * width[j] > hi[j] ? -h : h) * width[j] for j in free]
             pts   = [(x = copy(θ); x[j] += steps[i]; x) for (i, j) in enumerate(free)]
-            R     = pmap(x -> std_residuals(model, x, act), pts)
+            R     = whiten.(pmap(x -> std_residuals(model, x, act), pts))
             J     = reduce(hcat, [(R[i] .- r) ./ (steps[i] / width[free[i]]) for i in eachindex(free)])
             bad   = [!all(isfinite, J[:, i]) for i in eachindex(free)]
             any(bad) && (@printf(io, "  ⚠ Jacobian columns %s failed; zeroed\n", join(THETA_NAMES[free[bad]], ", ")); J[:, bad] .= 0.0)
@@ -128,7 +159,7 @@ function polish(model::SpatialModel, targets, θ0, bounds; max_iter = 25, h = 1e
             x[free] .+= Δ .* width[free]
             clamp.(x, lo, hi)
         end
-        Rc = pmap(x -> std_residuals(model, x, act), cands)
+        Rc = whiten.(pmap(x -> std_residuals(model, x, act), cands))
         fc = [sum(abs2, rc) for rc in Rc]
         k  = argmin(fc)
         if fc[k] < f
@@ -138,7 +169,7 @@ function polish(model::SpatialModel, targets, θ0, bounds; max_iter = 25, h = 1e
             J = nothing
             @printf(io, "  it %2d: criterion %.6g (−%.2e rel.)  damping %.1e  ϑ = %s\n", it, f, rel, μs[k], fmtvec(θ))
             flush(io)
-            rel < tol && break
+            (rel < tol || f < 1e-16) && break   # an exact fit keeps improving ~17% a step at f ≈ 1e-20
         else
             μ = 100 * maximum(μs)
             @printf(io, "  it %2d: no improvement (best trial %.6g); damping → %.1e\n", it, fc[k], μ)
@@ -217,26 +248,53 @@ end
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
-"Write ϑ, its criterion and the targeted moments `m` to a TOML file (read back by --theta)."
-function save_theta(path, θ, m, targets; note = "")
+"""
+Write ϑ, its criterion and the targeted moments `m` to a TOML file (read back by
+--theta). `criterion` is the diagonal Σr²; with whitening `W` (--weight corr) the
+weighted criterion is `criterion_weighted`.
+"""
+function save_theta(path, θ, m, targets; note = "", W = nothing)
     act = active_targets(targets)
     d = Dict{String,Any}("theta" => collect(θ), "theta_names" => collect(string.(THETA_NAMES)),
                          "criterion" => criterion(m, targets), "note" => note,
                          "created" => Libc.strftime("%Y-%m-%d %H:%M:%S", time()),
                          "moments" => Dict(string(t.key) => Float64(m[t.key]) for t in act))
+    W === nothing || (d["criterion_weighted"] = sum(abs2, W * residuals(m, targets)))
+    open(io -> TOML.print(io, d; sorted = true), path, "w")
+end
+
+"""
+Write every finite scalar and short real vector of `model_moments` to a TOML file
+(`moments.toml` next to theta.toml), with the active target keys and every target's
+data value, scale and status (table `targets`, as this case defined them): the input of
+the experiment summaries.
+"""
+function save_moments(path, m, targets)
+    d = Dict{String,Any}("active" => [string(t.key) for t in active_targets(targets)],
+                         "targets" => Dict(string(t.key) => Dict("value" => t.value, "se" => t.se, "active" => t.active)
+                                           for t in targets if isfinite(t.value) && isfinite(t.se)))
+    for (k, v) in pairs(m)
+        if v isa Real && isfinite(v)
+            d[string(k)] = Float64(v)
+        elseif v isa AbstractVector{<:Real} && length(v) ≤ 25 && all(isfinite, v)
+            d[string(k)] = Float64.(collect(v))
+        end
+    end
     open(io -> TOML.print(io, d; sorted = true), path, "w")
 end
 
 function run_diagnose(opts)
     ref = frozen_reference(something(opts["reference"], REFERENCE_FILE), SOLVER)
-    (; base, meas, targets, active, bounds) = problem_setup(opts, ref)
+    (; base, meas, targets, active, bounds, W, floor_tol) = problem_setup(opts, ref)
+    weighted = opts["weight"] == "corr"
     grid   = NamedTuple(k => (k in (:Nz, :nϵT, :nXO, :maxit, :hh_maxit) ? Int(v) : v) for (k, v) in opts["grid"])
     solver = merge(SOLVER, grid)
-    model  = SpatialModel(base, [t.key for t in active]; meas, solver)
+    model  = SpatialModel(base, [t.key for t in active]; meas, solver, floor_tol)
     θ = read_theta(opts["theta"])
     for (name, v) in opts["fix"]
         θ[theta_index(name)] = v
     end
+    external_start!(θ, bounds, base)       # a freed s_z, σ_ϵ or θ_ν at its off value 0 starts at the external block's value
     out = opts["out"]
     out === nothing || mkpath(out)
     io  = out === nothing ? stdout : open(joinpath(out, "report.txt"), "w")
@@ -247,7 +305,7 @@ function run_diagnose(opts)
                      "\n  measurement: ", meas, "\n  solver: ", solver, "\n  workers: ", nworkers()))
 
     if opts["polish"]
-        t = @elapsed pr = polish(model, targets, θ, bounds; max_iter = opts["max-iter"])
+        t = @elapsed pr = polish(model, targets, θ, bounds; max_iter = opts["max-iter"], W)
         θ = pr.θ
         tee(o -> @printf(o, "\npolish: %d iterations, %.1f minutes, criterion %.6g\n", pr.iters, t / 60, pr.f))
     end
@@ -255,7 +313,14 @@ function run_diagnose(opts)
     tee(o -> begin
         println(o, "\nϑ = (", join((@sprintf("%s = %.5f", n, x) for (n, x) in zip(THETA_NAMES, θ)), ", "), ")")
         moment_table(o, m, targets)
+        weighted && @printf(o, "  weighted criterion (district-target correlations, --district %s) = %.4f\n",
+                            something(opts["district"], "locale"), sum(abs2, W * residuals(m, targets)))
         diagnostics_table(o, m)
+        any(!iszero, θ[theta_index(:ρ_c):theta_index(:c_T0)]) && @printf(o, "  M3 block in effect: college %s, s_z %.4f, σϵ %.4f, φ %.4f; ρc %.3f, cC %.3f, cCz %.3f per unit of log z, ρT0 %.3f, cT0 %.3f, ϑs %.3f, sBA %.3f, sT0 %.3f, Fc %.4f, σd %.3f\n",
+                                           sol.p.college ? "on" : "off", sol.p.σξ / sqrt(1 - sol.p.ρz^2), sol.p.σϵ, sol.p.φ,
+                                           sol.p.ρc, sol.p.cC, sol.p.cCz, sol.p.ρT0, sol.p.cT0, sol.p.ϑs, sol.p.sBA, sol.p.sT0, sol.p.Fc, sol.p.σd)
+        @printf(o, "  (e, s) solve: residual %.1e, at most %d passes in the final sweep; relaxed step at up to %d nodes in a sweep\n",
+                sol.s_resid, sol.s_passes, sol.s_relaxed)
     end)
     if opts["consistency"]
         oc = occupation_consistency(sol, meas)
@@ -272,7 +337,9 @@ function run_diagnose(opts)
         end
     end
     if out !== nothing
-        save_theta(joinpath(out, "theta.toml"), θ, m, targets; note = "spatial_diagnose.jl --theta $(opts["theta"])")
+        save_theta(joinpath(out, "theta.toml"), θ, m, targets; note = "spatial_diagnose.jl --theta $(opts["theta"])",
+                   W = weighted ? W : nothing)
+        save_moments(joinpath(out, "moments.toml"), m, targets)
         close(io)
         println("\nReport and ϑ written to ", out)
     end

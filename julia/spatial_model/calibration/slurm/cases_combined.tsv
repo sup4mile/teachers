@@ -1,0 +1,11 @@
+# Combined specifications (2026-10 round 2): the teacher block of experiment 4 (observed schooling
+# requirement s_T ≥ 16.04/25; non-pecuniary teaching cost c_T fitted to the teacher pay premia) with the
+# sorting prototypes of experiment 5, each sorting parameter fitted to one external composition moment:
+# the NLSY79 gradient of children's city share in own AFQT (city_share_gradient_z) or the earnings gap.
+# Teacher cases start from runs/exp-teacher/school_req_cT; rev_* use the revenue district targets.
+taste_afqt	--free zeta --activate city_share_gradient_z
+teacher_taste_afqt	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+teacher_taste_income	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate gap_income --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+teacher_housing_acs	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --fix r_p=0.028 --grid maxit=60 --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+rev_teacher	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT
+rev_teacher_taste_afqt	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f --free zeta --activate city_share_gradient_z --theta julia/spatial_model/calibration/runs/exp-teacher/school_req_cT

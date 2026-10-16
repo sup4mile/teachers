@@ -82,6 +82,75 @@ The standardized Jacobian has rank eight, singular values from 6.94 to 210 and c
 
 The first-stage consistency and numerical grid checks pass. The main failures are income sorting, the staffing gradient, teacher schooling and relative pay, occupational wage levels/dispersion, and the gender wage gap. Matching the salary gap puts the FTE gap 3.1 SEs above the data and the SEDA growth gap 2.9 SEs above it. Teacher/non-teacher schooling is 0.76 versus 1.18 in the data; the market gender log-wage gap is 0.30 versus 0.10. See [known issues](calibration_log.md#known-issues-at-the-current-fit).
 
-**Sensitivity.** The deterministic panel and ACS 2016–19 refit remain to be run at the exactly identified baseline. [Table 5 details](calibration_log.md#table-5-sensitivity-panel).
+**Sensitivity.** The class-size, exposure, location-taste and WTP cases have been rerun at the exactly identified baseline and change no validation conclusion; the rest of the panel and the ACS 2016–19 refit have not. [Table 5 details](calibration_log.md#table-5-sensitivity-panel).
 
-**Remaining work.** Rerun the Table 5 panel at the exactly identified baseline; bootstrap the full calibration with Table 2 re-estimated, adding literature transport uncertainty; address the sorting, staffing and wage/schooling misses. [Detailed task log](calibration_log.md#5-to-do).
+**Experiments (2026-10).** Three rounds leave the baseline unchanged.
+- *First round.* Parameter and weighting changes do not resolve sorting; imposed residential sorting moves teacher allocation too strongly because teachers live where they teach. Schooling floors and teaching utility costs improve selected teacher moments but remain diagnostic prototypes, not an adopted specification. [Results and limitations](calibration_log.md#calibration-experiments-2026-10).
+- *10-05.* A pre-registered comparison selects C4′: a residence/workplace split, a joint college and occupation choice, and priced suburban access. Household sorting remains the main miss. [Results](calibration_log.md#model-experiments-2026-10-05).
+- *10-07.* The regular Roy model ($\gamma=1$) removes teachers' selection within occupation and raises their wage dispersion to the market's. It closes the baseline's teacher pay gap but overpays teachers under C4′. Local peer effects in school quality create no sorting; once sorting is imposed, SEDA growth bounds them. [Results](calibration_log.md#model-experiments-2026-10-07).
+
+## Accepted development direction (2026-10-15, after both rounds)
+
+The user provisionally accepted the next-step recommendations, conditional on preserving previous work. The September exact fit remains the reference baseline, C4′ remains the designated development candidate, and S1·R·E remains a diagnostic benchmark. Acceptance authorizes development along the following sequence; it does not adopt a new specification or authorize opening sealed B1.
+
+1. Retain college/occupation choice, licensure and estimated wage compression ($\gamma\approx0.61$), and carry the S1 teacher-supply repair into new candidates.
+2. Test a small set of income-dependent residential sorting mechanisms: housing or amenity demand whose expenditure share varies with income, with housing quantities and endogenous rents where appropriate. The failed fixed-charge and bounded-access tests do not reject this broader mechanism.
+3. Develop explicit teacher demand or hiring constraints (budgets, authorized positions or class-size rules) to replace the reduced-form workplace penalty $b_T$.
+4. Before new runs, fix identifying moments and acceptance thresholds. Include teacher residence, teacher crossing and commuting direction as explicit criteria alongside income/ability sorting, staffing, teacher selection, achievement levels and growth. Keep the gender wage gap visible; distinguish targets from validation and report component errors alongside the aggregate score.
+5. Estimate strongly sorted candidates at $N_z\ge9$ and check a finer grid (initially $N_z=13$). Check identification before the full bootstrap; complete sample/payroll alignment and in-equilibrium first-stage checks before final inference.
+
+**Preservation and readiness.** A verified local checkpoint of current source, pre-update documentation and selected fit evidence is in [`runs/_code/accepted-direction-20261015/`](runs/_code/accepted-direction-20261015/README.md). Existing outputs, historical protocols and older snapshots remain intact. New mechanisms must preserve the existing configurations and use new output directories. We are clear to proceed with specification design and implementation under this plan; the immediate deliverable is the next round's mechanism definitions, target map and pre-specified comparison, followed by checks and SLURM runs. [Detailed plan and preservation rules](calibration_log.md#accepted-development-plan-2026-10-15).
+
+**Status after round 2026-10-15c** ([log](calibration_log.md#round-2026-10-15c-income-graded-sorting-y-and-teacher-demand-d)). Items 1–5 above were followed in a pre-registered comparison. Item 5's identification checks wait for a selected specification.
+- *What was tested.* Income-graded residential demand (Y, a reduced form of non-homothetic demand) and explicit teacher demand (D: positions per pupil follow a rule, and $b_T$ becomes the rationing price). Both are switches that are bitwise-inert when off. Five candidates were fitted exactly at $N_z=9$ and checked at $N_z=13$.
+- *Selection.* No candidate meets every criterion, so **C4′ stays the development candidate**. The best without a severe failure is S1·Y·D0, at $S_{1015}$ 151.6 against C4′'s 315.1.
+  - It matches the targeted parental-income gradient ($\zeta_y$ ↔ V6a) and, untargeted, most of the poverty gap.
+  - 59% of its score gap (0.196) is school quality, which is the part SEDA growth rejects: it fails growth by z +6.0, through teacher quality following income sorting. It also fails teachers' net commuting marginally (z −3.1).
+  - S1·Y·R scores lower (133.9) but fails A6 by 0.015 (ε22 3.715 > 3.7), a severe failure under the pre-registration. C4′ stays by default, although it fails A6 itself (ε22 13.2).
+- *Teacher demand.* Y needs the demand closure: without it, suburban staffing collapses (FTE −0.153).
+- *Race composition.* A diagnostic after the round found that much of the sorting block is between-race composition, which the model lacks.
+  - The own-AFQT gradient pooled within race is −0.05 to −0.10, against −0.222 overall; it is ≈ 0 among non-Black non-Hispanic youth.
+  - The score gap pooled within race is ≈ 0.10, against 0.289 overall. It is ≈ 0 for white students and 0.16–0.21 for Black and Hispanic students.
+  - Household income and child-poverty gaps keep about three-quarters of their size.
+  - This explains part of the V4 and V6z shortfall, but not the growth overshoot.
+- *Next step.* Decide how the model treats race before adding mechanisms. The [proposal](calibration_log.md#next-round-proposed-after-2026-10-15c) is in two steps.
+  1. Re-score all fits under a race-consistent concept registered in advance. This is a diagnostic and data work only.
+  2. Decide whether to model the group dimension. Teacher allocation likely needs it, because teacher mobility responds to student composition.
+
+  Teacher-quality sorting is the next model margin after that. B1 stays sealed.
+
+## Recommended next round (2026-10-15)
+
+Historical plan written before the two October 15 rounds; the accepted direction above now controls new work. The audit described as immediate below is complete.
+
+Keep the September exact fit as the reference and use **C4′ as the development candidate**, retaining its college/occupation choice and residence/workplace separation. The next milestone is credible household sorting alongside plausible teacher allocation. These are recommendations for new work, not completed experiments or adoption of a new baseline.
+
+1. **Audit commuting and teacher supply first.** The saved elasticity near 31 is the response of the suburb/city teacher-count ratio to suburban pay; the literature's 1.4–3.7 estimates concern supply to individual employers. Separate own-location and cross-location responses, align the adjustment horizon and geography, and account for unobserved within-POWPUMA commuting before imposing a target. If excessive responsiveness remains, test workplace attachment or heterogeneous commuting costs using independent evidence.
+2. **Test heterogeneous housing access.** Use the rental distribution to discipline access to inexpensive suburban housing, housing quantities and endogenous rents. Start with school quality fixed; proceed to full equilibrium if the mechanism produces meaningful sorting at empirically supported housing parameters. Keep the ability-dependent taste case as a diagnostic benchmark.
+3. **Retain the college-choice mechanism and estimate wage compression.** Carry forward M3 with estimated $\gamma<1$. The completed $\gamma=1$ and contemporaneous peer-effect experiments do not justify making either the next priority.
+4. **Specify acceptance criteria before running.** Evaluate earnings, parental-income and AFQT sorting, staffing, teacher selection, and both score levels and growth jointly. Keep the gender wage gap visible. Give new parameters explicit identifying moments, distinguish targets from validation, and reserve genuinely unused evidence.
+5. **Complete inference after specification choice.** Align samples and payroll definitions, recheck the first stage in equilibrium, and validate the extended model's grids and identification before the full calibration bootstrap and literature-input sensitivities.
+
+The [detailed sequence](calibration_log.md#recommended-sequence-2026-10-15) gives the elasticity definitions, evidence, decision points and remaining work. The immediate deliverable is the commuting-elasticity audit.
+
+**Status (2026-10-15, both rounds done; [log](calibration_log.md#model-experiments-2026-10-15)).** Items 1, 2 and 4 are done; item 3 is kept; item 5 waits for a specification choice.
+
+- *Audit.* C4′'s supply is hypersensitive: own-location elasticity 13 and small-district elasticity ≈68, because σw ≈ 0.017. The repair S1 (ρw = 1 plus a utility commuting friction fitted to the crossing share) gives a full-equilibrium own-location elasticity of 1.6.
+- *Housing.* The bounded housing-access test fails its gate.
+- *Refits.* No pre-registered candidate meets all acceptance criteria, and C4′ remains the development candidate.
+  - Under realistic supply, matching the salary gap over-staffs the suburb.
+  - Matching FTE instead removes the school-quality contribution to the score gap.
+  - A utility moving cost flattens the own-AFQT mobility gradient.
+  - A BA-graded suburban amenity matches the parental-income gradient but moves teachers with other BA holders.
+  - A non-pecuniary staffing closure (teachers' value of a suburban job, $b_T$) matches salary and FTE together.
+  - With that closure, the BA amenity gives the best score: S1·R·E, 105 against C4′'s 315.
+    - It matches the parental-income and AFQT gradients, poverty, staffing and pay.
+    - It fails the Nz = 9 grid check at its fitted parameters. Re-fitted at Nz = 9 its moments are unchanged, but the
+      amenity moves from 1.39 to ≈1.47.
+    - It is a weakly identified reduced form (amenity ≈ 1.4 utils). It overshoots earnings and scores, and it puts
+      teachers' residences in the suburb at five times the data gap.
+- *Persistence.* Raising intergenerational persistence barely moves sorting. Shared family inputs are therefore not the next lever; household sorting must come from location forces graded by income or education outside school quality.
+- *Next.* Replace the reduced forms with a sorting force graded by income, not education, such as non-homothetic housing or
+  amenity demand, judged against the teacher-residence moments. Add a teacher-demand side in place of $b_T$. Score
+  sorted candidates at Nz ≥ 9. The sealed hold-out B1 is opened only on the user's instruction
+  ([log §5](calibration_log.md#recommended-sequence-2026-10-15)).

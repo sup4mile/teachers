@@ -1,0 +1,9 @@
+# Persistent residential sorting (2026-10 experiment 5): (a) a recurring residence cost in the suburb,
+# p = (0, r_p C̄); (b) an ability-graded taste for the suburb, ζ utils per SD of log z. Each new parameter
+# is fitted to one sorting moment: the earnings gap (district validation moment) or the NLSY79 gradient
+# of children's city share in parental income (external), exactly identified; the rest is validation.
+housing_income	--free r_p --activate gap_income
+taste_income	--free zeta --activate gap_income
+housing_nlsy	--free r_p --activate city_share_gradient
+taste_nlsy	--free zeta --activate city_share_gradient
+housing_taste	--free r_p --free zeta --activate gap_income --activate city_share_gradient

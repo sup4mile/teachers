@@ -1,0 +1,10 @@
+# Target tradeoffs (2026-10 experiment 2): overidentified refits from the exactly identified
+# baseline, one added moment set per case; *_corr cases weight the district targets by their
+# whole-CZ bootstrap correlations (--weight corr, data/spatial/estimates/settings/).
+fte_diag	--activate gap_teachers_pp
+income_diag	--activate gap_income
+pay_school_diag	--activate teacher_premium_m --activate teacher_premium_f --activate s_ratio
+fte_corr	--activate gap_teachers_pp --weight corr
+income_corr	--activate gap_income --weight corr
+fte_income_corr	--activate gap_teachers_pp --activate gap_income --weight corr
+all_corr	--activate gap_teachers_pp --activate gap_income --activate teacher_premium_m --activate teacher_premium_f --activate s_ratio --weight corr

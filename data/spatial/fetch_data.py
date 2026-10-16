@@ -191,6 +191,27 @@ NLSY_BLOCKS: dict[str, dict[str, str]] = {
         "geo": r"CV_(MSA|URBAN-RURAL|CENSUS_REGION)(_AGE_12(_YCHR)?)?",
         "parent_income": r"CV_INCOME_GROSS_YR|CV_HH_POV_RATIO|CV_HH_SIZE|CV_HH_INCOME_SOURCE"
                          r"|CV_INTERVIEW_DATE(_[MY]|~[MY])",
+        # --- added for the sealed NLSY97 hold-out (`nlsy97_holdout.py`); additive: every
+        # variable above is still cut, in the same order, ahead of these ---
+        # round-1 household roster: PUBIDs of the other NLSY97 respondents in the youth's
+        # household (the extract has no household id, so siblings are linked through these
+        # and household clusters are their connected components)
+        "household": r"YOUTH_SIBID0[1-4]\.01",
+        # the occupation of the CPS-like main job: CV_MAINJOB_FLG is the roster position of
+        # the current or most recent employer at the interview, YEMP_OCCODE-2002.NN the 2002
+        # Census 4-digit occupation of roster job NN (jobs 01-14), YEMP_CURFLAG.NN whether
+        # job NN is held at the interview date; CV_DOI_EMPLOYED (rounds 2015+) is a check
+        "jobs": r"CV_MAINJOB_FLG|YEMP_OCCODE-2002\.\d\d|YEMP_CURFLAG\.\d\d|CV_DOI_EMPLOYED",
+        # --- added in the review round of the hold-out; again additive (every block above is
+        # still cut first, in the same order, so the new file is a strict superset) ---
+        # variance stratum (117) and variance PSU (two per stratum): the public file's design
+        # variables, for design-based (Rao-Wu) standard errors; "to correct for clustering in
+        # the sample design" (NLS), and what the household clusters nest in
+        "design": r"VSTRAT|VPSU",
+        # is roster employer NN a military employer (1 = yes); with YEMP_CURFLAG.NN it tells
+        # whether the respondent serves in the armed forces at the interview, the analogue of
+        # the NLSY79 ESR_COL = 4 (CV_MAINJOB_FLG never points to a military employer)
+        "military": r"YEMP_MILFLAG\.\d\d",
     },
 }
 

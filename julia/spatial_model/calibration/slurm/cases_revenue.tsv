@@ -1,0 +1,11 @@
+# Revenue-based setting (2026-10 experiment 1): the district targets of the high/low local-revenue
+# split (data/spatial/estimates/settings/: audited salary and K–12 FTE definitions, pooled FTYR earnings).
+# The NLSY move rate measures city–suburb, not revenue-group, transitions, so r_m is held at the locale
+# estimate (the cost of a within-CZ move) and the move rate leaves the criterion; rev_moverate keeps it.
+# *_common: the 186 CZs in all three partitions (locale_common is the locale fit on the same CZs).
+rev_base	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan
+rev_moverate	--district revenue
+rev_common	--district revenue_common --fix r_m=0.20593082667094165 --target move_rate=nan
+locale_common	--district locale_common
+rev_fte_corr	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --activate gap_teachers_pp --weight corr
+rev_income_corr	--district revenue --fix r_m=0.20593082667094165 --target move_rate=nan --activate gap_income --weight corr

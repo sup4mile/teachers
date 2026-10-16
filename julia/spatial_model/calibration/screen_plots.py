@@ -1,9 +1,10 @@
 """Bin scatters of model moments against ϑ over the Sobol screening points.
 
 Reads one or more screen.jsonl files written by spatial_screen.jl and draws, in
-<out>/:
-  targeted.png     the 8 targeted moments against the 8 parameters
-  validation.png   Table 4 validation moments and diagnostics against the 8 parameters
+<out>/ (against the parameters the screen varies: the 8 of the baseline, and any extension
+parameters it frees, however long ϑ is):
+  targeted.png     the 8 targeted moments against the parameters
+  validation.png   Table 4 validation moments and diagnostics against the parameters
   params_best.png  pairwise scatter of ϑ among the points with the lowest criterion
   failures.png     share of failed solves by parameter decile
 Each moment panel shows every solved point (gray), the lowest-criterion 10% (blue),
@@ -29,6 +30,9 @@ ESTIMATE = HERE / "runs" / "exact-polish-base" / "theta.toml"
 
 PARAM_LABELS = [r"$\log\tilde\kappa$", r"$\delta_\kappa$", r"$\Delta B$", r"$\beta$",
                 r"$\lambda$", r"$r_m$", r"$\omega_f$", r"$\gamma$"]
+# the 2026-10 extension parameters, fixed at 0 unless a screen frees them; a screen of a longer ϑ
+# labels the parameters beyond these by their names
+EXTENSION_LABELS = [r"$r_p$", r"$\zeta$", r"$c_T$", r"$c_{Tz}$"]
 TARGETED = [("male_teach_share", "Male teaching share"), ("female_teach_share", "Female teaching share"),
             ("teacher_p9010", "Teacher 90/10"), ("gap_salary", "Salary gap"),
             ("gap_pupils", "Enrollment gap"), ("cfr_effect", "CFR effect"),
@@ -120,7 +124,8 @@ def params_best(df, names, bounds, theta_hat, path, frac=0.10):
     best = ok[ok["criterion"] <= ok["criterion"].quantile(frac)].sort_values("criterion", ascending=False)
     c = np.log10(best["criterion"])
     n = len(names)
-    fig, axes = plt.subplots(n, n, figsize=(13, 12.5), constrained_layout=True)
+    size = max(13, 1.6 * n)
+    fig, axes = plt.subplots(n, n, figsize=(size, size - 0.5), constrained_layout=True)
     for i in range(n):
         for j in range(n):
             ax = axes[i, j]
@@ -151,7 +156,8 @@ def params_best(df, names, bounds, theta_hat, path, frac=0.10):
 
 
 def failures(df, names, bounds, path):
-    fig, axes = plt.subplots(2, 4, figsize=(11, 4.6), sharey=True, constrained_layout=True)
+    nr = max(2, -(-len(names) // 4))                  # four panels a row, two rows for the eight parameters
+    fig, axes = plt.subplots(nr, 4, figsize=(11, 2.3 * nr), sharey=True, constrained_layout=True, squeeze=False)
     for j, (ax, name) in enumerate(zip(axes.flat, names)):
         edges = np.linspace(*bounds[j], 11)
         b = np.clip(np.digitize(df[name], edges) - 1, 0, 9)
@@ -159,8 +165,10 @@ def failures(df, names, bounds, path):
         ax.bar((edges[:-1] + edges[1:]) / 2, rate, width=0.9 * np.diff(edges), color=BEST)
         ax.set_xlabel(PARAM_LABELS[j])
         ax.tick_params(labelsize=7)
-    axes[0, 0].set_ylabel("share failed")
-    axes[1, 0].set_ylabel("share failed")
+    for ax in axes.flat[len(names):]:
+        ax.axis("off")
+    for i in range(nr):
+        axes[i, 0].set_ylabel("share failed")
     fig.suptitle(f"Failed solves by parameter decile ({(~df['ok']).sum()} of {len(df)} points)", fontsize=11)
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -174,6 +182,15 @@ def main():
     header, df = load(a.files)
     names, bounds = header["theta_names"], [tuple(b) for b in header["bounds"]]
     theta_hat = tomllib.load(open(ESTIMATE, "rb"))["theta"]
+    # plot the parameters the screen varies (screens written after 2026-10-02 also list the
+    # fixed extension parameters; the estimate file may hold only the first eight)
+    global PARAM_LABELS
+    labels = PARAM_LABELS + EXTENSION_LABELS
+    labels += [rf"${n}$" for n in names[len(labels):]]          # parameters of a longer ϑ
+    keep = [j for j, (lo, hi) in enumerate(bounds) if lo < hi]
+    PARAM_LABELS = [labels[j] for j in keep]
+    theta_hat = [theta_hat[j] if j < len(theta_hat) else 0.0 for j in keep]
+    names, bounds = [names[j] for j in keep], [bounds[j] for j in keep]
     targets = {t["key"]: t["value"] for t in header["targets"]}
     targets.update({k: v for k, _, v in VALIDATION})
     out = pathlib.Path(a.out)

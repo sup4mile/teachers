@@ -1,0 +1,6 @@
+# Teacher training and pay (2026-10 experiment 4): an observed schooling requirement for teaching,
+# s_T ≥ 16.04/25 = 0.641748 (K–12 teachers' mean years of schooling, ACS 2009–13), with the
+# eight targets (exactly identified) and with teacher pay relative to market pay added.
+school_req	--external sT_min=0.641748
+school_req_pay	--external sT_min=0.641748 --activate teacher_premium_m --activate teacher_premium_f
+school_req_cT	--external sT_min=0.641748 --free c_T --activate teacher_premium_m --activate teacher_premium_f

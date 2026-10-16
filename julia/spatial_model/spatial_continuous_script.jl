@@ -149,13 +149,15 @@ end
 # -----------------------------------------------------------------------------
 
 "Residual of the aggregate fixed point: re-evaluate the GE map at `sol` and
- compare to the stored aggregates. Zero only at a true fixed point."
+ compare to the stored aggregates (and the peer ability log ā with peer effects).
+ Zero only at a true fixed point."
 function ge_map_residual(sol)
     HTn, Mn, tn = aggregates(sol.Φ, sol.Pi_T, sol.Pi_O, sol.hh, sol.p, sol.gr)
     rH = maximum(abs, (HTn .- sol.HT) ./ sol.HT)
     rM = maximum(abs, (Mn  .- sol.M ) ./ sol.M )
     rt = maximum(abs,  tn  .- sol.t)
-    return (; res = max(rH, rM, rt), rH, rM, rt, HTn, Mn, tn)
+    ra = iszero(sol.p.ψa) ? 0.0 : maximum(abs, peer_log_ability(sol.Φ, sol.gr) .- sol.la)
+    return (; res = max(rH, rM, rt, ra), rH, rM, rt, ra, HTn, Mn, tn)
 end
 
 "Residual of the Φ eigen-problem: rebuild the joint kernel K from π̄ and Πz and
@@ -209,9 +211,11 @@ function household_residual(sol)
     return max(maximum(abs, hh1.WT .- hh.WT), maximum(abs, hh1.WO .- hh.WO))
 end
 
-"Consistency of the teacher-quality shifter: Q_l = (2 H̃_T,l / M_l)^σ."
+"Consistency of the school-quality shifter: the teacher index Q_T,l = (2 H̃_T,l / M_l)^σ, and
+ Q_l = Q_T,l ā_l^ψa at the peer ability the grid was built at (Q = Q_T without peer effects)."
 q_consistency_dev(sol) =
-    maximum(abs, sol.gr.Q .- (2 .* sol.HT ./ sol.M) .^ sol.p.σ)
+    max(maximum(abs, sol.gr.QT .- (2 .* sol.HT ./ sol.M) .^ sol.p.σ),
+        maximum(abs, sol.gr.Q .- sol.gr.QT .* exp.(sol.p.ψa .* sol.gr.la)))
 
 "Worst non-monotonicity (largest backward step) in W_T(ε_T) and W_O(X_O*)
  across all (g,l,z) states. The choice-map spline inversion silently mislocates
@@ -285,8 +289,9 @@ function report_checks(sol)
     Ml_dev = maximum(abs, sol.M .- [2 * sum(@view sol.Φ[:, l]) for l in 1:sol.gr.L])
     hh = household_residual(sol)
     println("\n  Convergence-sensitive equilibrium conditions:")
-    @printf("    GE-map residual              : %.2e   (H̃_T %.1e, M %.1e, t %.1e)  [%s]\n",
-            gm.res, gm.rH, gm.rM, gm.rt, mark(gm.res < 5e-3))
+    @printf("    GE-map residual              : %.2e   (H̃_T %.1e, M %.1e, t %.1e%s)  [%s]\n",
+            gm.res, gm.rH, gm.rM, gm.rt, iszero(sol.p.ψa) ? "" : @sprintf(", log ā %.1e", gm.ra),
+            mark(gm.res < 5e-3))
     @printf("    M_l = 2 ∫ Φ_l                : %.2e   [%s]\n", Ml_dev, mark(Ml_dev < 5e-3))
     @printf("    household policy residual    : %.2e   [%s]\n", hh, mark(hh < 1e-3))
     gm.res < 5e-3 || println("    ⚠ outer iteration not tightly converged — " *

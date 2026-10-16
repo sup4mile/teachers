@@ -14,7 +14,17 @@
 #      every aggregate is a quadrature integral against the atomless shock densities.
 #   3. Ability z is Rouwenhorst-discretised; the spatial distribution Φ_l(z) is the
 #      stationary distribution of the migration × AR(1) kernel.
-#   The outer loop is a damped fixed point in (H̃_T, M, t).
+#   4. Education before occupation (`Params.college`, off by default; §3c).  Given (g, l, z)
+#      and before the shocks ϵ are drawn, the young choose d ∈ {0, 1} (no BA / BA) by a logit
+#      with scale σd on EV₁ − EV₀ − cC − cCz log z, EV_d = E_ϵ[max_i W_i | d].  Each branch is
+#      solved as in 1–3 with its own returns and schooling constraint, so the household block
+#      carries two sets of policies and P₁(g, l, z); everything that integrates over a cell
+#      (location probabilities, Φ, aggregates, Λ, the moments) mixes them with the weights
+#      P(d | g, l, z).  With `college` off nothing of this is reached.
+#   5. Local peer effects (`Params.ψa`, off by default).  School quality carries the students' mean
+#      ability, Q_l = (2H̃_T/M_l)^σ ā_l^{ψa}, where log ā_l is the mean log z of the young schooled
+#      in l relative to its ergodic mean (`peer_log_ability`); ā is a fourth outer aggregate.
+#   The outer loop is a damped fixed point in (H̃_T, M, t), and ā when ψa ≠ 0.
 #
 # Notation: ε (\varepsilon) is the parental cost share; ϵ (\epsilon) is the
 # idiosyncratic ability shock.
@@ -53,6 +63,95 @@ child's ability. `expm1` avoids cancellation as ψ → 1.
 # moving cost (`mcost`; `τmove = 0`) and a linear warm glow (ψ = 0).
 # `nesting_params()` switches both off and recovers the pre-sorting model.
 #
+# Seven extensions (calibration experiments, 2026-10), each off at its default, so the
+# model above is reproduced exactly (an eighth, the joint education and occupation choice
+# `college`, follows the list; it composes with `split`):
+#   pres    recurring goods cost of living in l′, paid by every resident each period
+#           (housing/access); it enters consumption and Ξ exactly like `mcost`
+#   Bz      taste for location l′ per unit of log z (ability-graded location taste)
+#   sT_min  minimum time share in teaching (a schooling requirement); binds when s_T* is lower
+#   cT      non-pecuniary cost of teaching, in utils, subtracted from W_T
+#   cTz     its ability gradient: W_T falls by cT + cTz log z (cTz < 0: teacher training
+#           is less costly for higher z, which selects teachers positively on ability)
+#   csub    Stone–Geary subsistence c̲ = csub·Cbar, a goods cost paid by every adult in every
+#           location (utility μ log(C − c̲) over total consumption C); like `pres` it does
+#           not scale with (s, e), so it enters consumption and Ξ, and Proposition 2′ holds.
+#           `consumption` is the supernumerary C − c̲, the argument of the log
+#   split   residence and workplace apart (§3b): children go to school where the household
+#           lives, and every worker also chooses a workplace w, in a nested logit with the
+#           residence outer (σν) and the workplace inner (σw = ρw σν ≤ σν). A worker's positions
+#           are spread over the workplaces with shares P_w: pupils for teachers (`gr.PT`), `jobs`
+#           for non-teachers. Teachers' pay and their taste `BT` depend on w, taxes on r, and
+#           commuting (r ≠ w) costs the share `τk` of consumption-relevant income, a time cost.
+#           The solution then carries the joint probabilities instead of `Pi_T`, `Pi_O`.
+#           Teacher demand has no general-equilibrium closure of its own: the positions are fixed
+#           shares of the pupils, and the calibration handles the demand side by fitting the pay
+#           premium δκ to the FTE-per-pupil gap (`--activate gap_teachers_pp --deactivate
+#           gap_salary`), which is equivalent at a calibrated point to a demand-side closure
+#           (a workplace vacancy value, or the finance rule κ_w). With τk > 0 the position
+#           weights are normalised within each residence, so even at equal pay (δκ = 0) teachers
+#           do not locate in proportion to pupils (FTE gap +0.055 at the baseline ϑ, τk = 0.03,
+#           ρw = 0.066, against 0 at τk = 0): the equal-pay gap is part of what δκ offsets.
+#           Home producers (non-teachers whose best occupation is home production) enter the
+#           workplace nest like every other non-teacher, an approximation: they pick a workplace
+#           over `jobs` and lose τk of their output when they cross, about 0.3% of their income
+#           at τk = 0.03 and a crossing share of 0.107
+#
+# The eighth extension, `college` (§3c), makes the BA a choice taken before the occupation:
+#   sBA     BA schooling, as a time share (16/25): a floor for every BA holder and a cap for the rest
+#           (0: no constraint); ρc  log credential premium of a BA in every non-teaching occupation;
+#   ρT0     log pay penalty of a teacher without a BA;  ϑs  elasticity of a BA teacher's pay in the
+#           time share, pay κ h^γ (s/sBA)^ϑs (the salary schedule);  Fc  tuition, in units of Cbar
+#   cC, cCz utility cost of a BA and its gradient per unit of log z, common to every BA holder;
+#   sT0     time-share floor of a teacher without a BA (0: none, the default; the non-BA teaching track's
+#           mean schooling is 12.99 years = 0.52 in the ACS);  cT0  its non-pecuniary cost, in utils,
+#           on top of cT + cTz log z (0: none): the margin of the track's size, so that ρT0 can carry
+#           its pay gap to BA teachers (ACS 0.48), not its size
+#   σd      scale of the college taste shock;  ωz  loading of teacher effectiveness on z:
+#           h_eff = h_T z^{−(1−ωz)α} enters Q and the CFR experiment (1: as h_T; any `college`)
+# A ninth extension, local peer effects (2026-10-07), composes with all of the above:
+#   ψa      elasticity of human capital in the local peer ability ā_l: every student schooled in l
+#           acquires h = Q_T,l ā_l^{ψa} (z ϵ)^α s^φ e^η, with Q_T,l = (2H̃_T/M_l)^σ the teacher index (`QT`),
+#           so the peer factor is part of the school-quality index Q = Q_T ā^{ψa} (`build_grids`) and
+#           reaches everything that Q reaches (the technology, the scores and SEDA growth of the
+#           moments, the value of a location to parents). ā_l is the geometric
+#           mean of the students' z relative to the economy's (`peer_log_ability`), so it moves quality
+#           across locations, not its overall level. 0: off, and Q is the teacher index alone
+# Two further switches (2026-10-15), each off at its default, compose with all of the above:
+#   κc      utility friction of commuting (`split` only): a worker who lives in r and works at w ≠ r loses
+#           κc utils on top of the time cost τk. It is an additive term of the location values of the
+#           nested node (`location_values`), constant in (s, e), so it does not touch consumption, taxes,
+#           Ξ or the per-destination value derivatives (the node's g and H move only through the choice
+#           probabilities π), and Proposition 2′ and the X_O* collapse hold (0: off). It acts inside the
+#           workplace nest, so its scale is σw = ρw σν, not σν
+#   Bd      extra amenity of residence r for BA holders, in utils, by location (`college` only; the
+#           education branch d = 1 of `with_education`): added to the residence-level additive term of
+#           the BA branch's node, so within a branch it enters location choice only, like `Bz`. It also
+#           raises the inclusive value of every BA node, hence W_T, W_O and EV₁, so it moves the college
+#           choice: a uniform shift of Bd is a shift of cC, which is why it is normalised to (0, ζ_BA) and
+#           read jointly with cC. `hh.Λ`, `dLambda_z` and `school_quality_wtp` keep their meaning; the BA's
+#           valuation of the suburb is ΔB + Bd[2] − Bd[1] (zeros: off)
+# Two switches of round 2026-10-15c, each off at its default, compose with all of the above:
+#   By      income-graded location taste, an income interaction of the location preference (as in Bayer,
+#           Ferreira and McMillan 2007): a worker values residence r by an extra By_r (ln ŷ − lyref) utils,
+#           where ŷ is the node's predicted pre-tax income (`predicted_log_income`): its income at its own
+#           location (r = w = l), before the local tax, at the time share of Proposition 2′ with Ξ = 0 (within
+#           the node's bounds) and the goods investment of the destination-homogeneous first-order condition.
+#           ŷ is a constant of the node, so the term enters location choice only, like Bz and Bd: consumption,
+#           taxes, Ξ, Proposition 2′ and the X_O* collapse are untouched (`income_taste`). `lyref` is a frozen
+#           reference (the calibration's population mean of ln ŷ), so that By tilts the location values across
+#           incomes and B keeps its meaning; it has no default (NaN) and must be given whenever By ≠ 0. A uniform
+#           By would be a shift of B; it is normalised to (0, ζ_y) (zeros: off)
+#   fte_rule  teacher-demand closure (`split` only, two locations; NaN: off): districts' positions per pupil
+#           differ by the log gap `fte_rule` (0: a common pupil–teacher norm), and teachers' value of the
+#           suburban workplace, BT = (0, b), is the shadow price that rations the positions: `solve_ge` solves b
+#           as an aggregate of the outer fixed point, so that teachers working in each location per pupil differ
+#           by exactly `fte_rule`. The solution carries the equilibrium b in `p.BT`. Off, BT is a parameter
+# `occ_sample` records the occupational sample of the calibration's occupational block and is
+# not used here. Nor is `move_util` (2026-10-15): it tells the calibration (`theta_to_params`) to read its
+# moving-cost parameter r_m as a utility cost `τmove` (utils) instead of the goods cost `mcost` (r_m C̄); the
+# model has both fields and treats them as always.
+#
 # Frozen normalisations, measured once at `nesting_params()` (Nz = 5,
 # nϵT = nXO = 48) and re-checked by `sorting_mechanism_tests` in the script:
 #   HBAR_BENCH  mean child human capital h̄ → warm-glow reference `href`
@@ -77,6 +176,7 @@ Base.@kwdef struct Params
     σ::Float64 = 0.25                  # curvature of the teacher-quality index Q
     γ::Float64 = 0.80                  # human-capital elasticity of the teaching wage
     β::Float64 = 0.15                  # H̃_T aggregates teachers' h^{β/σ}
+    ψa::Float64 = 0.0                  # peer effect: elasticity of h in local mean ability ā_l (0: off)
     κ::Vector{Float64} = [0.75, 0.9]   # teaching-wage shifter by location
     # preferences
     μ::Float64    = 1.00               # weight on log consumption
@@ -89,6 +189,12 @@ Base.@kwdef struct Params
     τmove::Matrix{Float64} = zeros(2, 2)             # utility cost of moving l → l'
     mcost::Matrix{Float64} = offdiag(MCOST_BENCH, 2) # goods cost of moving l → l'
     Cbar::Float64          = CBAR_BENCH              # consumption level `mcost` is denominated at
+    pres::Vector{Float64}  = [0.0, 0.0]              # recurring goods cost of residence in l'
+    Bz::Vector{Float64}    = [0.0, 0.0]              # taste for l' per unit of log z
+    sT_min::Float64        = 0.0                     # minimum time share in teaching
+    cT::Float64            = 0.0                     # non-pecuniary cost of teaching (utils)
+    cTz::Float64           = 0.0                     # its gradient per unit of log z
+    csub::Float64          = 0.0                     # subsistence c̲ paid by every adult, in units of Cbar
     # wedges by (occupation, gender)
     τω::Matrix{Float64} = [0.0 0.0; 0.0 0.1]   # labour-income wedge; income keeps (1 − τω)
     τe::Matrix{Float64} = [0.0 0.0; 0.0 0.0]   # education barrier; goods cost is (1 + τe)e
@@ -97,6 +203,33 @@ Base.@kwdef struct Params
     σξ::Float64   = 0.20               # AR(1) innovation std of log z
     σϵ::Float64   = 0.30               # std of log ϵ (iid across occupations)
     Mtot::Float64 = 2.0                # total population, both genders
+    # residence/workplace split (§3b); the fields below matter only if `split`
+    split::Bool           = false      # workers choose a residence r and a workplace w
+    σw::Float64           = 0.25       # scale of the workplace taste shock, 0 < σw ≤ σν (σw = ρw σν)
+    τk::Float64           = 0.0        # share of consumption-relevant income lost to commuting (r ≠ w)
+    jobs::Vector{Float64} = [0.5, 0.5] # non-teaching positions by workplace (shares of the jobs)
+    BT::Vector{Float64}   = zeros(2)   # non-pecuniary value of teaching at workplace w (utils)
+    κc::Float64           = 0.0        # utility friction of commuting (r ≠ w), on top of τk (0: none)
+    fte_rule::Float64     = NaN        # teacher-demand closure: log gap in positions per pupil; BT[2] solved in GE (NaN: off)
+    # joint education and occupation choice (§3c); `sBA` … `σd` matter only if `college`
+    college::Bool = false              # the young choose a BA (d = 1) or not (d = 0) before ϵ
+    sBA::Float64  = 16 / 25            # BA schooling: time-share floor of BA holders, cap of the rest (0: none)
+    ρc::Float64   = 0.0                # log credential premium of a BA, every non-teaching occupation
+    ρT0::Float64  = 0.0                # log pay penalty of a teacher without a BA
+    ϑs::Float64   = 0.0                # elasticity of BA teachers' pay in s: κ h^γ (s/sBA)^ϑs
+    Fc::Float64   = 0.0                # tuition of a BA, goods, in units of Cbar
+    cC::Float64   = 0.0                # utility cost of a BA, common to every BA holder
+    cCz::Float64  = 0.0                # its gradient per unit of log z
+    σd::Float64   = 0.25               # scale of the college taste shock
+    sT0::Float64  = 0.0                # time-share floor of a teacher without a BA (0: none)
+    cT0::Float64  = 0.0                # extra non-pecuniary cost of teaching without a BA (utils)
+    Bd::Vector{Float64} = [0.0, 0.0]   # extra amenity of residence r for BA holders (d = 1), utils; location choice only
+    By::Vector{Float64} = [0.0, 0.0]   # taste for residence r per unit of predicted log income ln ŷ − lyref (utils); location choice only
+    lyref::Float64      = NaN          # frozen reference of ln ŷ for `By`; must be set when By ≠ 0 (NaN: unset)
+    # teacher effectiveness h_T z^{−(1−ωz)α} for Q and the CFR experiment (any `college`; 1 = h_T)
+    ωz::Float64   = 1.0
+    occ_sample::Symbol = :acs2009_13   # occupational sample of the calibration's block (metadata)
+    move_util::Bool = false            # calibration metadata: ϑ's r_m sets τmove (utils), not mcost (goods)
 end
 
 """
@@ -105,7 +238,8 @@ end
 `I` occupations and `L` locations. Location 1 is the base; locations 2..L share
 `B_other`, `κ_other` and the off-diagonal moving costs `τmove_off` (utility) and
 `mcost_off` (goods). Non-teaching occupations share `A_other`; `τω_other` is the
-wedge on occupation 2 for gender 2. Other fields can be passed as keywords.
+wedge on occupation 2 for gender 2. Other fields can be passed as keywords; `jobs`
+defaults to equal shares and `BT` to zero.
 
 `mcost_off` is an absolute goods amount. An economy whose consumption level is far
 from `CBAR_BENCH` should re-derive it with `redenominate_move_cost`.
@@ -126,7 +260,8 @@ function Params(I::Int, L::Int;
     defaults = (; T, A, τω, τe = zeros(I, 2),
                 κ = vcat(κ_base, fill(κ_other, L - 1)),
                 B = vcat(B_base, fill(B_other, L - 1)),
-                τmove = offdiag(τmove_off, L), mcost = offdiag(mcost_off, L))
+                τmove = offdiag(τmove_off, L), mcost = offdiag(mcost_off, L),
+                pres = zeros(L), Bz = zeros(L), Bd = zeros(L), By = zeros(L), jobs = fill(1.0 / L, L), BT = zeros(L))
     return Params(; merge(defaults, NamedTuple(kwargs))...)
 end
 
@@ -167,8 +302,31 @@ function check_params(p::Params)
     I, L = length(p.A), length(p.B)
     @assert I ≥ 2 && 1 ≤ p.T ≤ I "need a teaching and at least one non-teaching occupation"
     @assert length(p.κ) == L && size(p.τmove) == (L, L) && size(p.mcost) == (L, L) &&
+            length(p.pres) == L && length(p.Bz) == L && length(p.Bd) == L && length(p.By) == L &&
             size(p.τω) == (I, 2) && size(p.τe) == (I, 2) "Params dimensions are inconsistent"
     @assert all(iszero, diag(p.mcost)) "mcost must have a zero diagonal"
+    @assert 0.0 ≤ p.sT_min < 1.0 "sT_min must lie in [0, 1)"
+    @assert p.csub ≥ 0.0 "csub must be nonnegative"
+    @assert isfinite(p.ψa) "ψa must be finite"
+    @assert 0.0 ≤ p.τk < 1.0 "τk must lie in [0, 1)"
+    @assert p.κc ≥ 0.0 && isfinite(p.κc) "κc must be nonnegative and finite"
+    @assert all(isfinite, p.Bd) "Bd must be finite"
+    @assert all(isfinite, p.By) "By must be finite"
+    @assert all(iszero, p.By) || isfinite(p.lyref) "the income-graded taste By ≠ 0 needs its frozen reference lyref (--external lyref=…)"
+    if !isnan(p.fte_rule)
+        @assert isfinite(p.fte_rule) "fte_rule must be finite (NaN: off)"
+        @assert p.split && L == 2 "the teacher-demand closure (fte_rule) needs the split and two locations"
+    end
+    @assert all(≥(0.0), p.jobs) && isapprox(sum(p.jobs), 1.0; atol = 1e-12) "jobs must be nonnegative shares summing to one"
+    if p.split
+        @assert length(p.jobs) == L && length(p.BT) == L "the split needs one `jobs` and one `BT` entry per location"
+        @assert 0.0 < p.σw ≤ p.σν "σw must lie in (0, σν]: σw = ρw σν with 0 < ρw ≤ 1"
+    end
+    @assert 0.0 ≤ p.sBA < 1.0 "sBA must lie in [0, 1)"
+    @assert p.σd > 0.0 && p.Fc ≥ 0.0 && p.ϑs ≥ 0.0 && p.ωz ≥ 0.0 "σd must be positive; Fc, ϑs and ωz nonnegative"
+    p.college && !iszero(p.ϑs) && @assert p.sBA > 0.0 "the salary schedule (s/sBA)^ϑs needs sBA > 0"
+    @assert 0.0 ≤ p.sT0 < 1.0 "sT0 must lie in [0, 1)"
+    p.college && p.sBA > 0.0 && @assert p.sT0 ≤ p.sBA "the floor of non-BA teachers, sT0, may not exceed the BA schooling sBA (their cap)"
     # The X_O* collapse needs a common τe across non-teaching occupations.
     nonteach = [i for i in 1:I if i != p.T]
     @assert all(p.τe[i, g] == p.τe[nonteach[1], g] for i in nonteach, g in 1:2) "τe must be common across non-teaching occupations"
@@ -217,11 +375,14 @@ function make_increasing(v::AbstractVector)
 end
 
 """
-    build_grids(p; H̃T, M, t, Nz, nϵT, nXO, q_lo, q_hi)
+    build_grids(p; H̃T, M, t, la, Nz, nϵT, nXO, q_lo, q_hi)
 
-Grids and shock laws at aggregates (H̃_T, M, t):
+Grids and shock laws at aggregates (H̃_T, M, t) and local peer ability `la` = log ā_l (zeros by
+default):
 - `z`, `Πz`: Rouwenhorst ability nodes and transitions;
-- `Q`: teacher-quality index Q_l = (2H̃_T/M)^σ;
+- `Q`: school quality, the index of the technology h = Q_l (z ϵ)^α s^φ e^η: the teacher-quality
+  index `QT` = (2H̃_T/M)^σ times the peer factor ā_l^{ψa} (`peer_log_ability`). With ψa = 0 (the
+  default) `Q` equals `QT` and `la` has no effect; `la` is returned as given;
 - `dT`, `ϵTgrid`: law of ϵ_T ~ LogNormal(−σϵ²/2, σϵ) and a log-spaced grid between its
   `q_lo` and `q_hi` quantiles. Teachers come from the upper tail of ϵ_T; a grid spaced
   in quantiles would leave that whole tail (above the 0.98 quantile at nϵT = 48) in one
@@ -229,15 +390,18 @@ Grids and shock laws at aggregates (H̃_T, M, t):
 - `dO[i,g]`: law of X_{O,i} = Θ_{i,g} ϵ_i^α; `XOgrid[:,g]`: log-spaced grid between the
   `q_lo` and `q_hi` quantiles of X_O*;
 - `lϵT`, `lXO`: the grids in logs, the coordinate of every spline and integral;
-- `logΘ[i,g]`: log Θ_{i,g}, to recover h_O from X_O*.
+- `logΘ[i,g]`: log Θ_{i,g}, to recover h_O from X_O*;
+- `PT`: the pupils' shares M_l/ΣM, the teachers' positions of the residence/workplace split
+  (§3b; unused otherwise).
 """
-function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
+function build_grids(p::Params; H̃T, M, t, la = zeros(length(p.B)), Nz = 5, nϵT = 64, nXO = 64,
                      q_lo = 1e-5, q_hi = 1 - 1e-6)
     I, L = length(p.A), length(p.B)
     z, Πz = rouwenhorst(Nz, p.ρz, p.σξ)
     # H̃_T is an integral of a spline and can undershoot zero when a location has
     # almost no teachers; the floor keeps Q real there.
-    Q = (2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) .^ p.σ
+    QT = (2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) .^ p.σ
+    Q  = iszero(p.ψa) ? copy(QT) : QT .* exp.(p.ψa .* la)
 
     dT     = LogNormal(-p.σϵ^2 / 2, p.σϵ)
     ϵTgrid = exp.(range(log(quantile(dT, q_lo)), log(quantile(dT, q_hi)), nϵT))
@@ -256,8 +420,9 @@ function build_grids(p::Params; H̃T, M, t, Nz = 5, nϵT = 64, nXO = 64,
         hi = quantile_xo(dO, nonteach, g, q_hi)
         XOgrid[:, g] = exp.(range(log(lo), log(hi), nXO))
     end
-    return (; z, Πz, Nz, Q, t, I, L, dT, ϵTgrid, dO, XOgrid, lϵT = log.(ϵTgrid), lXO = log.(XOgrid),
-              logΘ, nonteach, nϵT, nXO)
+    return (; z, Πz, Nz, Q, QT, la = collect(Float64, la), t, I, L, dT, ϵTgrid, dO, XOgrid,
+              lϵT = log.(ϵTgrid), lXO = log.(XOgrid),
+              logΘ, nonteach, nϵT, nXO, PT = max.(M, M_FLOOR) ./ sum(max.(M, M_FLOOR)))
 end
 
 """
@@ -330,32 +495,81 @@ Eϵ_nonteach(gr, g, x, α) = x^(1 / α) * argmax_mean(lθ -> exp(-lθ / α), gr,
 # with γ_b = γ for teaching (wage κ h^γ) and γ_b = 1 otherwise:
 #     teaching:      c_{l'} = (1−t_{l'})(1−τω_{T,g}) κ_{l'} [Q_l (z ϵ_T)^α]^γ
 #     non-teaching:  c_{l'} = (1−t_{l'}) Q_l z^α X_O*
-# Consumption is C_{l'} = y_{l'} − (1+τe)e − m_{l,l'}, and the value of l' is
-# W_{l'} = μ log C_{l'} + Λ(z, l'). A Gumbel shock over l' gives logit choice.
+# Consumption is C_{l'} = y_{l'} − (1+τe)e − m_{l,l'} − p_{l'} − c̲ (p = `pres`,
+# c̲ = `csub` C̄), and the value of l' is W_{l'} = μ log C_{l'} + Λ(z, l') + Bz_{l'} log z.
+# A Gumbel shock over l' gives logit choice. Under `Params.split` the node is a `NestedNode`
+# over residence and workplace (§3b) instead, and everything that follows is generic in the node.
 # -----------------------------------------------------------------------------
-struct Node
+"The household's location problem at one node: a `Node`, or a `NestedNode` under the split."
+abstract type AbstractNode end
+
+struct Node <: AbstractNode
     c::Vector{Float64}    # income coefficient c_{l'}
     γb::Float64           # income elasticity of s^φ e^η
     τe::Float64           # education barrier
-    m::Vector{Float64}    # goods moving cost m_{l,l'}
-    Λ::Vector{Float64}    # altruism term Λ(z, l')
+    m::Vector{Float64}    # goods costs m_{l,l'} + p_{l'} + c̲ (moving, residence, subsistence)
+    Λ::Vector{Float64}    # altruism term Λ(z, l') plus the location taste Bz_{l'} log z
     l::Int                # birth location
+    smin::Float64         # lower bound on the time share (teaching: `sT_min`)
+    smax::Float64         # upper bound on the time share (§3c, no BA: `sBA`; Inf = none)
+    ϑs::Float64           # extra elasticity of income in s (§3c, BA teachers' salary schedule)
 end
 
-function teach_node(ϵT, zi, l, g, Λ, p::Params, gr)
+"A node without the §3c fields: no upper bound on s and no extra elasticity (the baseline)."
+Node(c, γb, τe, m, Λ, l, smin) = Node(c, γb, τe, m, Λ, l, smin, Inf, 0.0)
+
+"""
+    goods_cost(l, p)
+
+Goods cost of each work location l' that does not scale with (s, e): the move from l,
+the residence cost p_{l'} and the subsistence c̲ = `csub` C̄, which every adult pays in
+every location. Every `Node` takes its `m` from here, so each of them enters consumption
+and Ξ.
+"""
+goods_cost(l, p::Params) = p.mcost[l, :] .+ p.pres .+ p.csub * p.Cbar
+
+"""
+    teach_node(ϵT, zi, l, g, Λ, p, gr; d)
+    nonteach_node(XO, zi, l, g, Λ, p, gr; d)
+
+The node of the teaching problem at shock ϵ_T and of the non-teaching problem at X_O*: the
+baseline node (`plain_teach_node`, `plain_nonteach_node`; under `p.split` the `NestedNode` of
+§3b, `nested_teach_node`, `nested_nonteach_node`), and under `p.college` the node of education
+branch `d` ∈ {0, 1} derived from it (`with_education`, §3c); `d` is ignored otherwise.
+"""
+function teach_node(ϵT, zi, l, g, Λ, p::Params, gr; d = nothing)
+    nd = p.split ? nested_teach_node(ϵT, zi, l, g, Λ, p, gr) : plain_teach_node(ϵT, zi, l, g, Λ, p, gr)
+    nd = p.college ? with_education(nd, p, d, :teach) : nd
+    return income_taste(nd, p, gr)
+end
+
+function nonteach_node(XO, zi, l, g, Λ, p::Params, gr; d = nothing)
+    nd = p.split ? nested_nonteach_node(XO, zi, l, g, Λ, p, gr) : plain_nonteach_node(XO, zi, l, g, Λ, p, gr)
+    nd = p.college ? with_education(nd, p, d, :nonteach) : nd
+    return income_taste(nd, p, gr)
+end
+
+"The baseline teaching node (§3)."
+function plain_teach_node(ϵT, zi, l, g, Λ, p::Params, gr)
     k = (1 - p.τω[p.T, g]) * (gr.Q[l] * (gr.z[zi] * ϵT)^p.α)^p.γ
     c = [(1 - gr.t[lp]) * p.κ[lp] * k for lp in 1:gr.L]
-    return Node(c, p.γ, p.τe[p.T, g], p.mcost[l, :], Λ[zi, :], l)
+    return Node(c, p.γ, p.τe[p.T, g], goods_cost(l, p), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]), l,
+                p.sT_min)
 end
 
-function nonteach_node(XO, zi, l, g, Λ, p::Params, gr)
+"The baseline non-teaching node (§3)."
+function plain_nonteach_node(XO, zi, l, g, Λ, p::Params, gr)
     k = gr.Q[l] * gr.z[zi]^p.α * XO
     c = [(1 - gr.t[lp]) * k for lp in 1:gr.L]
-    return Node(c, 1.0, p.τe[gr.nonteach[1], g], p.mcost[l, :], Λ[zi, :], l)
+    return Node(c, 1.0, p.τe[gr.nonteach[1], g], goods_cost(l, p),
+                Λ[zi, :] .+ p.Bz .* log(gr.z[zi]), l, 0.0)
 end
 
-consumption(nd::Node, s, e, p::Params) =
-    nd.c .* (s^p.φ * e^p.η)^nd.γb .- (1 + nd.τe) * e .- nd.m
+function consumption(nd::Node, s, e, p::Params)
+    y = nd.c .* (s^p.φ * e^p.η)^nd.γb
+    iszero(nd.ϑs) || (y = y .* s^nd.ϑs)       # §3c: BA teachers' salary schedule, y ∝ s^{γφ + ϑs}
+    return y .- (1 + nd.τe) * e .- nd.m
+end
 
 location_values(nd::Node, C, p::Params) = p.μ .* smooth_log.(C) .+ nd.Λ
 
@@ -365,16 +579,19 @@ teacher_h(ϵT, zi, l, s, e, p::Params, gr) = gr.Q[l] * (gr.z[zi] * ϵT)^p.α * s
 "Non-teaching income capacity (1−τω)A_{i*} h_O = Q_l z^α X_O* s^φ e^η."
 nonteach_cap(XO, zi, l, s, e, p::Params, gr) = gr.Q[l] * gr.z[zi]^p.α * XO * s^p.φ * e^p.η
 
-"Location values W and teacher human capital at a teaching node."
-function W_teach(ϵT, zi, l, g, e, s, Λ, p::Params, gr)
-    nd = teach_node(ϵT, zi, l, g, Λ, p, gr)
+"Location values W and teacher human capital at a teaching node (`d`: the education branch under `college`)."
+function W_teach(ϵT, zi, l, g, e, s, Λ, p::Params, gr; d = nothing)
+    nd = teach_node(ϵT, zi, l, g, Λ, p, gr; d)
     return location_values(nd, consumption(nd, s, e, p), p), teacher_h(ϵT, zi, l, s, e, p, gr)
 end
 
-"Location values W and income capacity at a non-teaching node."
-function W_nonteach(XO, zi, l, g, e, s, Λ, p::Params, gr)
-    nd = nonteach_node(XO, zi, l, g, Λ, p, gr)
-    return location_values(nd, consumption(nd, s, e, p), p), nonteach_cap(XO, zi, l, s, e, p, gr)
+"""
+Location values W and income capacity at a non-teaching node (`d`: the education branch under
+`college`, where the capacity includes the credential premium of a BA, e^{ρc}).
+"""
+function W_nonteach(XO, zi, l, g, e, s, Λ, p::Params, gr; d = nothing)
+    nd = nonteach_node(XO, zi, l, g, Λ, p, gr; d)
+    return location_values(nd, consumption(nd, s, e, p), p), nonteach_cap(XO, zi, l, s, e, p, gr) * credential(p, d)
 end
 
 "Inclusive value σν·log Σ exp((W + B − τmove)/σν) and logit probabilities over work locations."
@@ -390,16 +607,83 @@ end
     time_share(γb, p, Ξ = 0)
 
 Optimal time share (Proposition 2′). Combining the s- and e-FOCs leaves one
-state variable, Ξ = Σ_{l'} π_{l'} m_{l,l'}/C_{l'}. With b = μφ(1+Ξ),
-s = bγ_b / (bγ_b + 1 − γ_b η). Without a goods moving cost Ξ = 0 and s is constant.
+state variable, Ξ = Σ_{l'} π_{l'} m_{l,l'}/C_{l'}, where m_{l,l'} is every goods cost
+that does not scale with (s, e): the moving cost plus the residence cost p_{l'} and
+the subsistence c̲ (`goods_cost`).
+With b = μφ(1+Ξ), s = bγ_b / (bγ_b + 1 − γ_b η). Without goods costs Ξ = 0 and s is
+constant.
 """
 @inline function time_share(γb, p::Params, Ξ = 0.0)
     b = p.μ * p.φ * (1 + Ξ) * γb
     return b / (b + 1 - γb * p.η)
 end
 
+"""
+    time_share(γb, p, Ξ, ϑs)
+
+Time share with a salary schedule (§3c): pay κ h^γ (s/sBA)^ϑs makes income ∝ s^{γ_bφ + ϑs}
+e^{γ_bη}, and the same two first-order conditions as in Proposition 2′ give
+s = b/(b + 1 − γ_bη) with b = μ(γ_bφ + ϑs)(1 + Ξ).
+"""
+@inline function time_share(γb, p::Params, Ξ, ϑs)
+    b = p.μ * (p.φ * γb + ϑs) * (1 + Ξ)
+    return b / (b + 1 - γb * p.η)
+end
+
+"""
+    node_share(nd, p, Ξ) -> s
+
+The time share of node `nd` at Ξ, with its constraints: the optimum of Proposition 2′ (with the
+node's salary-schedule elasticity `ϑs`, if any) clamped to [`smin`, `smax`]. With `smin` and
+`smax` as the baseline has them (0 or `sT_min`; Inf) this is `max(time_share, smin)`.
+"""
+@inline node_share(nd::AbstractNode, p::Params, Ξ = 0.0) =
+    min(max(iszero(nd.ϑs) ? time_share(nd.γb, p, Ξ) : time_share(nd.γb, p, Ξ, nd.ϑs), nd.smin), nd.smax)
+
 "Ξ = 0 time share of occupation `i`."
 s_of(i::Int, p::Params, Ξ = 0.0) = time_share(i == p.T ? p.γ : 1.0, p, Ξ)
+
+"""
+    predicted_log_income(nd, p, gr) -> Float64
+
+ln ŷ, the predicted pre-tax income of a node, the grading variable of the income-graded location taste
+`Params.By` (round 2026-10-15c). It is the node's income at its own location (r = w = l: no commuting) before
+the local tax, at the time share of Proposition 2′ with Ξ = 0 within the node's bounds (`node_share`) and the
+goods investment of the destination-homogeneous first-order condition, (1 + τe) e = a y with a = ηγ_b. Income
+is y = c s^{γ_bφ + ϑs} e^a (`consumption`), so
+    (1 − a) ln ŷ = ln c_own + (γ_bφ + ϑs) ln s + a ln(a/(1 + τe)),
+with c_own the node's income coefficient at its own location over 1 − t_l. c_own carries the wedge 1 − τω,
+Q_l, z and the shock, κ_l and the pay factor for teachers, and the credential premium e^{ρc} for BA
+non-teachers; ŷ depends on none of (s, e), so it is a constant of the node.
+"""
+function predicted_log_income(nd::AbstractNode, p::Params, gr)
+    l   = nd.l
+    own = nd isa NestedNode ? (l - 1) * gr.L + l : l
+    a   = p.η * nd.γb
+    s   = node_share(nd, p, 0.0)
+    return (log(nd.c[own] / (1 - gr.t[l])) + (p.φ * nd.γb + nd.ϑs) * log(s) + a * log(a / (1 + nd.τe))) / (1 - a)
+end
+
+"""
+    income_taste(nd, p, gr) -> node
+
+The node with the income-graded location taste `Params.By` (round 2026-10-15c): its residence-level additive
+term `Λ` (by residence r) gains By_r (ln ŷ − lyref), with ln ŷ the node's predicted log income
+(`predicted_log_income`), a constant of the node. Like `Bz` and `Bd` it enters location choice only. Returns
+`nd` itself when `By` is zero (off), so the model without it is reproduced bit for bit.
+"""
+function income_taste(nd::Node, p::Params, gr)
+    all(iszero, p.By) && return nd
+    Λ = nd.Λ .+ p.By .* (predicted_log_income(nd, p, gr) - p.lyref)
+    return Node(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.l, nd.smin, nd.smax, nd.ϑs)
+end
+
+# The `NestedNode` of §3b, defined below (the only other subtype of `AbstractNode`).
+function income_taste(nd::AbstractNode, p::Params, gr)
+    all(iszero, p.By) && return nd
+    Λ = nd.Λ .+ p.By .* (predicted_log_income(nd, p, gr) - p.lyref)
+    return NestedNode(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.bw, nd.lP, nd.l, nd.smin, nd.smax, nd.ϑs)
+end
 
 "Robust fallback for the goods margin: bounded Brent search over u = log e."
 function solve_e_bracket(nd::Node, s, p::Params; lo, hi)
@@ -425,6 +709,7 @@ function solve_e(nd::Node, s, u0, p::Params;
                  lo = log(1e-8), hi = log(1e4), maxit = 30, gtol = 1e-10)
     a  = p.η * nd.γb
     y1 = nd.c .* s^(p.φ * nd.γb)        # income at e = 1
+    iszero(nd.ϑs) || (y1 = y1 .* s^nd.ϑs)   # §3c: BA teachers' salary schedule
     u  = clamp(isfinite(u0) ? u0 : log(1e-3), lo, hi)
     for _ in 1:maxit
         e  = exp(u)
@@ -445,14 +730,23 @@ function solve_e(nd::Node, s, u0, p::Params;
 end
 
 """
-    solve_node(nd, p, u0, s0; maxit = 12, tol = 1e-10)
+    solve_node(nd, p, u0, s0; maxit = 12, relax_maxit = 200, tol = 1e-10)
 
 Joint (e, s) solution at one node: alternate the Newton e-solve with the explicit
 s(Ξ) update. The map contracts by about 0.03 per pass and exits after one pass when
-there is no goods moving cost. Returns (e, V̄, s, residual, passes).
+there is no goods moving cost. A goods cost paid in every location (`csub`, `pres`) makes
+its slope about −sΞ/((1+Ξ)μ), which tends to −1 as consumption nears zero, and the
+undamped passes then oscillate. If `maxit` of them leave the residual at or above `tol`,
+up to `relax_maxit` further passes take the relaxed step s ← s + ω (s(Ξ) − s) with
+ω = 1/2, halved whenever the residual grows; e is re-solved at each pass as before. A
+binding schooling requirement (`nd.smin` above the optimal s) holds s at `nd.smin`, and e
+is optimal given it; likewise a binding cap (`nd.smax` below it, §3c) holds s at `nd.smax`.
+Returns (e, V̄, s, residual, passes, relaxed), where `relaxed` says
+whether the relaxed phase was needed (it never is at the baseline). Generic in the node:
+under the split the destinations of π, C and m are the (residence, workplace) pairs.
 """
-function solve_node(nd::Node, p::Params, u0, s0; maxit = 12, tol = 1e-10)
-    s = (isfinite(s0) && 0.0 < s0 < 1.0) ? s0 : time_share(nd.γb, p)
+function solve_node(nd::AbstractNode, p::Params, u0, s0; maxit = 12, relax_maxit = 200, tol = 1e-10)
+    s = min(max((isfinite(s0) && 0.0 < s0 < 1.0) ? s0 : node_share(nd, p), nd.smin), nd.smax)
     e = V̄ = NaN
     resid = Inf
     passes = 0
@@ -460,11 +754,546 @@ function solve_node(nd::Node, p::Params, u0, s0; maxit = 12, tol = 1e-10)
         passes += 1
         e, V̄, C, π = solve_e(nd, s, u0, p)
         Ξ = sum(π[lp] * nd.m[lp] / max(C[lp], 1e-8) for lp in eachindex(π))
-        s_new = time_share(nd.γb, p, Ξ)
+        s_new = node_share(nd, p, Ξ)
         resid = abs(s_new - s)
         s = s_new
     end
-    return e, V̄, s, resid, passes
+    relaxed = resid ≥ tol
+    ω = 0.5
+    while passes < maxit + relax_maxit && resid ≥ tol
+        passes += 1
+        e, V̄, C, π = solve_e(nd, s, u0, p)
+        Ξ = sum(π[lp] * nd.m[lp] / max(C[lp], 1e-8) for lp in eachindex(π))
+        s_new = node_share(nd, p, Ξ)
+        r = abs(s_new - s)
+        r > resid && (ω /= 2)
+        resid = r
+        s = r < tol ? s_new : s + ω * (s_new - s)
+    end
+    return e, V̄, s, resid, passes, relaxed
+end
+
+# -----------------------------------------------------------------------------
+# 3b. Residence and workplace: the nested location problem (`Params.split`)
+#
+# Children attend school where the household lives, but a worker chooses a residence r and a
+# workplace w inside the CZ. The choice is a nested logit: the residence outer (scale σν) and
+# the workplace inner (scale σw = ρw σν with 0 < ρw ≤ 1, which keeps it consistent with random
+# utility; ρw = 1 is a flat logit over the L² pairs). The inner nest is weighted by positions: a
+# worker of group o has positions spread over the workplaces with shares P^o_w, each with an iid
+# taste shock, so that with W_{rw} = μ log C_{rw} + b_w + Λ_r (the last constant within a nest)
+#     π_{w|r} = P^o_w exp(W_{rw}/σw) / Σ_{w'} P^o_{w'} exp(W_{rw'}/σw),
+#     I_r     = σw log Σ_w P^o_w exp(W_{rw}/σw),
+#     V̄       = σν log Σ_r exp((I_r + B_r − τmove_{l,r})/σν),        π_{rw} = π_r π_{w|r}.
+# Teachers' positions are proportional to the pupils, P^T_w = S_w/ΣS (`gr.PT`), so that with equal
+# pay, no commuting cost and b = 0 they locate in proportion to pupils; non-teachers' follow
+# the data's job shares (`Params.jobs`). b_w = BT_w for teachers and 0 for non-teachers.
+# With a commuting cost the weights, normalised within each residence, draw commuters toward the
+# larger location, and the staffing at equal pay departs from the pupils': there is no
+# general-equilibrium teacher-demand closure, and the calibration fits δκ to the FTE-per-pupil gap
+# instead, which is equivalent at a calibrated point (see `split` in §1).
+# The home producers (the non-teachers whose best occupation is home production) are in the
+# workplace nest like every other non-teacher, an approximation: the X_O* collapse leaves no
+# separate node for them, and they lose the share τk of their output when they cross (about 0.3% of
+# home-production income at τk = 0.03 and a crossing share of 0.107).
+# Teaching pay κ_w is paid at the workplace and the tax t_r levied at the residence.
+# Commuting (r ≠ w) costs the share τk of consumption-relevant income, a time cost that leaves
+# taxable income and measured wages alone:
+#     teaching:      c_{rw} = (1−t_r)(1−τω_{T,g}) κ_w [Q_l (z ϵ_T)^α]^γ (1 − τk 1{r≠w})
+#     non-teaching:  c_{rw} = (1−t_r) Q_l z^α X_O* (1 − τk 1{r≠w})
+# so income stays homogeneous in (s, e), the goods costs m_{rw} = m_{l,r} + p_r + c̲ do not
+# involve commuting, and Proposition 2′ holds with Ξ = Σ_{rw} π_{rw} m_{rw}/C_{rw}. Destinations
+# are d = (r − 1)L + w: `reshape(x, L, L)` of a vector over d is indexed [w, r].
+# -----------------------------------------------------------------------------
+"Choice probability below which a destination at the consumption floor drops out of the Newton step of a `NestedNode`."
+const P_FLOOR = 1e-14
+
+"""
+    NestedNode
+
+The `Node` of the residence/workplace split. Its vectors over destinations d = (r − 1)L + w
+(`c`, `m`, and the C, π of `solve_node`) have L² entries; `Λ` is by residence r, and `bw`, `lP`
+by workplace w.
+"""
+struct NestedNode <: AbstractNode
+    c::Vector{Float64}    # income coefficient c_d: tax of r, pay of w, commuting time
+    γb::Float64           # income elasticity of s^φ e^η
+    τe::Float64           # education barrier
+    m::Vector{Float64}    # goods costs m_{l,r} + p_r + c̲ of destination d (by residence)
+    Λ::Vector{Float64}    # altruism term Λ(z, r) plus the location taste Bz_r log z
+    bw::Vector{Float64}   # non-pecuniary value of working at w (teachers: `BT`; non-teachers: 0)
+    lP::Vector{Float64}   # log P_w: the position weights of the inner nest
+    l::Int                # birth location
+    smin::Float64         # lower bound on the time share (teaching: `sT_min`)
+    smax::Float64         # upper bound on the time share (§3c, no BA: `sBA`; Inf = none)
+    ϑs::Float64           # extra elasticity of income in s (§3c, BA teachers' salary schedule)
+end
+
+"A `NestedNode` without the §3c fields: no upper bound on s and no extra elasticity (no college)."
+NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin) = NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin, Inf, 0.0)
+
+"A vector over residences r, stacked over the destinations d = (r − 1)L + w."
+by_residence(x) = repeat(x; inner = length(x))
+
+"A vector over workplaces w, stacked over the destinations d = (r − 1)L + w."
+by_workplace(x) = repeat(x, length(x))
+
+"Income coefficients c_d = (1 − t_r) f_w k (1 − τk 1{r ≠ w}) over the destinations d = (r − 1)L + w."
+commuting_income(t, f, k, τk) =
+    vec([(1 - t[r]) * f[w] * k * (r == w ? 1.0 : 1 - τk) for w in eachindex(f), r in eachindex(t)])
+
+"""
+    nested_teach_node(ϵT, zi, l, g, Λ, p, gr) -> NestedNode
+
+The node of a teacher under the split: the workplace nest with the pupils' shares `gr.PT` as position
+weights, pay κ_w at the workplace, the taste `p.BT`, and the commuting time cost `p.τk`. Teacher
+demand has no equilibrium closure of its own (the calibration fits δκ to the FTE-per-pupil gap,
+which is equivalent at a calibrated point); see §3b.
+"""
+function nested_teach_node(ϵT, zi, l, g, Λ, p::Params, gr)
+    k = (1 - p.τω[p.T, g]) * (gr.Q[l] * (gr.z[zi] * ϵT)^p.α)^p.γ
+    return NestedNode(commuting_income(gr.t, p.κ, k, p.τk), p.γ, p.τe[p.T, g],
+                      by_residence(goods_cost(l, p)), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]),
+                      p.BT, log.(gr.PT), l, p.sT_min)
+end
+
+"""
+    nested_nonteach_node(XO, zi, l, g, Λ, p, gr) -> NestedNode
+
+The node of a non-teaching worker under the split: the workplace nest with the position weights
+`p.jobs`. Every non-teaching node is in it, home producers included: the X_O* collapse leaves no
+separate node for the occupation that attains the max, so a home producer chooses a workplace like
+any other non-teacher and loses the share τk of her output when she crosses. This is an
+approximation (about 0.3% of home-production income at τk = 0.03 and a crossing share of 0.107). The
+market-worker moments (`commute_shares`) leave home producers out; their consumption, their
+job-access term in the residential choice and the inclusive-value gap (`option_values`) do not.
+"""
+function nested_nonteach_node(XO, zi, l, g, Λ, p::Params, gr)
+    k = gr.Q[l] * gr.z[zi]^p.α * XO
+    return NestedNode(commuting_income(gr.t, ones(gr.L), k, p.τk), 1.0, p.τe[gr.nonteach[1], g],
+                      by_residence(goods_cost(l, p)), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]),
+                      zeros(gr.L), log.(p.jobs), l, 0.0)
+end
+
+function consumption(nd::NestedNode, s, e, p::Params)
+    y = nd.c .* (s^p.φ * e^p.η)^nd.γb
+    iszero(nd.ϑs) || (y = y .* s^nd.ϑs)       # §3c: BA teachers' salary schedule, y ∝ s^{γφ + ϑs}
+    return y .- (1 + nd.τe) * e .- nd.m
+end
+
+"""
+Indicator of commuting, 1{r ≠ w}, over the destinations d = (r − 1)L + w of a `NestedNode` with `L`
+locations: the pairs that bear the utility friction `Params.κc`.
+"""
+commuting_indicator(L) = vec([r == w ? 0.0 : 1.0 for w in 1:L, r in 1:L])
+
+"""
+W_d = μ log C_d + b_w + Λ_r − κc 1{r ≠ w} of living in r and working at w, before the amenity B_r and
+the moving cost. The friction `κc` (utils, `Params.κc`; 0 by default, when W is unchanged) is the same
+on every commuting pair and constant in (s, e), so the per-destination derivatives w_d and dw_d of
+`nested_value_derivs` are those of W without it (the node's g and H change only through the choice
+probabilities π, which it moves), and consumption, taxes and Ξ do not know about it. It acts inside the
+workplace nest, whose scale is σw = ρw σν: κc / σw, not κc / σν, measures how much commuting it removes.
+"""
+function location_values(nd::NestedNode, C, p::Params)
+    W = p.μ .* smooth_log.(C) .+ by_workplace(nd.bw) .+ by_residence(nd.Λ)
+    return iszero(p.κc) ? W : W .- p.κc .* commuting_indicator(length(nd.Λ))
+end
+
+"""
+    nested_logsum_probs(W, l, nd, p) -> (V̄, π, πr, πw, I)
+
+Inclusive value V̄ and choice probabilities of a `NestedNode` born in `l`, at the values `W` of
+`location_values`: the position-weighted logsum over workplaces within each residence (inner
+values `I[r]`, probabilities `πw[w, r]` = π_{w|r}), then over residences (`πr[r]`); `π =
+vec(πw .* πr')` is the joint over the pairs d. Both logsums are shifted by their maximum, and a
+workplace without positions has probability zero.
+"""
+function nested_logsum_probs(W, l, nd::NestedNode, p::Params)
+    L    = length(nd.Λ)
+    x    = reshape(W ./ p.σw, L, L) .+ nd.lP         # [w, r]
+    xmax = maximum(x; dims = 1)
+    ex   = exp.(x .- xmax)
+    Sw   = sum(ex; dims = 1)
+    I    = vec(p.σw .* (xmax .+ log.(Sw)))
+    πw   = ex ./ Sw
+    u    = (I .+ p.B .- p.τmove[l, :]) ./ p.σν
+    umax = maximum(u)
+    eu   = exp.(u .- umax)
+    Su   = sum(eu)
+    πr   = eu ./ Su
+    return p.σν * (umax + log(Su)), vec(πw .* πr'), πr, πw, I
+end
+
+"""
+    nested_value_derivs(nd, s, u, p) -> (; V̄, g, H, C, π, ok)
+
+V̄ and its first two derivatives in u = log e at fixed s. With w_d = ∂W_d/∂u as in `solve_e`
+and w̄_r = E_{π_{w|r}}[w], the derivative of the inner value I_r,
+    g = ∂V̄/∂u   = E_π[w],
+    H = ∂²V̄/∂u² = E_π[μ(a² y − mc)/C − w²/μ] + Σ_r π_r Var_{π_{w|r}}(w_{rw})/σw
+                   + Σ_r π_r (w̄_r − g)²/σν.
+A pair at the consumption floor with probability below `P_FLOOR` drops out of the sums (its
+terms are of that order); with a larger probability the log barrier binds, and `ok` is false.
+"""
+function nested_value_derivs(nd::NestedNode, s, u, p::Params)
+    L  = length(nd.Λ)
+    a  = p.η * nd.γb
+    e  = exp(u)
+    y1 = nd.c .* s^(p.φ * nd.γb)                          # income at e = 1
+    iszero(nd.ϑs) || (y1 = y1 .* s^nd.ϑs)                 # §3c: BA teachers' salary schedule
+    y  = y1 .* e^a
+    mc = (1 + nd.τe) * e
+    C  = y .- mc .- nd.m
+    V̄, π, πr, πw = nested_logsum_probs(location_values(nd, C, p), nd.l, nd, p)
+    floored = C .≤ C_FLOOR
+    any(floored .& (π .> P_FLOOR)) && return (; V̄, g = NaN, H = NaN, C, π, ok = false)
+    w  = @. p.μ * (a * y - mc) / C
+    dw = @. p.μ * (a^2 * y - mc) / C - w^2 / p.μ
+    w[floored] .= 0.0
+    dw[floored] .= 0.0
+    wr = vec(sum(πw .* reshape(w, L, L); dims = 1))
+    g  = dot(π, w)
+    H  = dot(π, dw) + dot(πr, vec(sum(πw .* (reshape(w, L, L) .- wr') .^ 2; dims = 1))) / p.σw +
+         dot(πr, (wr .- g) .^ 2) / p.σν
+    return (; V̄, g, H, C, π, ok = true)
+end
+
+"`solve_e_bracket` for a `NestedNode`."
+function solve_e_bracket(nd::NestedNode, s, p::Params; lo, hi)
+    V(u) = nested_logsum_probs(location_values(nd, consumption(nd, s, exp(u), p), p), nd.l, nd, p)[1]
+    e = exp(Optim.minimizer(optimize(u -> -V(u), lo, hi)))
+    C = consumption(nd, s, e, p)
+    V̄, π = nested_logsum_probs(location_values(nd, C, p), nd.l, nd, p)
+    return e, V̄, C, π
+end
+
+"`solve_e` for a `NestedNode`: the same Newton step and fallback with the derivatives of `nested_value_derivs`."
+function solve_e(nd::NestedNode, s, u0, p::Params;
+                 lo = log(1e-8), hi = log(1e4), maxit = 30, gtol = 1e-10)
+    u = clamp(isfinite(u0) ? u0 : log(1e-3), lo, hi)
+    for _ in 1:maxit
+        d = nested_value_derivs(nd, s, u, p)
+        d.ok || break
+        abs(d.g) < gtol && return exp(u), d.V̄, d.C, d.π
+        d.H ≥ -1e-14 && break
+        u -= d.g / d.H
+        (isfinite(u) && lo ≤ u ≤ hi) || break
+    end
+    return solve_e_bracket(nd, s, p; lo, hi)
+end
+
+# -----------------------------------------------------------------------------
+# 3c. Education before occupation (`Params.college`)
+#
+# Given (g, l, z) and before the occupational shocks are drawn, a young agent chooses d ∈ {0, 1}
+# (no BA, BA) by a logit with scale σd,
+#     P₁(g, l, z) = Λ([EV₁ − EV₀ − cC − cCz log z]/σd),
+#     EV_d = E_ϵ[max(W_T^d, W_O^d)] = ∫_teachers W_T^d + ∫_non-teachers W_O^d  (branch d's choice maps),
+# so the cost cC + cCz log z falls on every BA holder, teachers and non-teachers alike. Both
+# branches keep the full teach / don't-teach structure of §4:
+#   d = 1  non-teaching income × e^{ρc}, a credential premium common to every non-teaching
+#          occupation (home production included, so X_O* stays a sufficient statistic and the
+#          first-stage shares are unchanged); teaching pay κ h^γ (s/sBA)^ϑs, the salary schedule
+#          as a lane in s, so income ∝ s^{γφ+ϑs} and Proposition 2′ holds with the elasticity
+#          γφ + ϑs (`time_share`); s ≥ sBA for teachers (max(sT_min, sBA)) and non-teachers
+#          (Kuhn–Tucker, as `smin`); tuition Fc C̄ is a goods cost like m (in `Node.m`, so in Ξ);
+#   d = 0  non-teaching as in §3; a teaching track without a BA at pay κ h^γ e^{−ρT0} and no
+#          licensing floor by default (`sT0`: a floor of its own, e.g. the track's mean schooling 0.52);
+#          s ≤ sBA, a cap (Kuhn–Tucker, `smax`; none if sBA = 0); the cost cT0 (utils) of teaching
+#          without a BA, on top of cT + cTz log z, makes the track's size a margin of its own.
+# The warm glow mixes the branches, E f(h′) = P₁ E[f | d = 1] + (1 − P₁) E[f | d = 0], and uses
+# human capital net of the credential premium (a BA non-teacher's h is her income capacity over
+# e^{ρc}; a teacher's h is her human capital, the pay factor being a wage).
+#
+# Household solution under `college`: `hh = (; college = true, br1, br0, P1, Λ, …)`. Branch d
+# (`br1`, `br0`) carries the arrays of §6 (eT, sT, WT, hT, eO, sO, WO, capO, Λ, infeasT, infeasO),
+# where `capO` is the INCOME capacity of non-teachers (with e^{ρc} for d = 1), and `P1[g, l, zi]` is
+# P₁. The work-location probabilities are pairs (d = 1, d = 0). Everything that integrates over a cell
+# loops over `cell_branches` with the weights P(d | g, l, z); the arrays have no top-level `eT`, …, so
+# a consumer that has not been taught the branches throws instead of reading half of the economy.
+# With `college` off none of this is reached, and cC = −∞ with ρc = ρT0 = ϑs = Fc = sBA = 0
+# reproduces the baseline.
+#
+# Under `Params.split` (§3b) the two extensions compose: each branch's nodes are `NestedNode`s with
+# the branch's income scale, tuition, time-share bounds and salary-schedule elasticity
+# (`with_education`), the branch's location probabilities are the joint residence × workplace
+# arrays [g, l, zi, k, r, w], the EV of the college choice is the nested inclusive value inside W
+# (nothing changes in `college_values`), and the aggregates and the tax base mix the branches with
+# P(d | g, l, z) by residence and workplace (`aggregates`). The floored-node cap of `choice_maps`
+# applies in each branch (the branch arrays carry `infeasT`, `infeasO`).
+# -----------------------------------------------------------------------------
+"Education branches of the model: (1,) without college (the baseline), (1, 0) with it."
+branch_ids(p::Params) = p.college ? (1, 0) : (1,)
+
+"Household arrays of education branch `d`: `hh` itself without college."
+branch_of(hh, p::Params, d) = !p.college ? hh : d == 1 ? hh.br1 : hh.br0
+
+"The entry of education branch `d` in a pair `π` of per-branch arrays (`location_probs` under college): `π` itself without college."
+branch_probs(π, p::Params, d) = !p.college ? π : d == 1 ? π[1] : π[2]
+
+"""
+    cell_branches(hh, p, g, l, zi)
+    cell_branches(hh, πT, πO, p, g, l, zi)
+
+The education branches of the cell (gender g, birth location l, ability node zi) as named
+tuples `(; h, w, d)`: household arrays, weight P(d | g, l, z) and label. The second form adds
+the branch's work-location probabilities `πT`, `πO`. Without college there is one branch of
+weight 1 holding `hh` (and `πT`, `πO` as passed), so a loop over it is the baseline loop.
+"""
+@inline cell_branches(hh, p::Params, g, l, zi) = p.college ?
+    ((; h = hh.br1, w = hh.P1[g, l, zi], d = 1), (; h = hh.br0, w = 1 - hh.P1[g, l, zi], d = 0)) :
+    ((; h = hh, w = 1.0, d = 1),)
+@inline cell_branches(hh, πT, πO, p::Params, g, l, zi) = p.college ?
+    ((; h = hh.br1, πT = πT[1], πO = πO[1], w = hh.P1[g, l, zi], d = 1),
+     (; h = hh.br0, πT = πT[2], πO = πO[2], w = 1 - hh.P1[g, l, zi], d = 0)) :
+    ((; h = hh, πT, πO, w = 1.0, d = 1),)
+
+"The credential premium e^{ρc} of a BA (d = 1) in every non-teaching occupation; 1 otherwise and without college."
+@inline credential(p::Params, d) = p.college && d == 1 ? exp(p.ρc) : 1.0
+
+"""
+Multiplier of a teacher's pay κ h^γ in education branch `d` at time share `s`: the salary
+schedule (s/sBA)^ϑs for BA teachers, e^{−ρT0} without a BA; 1 without college.
+"""
+@inline pay_factor(s, p::Params, d) =
+    !p.college ? 1.0 : d == 1 ? (iszero(p.ϑs) ? 1.0 : (s / p.sBA)^p.ϑs) : exp(-p.ρT0)
+
+"`pay_factor` at each time share of the vector `sT`."
+teacher_pay_factor(sT, p::Params, d) = [pay_factor(s, p, d) for s in sT]
+
+"""
+    teacher_logpay_shift(hb, g, l, zi, luT, u, p, d)
+
+Log of the pay factor at the log shocks `u` for the teachers of cell (g, l, zi) of branch `hb`
+(the time-share spline over the log-shock grid `luT`, as `micro_sample` splines log h): 0 without
+college, −ρT0 without a BA, ϑs (log s − log sBA) for BA teachers.
+"""
+function teacher_logpay_shift(hb, g, l, zi, luT, u, p::Params, d)
+    !p.college && return 0.0
+    d == 0 && return -p.ρT0
+    iszero(p.ϑs) && return 0.0
+    ls = Spline1D(luT, log.(hb.sT[g, l, zi, :]))
+    return p.ϑs .* (ls(u) .- log(p.sBA))
+end
+
+"""
+Teacher effectiveness h_T z^{−(1−ωz)α} of the teachers' human capital `h` at ability node `zi`:
+what a teacher contributes to H̃_T (hence Q) and to the CFR experiment. ωz = 1 (the default)
+leaves h_T; ωz = 0 makes effectiveness independent of academic ability z. Pay stays on h_T.
+"""
+effective_h(h, zi, p::Params, gr) = p.ωz == 1.0 ? h : h .* gr.z[zi]^(-(1 - p.ωz) * p.α)
+
+"""
+    with_education(nd, p, d, kind) -> Node or NestedNode
+
+The node of education branch `d` (§3c) of the baseline node `nd` of the same problem, `kind` being
+`:teach` or `:nonteach`. Income, goods costs and the time-share bounds change as follows (the
+location problem, the vectors over destinations and Λ do not, except the BA amenity `Bd` below):
+- d = 1: non-teaching income × e^{ρc}; teaching income × sBA^{−ϑs}, which makes the pay
+  κ h^γ (s/sBA)^ϑs = (κ h^γ sBA^{−ϑs}) s^ϑs with the extra income elasticity ϑs in s (`Node.ϑs`);
+  tuition Fc C̄ added to every goods cost; s ≥ sBA (teaching: max(sT_min, sBA));
+- d = 0: teaching income × e^{−ρT0}, a floor sT0 (none by default: no licensing) and s ≤ sBA, a cap
+  (none if sBA = 0); the extra cost cT0 of teaching without a BA is in the value, not the node
+  (`solve_household_college`).
+Only the node's income vector `c`, `m`, `smin`, `smax`, `ϑs` are touched, so the same function serves the
+`NestedNode` of the residence/workplace split (income scales on every destination, tuition on every
+pair): the education block does not know where the household lives or works. The one exception is
+the residence-level additive term of the node, which the BA branch's extra amenity `Bd` raises
+(`education_amenity`): within the branch it enters location choice only, but it also raises the BA
+node's inclusive value and so the college choice (see `education_amenity`).
+"""
+function with_education(nd::Node, p::Params, d, kind::Symbol)
+    scale, m, smin, smax, ϑs = education_terms(nd.m, p, d, kind)
+    return Node(nd.c .* scale, nd.γb, nd.τe, m, education_amenity(nd.Λ, p, d), nd.l, smin, smax, ϑs)
+end
+
+function with_education(nd::NestedNode, p::Params, d, kind::Symbol)
+    scale, m, smin, smax, ϑs = education_terms(nd.m, p, d, kind)
+    return NestedNode(nd.c .* scale, nd.γb, nd.τe, m, education_amenity(nd.Λ, p, d), nd.bw, nd.lP, nd.l,
+                      smin, smax, ϑs)
+end
+
+"""
+    education_amenity(Λ, p, d)
+
+The residence-level additive term of a node in education branch `d`: `Λ` (altruism plus the ability
+taste `Bz log z`) plus the extra amenity `Params.Bd` of each residence for BA holders (d = 1), in
+utils. It is a taste for where to live, so it is in the location values of the node and nowhere else:
+not in consumption, taxes or Ξ, so Proposition 2′ and the X_O* collapse hold, and not in `hh.Λ` (the
+altruism term, `dLambda_z`, `school_quality_wtp`). Through the location values it raises the inclusive
+value of every BA node, hence W_T, W_O and EV₁, so P(BA) moves with it: a uniform shift of `Bd` is
+exactly a shift of the BA cost cC, so `Bd` is normalised to (0, ζ_BA) and ζ_BA is read jointly with cC.
+With `Bd` zero, or for d = 0, it returns `Λ` itself.
+"""
+education_amenity(Λ, p::Params, d) = d == 1 && !all(iszero, p.Bd) ? Λ .+ p.Bd : Λ
+
+"""
+    education_terms(m, p, d, kind) -> (scale, m′, smin, smax, ϑs)
+
+What branch `d` changes at a node whose goods costs are `m`: the factor on its income vector, its goods costs,
+its time-share bounds and its extra income elasticity in s (`with_education`).
+"""
+function education_terms(m, p::Params, d, kind::Symbol)
+    d in (0, 1) || throw(ArgumentError("college is on: pass the education branch d ∈ {0, 1}, got d = $d"))
+    teach = kind === :teach
+    scale = d == 1 ? (teach ? (iszero(p.ϑs) ? 1.0 : p.sBA^(-p.ϑs)) : credential(p, 1)) :
+                     (teach ? exp(-p.ρT0) : 1.0)
+    return (scale, d == 1 ? m .+ p.Fc * p.Cbar : m,
+            d == 1 ? (teach ? max(p.sT_min, p.sBA) : p.sBA) : (teach ? p.sT0 : 0.0),
+            d == 1 || iszero(p.sBA) ? Inf : p.sBA, d == 1 && teach ? p.ϑs : 0.0)
+end
+
+"""
+    college_values(hh, gr) -> (EV1, EV0)
+
+EV_d[g, l, zi] = ∫_teachers W_T + ∫_non-teachers W_O of branch d at its own choice maps, the
+expected value E_ϵ[max(W_T, W_O)] of the occupational problem given education d. The values are
+those of the choice maps (`cm.WTv`, `cm.WOv`): `choice_maps` caps the values at the nodes with no
+feasible destination (`cap_infeasible`), and the expectation of the maximum is taken at the values
+the choice itself uses; a cell without such a node has the raw values, as the baseline does. Under
+the split W is the nested inclusive value (§3b), so nothing else changes.
+"""
+function college_values(hh, gr)
+    EV1 = zeros(2, gr.L, gr.Nz); EV0 = zeros(2, gr.L, gr.Nz)
+    for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz
+        for (EV, hb) in ((EV1, hh.br1), (EV0, hh.br0))
+            cm = choice_maps(hb, g, l, zi, gr)
+            EV[g, l, zi] = sum(integrate_choice(cm.WTv, cm.WOv, cm, gr))
+        end
+    end
+    return EV1, EV0
+end
+
+"""
+    college_choice!(hh, p, gr) -> hh
+
+The college choice P₁[g, l, zi] = Λ([EV₁ − EV₀ − cC − cCz log z]/σd), in place, from the branch values.
+"""
+function college_choice!(hh, p::Params, gr)
+    EV1, EV0 = college_values(hh, gr)
+    for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz
+        Δ = EV1[g, l, zi] - EV0[g, l, zi] - p.cC - p.cCz * log(gr.z[zi])
+        hh.P1[g, l, zi] = 1 / (1 + exp(-Δ / p.σd))
+    end
+    return hh
+end
+
+"""
+    solve_household_college(p, gr; tol, maxit, verbose, print_every, hh0, Λ0)
+
+`solve_household` with the college choice: each sweep solves every node of both education
+branches given Λ, computes P₁ from the new values (`college_choice!`) and then Λ with the
+mixed warm glow (`child_Ef`), until the values converge. Returns `(; college = true, br1, br0,
+P1, Λ, s_resid, s_passes, s_relaxed)` (§3c); `hh0`, a solution of the same layout, warm-starts
+the policies and P₁. `s_resid`, `s_passes` and `s_relaxed` are over both branches.
+"""
+function solve_household_college(p::Params, gr; tol = 1e-6, maxit = 500,
+                                 verbose = false, print_every = 25,
+                                 hh0 = nothing, Λ0 = hh0 === nothing ? nothing : hh0.Λ)
+    (; Nz, L, nϵT, nXO) = gr
+    szT, szO = (2, L, Nz, nϵT), (2, L, Nz, nXO)
+    Λ  = (Λ0 !== nothing && size(Λ0) == (Nz, L)) ? copy(Λ0) : zeros(Nz, L)
+    branch() = (; eT = zeros(szT), sT = fill(s_of(p.T, p), szT), WT = zeros(szT), hT = zeros(szT),
+                  eO = zeros(szO), sO = fill(s_of(gr.nonteach[1], p), szO), WO = zeros(szO),
+                  capO = zeros(szO), Λ, infeasT = falses(szT), infeasO = falses(szO))
+    br1, br0 = branch(), branch()
+    P1 = fill(0.5, 2, L, Nz)
+    if hh0 !== nothing && haskey(hh0, :br1) && size(hh0.br1.eT) == szT && size(hh0.br1.eO) == szO
+        for (b, b0) in ((br1, hh0.br1), (br0, hh0.br0))
+            b.eT .= b0.eT; b.sT .= b0.sT; b.eO .= b0.eO; b.sO .= b0.sO
+        end
+        P1 .= hh0.P1
+    end
+    hh = (; college = true, br1, br0, P1, Λ)
+
+    # one sweep over the nodes of branch d; the worst (e, s) residual, passes, relaxed-step nodes
+    function solve_branch!(b, d)
+        s_resid, s_passes, n_relaxed = 0.0, 0, 0
+        cred = credential(p, d)
+        cT0  = d == 0 ? p.cT0 : 0.0                  # the extra cost of teaching without a BA
+        for g in 1:2, l in 1:L, zi in 1:Nz
+            for k in 1:nϵT
+                ϵ  = gr.ϵTgrid[k]
+                nd = teach_node(ϵ, zi, l, g, Λ, p, gr; d)
+                e, V̄, s, r, n, rx = solve_node(nd, p, log(b.eT[g, l, zi, k]), b.sT[g, l, zi, k])
+                b.eT[g, l, zi, k] = e
+                b.sT[g, l, zi, k] = s
+                b.WT[g, l, zi, k] = log(1 - s) + V̄ - p.cT - p.cTz * log(gr.z[zi]) - cT0
+                b.hT[g, l, zi, k] = teacher_h(ϵ, zi, l, s, e, p, gr)
+                b.infeasT[g, l, zi, k] = all(≤(C_FLOOR), consumption(nd, s, e, p))
+                s_resid, s_passes, n_relaxed = max(s_resid, r), max(s_passes, n), n_relaxed + rx
+            end
+            for k in 1:nXO
+                x  = gr.XOgrid[k, g]
+                nd = nonteach_node(x, zi, l, g, Λ, p, gr; d)
+                e, V̄, s, r, n, rx = solve_node(nd, p, log(b.eO[g, l, zi, k]), b.sO[g, l, zi, k])
+                b.eO[g, l, zi, k]   = e
+                b.sO[g, l, zi, k]   = s
+                b.WO[g, l, zi, k]   = log(1 - s) + V̄
+                b.capO[g, l, zi, k] = nonteach_cap(x, zi, l, s, e, p, gr) * cred
+                b.infeasO[g, l, zi, k] = all(≤(C_FLOOR), consumption(nd, s, e, p))
+                s_resid, s_passes, n_relaxed = max(s_resid, r), max(s_passes, n), n_relaxed + rx
+            end
+        end
+        return s_resid, s_passes, n_relaxed
+    end
+
+    s_resid, s_passes, s_relaxed = 0.0, 0, 0
+    t0 = time()
+    for it in 1:maxit
+        old = (copy(br1.WT), copy(br1.WO), copy(br0.WT), copy(br0.WO))
+        s_resid, s_passes, n_relaxed = 0.0, 0, 0
+        for (b, d) in ((br1, 1), (br0, 0))
+            r, n, rx = solve_branch!(b, d)
+            s_resid, s_passes, n_relaxed = max(s_resid, r), max(s_passes, n), n_relaxed + rx
+        end
+        s_relaxed = max(s_relaxed, n_relaxed)
+        college_choice!(hh, p, gr)
+        Λ .= compute_lambda(hh, p, gr)
+        err = max(maximum(abs, br1.WT .- old[1]), maximum(abs, br1.WO .- old[2]),
+                  maximum(abs, br0.WT .- old[3]), maximum(abs, br0.WO .- old[4]))
+        if verbose && (it == 1 || it % print_every == 0 || err < tol)
+            @printf("    HH %4d/%d  err=%.3e  BA share %.4f  elapsed=%.1fs\n", it, maxit, err,
+                    sum(P1) / length(P1), time() - t0)
+            flush(stdout)
+        end
+        err < tol && break
+    end
+    return (; hh..., s_resid, s_passes, s_relaxed)
+end
+
+"""
+    college_child_Ef(l, g, zi, hh, p, gr)
+
+E[f(h′)] of a child born in l with gender g and ability node zi, mixing the education branches:
+P₁ E[f | d = 1] + (1 − P₁) E[f | d = 0], each integrated over its own occupation choice, with
+the non-teachers' human capital net of the credential premium (`child_Ef`).
+"""
+function college_child_Ef(l, g, zi, hh, p::Params, gr)
+    P1 = hh.P1[g, l, zi]
+    function Ef(hb, d)
+        cred = credential(p, d)
+        cm = choice_maps(hb, g, l, zi, gr)
+        fT = warm.(hb.hT[g, l, zi, :], p.ψ, p.href)
+        fO = [Ewarm_nonteach(hb.capO[g, l, zi, k] / cred, gr.XOgrid[k, g], g, p, gr) for k in 1:gr.nXO]
+        return sum(integrate_choice(fT, fO, cm, gr))
+    end
+    return P1 * Ef(hh.br1, 1) + (1 - P1) * Ef(hh.br0, 0)
+end
+
+"The pairs ((πT₁, πT₀), (πO₁, πO₀)) of work-location probabilities of the two education branches (`location_probs`)."
+function college_location_probs(hh, p::Params, gr)
+    pr1 = location_probs(hh.br1, p, gr; d = 1)
+    pr0 = location_probs(hh.br0, p, gr; d = 0)
+    return (pr1[1], pr0[1]), (pr1[2], pr0[2])
+end
+
+"Teaching share among the young born in `l` (both genders), mixing the education branches (`teaching_share_endo`)."
+function college_teaching_share(hh, l, Φ, gr, p::Params)
+    mass = sum(@view Φ[:, l])
+    return sum(Φ[zi, l] / mass / 2 * br.w * integrate_teach(ones(gr.nϵT), choice_maps(br.h, g, l, zi, gr), gr)
+               for zi in 1:gr.Nz, g in 1:2 for br in cell_branches(hh, p, g, l, zi))
 end
 
 # -----------------------------------------------------------------------------
@@ -508,7 +1337,53 @@ function choice_maps(WTv, WOv, g, gr)
                       WTv, WOv, g, gr)
 end
 
-choice_maps(hh, g, l, zi, gr) = choice_maps(hh.WT[g, l, zi, :], hh.WO[g, l, zi, :], g, gr)
+"""
+    cap_infeasible(WTv, WOv, infT, infO) -> (WTv′, WOv′)
+
+Values at the nodes of a cell with no feasible destination (every destination at the consumption
+floor: `hh.infeasT`, `hh.infeasO`) sit on `smooth_log`'s linear branch. They are not utilities but
+a penalty that grows with the shortfall in consumption (hundreds of utils within a few nodes of the
+feasible ones), and a cubic spline through them rings across the jump to the first feasible node.
+At the m2_rp075 point the spline of W_T peaked at −5.7 (min W_O −6.3), and after a step of 0.001 in
+δκ at +3.7, above every W_O: teach weights of one on a fifth of the interval where nobody teaches,
+which moved the male teaching share by 1.6%, the teacher 90/10 from 2.84 to 2.90 and the
+population share at the floor from 5e−7 to 2e−4. The values at those nodes are replaced by one
+level for all the infeasible nodes of a branch,
+    c_T = min(a_O − 1, a_T) for the teacher nodes,    c_O = min(a_T − 1, a_O) for the non-teacher nodes,
+with a_T, a_O the lowest values among the feasible nodes of each branch (∞ for a branch without
+one): the lower of one util below the other branch's lowest feasible value, so that nobody takes
+the infeasible branch there against a feasible alternative (the teach weight is exactly zero), and
+of the branch's own lowest feasible value, so that the values stay nondecreasing in the shock and the
+jump at the feasibility boundary is max(0, a_T − a_O + 1), not the hundreds of the extrapolation. A
+cell with no feasible node on either branch is left alone. Only nodes with no feasible destination
+change, so a cell without any, as at the bundled baseline, is untouched bit for bit.
+"""
+function cap_infeasible(WTv, WOv, infT, infO)
+    aT = minimum(view(WTv, .!infT); init = Inf)
+    aO = minimum(view(WOv, .!infO); init = Inf)
+    cT, cO = min(aO - 1, aT), min(aT - 1, aO)
+    WT, WO = copy(WTv), copy(WOv)
+    isfinite(cT) && (WT[infT] .= cT)
+    isfinite(cO) && (WO[infO] .= cO)
+    return WT, WO
+end
+
+"""
+    choice_maps(hh, g, l, zi, gr) -> ChoiceMaps
+
+The choice maps of cell (g, l, zi) of a household solution. At the nodes with no feasible destination
+(`hh.infeasT`, `hh.infeasO`) the values are capped first (`cap_infeasible`); a cell without such a
+node, and an `hh` without the flags, use the raw values. `choice_maps(WTv, WOv, g, gr)` builds the
+maps from value vectors as they are.
+"""
+function choice_maps(hh, g, l, zi, gr)
+    WTv, WOv = hh.WT[g, l, zi, :], hh.WO[g, l, zi, :]
+    if haskey(hh, :infeasT)
+        infT, infO = hh.infeasT[g, l, zi, :], hh.infeasO[g, l, zi, :]
+        (any(infT) || any(infO)) && ((WTv, WOv) = cap_infeasible(WTv, WOv, infT, infO))
+    end
+    return choice_maps(WTv, WOv, g, gr)
+end
 
 "P(teach | log ϵ_T = u)."
 @inline function teach_wt_log(cm::ChoiceMaps, u)
@@ -532,31 +1407,38 @@ end
 # Integrals of a grid quantity over the teachers / non-teachers of one cell:
 # quadrature in the log shock (density f(eᵘ)eᵘ) over the grid, plus the shock mass
 # outside the grid at the endpoint values (constant extrapolation; the residual is
-# O(1 − q_hi)).
-function integrate_teach(q, cm::ChoiceMaps, gr)
+# O(1 − q_hi)). The grid quantity is interpolated by a spline of degree `k` in the log
+# shock: cubic by default; `k = 1` for a quantity that must stay nonnegative (a cubic
+# spline through nonnegative values can undershoot zero between nodes). A linear spline of
+# a 0/1 indicator is a ramp one grid interval wide, which an adaptive rule can step over
+# (it missed 10% of a tail mass of 6e−6 and half of a mass of 0.04), so `k = 1` splits the
+# quadrature at the grid nodes.
+function integrate_teach(q, cm::ChoiceMaps, gr; k = 3)
     (; dT, ϵTgrid, lϵT) = gr
     lo, hi = ϵTgrid[1], ϵTgrid[end]
-    spl = Spline1D(lϵT, q)
+    spl = Spline1D(lϵT, q; k)
     f(u) = (w = teach_wt_log(cm, u); w <= 0.0 ? 0.0 : (ϵ = exp(u); pdf(dT, ϵ) * ϵ * spl(u) * w))
-    return quadgk(f, lϵT[1], lϵT[end])[1] +
+    I = k == 1 ? quadgk(f, lϵT...)[1] : quadgk(f, lϵT[1], lϵT[end])[1]
+    return I +
            cdf(dT, lo)  * q[1]   * teach_wt(cm, lo) +
            ccdf(dT, hi) * q[end] * teach_wt(cm, hi)
 end
 
-function integrate_nonteach(q, cm::ChoiceMaps, gr)
+function integrate_nonteach(q, cm::ChoiceMaps, gr; k = 3)
     g = cm.g
     lx = view(gr.lXO, :, g)
     lo, hi = gr.XOgrid[1, g], gr.XOgrid[end, g]
-    spl = Spline1D(lx, q)
+    spl = Spline1D(lx, q; k)
     f(v) = (w = nonteach_wt_log(cm, v); w <= 0.0 ? 0.0 : (x = exp(v); fxo(gr, g, x) * x * spl(v) * w))
-    return quadgk(f, lx[1], lx[end])[1] +
+    I = k == 1 ? quadgk(f, lx...)[1] : quadgk(f, lx[1], lx[end])[1]
+    return I +
            Fxo(gr, g, lo)       * q[1]   * nonteach_wt(cm, lo) +
            (1 - Fxo(gr, g, hi)) * q[end] * nonteach_wt(cm, hi)
 end
 
-"(∫ over teachers of qT(ϵ_T), ∫ over non-teachers of qO(X_O*)) for one cell."
-integrate_choice(qT, qO, cm::ChoiceMaps, gr) =
-    (integrate_teach(qT, cm, gr), integrate_nonteach(qO, cm, gr))
+"(∫ over teachers of qT(ϵ_T), ∫ over non-teachers of qO(X_O*)) for one cell; `k` as above."
+integrate_choice(qT, qO, cm::ChoiceMaps, gr; k = 3) =
+    (integrate_teach(qT, cm, gr; k), integrate_nonteach(qO, cm, gr; k))
 
 # -----------------------------------------------------------------------------
 # 5. Altruism term
@@ -573,6 +1455,7 @@ function Ewarm_nonteach(cap, x, g, p::Params, gr)
 end
 
 function child_Ef(l, g, zi, hh, p::Params, gr)
+    p.college && return college_child_Ef(l, g, zi, hh, p, gr)
     cm = choice_maps(hh, g, l, zi, gr)
     fT = warm.(hh.hT[g, l, zi, :], p.ψ, p.href)
     fO = [Ewarm_nonteach(hh.capO[g, l, zi, k], gr.XOgrid[k, g], g, p, gr) for k in 1:gr.nXO]
@@ -597,50 +1480,61 @@ Solve every (gender, birth location, ability, shock) node given Λ, update Λ,
 and repeat until the values converge. `hh0` warm-starts the policies (e, s) and,
 through `Λ0`, the altruism term. Arrays are indexed [g, l, zi, k].
 
-Returns the policies and values plus `s_resid`/`s_passes`, the largest (e, s)
-fixed-point residual and pass count over the nodes in the final sweep.
+Returns the policies and values plus `infeasT`, `infeasO` (flags, true at the nodes with no
+destination above the consumption floor at the policies, which `choice_maps` caps), and
+`s_resid`/`s_passes`, the largest (e, s)
+fixed-point residual and pass count over the nodes in the final sweep, and `s_relaxed`,
+the largest number of nodes that needed the relaxed update (`solve_node`) in any one sweep:
+a cold sweep may need it at many nodes, while the warm-started final sweep rarely does.
+Under `p.college` the household block has two education branches and the college choice
+(`solve_household_college`, §3c); its arrays are then `hh.br1[…]`, `hh.br0[…]` and `hh.P1`.
 """
 function solve_household(p::Params, gr; tol = 1e-6, maxit = 500,
                          verbose = false, print_every = 25,
                          hh0 = nothing, Λ0 = hh0 === nothing ? nothing : hh0.Λ)
+    p.college && return solve_household_college(p, gr; tol, maxit, verbose, print_every, hh0, Λ0)
     (; Nz, L, nϵT, nXO) = gr
     szT, szO = (2, L, Nz, nϵT), (2, L, Nz, nXO)
     eT = zeros(szT); sT = fill(s_of(p.T, p), szT);           WT = zeros(szT); hT   = zeros(szT)
     eO = zeros(szO); sO = fill(s_of(gr.nonteach[1], p), szO); WO = zeros(szO); capO = zeros(szO)
+    infeasT, infeasO = falses(szT), falses(szO)       # no destination above the consumption floor
     if hh0 !== nothing && size(hh0.eT) == szT && size(hh0.eO) == szO
         eT .= hh0.eT; sT .= hh0.sT; eO .= hh0.eO; sO .= hh0.sO
     end
     Λ  = (Λ0 !== nothing && size(Λ0) == (Nz, L)) ? copy(Λ0) : zeros(Nz, L)
-    hh = (; eT, sT, WT, hT, eO, sO, WO, capO, Λ)
+    hh = (; eT, sT, WT, hT, eO, sO, WO, capO, Λ, infeasT, infeasO)
 
-    s_resid, s_passes = 0.0, 0
+    s_resid, s_passes, s_relaxed = 0.0, 0, 0
     t0 = time()
     for it in 1:maxit
         WT_old, WO_old = copy(WT), copy(WO)
-        s_resid, s_passes = 0.0, 0
+        s_resid, s_passes, n_relaxed = 0.0, 0, 0
         # A zero e (unset) gives u0 = −Inf, which the e-solver treats as a cold start.
         for g in 1:2, l in 1:L, zi in 1:Nz
             for k in 1:nϵT
                 ϵ  = gr.ϵTgrid[k]
                 nd = teach_node(ϵ, zi, l, g, Λ, p, gr)
-                e, V̄, s, r, n = solve_node(nd, p, log(eT[g, l, zi, k]), sT[g, l, zi, k])
+                e, V̄, s, r, n, rx = solve_node(nd, p, log(eT[g, l, zi, k]), sT[g, l, zi, k])
                 eT[g, l, zi, k] = e
                 sT[g, l, zi, k] = s
-                WT[g, l, zi, k] = log(1 - s) + V̄
+                WT[g, l, zi, k] = log(1 - s) + V̄ - p.cT - p.cTz * log(gr.z[zi])
                 hT[g, l, zi, k] = teacher_h(ϵ, zi, l, s, e, p, gr)
-                s_resid, s_passes = max(s_resid, r), max(s_passes, n)
+                infeasT[g, l, zi, k] = all(≤(C_FLOOR), consumption(nd, s, e, p))
+                s_resid, s_passes, n_relaxed = max(s_resid, r), max(s_passes, n), n_relaxed + rx
             end
             for k in 1:nXO
                 x  = gr.XOgrid[k, g]
                 nd = nonteach_node(x, zi, l, g, Λ, p, gr)
-                e, V̄, s, r, n = solve_node(nd, p, log(eO[g, l, zi, k]), sO[g, l, zi, k])
+                e, V̄, s, r, n, rx = solve_node(nd, p, log(eO[g, l, zi, k]), sO[g, l, zi, k])
                 eO[g, l, zi, k]   = e
                 sO[g, l, zi, k]   = s
                 WO[g, l, zi, k]   = log(1 - s) + V̄
                 capO[g, l, zi, k] = nonteach_cap(x, zi, l, s, e, p, gr)
-                s_resid, s_passes = max(s_resid, r), max(s_passes, n)
+                infeasO[g, l, zi, k] = all(≤(C_FLOOR), consumption(nd, s, e, p))
+                s_resid, s_passes, n_relaxed = max(s_resid, r), max(s_passes, n), n_relaxed + rx
             end
         end
+        s_relaxed = max(s_relaxed, n_relaxed)
         Λ .= compute_lambda(hh, p, gr)
         err = max(maximum(abs, WT .- WT_old), maximum(abs, WO .- WO_old))
         if verbose && (it == 1 || it % print_every == 0 || err < tol)
@@ -649,25 +1543,33 @@ function solve_household(p::Params, gr; tol = 1e-6, maxit = 500,
         end
         err < tol && break
     end
-    return (; hh..., s_resid, s_passes)
+    return (; hh..., s_resid, s_passes, s_relaxed)
 end
 
 # -----------------------------------------------------------------------------
 # 7. Location choice, stationary distribution and aggregates
 # -----------------------------------------------------------------------------
-"Logit work-location probabilities πT[g, l, zi, k, l'] and πO[g, l, zi, k, l'] at the policies."
-function location_probs(hh, p::Params, gr)
+"""
+Logit work-location probabilities πT[g, l, zi, k, l'] and πO[g, l, zi, k, l'] at the policies.
+Under `Params.split` the joint residence × workplace probabilities πT[g, l, zi, k, r, w] and
+πO[g, l, zi, k, r, w] (`nested_location_probs`). Under `p.college` a pair ((πT₁, πT₀), (πO₁, πO₀)) for
+the two education branches (`college_location_probs`), each of them the arrays of the baseline or,
+under the split, the joint ones; `d` selects a branch's arrays `hh` (§3c).
+"""
+function location_probs(hh, p::Params, gr; d = nothing)
+    p.college && d === nothing && return college_location_probs(hh, p, gr)
+    p.split && return nested_location_probs(hh, p, gr; d)
     (; Nz, L, nϵT, nXO) = gr
     πT = zeros(2, L, Nz, nϵT, L)
     πO = zeros(2, L, Nz, nXO, L)
     for g in 1:2, l in 1:L, zi in 1:Nz
         for k in 1:nϵT
-            nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr)
+            nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p)
             πT[g, l, zi, k, :] .= logsum_probs(location_values(nd, C, p), l, p)[2]
         end
         for k in 1:nXO
-            nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr)
+            nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p)
             πO[g, l, zi, k, :] .= logsum_probs(location_values(nd, C, p), l, p)[2]
         end
@@ -680,16 +1582,17 @@ end
 
 `πbar[l, zi, l']` is the migration probability born-in-l → work-in-l', integrated
 over the occupation choice and averaged over gender. `Φ[zi, l]` is the per-gender
-stationary mass of the kernel P((l,z) → (l',z')) = πbar[l, z, l'] Πz[z, z'].
+stationary mass of the kernel P((l,z) → (l',z')) = πbar[l, z, l'] Πz[z, z']. Under `p.college`
+πbar mixes the education branches with the weights P(d | g, l, z) (§3c).
 """
 function stationary_phi(πT, πO, hh, p::Params, gr)
     (; Nz, L, Πz) = gr
     πbar = zeros(L, Nz, L)
-    for l in 1:L, zi in 1:Nz, g in 1:2
-        cm = choice_maps(hh, g, l, zi, gr)
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+        cm = choice_maps(br.h, g, l, zi, gr)
         for lp in 1:L
-            IT, IO = integrate_choice(πT[g, l, zi, :, lp], πO[g, l, zi, :, lp], cm, gr)
-            πbar[l, zi, lp] += (IT + IO) / 2
+            IT, IO = integrate_choice(br.πT[g, l, zi, :, lp], br.πO[g, l, zi, :, lp], cm, gr)
+            πbar[l, zi, lp] += br.w * (IT + IO) / 2
         end
     end
     idx(l, zi) = (l - 1) * Nz + zi
@@ -702,29 +1605,54 @@ function stationary_phi(πT, πO, hh, p::Params, gr)
 end
 
 """
+    peer_log_ability(Φ, gr) -> Vector
+
+Local peer ability by location, log ā_l = E[log z | young in l] − E*[log z]: the mean log persistent
+ability of the students of l (the young schooled there, Φ[:, l]; under the split, where the household
+lives) relative to its ergodic mean under Πz. ā_l is the geometric mean of the students' z relative to
+the economy's. Since z′ ~ Πz(z, ·) whatever the location, the young as a whole have the ergodic
+distribution of z in a stationary equilibrium, so the log ā_l average to zero over the young (up to
+the quadrature error of Φ, of the order of its stationarity deviation) and the peer factor ā_l^{ψa}
+of `build_grids` shifts school quality between locations without changing its overall level. An
+empty location gets 0.
+"""
+function peer_log_ability(Φ, gr)
+    lz  = log.(gr.z)
+    ref = dot(stationary(gr.Πz), lz)
+    return [(m = sum(view(Φ, :, l)); m > 0 ? dot(view(Φ, :, l), lz) / m - ref : 0.0) for l in 1:gr.L]
+end
+
+"""
     aggregates(Φ, πT, πO, hh, p, gr) -> (H̃_T, M, t)
 
 By work location: the teacher aggregator H̃_T = ∫ h_T^{β/σ} over teachers,
 population M, and the balanced-budget tax rate t = teacher wage bill / taxable income.
+Under `p.college` the cells mix the education branches with the weights P(d | g, l, z),
+teachers' pay carries the pay factor of its branch (`pay_factor`), non-teachers' income is
+their capacity `capO` (with the credential premium), and H̃_T aggregates the teachers'
+effectiveness (`effective_h`, h_T unless ωz ≠ 1) (§3c).
 """
 function aggregates(Φ, πT, πO, hh, p::Params, gr)
     (; Nz, L) = gr
     expo = p.β / p.σ
     HT = zeros(L); income = zeros(L); wagebill = zeros(L)
     for l in 1:L, zi in 1:Nz
-        mass = Φ[zi, l] / 2                      # per gender
-        iszero(mass) && continue
-        for g in 1:2
-            cm   = choice_maps(hh, g, l, zi, gr)
-            hTv  = hh.hT[g, l, zi, :]
-            capO = hh.capO[g, l, zi, :]
+        mass0 = Φ[zi, l] / 2                     # per gender
+        iszero(mass0) && continue
+        for g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+            mass = mass0 * br.w
+            cm   = choice_maps(br.h, g, l, zi, gr)
+            hTv  = br.h.hT[g, l, zi, :]
+            hEv  = effective_h(hTv, zi, p, gr)
+            pf   = teacher_pay_factor(br.h.sT[g, l, zi, :], p, br.d)
+            capO = br.h.capO[g, l, zi, :]
             for lp in 1:L
-                πTv = πT[g, l, zi, :, lp]
-                wT  = integrate_teach(πTv .* p.κ[lp] .* hTv .^ p.γ, cm, gr)
-                HT[lp]       += mass * integrate_teach(πTv .* hTv .^ expo, cm, gr)
+                πTv = br.πT[g, l, zi, :, lp]
+                wT  = integrate_teach(πTv .* p.κ[lp] .* hTv .^ p.γ .* pf, cm, gr)
+                HT[lp]       += mass * integrate_teach(πTv .* hEv .^ expo, cm, gr)
                 wagebill[lp] += mass * wT
                 income[lp]   += mass * ((1 - p.τω[p.T, g]) * wT +
-                                        integrate_nonteach(πO[g, l, zi, :, lp] .* capO, cm, gr))
+                                        integrate_nonteach(br.πO[g, l, zi, :, lp] .* capO, cm, gr))
             end
         end
     end
@@ -733,8 +1661,159 @@ function aggregates(Φ, πT, πO, hh, p::Params, gr)
     return HT, M, t
 end
 
+# Residence and workplace apart (§3b). `location_probs` returns the joint probabilities
+# π[g, l, zi, k, r, w] (under `college`: a pair of such arrays, one per education branch), and
+# `stationary_phi` and `aggregates` have methods for such arrays.
+"The joint probabilities of the split: an array [g, l, zi, k, r, w], or the pair of them of the two education branches."
+const JointProbs = Union{AbstractArray{<:Real,6}, Tuple{AbstractArray{<:Real,6}, AbstractArray{<:Real,6}}}
+
+"Residence marginal Σ_w π[g, l, zi, k, r, w] of joint probabilities (of each branch under `college`)."
+residence_probs(π::AbstractArray{<:Real,6}) = dropdims(sum(π; dims = 6); dims = 6)
+residence_probs(π::Tuple) = map(residence_probs, π)
+
+"Workplace marginal Σ_r π[g, l, zi, k, r, w] of joint probabilities (of each branch under `college`)."
+workplace_probs(π::AbstractArray{<:Real,6}) = dropdims(sum(π; dims = 5); dims = 5)
+workplace_probs(π::Tuple) = map(workplace_probs, π)
+
+"The joint probabilities of node k in cell (g, l, zi) as a vector over the pairs d = (r − 1)L + w."
+pair_probs(π, g, l, zi, k) = vec(permutedims(π[g, l, zi, k, :, :]))
+
+"""
+    nested_location_probs(hh, p, gr; d = nothing) -> (πTW, πOW)
+
+Joint residence × workplace probabilities πTW[g, l, zi, k, r, w] and πOW[g, l, zi, k, r, w] at
+the policies: `location_probs` under the split (`d`: the arrays of education branch `d` under `college`).
+"""
+function nested_location_probs(hh, p::Params, gr; d = nothing)
+    (; Nz, L, nϵT, nXO) = gr
+    πT = zeros(2, L, Nz, nϵT, L, L)
+    πO = zeros(2, L, Nz, nXO, L, L)
+    for g in 1:2, l in 1:L, zi in 1:Nz
+        for k in 1:nϵT
+            nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr; d)
+            C  = consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p)
+            πT[g, l, zi, k, :, :] .= reshape(nested_logsum_probs(location_values(nd, C, p), l, nd, p)[2], L, L)'
+        end
+        for k in 1:nXO
+            nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr; d)
+            C  = consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p)
+            πO[g, l, zi, k, :, :] .= reshape(nested_logsum_probs(location_values(nd, C, p), l, nd, p)[2], L, L)'
+        end
+    end
+    return πT, πO
+end
+
+"""
+`stationary_phi` for joint probabilities: children go to school where the household lives, so
+only the residence marginals matter (`πbar[l, zi, r]` is the probability born-in-l → lives-in-r).
+Under `college` the marginals are taken branch by branch and the baseline method mixes them.
+"""
+stationary_phi(πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
+    stationary_phi(residence_probs(πT), residence_probs(πO), hh, p, gr)
+
+"""
+`aggregates` for joint probabilities. The tax base is by residence, the teachers' side by workplace:
+H̃_T[w] and the wage bill[w] integrate the teachers who work at w (wherever they live), the taxable
+income[r] is the pre-commuting income of the residents of r, and t_r = wage bill[r]/income[r] is the
+tax rate that funds the teachers who work in r with the income of those who live there. Under
+`p.college` the cells mix the education branches with the weights P(d | g, l, z), with the pay
+factor of the branch on the teachers' pay, the credential premium in the non-teachers' capacity
+`capO` and the teachers' effectiveness in H̃_T, as in the baseline method (§3c).
+"""
+function aggregates(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr)
+    (; Nz, L) = gr
+    expo = p.β / p.σ
+    HT = zeros(L); income = zeros(L); wagebill = zeros(L)
+    for l in 1:L, zi in 1:Nz
+        mass0 = Φ[zi, l] / 2                     # per gender
+        iszero(mass0) && continue
+        for g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+            mass = mass0 * br.w
+            cm   = choice_maps(br.h, g, l, zi, gr)
+            hTv  = br.h.hT[g, l, zi, :]
+            hEv  = effective_h(hTv, zi, p, gr)
+            pf   = teacher_pay_factor(br.h.sT[g, l, zi, :], p, br.d)
+            capO = br.h.capO[g, l, zi, :]
+            for r in 1:L
+                πOr = vec(sum(br.πO[g, l, zi, :, r, :]; dims = 2))        # non-teachers: residence only
+                income[r] += mass * integrate_nonteach(πOr .* capO, cm, gr)
+                for w in 1:L
+                    πTv = br.πT[g, l, zi, :, r, w]
+                    wT  = integrate_teach(πTv .* p.κ[w] .* hTv .^ p.γ .* pf, cm, gr)
+                    HT[w]       += mass * integrate_teach(πTv .* hEv .^ expo, cm, gr)
+                    wagebill[w] += mass * wT
+                    income[r]   += mass * (1 - p.τω[p.T, g]) * wT
+                end
+            end
+        end
+    end
+    M = 2 .* vec(sum(Φ; dims = 1))
+    t = [income[r] > 0 ? clamp(wagebill[r] / income[r], 0.0, TAX_CAP) : 0.0 for r in 1:L]
+    return HT, M, t
+end
+
+"""
+    split_probs(hh, p, gr) -> (; Pi_T, Pi_O, Pi_Tr, Pi_Or, Pi_TW, Pi_OW, Φ, πbar)
+
+The location-choice objects of a solution under the split: the joint probabilities `Pi_TW`,
+`Pi_OW`, their residence marginals `Pi_Tr`, `Pi_Or` (where the children go to school) and the
+stationary distribution. `Pi_T` and `Pi_O` are `nothing`, so that a consumer that has not been
+migrated to the split throws instead of reading the wrong object. Under `p.college` the four
+probability objects are pairs, one entry per education branch (`cell_branches`).
+"""
+function split_probs(hh, p::Params, gr)
+    Pi_TW, Pi_OW = location_probs(hh, p, gr)
+    Φ, πbar = stationary_phi(Pi_TW, Pi_OW, hh, p, gr)
+    return (; Pi_T = nothing, Pi_O = nothing, Pi_Tr = residence_probs(Pi_TW), Pi_Or = residence_probs(Pi_OW),
+              Pi_TW, Pi_OW, Φ, πbar)
+end
+
+"""
+    teachers_by_workplace(Φ, πT, πO, hh, p, gr) -> Vector
+
+Teacher mass by workplace w under the split (joint probabilities; both genders, every birth location, ability
+node and education branch), integrated exactly as the calibration's `location_stats` integrates it: the
+numerator of the FTE-per-pupil gap that the teacher-demand closure (`Params.fte_rule`) holds.
+"""
+function teachers_by_workplace(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr)
+    (; Nz, L) = gr
+    n = zeros(L)
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
+        iszero(mass) && continue
+        cm = choice_maps(br.h, g, l, zi, gr)
+        for r in 1:L, w in 1:L
+            n[w] += mass * integrate_teach(br.πT[g, l, zi, :, r, w], cm, gr)
+        end
+    end
+    return n
+end
+
+"""
+    fte_gap(Φ, πT, πO, hh, p, gr) -> Float64
+
+Δlog teachers per pupil, log(n_2/S_2) − log(n_1/S_1), with teachers by workplace (`teachers_by_workplace`) and
+pupils by residence, S_l = Σ_z Φ[z, l]: the calibration's `gap_teachers_pp` at these choices.
+"""
+function fte_gap(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr)
+    n = teachers_by_workplace(Φ, πT, πO, hh, p, gr)
+    S = vec(sum(Φ; dims = 1))
+    return log(n[2] / S[2]) - log(n[1] / S[1])
+end
+
+"Initial slope ∂(FTE gap)/∂b of the teacher-demand closure, per util (refined by secant steps in `solve_ge`)."
+const FTE_SLOPE0 = 3.0
+"Bounds on the closure's slope. Too small a slope overshoots, so the lower bound is the binding safeguard."
+const FTE_SLOPE_MIN, FTE_SLOPE_MAX = 1.5, 48.0
+"Largest step of the closure's b in one outer iteration (utils): far from the fixed point the FTE gap is no guide."
+const FTE_STEP_MAX = 0.25
+"b moves only once the other aggregates change by less than this (far from the fixed point the FTE gap is no guide)."
+const FTE_SETTLE = 1e-2
+"A secant pair is used only if both iterates had the other aggregates within this and b moved by more than `FTE_SECANT_DB`."
+const FTE_SECANT_ERR, FTE_SECANT_DB = 1e-4, 1e-4
+
 # -----------------------------------------------------------------------------
-# 8. General equilibrium: damped fixed point in (H̃_T, M, t)
+# 8. General equilibrium: damped fixed point in (H̃_T, M, t), and ā with peer effects
 # -----------------------------------------------------------------------------
 fmtvec(v) = "(" * join((@sprintf("%.4f", x) for x in v), ", ") * ")"
 reldiff(new, old; floor = 1e-3) = maximum(abs.(new .- old) ./ max.(abs.(old), floor))
@@ -748,7 +1827,28 @@ problem (warm-started from the previous iteration), computes location choices, �
 and the implied aggregates, and takes a damped step. Convergence is on the max
 relative change in H̃_T and M and absolute change in t. `init` is a previous
 solution to continue from. A final solve at the converged aggregates makes the
-returned objects mutually consistent.
+returned objects mutually consistent. `s_resid` and `s_passes` are those of the final
+solve, `s_relaxed` the largest number of nodes that needed the relaxed (e, s) update in
+any household sweep of the whole solve (`solve_household`). Under `p.split` the solution
+carries `Pi_T = Pi_O = nothing` and, in their place, the residence marginals `Pi_Tr`, `Pi_Or`
+and the joint residence × workplace probabilities `Pi_TW`, `Pi_OW` (`split_probs`); the
+aggregates H̃_T and the wage bill are by workplace, M and the tax rate t by residence.
+With peer effects (`p.ψa ≠ 0`) the local peer ability `la` = log ā_l (`peer_log_ability`) is a
+fourth aggregate: the grids are built at it, it is recomputed from Φ, damped like the others and
+converges in absolute change; it starts at 0 (no sorting) or at `init.la`. With ψa = 0 it stays at 0
+and the iterations are those of the model without peers. The solution carries `la`, the value its
+grid (and so its Q) was built at.
+With the teacher-demand closure (`p.fte_rule` finite, round 2026-10-15c) the teachers' value of the suburban
+workplace b = BT[2] is a further aggregate: each iteration measures the FTE-per-pupil gap at the choices
+(`fte_gap`) and, once the other aggregates move by less than `FTE_SETTLE`, moves b by the damped step
+damping·(fte_rule − gap)/slope. The slope starts at `FTE_SLOPE0` and is refined by secant steps between iterates whose
+other aggregates had settled to `FTE_SECANT_ERR` and whose b differ by more than `FTE_SECANT_DB`. It is held within
+[`FTE_SLOPE_MIN`, `FTE_SLOPE_MAX`] and doubled when the residual changes sign and grows, an overshoot. (The first
+version refined the slope from any consecutive iterates with a relative clamp: near the fixed point, aggregate drift
+contaminated the tiny b steps and the slope fell until b cycled at ±`FTE_STEP_MAX`, 2026-10-15.) Convergence also
+requires |fte_rule − gap| < tol. b starts at `p.BT[2]` (or at `init.p.BT[2]`), and the returned `p` carries the
+equilibrium b in `BT`, so that everything downstream (moments, partial-equilibrium re-solves) holds it fixed.
+Without the closure the iterations are those of the model without it.
 """
 function solve_ge(p::Params = Params();
                   Nz = 5, nϵT = 64, nXO = 64, damping = 0.3, tol = 1e-5,
@@ -766,25 +1866,45 @@ function solve_ge(p::Params = Params();
             @printf("%s s=%.4f   ", i == p.T ? "T" : "occ$i", s_of(i, p))
         end
         @printf("| ψ=%.3f href=%.4f  max mcost=%.4f\n", p.ψ, p.href, maximum(p.mcost))
+        p.split && @printf("  split: σw=%.4f (σw/σν=%.3f), τk=%.4f, jobs=%s, BT=%s\n", p.σw, p.σw / p.σν, p.τk,
+                           fmtvec(p.jobs), fmtvec(p.BT))
+        p.college && @printf("  college: σd=%.3f sBA=%.3f ρc=%.3f ρT0=%.3f ϑs=%.3f Fc=%.4f cC=%.3f cCz=%.3f ωz=%.2f sT0=%.3f cT0=%.3f\n",
+                             p.σd, p.sBA, p.ρc, p.ρT0, p.ϑs, p.Fc, p.cC, p.cCz, p.ωz, p.sT0, p.cT0)
+        iszero(p.ψa) || @printf("  peers: ψa=%.3f (Q_l = (2H̃_T/M_l)^σ ā_l^ψa)\n", p.ψa)
+        iszero(p.κc) || @printf("  commuting friction: κc=%.4f utils per commuting pair (r ≠ w)\n", p.κc)
+        all(iszero, p.Bd) || @printf("  BA amenity: Bd=%s utils (residence r, BA holders)\n", fmtvec(p.Bd))
+        all(iszero, p.By) || @printf("  income-graded taste: By=%s utils per log point of predicted income (lyref=%.4f)\n",
+                                     fmtvec(p.By), p.lyref)
+        isnan(p.fte_rule) || @printf("  teacher-demand closure: positions per pupil gap %.4f; BT[2] solved in GE\n", p.fte_rule)
         flush(stdout)
     end
 
     HT = fill(1.0, L); M = fill(p.Mtot / L, L); t = fill(0.10, L)
+    la = zeros(L)                                 # log ā_l, an aggregate only with peer effects
+    peer = !iszero(p.ψa)
+    closure = p.split && !isnan(p.fte_rule)       # teacher-demand closure: b = BT[2] is an aggregate
+    b = closure ? p.BT[2] : NaN                  # (BT has one entry per location: read it only under the closure)
     hh0 = nothing
     if init !== nothing
         if length(init.HT) == L
             HT .= init.HT; M .= init.M; t .= init.t
+            peer && hasproperty(init, :la) && (la .= init.la)
+            closure && hasproperty(init, :p) && (b = init.p.BT[2])
             hh0 = init.hh
         elseif verbose
             @printf("  ⚠ warm start ignored: init has L=%d ≠ %d\n", length(init.HT), L)
         end
     end
+    closure && (p = with_params(p; BT = [p.BT[1], b]))
+    slope, b_prev, f_prev, e_prev, r_prev = FTE_SLOPE0, NaN, NaN, NaN, NaN
 
     converged = false
+    s_relaxed = 0
     for it in 1:maxit
-        gr = build_grids(p; H̃T = HT, M, t, grid_kw...)
+        gr = build_grids(p; H̃T = HT, M, t, la, grid_kw...)
         t_hh = @elapsed (hh0 = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit,
                                                 verbose = verbose && it == 1, hh0))
+        s_relaxed = max(s_relaxed, hh0.s_relaxed)
         t_pi  = @elapsed ((πT, πO) = location_probs(hh0, p, gr))
         t_phi = @elapsed ((Φ, _) = stationary_phi(πT, πO, hh0, p, gr))
         t_agg = @elapsed ((HTn, Mn, tn) = aggregates(Φ, πT, πO, hh0, p, gr))
@@ -794,14 +1914,40 @@ function solve_ge(p::Params = Params();
         tn[.!live] .= t[.!live]
         t_err = any(live) ? maximum(abs, tn[live] .- t[live]) : 0.0
         err = max(reldiff(HTn, HT), reldiff(Mn, M), t_err)
+        if peer                                   # the students' mean ability, in absolute change
+            lan = peer_log_ability(Φ, gr)
+            lan[.!live] .= la[.!live]             # nor peers: hold an empty location's ā too
+            err = max(err, maximum(abs, lan .- la))
+            @. la = (1 - damping) * la + damping * lan
+        end
+
+        fte = NaN
+        if closure                                # positions per pupil: b rations the suburban positions
+            fte = fte_gap(Φ, πT, πO, hh0, p, gr)
+            res = p.fte_rule - fte
+            if err < FTE_SETTLE                   # the other aggregates have settled: move b
+                if max(err, e_prev) < FTE_SECANT_ERR && abs(b - b_prev) > FTE_SECANT_DB
+                    sec = (fte - f_prev) / (b - b_prev)
+                    isfinite(sec) && sec > 0 && (slope = clamp(sec, FTE_SLOPE_MIN, FTE_SLOPE_MAX))
+                end
+                isfinite(r_prev) && res * r_prev < 0 && abs(res) > abs(r_prev) &&
+                    (slope = min(2 * slope, FTE_SLOPE_MAX))   # a growing overshoot: halve the step
+                b_prev, f_prev, e_prev, r_prev = b, fte, err, res
+                b  += clamp(damping * res / slope, -FTE_STEP_MAX, FTE_STEP_MAX)
+                p   = with_params(p; BT = [p.BT[1], b])
+            end
+            err = max(err, abs(res))
+        end
 
         @. HT = (1 - damping) * HT + damping * HTn
         @. M  = (1 - damping) * M  + damping * Mn
         @. t  = (1 - damping) * t  + damping * tn
 
         if verbose
-            @printf("GE %3d  err=%.3e  H̃_T=%s  M=%s  t=%s  [hh=%.1fs pi=%.1fs phi=%.1fs agg=%.1fs]\n",
-                    it, err, fmtvec(HT), fmtvec(M), fmtvec(t), t_hh, t_pi, t_phi, t_agg)
+            @printf("GE %3d  err=%.3e  H̃_T=%s  M=%s  t=%s%s%s  [hh=%.1fs pi=%.1fs phi=%.1fs agg=%.1fs]\n",
+                    it, err, fmtvec(HT), fmtvec(M), fmtvec(t), peer ? "  log ā=" * fmtvec(la) : "",
+                    closure ? @sprintf("  FTE gap=%.5f b=%.5f (slope %.2f)", fte, b, slope) : "",
+                    t_hh, t_pi, t_phi, t_agg)
             flush(stdout)
         end
         if err < tol
@@ -812,12 +1958,14 @@ function solve_ge(p::Params = Params();
     end
     verbose && !converged && println("  ⚠ GE did not converge in $maxit iterations.")
 
-    gr = build_grids(p; H̃T = HT, M, t, grid_kw...)
+    gr = build_grids(p; H̃T = HT, M, t, la, grid_kw...)
     hh = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit, hh0)
+    p.split && return (; hh, split_probs(hh, p, gr)..., HT, M, t, la, gr, p, converged,
+                         s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed))
     Pi_T, Pi_O = location_probs(hh, p, gr)
     Φ, πbar = stationary_phi(Pi_T, Pi_O, hh, p, gr)
-    return (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, gr, p, converged,
-              s_resid = hh.s_resid, s_passes = hh.s_passes)
+    return (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, la, gr, p, converged,
+              s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed))
 end
 
 # -----------------------------------------------------------------------------
@@ -827,24 +1975,27 @@ end
     verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
 
 Check that the numerical safeguards are slack at the solution: (i) consumption
-exceeds δ in every (node, work location), so smooth_log equals log; (ii) no tax
-rate is on the clamp [0, tclamp]; (iii) the (e, s) fixed point converged.
-Returns true if all hold. Condition (i) is what limits how large `mcost` can be:
+exceeds δ in every (node, work location), so smooth_log equals log (under the split, in every
+(node, residence, workplace)); (ii) no tax
+rate is on the clamp [0, tclamp]; (iii) the (e, s) fixed point converged. It also
+reports how many nodes needed the relaxed (e, s) update (`solve_node`) in the largest
+sweep, which is not a failure. Returns true if all hold. Condition (i) is what limits how large `mcost` can be:
 the goods cost bites first on low-ability movers.
 """
 function verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
-    (; hh, t, gr, p, s_resid, s_passes) = sol
+    (; hh, t, gr, p, s_resid, s_passes, s_relaxed) = sol
     minC = Inf
     n_binding = 0
-    for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz
+    for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz, d in branch_ids(p)
+        hb = branch_of(hh, p, d)
         for k in 1:gr.nϵT
-            nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr)
-            C  = consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p)
+            nd = teach_node(gr.ϵTgrid[k], zi, l, g, hb.Λ, p, gr; d)
+            C  = consumption(nd, hb.sT[g, l, zi, k], hb.eT[g, l, zi, k], p)
             minC = min(minC, minimum(C)); n_binding += count(≤(δ), C)
         end
         for k in 1:gr.nXO
-            nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr)
-            C  = consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p)
+            nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hb.Λ, p, gr; d)
+            C  = consumption(nd, hb.sO[g, l, zi, k], hb.eO[g, l, zi, k], p)
             minC = min(minC, minimum(C)); n_binding += count(≤(δ), C)
         end
     end
@@ -853,6 +2004,8 @@ function verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
         @printf("  ⚠ s fixed point residual %.2e (> %.1e) after %d passes\n", s_resid, s_atol, s_passes)
         ok = false
     end
+    @printf("  (e, s) update: relaxed step needed at up to %d of %d nodes in a sweep\n", s_relaxed,
+            length(branch_ids(p)) * 2 * gr.L * gr.Nz * (gr.nϵT + gr.nXO))
     if n_binding > 0
         @printf("  ⚠ smooth_log barrier BINDING at %d (node, l') cells (min C = %.3e ≤ δ = %.1e)\n",
                 n_binding, minC, δ)
@@ -871,24 +2024,54 @@ function verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
 end
 
 """
+    sol_probs(sol) -> (πT, πO)
+
+The work-location probabilities of a solution as `cell_branches` takes them: `Pi_T`, `Pi_O`, or the
+joint residence × workplace probabilities `Pi_TW`, `Pi_OW` under the split (a pair of arrays, one per
+education branch, under `college`).
+"""
+sol_probs(sol) = sol.p.split ? (sol.Pi_TW, sol.Pi_OW) : (sol.Pi_T, sol.Pi_O)
+
+"""
     cell_mean(sol, qT, qO)
 
 Population mean of a quantity given on the grids, weighted by Φ and integrated
-over the occupation choice. `qT(g, l, zi)` and `qO(g, l, zi)` return the vectors
-on the ϵ_T and X_O* grids for that cell.
+over the occupation choice. `qT(br, g, l, zi)` and `qO(br, g, l, zi)` return the vectors
+on the ϵ_T and X_O* grids for that cell and education branch `br` (a `cell_branches` entry:
+`br.h` the household arrays, `br.πT`, `br.πO` the location probabilities (the joint ones under the
+split), `br.d` the label); under `p.college` the branches are mixed with the weights
+P(d | g, l, z) (§3c).
 """
 function cell_mean(sol, qT, qO)
-    (; hh, Φ, gr) = sol
+    (; hh, Φ, gr, p) = sol
+    PT, PO = sol_probs(sol)
     onesT, onesO = ones(gr.nϵT), ones(gr.nXO)
     num = den = 0.0
-    for l in 1:gr.L, zi in 1:gr.Nz, g in 1:2
-        mass = Φ[zi, l] / 2
+    for l in 1:gr.L, zi in 1:gr.Nz, g in 1:2, br in cell_branches(hh, PT, PO, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
-        cm = choice_maps(hh, g, l, zi, gr)
-        num += mass * sum(integrate_choice(qT(g, l, zi), qO(g, l, zi), cm, gr))
+        cm = choice_maps(br.h, g, l, zi, gr)
+        num += mass * sum(integrate_choice(qT(br, g, l, zi), qO(br, g, l, zi), cm, gr))
         den += mass * sum(integrate_choice(onesT, onesO, cm, gr))
     end
     return num / den
+end
+
+"""
+    mean_predicted_log_income(sol)
+
+Population mean of the predicted log income ln ŷ (`predicted_log_income`), the grading variable of the
+income-graded location taste `Params.By` (round 2026-10-15c), over every node weighted by Φ and the occupation
+choice (`cell_mean`). The calibration freezes the reference `lyref` at this mean at a reference solution; ln ŷ does
+not depend on `By`, so the mean is the same with the taste on or off at the same aggregates.
+"""
+function mean_predicted_log_income(sol)
+    (; gr, p) = sol
+    qT(br, g, l, zi) = [predicted_log_income(teach_node(gr.ϵTgrid[k], zi, l, g, br.h.Λ, p, gr; d = br.d), p, gr)
+                        for k in 1:gr.nϵT]
+    qO(br, g, l, zi) = [predicted_log_income(nonteach_node(gr.XOgrid[k, g], zi, l, g, br.h.Λ, p, gr; d = br.d), p, gr)
+                        for k in 1:gr.nXO]
+    return cell_mean(sol, qT, qO)
 end
 
 """
@@ -896,52 +2079,89 @@ end
 
 Mean human capital h̄ at `sol`. The warm-glow reference `href` is frozen at this
 value (`HBAR_BENCH` at `nesting_params()`) so that ψ changes only the curvature of
-the kernel, not its level.
+the kernel, not its level. Non-teachers' capacity is net of the credential premium (§3c).
 """
 function mean_child_h(sol)
-    (; hh, gr) = sol
-    hO(g, l, zi) = [hh.capO[g, l, zi, k] * EΘpow(gr, g, gr.XOgrid[k, g], 0.0) for k in 1:gr.nXO]
-    return cell_mean(sol, (g, l, zi) -> hh.hT[g, l, zi, :], hO)
+    (; hh, gr, p) = sol
+    hO(br, g, l, zi) = [br.h.capO[g, l, zi, k] / credential(p, br.d) * EΘpow(gr, g, gr.XOgrid[k, g], 0.0)
+                        for k in 1:gr.nXO]
+    return cell_mean(sol, (br, g, l, zi) -> br.h.hT[g, l, zi, :], hO)
 end
 
 """
     mean_consumption(sol)
 
 Mean consumption C̄, averaged over location choices, at `sol` (`CBAR_BENCH` at
-`nesting_params()`). Used by `redenominate_move_cost`.
+`nesting_params()`). Used by `redenominate_move_cost`. It is net of the subsistence
+c̲ = `csub` C̄, like `consumption`; under the split it averages over the (residence, workplace)
+pairs.
 """
 function mean_consumption(sol)
-    (; hh, gr, p, Pi_T, Pi_O) = sol
-    CT(g, l, zi) = map(1:gr.nϵT) do k
-        nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr)
-        dot(Pi_T[g, l, zi, k, :], consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p))
+    sol.p.split && return mean_consumption_split(sol)
+    (; gr, p) = sol
+    CT(br, g, l, zi) = map(1:gr.nϵT) do k
+        nd = teach_node(gr.ϵTgrid[k], zi, l, g, br.h.Λ, p, gr; d = br.d)
+        dot(br.πT[g, l, zi, k, :], consumption(nd, br.h.sT[g, l, zi, k], br.h.eT[g, l, zi, k], p))
     end
-    CO(g, l, zi) = map(1:gr.nXO) do k
-        nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr)
-        dot(Pi_O[g, l, zi, k, :], consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p))
+    CO(br, g, l, zi) = map(1:gr.nXO) do k
+        nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, br.h.Λ, p, gr; d = br.d)
+        dot(br.πO[g, l, zi, k, :], consumption(nd, br.h.sO[g, l, zi, k], br.h.eO[g, l, zi, k], p))
     end
     return cell_mean(sol, CT, CO)
 end
 
-"Mean time share among teachers and non-teachers, and its (min, max) over all nodes."
+function mean_consumption_split(sol)
+    (; gr, p) = sol
+    CT(br, g, l, zi) = map(1:gr.nϵT) do k
+        nd = teach_node(gr.ϵTgrid[k], zi, l, g, br.h.Λ, p, gr; d = br.d)
+        dot(pair_probs(br.πT, g, l, zi, k), consumption(nd, br.h.sT[g, l, zi, k], br.h.eT[g, l, zi, k], p))
+    end
+    CO(br, g, l, zi) = map(1:gr.nXO) do k
+        nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, br.h.Λ, p, gr; d = br.d)
+        dot(pair_probs(br.πO, g, l, zi, k), consumption(nd, br.h.sO[g, l, zi, k], br.h.eO[g, l, zi, k], p))
+    end
+    return cell_mean(sol, CT, CO)
+end
+
+"""
+Mean time share among teachers and non-teachers, and its (min, max) over all nodes. Under
+`p.college` also the means by education: BA and non-BA teachers (`meanT_ba`, `meanT_nonba`), BA and
+non-BA non-teachers (`meanO_ba`, `meanO_nonba`); NaN without college.
+"""
 function s_summary(sol)
-    (; hh, Φ, gr) = sol
+    (; hh, Φ, gr, p) = sol
     numT = numO = denT = denO = 0.0
-    for l in 1:gr.L, zi in 1:gr.Nz, g in 1:2
-        mass = Φ[zi, l] / 2
+    num = zeros(2, 2); den = zeros(2, 2)           # [teacher / non-teacher, d = 1 / d = 0]
+    for l in 1:gr.L, zi in 1:gr.Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
-        cm = choice_maps(hh, g, l, zi, gr)
-        sT, sO = integrate_choice(hh.sT[g, l, zi, :], hh.sO[g, l, zi, :], cm, gr)
+        cm = choice_maps(br.h, g, l, zi, gr)
+        sT, sO = integrate_choice(br.h.sT[g, l, zi, :], br.h.sO[g, l, zi, :], cm, gr)
         mT, mO = integrate_choice(ones(gr.nϵT), ones(gr.nXO), cm, gr)
         numT += mass * sT; denT += mass * mT
         numO += mass * sO; denO += mass * mO
+        j = br.d == 1 ? 1 : 2
+        num[1, j] += mass * sT; den[1, j] += mass * mT
+        num[2, j] += mass * sO; den[2, j] += mass * mO
     end
-    return (; meanT = numT / denT, meanO = numO / denO,
-              rangeT = extrema(hh.sT), rangeO = extrema(hh.sO))
+    ext(name) = extrema(vcat((vec(getproperty(branch_of(hh, p, d), name)) for d in branch_ids(p))...))
+    return (; meanT = numT / denT, meanO = numO / denO, rangeT = ext(:sT), rangeO = ext(:sO),
+              meanT_ba = p.college ? num[1, 1] / den[1, 1] : NaN,
+              meanT_nonba = p.college ? num[1, 2] / den[1, 2] : NaN,
+              meanO_ba = p.college ? num[2, 1] / den[2, 1] : NaN,
+              meanO_nonba = p.college ? num[2, 2] / den[2, 2] : NaN)
+end
+
+"The BA share P₁ of the young (Φ-weighted over cells, both genders), overall and by ability node: `p.college` only."
+function ba_share_young(sol)
+    (; hh, Φ, gr) = sol
+    w = [hh.P1[g, l, zi] * Φ[zi, l] / 2 for g in 1:2, l in 1:gr.L, zi in 1:gr.Nz]
+    return sum(w) / sum(Φ), [sum(w[:, :, zi]) / sum(Φ[zi, :]) for zi in 1:gr.Nz]
 end
 
 "Teaching share among the young born in `l` (both genders)."
 function teaching_share_endo(hh, l, Φ, gr, p::Params)
+    p.college && return college_teaching_share(hh, l, Φ, gr, p)
     mass = sum(@view Φ[:, l])
     return sum(Φ[zi, l] / mass / 2 * integrate_teach(ones(gr.nϵT), choice_maps(hh, g, l, zi, gr), gr)
                for zi in 1:gr.Nz, g in 1:2)
@@ -966,10 +2186,10 @@ function student_ability_moments(sol)
     onesT, onesO = ones(nϵT), ones(nXO)
     ΦT = zeros(Nz, L); ΦO = zeros(Nz, L)
     aT = zeros(L);     aO = zeros(L)
-    for l in 1:L, zi in 1:Nz, g in 1:2
-        mass = Φ[zi, l] / 2
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
-        cm  = choice_maps(hh, g, l, zi, gr)
+        cm  = choice_maps(br.h, g, l, zi, gr)
         aTv = z[zi] .* gr.ϵTgrid
         aOv = [z[zi] * Eϵ_nonteach(gr, g, gr.XOgrid[k, g], p.α) for k in 1:nXO]
         mT, mO = integrate_choice(onesT, onesO, cm, gr)
@@ -1012,10 +2232,10 @@ function student_ability_density(sol, l, agrid)
     (; hh, Φ, gr, p) = sol
     (; z, Nz, dT, dO, nonteach, logΘ) = gr
     fT = zeros(length(agrid)); fO = zeros(length(agrid))
-    for zi in 1:Nz, g in 1:2
-        mass = Φ[zi, l] / 2
+    for zi in 1:Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
-        cm = choice_maps(hh, g, l, zi, gr)
+        cm = choice_maps(br.h, g, l, zi, gr)
         for (ia, a) in enumerate(agrid)
             ϵ  = a / z[zi]
             fϵ = mass * pdf(dT, ϵ) / z[zi]
@@ -1039,10 +2259,17 @@ function report_ge(sol)
     ss = s_summary(sol)
     @printf("  s (choice-weighted mean [min, max]):  T=%.4f [%.4f, %.4f]   nonteach=%.4f [%.4f, %.4f]\n",
             ss.meanT, ss.rangeT..., ss.meanO, ss.rangeO...)
+    if p.college
+        ba, ba_z = ba_share_young(sol)
+        @printf("  s by education: BA teachers %.4f, non-BA teachers %.4f, BA non-teachers %.4f, non-BA non-teachers %.4f;  BA share of the young %.4f, by z %s\n",
+                ss.meanT_ba, ss.meanT_nonba, ss.meanO_ba, ss.meanO_nonba, ba, fmtvec(ba_z))
+    end
     @printf("  H̃_T    = %s\n", fmtvec(HT))
     @printf("  M      = %s      [total %.4f]\n", fmtvec(M), sum(M))
     @printf("  t      = %s\n", fmtvec(t))
     @printf("  Q      = %s\n", fmtvec(Q))
+    iszero(p.ψa) || @printf("  peers  : ψa = %.3f;  log ā = %s (at Φ: %s);  teacher part Q_T = %s\n",
+                            p.ψa, fmtvec(gr.la), fmtvec(peer_log_ability(Φ, gr)), fmtvec(gr.QT))
 
     ergodic = stationary(Πz)
     println("\n  Endogenous ability distribution  G_l(z)   (vs ergodic G*):")

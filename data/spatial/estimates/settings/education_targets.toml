@@ -1,0 +1,901 @@
+# education_targets.toml -- moments for the joint education and occupational choice (DESIGN.md section M3), for the Julia calibration.
+# Generated 2026-10-05T02:24:43 by data/spatial/education_occupation.py; see education_occupation.md (definitions, SEs, caveats).
+# role: target (the M3 targets), target_by_gender / target_alt (other forms of a target), validation, cost.
+# model_moment: the name of the model-side moment (M3 spec) that the data moment is the counterpart of ("none" where the model has no counterpart yet).
+# choice_group: moments with the same group are alternative forms of ONE moment; a criterion should contain only one of them (the choice is the designer's).
+# value, se: point estimate and standard error (ACS: Census replicate weights; NLSY79: household bootstrap B = 500, seed 20260929; NCES: delta method).
+# scale: suggested criterion scale of a target (the sampling SE is much smaller than the other errors). alt_*: alternative definitions, weights or samples
+# (alt_weeks_40plus / alt_weeks_27plus: the wage sample also admits 40-47 / 27-47 weeks worked; alt_at_acs_share: level-shifted to the ACS BA share).
+# convention T2 = cell means weighted by PWGTP, combined with the Table 2 (unweighted) counts, as the existing teacher-premium targets;
+# P = population weights. Nothing here is fitted; no value was chosen to match a model output.
+
+[source]
+acs = "ACS 2009-13 5-year PUMS (data years 2009-13; Census API https://api.census.gov/data/2013/acs/acs5/pums), ages 25-34, Table 2 universe (acs_occupations.py sample, HHJK rules); SEs from the 80 Census replicate weights"
+nlsy79 = "NLSY79 block A, ages 25-34 (nlsy_teachers.py / nlsy_ability.py machinery), household bootstrap B = 500, seed 20260929"
+mincer = "data/Mincer_YrsSchool.xlsx, sheet years_of_school, 2013 column (the constants of spatial_calibrate.jl SCHOOLING); PUMS cross-checks from acs"
+nces_211_20 = "NCES Digest of Education Statistics 2022, Table 211.20, https://nces.ed.gov/programs/digest/d22/tables/dt22_211.20.asp (2017-18 NTPS), current dollars; delta-method SEs"
+tuition = "College Board, Trends in College Pricing 2018 (Ma, Pender and Welch), Figures 9 and 10, printed pp. 18-19, https://research.collegeboard.org/media/pdf/trends-college-pricing-2018-full-report.pdf (net tuition and fees); NCES Digest 2018 Table 330.10 https://nces.ed.gov/programs/digest/d18/tables/dt18_330.10.asp and Table 303.70 https://nces.ed.gov/programs/digest/d18/tables/dt18_303.70.asp; NCES Digest 2019 Table 331.30 https://nces.ed.gov/programs/digest/d19/tables/dt19_331.30.asp; BLS Consumer Expenditure Survey 2018 Table R-1 https://www.bls.gov/cex/tables/calendar-year/mean/cu-all-detail-2018.pdf (expenditures, people, children and earners per consumer unit, college tuition)"
+
+[meta]
+generated = "2026-10-05T02:24:43"
+script = "data/spatial/education_occupation.py"
+acs_persons = 1632604
+nlsy_B = 500
+nlsy_seed = 20260929
+
+[units]
+# dollars to model units for goods costs: C-bar is mean annual expenditures PER ADULT (CE 2018 Table R-1, per consumer unit / adults per unit); a recurring annual cost is
+# annual dollars / C-bar, a one-off cost is total dollars / (working_years x C-bar) undiscounted (or / (annuity factor x C-bar) at the discount rate)
+ce_expenditures_per_consumer_unit = 61224.13
+people_per_consumer_unit = 2.5
+adults_per_consumer_unit = 1.9
+earners_per_consumer_unit = 1.3
+cbar_dollars_per_adult = 32223.226315789474
+cbar_dollars_per_earner = 47095.48461538461
+working_years = 40
+discount_rate = 0.03
+annuity_factor = 23.11477197420646
+
+[moment.ba_share_nonteacher]
+role = "target"
+value = 0.3231209468159507
+se = 0.0007195439967201299
+scale = 0.016156047340797536
+scale_rule = "5% of the value (modelling tolerance; the sampling SE is far smaller)"
+n_universe = 1567015
+n_universe_note = "Table 2 person-equivalents of non-teachers (home production included)"
+units = "share"
+convention = "T2"
+source = "acs"
+model_moment = "ba_share_nonteach"
+definition = "share with a bachelor's degree or more (SCHL >= 21) among non-teachers aged 25-34, men and women pooled; non-teachers = every non-K-12-teaching occupation plus home production (Table 2 universe); cell shares weighted by PWGTP, combined with the Table 2 counts"
+model = "share of adults with d = 1 among non-teachers (all non-teaching occupations and home production)"
+alt_population_weights = 0.31896209020673477
+alt_market_workers_only_T2 = 0.3694372890698318
+
+[moment.ba_premium]
+role = "target"
+choice_group = "ba_premium"
+value = 0.48055234910253075
+se = 0.0012147729261339825
+scale = 0.05
+scale_rule = "0.05 (modelling tolerance, as the teacher premia)"
+n_wage_sample = 930479
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "ba_premium"
+definition = "mean log hourly wage of non-teacher market workers with a BA or more minus those without, men and women pooled, full-time full-year wage sample; occupation x gender cell means (PWGTP) weighted by the Table 2 counts of each education group (raw: no occupation control)"
+model = "mean log wage of d = 1 minus d = 0 among non-teacher market workers (home production out), cells weighted by the model's shares; the model's non-teaching occupation choice does not depend on d, so this equals its within-occupation premium"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_population_weights = 0.4834834829637429
+alt_age_controlled = 0.48964139692748265
+alt_age_and_occupation_controlled = 0.3610431856816829
+alt_weeks_40plus = 0.4805872915049476
+
+[moment.ba_premium_within_occupation]
+role = "target"
+choice_group = "ba_premium"
+value = 0.3610431856816829
+se = 0.0013154426849155633
+scale = 0.05
+scale_rule = "0.05 (the existing practice for premia)"
+n_wage_sample = 930479
+units = "log points"
+convention = "P (regression)"
+source = "acs"
+model_moment = "ba_premium"
+definition = "coefficient on BA+ in a PWGTP-weighted regression of log hourly wage on BA+, single-year age dummies and occupation x gender fixed effects, non-teacher market workers, men and women pooled: the BA premium within occupation"
+model = "ba_premium when occupation cells are held fixed: the model has one credential premium rho_c in every non-teaching occupation and no BA-specific occupational sorting, so this is its counterpart of rho_c plus selection on z"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_weeks_40plus = 0.35863268153405115
+
+[moment.afqt_gap_ba]
+role = "target"
+value = 1.22715362956182
+se = 0.01969108623752755
+scale = 0.05
+scale_rule = "0.05 (the bootstrap SE is smaller; AFQT was taken at 15-23 and partly reflects schooling, and the cohort is 1957-64)"
+n_persons = 8528
+units = "latent AFQT SDs"
+convention = "weighted means, latent SD = observed / sqrt(R_comp_pop)"
+source = "nlsy79"
+model_moment = "ba_z_gap_sd"
+definition = "mean latent AFQT of persons with 16+ years of schooling minus those with less (highest grade >= 9), men and women pooled, observed at 25-34"
+model = "mean log z of d = 1 adults minus d = 0 adults, in SDs of log z (as teacher_z_gap_market_sd; stationary s_z = 0.1955), all adults, home production included"
+alt_all_grades = 1.259064901473208
+alt_employed = 1.207744653423805
+alt_employed_nonteachers = 1.2247813418881242
+alt_at_acs_ba_share = 1.2188547004609602
+
+[moment.s_O_mean]
+role = "target"
+value = 0.5456759999999999
+scale = 0.005
+scale_rule = "0.005 (0.125 years of schooling): about three times the gap between the workbook and the PUMS T2 mean (0.0015), far above the PUMS sampling SE; phi is re-fit to hit the value, so the scale matters only if the moment enters a criterion"
+units = "share of 25 years"
+convention = "Mincer workbook, Table 2 counts (existing target, spatial_calibrate.jl SCHOOLING)"
+source = "mincer"
+model_moment = "s_O_mean"
+definition = "mean years of schooling (capped 9-17) of non-teachers, home production included, over 25: 13.6419 / 25"
+model = "mean time share s of non-teachers; re-fit by phi (calibrate_phi)"
+note = "the workbook value cannot be reproduced exactly from PUMS (RMSE 0.059 years by cell); the PUMS SE of the T2 mean is in se_pums_T2"
+se_pums_T2 = 0.00014517819155935885
+alt_pums_T2 = 0.5471730647503825
+alt_pums_population_weights = 0.5464955304341514
+
+[moment.ba_share_nonteacher_m]
+role = "target_by_gender"
+value = 0.29379089344818554
+se = 0.0006806744864927403
+scale = 0.014689544672409278
+scale_rule = "5% of the value (modelling tolerance; the sampling SE is far smaller)"
+n_universe = 779966
+n_universe_note = "Table 2 person-equivalents of non-teachers (home production included)"
+units = "share"
+convention = "T2"
+source = "acs"
+model_moment = "ba_share_nonteach"
+definition = "share with a bachelor's degree or more (SCHL >= 21) among non-teachers aged 25-34, men; non-teachers = every non-K-12-teaching occupation plus home production (Table 2 universe); cell shares weighted by PWGTP, combined with the Table 2 counts"
+model = "share of adults with d = 1 among non-teachers (all non-teaching occupations and home production), men"
+alt_population_weights = 0.29089977150603796
+alt_market_workers_only_T2 = 0.33339454679997205
+
+[moment.ba_premium_m]
+role = "target_by_gender"
+choice_group = "ba_premium"
+value = 0.47947944976720924
+se = 0.0018783085832831015
+scale = 0.05
+scale_rule = "0.05 (modelling tolerance, as the teacher premia)"
+n_wage_sample = 515754
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "ba_premium"
+definition = "mean log hourly wage of non-teacher market workers with a BA or more minus those without, men, full-time full-year wage sample; occupation x gender cell means (PWGTP) weighted by the Table 2 counts of each education group (raw: no occupation control)"
+model = "mean log wage of d = 1 minus d = 0 among non-teacher market workers (home production out), cells weighted by the model's shares; the model's non-teaching occupation choice does not depend on d, so this equals its within-occupation premium"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_population_weights = 0.48578658969647703
+alt_age_controlled = 0.4754966863162103
+alt_age_and_occupation_controlled = 0.3257146834178352
+alt_weeks_40plus = 0.47912586407807867
+
+[moment.ba_premium_within_occupation_m]
+role = "target_by_gender"
+choice_group = "ba_premium"
+value = 0.3257146834178352
+se = 0.0021437010185876466
+scale = 0.05
+scale_rule = "0.05 (the existing practice for premia)"
+n_wage_sample = 515754
+units = "log points"
+convention = "P (regression)"
+source = "acs"
+model_moment = "ba_premium"
+definition = "coefficient on BA+ in a PWGTP-weighted regression of log hourly wage on BA+, single-year age dummies and occupation x gender fixed effects, non-teacher market workers, men: the BA premium within occupation"
+model = "ba_premium when occupation cells are held fixed: the model has one credential premium rho_c in every non-teaching occupation and no BA-specific occupational sorting, so this is its counterpart of rho_c plus selection on z"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_weeks_40plus = 0.322806871457573
+
+[moment.afqt_gap_ba_m]
+role = "target_by_gender"
+value = 1.2981781353930903
+se = 0.0313144533559626
+scale = 0.05
+scale_rule = "0.05 (the bootstrap SE is smaller; AFQT was taken at 15-23 and partly reflects schooling, and the cohort is 1957-64)"
+n_persons = 4135
+units = "latent AFQT SDs"
+convention = "weighted means, latent SD = observed / sqrt(R_comp_pop)"
+source = "nlsy79"
+model_moment = "ba_z_gap_sd"
+definition = "mean latent AFQT of persons with 16+ years of schooling minus those with less (highest grade >= 9), men, observed at 25-34"
+model = "mean log z of d = 1 adults minus d = 0 adults, in SDs of log z (as teacher_z_gap_market_sd; stationary s_z = 0.1955), all adults, home production included"
+alt_all_grades = 1.3317595411691414
+alt_employed = 1.2860797566629643
+alt_employed_nonteachers = 1.2930841380332692
+alt_at_acs_ba_share = 1.2951113491067077
+
+[moment.ba_share_nonteacher_f]
+role = "target_by_gender"
+value = 0.3521870090395029
+se = 0.0009697627321886946
+scale = 0.017609350451975144
+scale_rule = "5% of the value (modelling tolerance; the sampling SE is far smaller)"
+n_universe = 787050
+n_universe_note = "Table 2 person-equivalents of non-teachers (home production included)"
+units = "share"
+convention = "T2"
+source = "acs"
+model_moment = "ba_share_nonteach"
+definition = "share with a bachelor's degree or more (SCHL >= 21) among non-teachers aged 25-34, women; non-teachers = every non-K-12-teaching occupation plus home production (Table 2 universe); cell shares weighted by PWGTP, combined with the Table 2 counts"
+model = "share of adults with d = 1 among non-teachers (all non-teaching occupations and home production), women"
+alt_population_weights = 0.3472553662535296
+alt_market_workers_only_T2 = 0.41215713745182236
+
+[moment.ba_premium_f]
+role = "target_by_gender"
+choice_group = "ba_premium"
+value = 0.5081337431661419
+se = 0.0016472908244411046
+scale = 0.05
+scale_rule = "0.05 (modelling tolerance, as the teacher premia)"
+n_wage_sample = 414725
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "ba_premium"
+definition = "mean log hourly wage of non-teacher market workers with a BA or more minus those without, women, full-time full-year wage sample; occupation x gender cell means (PWGTP) weighted by the Table 2 counts of each education group (raw: no occupation control)"
+model = "mean log wage of d = 1 minus d = 0 among non-teacher market workers (home production out), cells weighted by the model's shares; the model's non-teaching occupation choice does not depend on d, so this equals its within-occupation premium"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_population_weights = 0.506633339300028
+alt_age_controlled = 0.5052671100118122
+alt_age_and_occupation_controlled = 0.39572274275398245
+alt_weeks_40plus = 0.5081147161150028
+
+[moment.ba_premium_within_occupation_f]
+role = "target_by_gender"
+choice_group = "ba_premium"
+value = 0.39572274275398245
+se = 0.0019807236425012
+scale = 0.05
+scale_rule = "0.05 (the existing practice for premia)"
+n_wage_sample = 414725
+units = "log points"
+convention = "P (regression)"
+source = "acs"
+model_moment = "ba_premium"
+definition = "coefficient on BA+ in a PWGTP-weighted regression of log hourly wage on BA+, single-year age dummies and occupation x gender fixed effects, non-teacher market workers, women: the BA premium within occupation"
+model = "ba_premium when occupation cells are held fixed: the model has one credential premium rho_c in every non-teaching occupation and no BA-specific occupational sorting, so this is its counterpart of rho_c plus selection on z"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+alt_weeks_40plus = 0.3935052625825597
+
+[moment.afqt_gap_ba_f]
+role = "target_by_gender"
+value = 1.157429159992591
+se = 0.02860422922922615
+scale = 0.05
+scale_rule = "0.05 (the bootstrap SE is smaller; AFQT was taken at 15-23 and partly reflects schooling, and the cohort is 1957-64)"
+n_persons = 4393
+units = "latent AFQT SDs"
+convention = "weighted means, latent SD = observed / sqrt(R_comp_pop)"
+source = "nlsy79"
+model_moment = "ba_z_gap_sd"
+definition = "mean latent AFQT of persons with 16+ years of schooling minus those with less (highest grade >= 9), women, observed at 25-34"
+model = "mean log z of d = 1 adults minus d = 0 adults, in SDs of log z (as teacher_z_gap_market_sd; stationary s_z = 0.1955), all adults, home production included"
+alt_all_grades = 1.187711561289254
+alt_employed = 1.1295739150274944
+alt_employed_nonteachers = 1.150395990283086
+alt_at_acs_ba_share = 1.143902880587748
+
+[moment.ba_premium_age_adj]
+role = "target_alt"
+choice_group = "ba_premium"
+value = 0.48964139692748265
+se = 0.0012953926089993354
+scale = 0.05
+scale_rule = "0.05"
+n_wage_sample = 930479
+units = "log points"
+convention = "P (regression)"
+source = "acs"
+model_moment = "ba_premium"
+definition = "coefficient on BA+ in a PWGTP-weighted regression of log hourly wage on BA+, single-year age dummies and a female dummy, non-teacher market workers (no occupation control)"
+model = "as ba_premium, with the model's gender composition entering through the female dummy"
+tradeoff = "Alternative forms of ONE moment (choice_group ba_premium): use one of them in a criterion. ba_premium (raw) is the total return to a BA, including the BA holders' sorting into better-paid occupations, which the model's non-teaching occupation choice (independent of d) cannot generate, so rho_c would absorb it; ba_premium_within_occupation is the premium within occupation, which is the model's premium by construction, but it leaves the model's total return to college below the data's. Which one is primary is the M3 designer's choice."
+
+[moment.ba_share_all]
+role = "validation"
+value = 0.33906579987668034
+se = 0.0011209155701027013
+n_universe = 1632604
+units = "share"
+convention = "P"
+source = "acs"
+definition = "share with a bachelor's degree or more (SCHL >= 21) among all persons aged 25-34 of the Table 2 universe (home production included), PWGTP weights"
+model = "share of adults with d = 1 (teachers and non-teachers)"
+model_moment = "ba_share"
+alt_men = 0.30127281519972887
+alt_women = 0.3757466986117933
+
+[moment.s_ratio]
+role = "validation"
+value = 1.1760605194291118
+units = "ratio"
+se_pums_T2 = 0.0004177189956651407
+convention = "Mincer workbook (existing); PUMS in alt"
+source = "mincer"
+model_moment = "s_ratio"
+definition = "mean years of schooling of K-12 teachers over non-teachers' (16.0437 / 13.6419)"
+model = "s_T / s_O (mean time shares)"
+alt_pums_T2 = 1.1696127175108715
+alt_pums_population_weights = 1.1710627801530753
+
+[moment.s_ba_nonteacher]
+role = "validation"
+value = 0.6515197507312586
+se = 2.7964584248527445e-05
+units = "share of 25 years"
+convention = "T2"
+source = "acs"
+model_moment = "none (mean s of d = 1 non-teachers)"
+definition = "mean years of schooling (capped 9-17) of BA+ non-teachers over 25 (a BA is 16, a graduate degree 17 after the cap)"
+model = "mean s of d = 1 non-teachers (s >= s_BA = 16/25 = 0.64 binds for many)"
+
+[moment.s_nonba_nonteacher]
+role = "validation"
+value = 0.49714203092876547
+se = 7.927023184445317e-05
+units = "share of 25 years"
+convention = "T2"
+source = "acs"
+model_moment = "none (mean s of d = 0 non-teachers)"
+definition = "mean years of schooling (capped 9-17) of non-BA non-teachers over 25"
+model = "mean s of d = 0 non-teachers (s unconstrained)"
+
+[moment.s_T_mean_ba]
+role = "validation"
+value = 0.6572872592816204
+se = 9.365053519492924e-05
+units = "share of 25 years"
+convention = "P"
+source = "acs"
+model_moment = "s_T_mean_ba"
+definition = "mean years of schooling (capped 9-17) of K-12 teachers with a BA or more over 25: a BA is 16, a graduate degree 17 after the cap (43% of BA+ teachers hold one)"
+model = "mean s of d = 1 teachers"
+alt_men = 0.656089122186601
+alt_women = 0.6576676889980988
+
+[moment.teacher_ba_share]
+role = "validation"
+value = 0.8743860027773656
+se = 0.0017098334843338476
+n_universe = 65589
+n_universe_note = "Table 2 person-equivalents of K-12 teachers"
+units = "share"
+convention = "P"
+source = "acs"
+model_moment = "ba_share_teach"
+definition = "BA+ share of K-12 teachers (Census codes 2300-2340: pre-K and kindergarten, elementary and middle, secondary, special education, other teachers and instructors)"
+model = "1 if the licensure rule (s >= 16/25) is imposed on every teacher; the data share is lower because of the pre-K/K and 'other instructors' codes (a non-BA teaching track would reproduce it)"
+alt_core_codes_2310_2330 = 0.9607080322151103
+alt_prek_kindergarten_2300 = 0.4722421499917223
+alt_other_instructors_2340 = 0.5937984436337835
+core_share_of_teachers = 0.7997518672843613
+
+[moment.teacher_graduate_share]
+role = "validation"
+value = 0.37789343855579904
+se = 0.002133095942722109
+units = "share"
+convention = "P"
+source = "acs"
+model_moment = "none"
+definition = "share of K-12 teachers with a master's, professional or doctoral degree (SCHL >= 22), ages 25-34"
+model = "no graduate margin in the model (outside M3)"
+alt_share_of_ba_teachers = 0.43218148204050966
+
+[moment.teacher_premium_all]
+role = "validation"
+value = 0.07857598381578673
+se = 0.0025773170789888046
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "teacher_premium_m / teacher_premium_f (the existing targets +0.0557 / +0.0860)"
+comparison = "all teachers against all non-teachers; the existing targets"
+alt_population_weights = 0.07360812371698269
+alt_wage_sample_weights = 0.06343715840629166
+alt_age_controlled = 0.07209726576264563
+alt_weeks_40plus = 0.10312325624356126
+alt_weeks_27plus = 0.11836897698009426
+
+[moment.teacher_premium_all_m]
+role = "validation"
+value = 0.055651655234401076
+se = 0.004889678297308422
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men"
+model = "teacher_premium_m / teacher_premium_f (the existing targets +0.0557 / +0.0860)"
+comparison = "all teachers against all non-teachers; the existing targets"
+alt_population_weights = 0.05102836963712365
+alt_wage_sample_weights = 0.04195487669233655
+alt_age_controlled = 0.04268405838719158
+alt_weeks_40plus = 0.07429882441968783
+alt_weeks_27plus = 0.08654863500327581
+
+[moment.teacher_premium_all_f]
+role = "validation"
+value = 0.08599082470059205
+se = 0.0031441502354115354
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), women"
+model = "teacher_premium_m / teacher_premium_f (the existing targets +0.0557 / +0.0860)"
+comparison = "all teachers against all non-teachers; the existing targets"
+alt_population_weights = 0.08091151247821937
+alt_wage_sample_weights = 0.07038557131993661
+alt_age_controlled = 0.0816109250973781
+alt_weeks_40plus = 0.11223817835805772
+alt_weeks_27plus = 0.1282989210327381
+
+[moment.teacher_premium_ba]
+role = "validation"
+value = -0.22106439048338694
+se = 0.0027684675416890236
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "teacher premium relative to d = 1 non-teacher market workers when the model has a non-BA teaching track (all teachers against d = 1 non-teachers)"
+comparison = "all teachers against BA+ non-teachers"
+alt_population_weights = -0.22748222172235377
+alt_wage_sample_weights = -0.23017358805027088
+alt_age_controlled = -0.2260363308638717
+alt_weeks_40plus = -0.19617866261299052
+alt_weeks_27plus = -0.1828573895333085
+
+[moment.teacher_premium_ba_m]
+role = "validation"
+value = -0.2610269563318002
+se = 0.004930898467628024
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men"
+model = "teacher premium relative to d = 1 non-teacher market workers when the model has a non-BA teaching track (all teachers against d = 1 non-teachers)"
+comparison = "all teachers against BA+ non-teachers"
+alt_population_weights = -0.26982266366136365
+alt_wage_sample_weights = -0.27206448333134103
+alt_age_controlled = -0.2709551529721837
+alt_weeks_40plus = -0.24224981597018314
+alt_weeks_27plus = -0.23130602383337484
+
+[moment.teacher_premium_ba_f]
+role = "validation"
+value = -0.20813855642623835
+se = 0.003347178969898849
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f"
+definition = "mean log hourly wage of all K-12 teachers (codes 2300-2340, including the pre-K/K and other instructors, 12.6% of whom have no BA) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), women"
+model = "teacher premium relative to d = 1 non-teacher market workers when the model has a non-BA teaching track (all teachers against d = 1 non-teachers)"
+comparison = "all teachers against BA+ non-teachers"
+alt_population_weights = -0.21378726708690943
+alt_wage_sample_weights = -0.21662403863038548
+alt_age_controlled = -0.21150740289620792
+alt_weeks_40plus = -0.18160994614559334
+alt_weeks_27plus = -0.1677383745215546
+
+[moment.teacher_premium_ba_teachers_all]
+role = "validation"
+value = 0.13827655569469516
+se = 0.002415082897873486
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "d = 1 teachers against all non-teachers"
+comparison = "BA+ teachers against all non-teachers"
+alt_population_weights = 0.13330869559589112
+alt_wage_sample_weights = 0.12313773028520009
+alt_age_controlled = 0.13072931044326958
+alt_weeks_40plus = 0.16136046812639512
+alt_weeks_27plus = 0.17738001945942286
+
+[moment.teacher_premium_ba_teachers_all_m]
+role = "validation"
+value = 0.07928395620810846
+se = 0.0052248236224955846
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men"
+model = "d = 1 teachers against all non-teachers"
+comparison = "BA+ teachers against all non-teachers"
+alt_population_weights = 0.07466067061083104
+alt_wage_sample_weights = 0.06558717766604394
+alt_age_controlled = 0.06432870403231847
+alt_weeks_40plus = 0.09936109502319068
+alt_weeks_27plus = 0.11234675494804902
+
+[moment.teacher_premium_ba_teachers_all_f]
+role = "validation"
+value = 0.15735762657627683
+se = 0.0029126767857289263
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of all non-teacher market workers (cell means weighted by Table 2 counts), women"
+model = "d = 1 teachers against all non-teachers"
+comparison = "BA+ teachers against all non-teachers"
+alt_population_weights = 0.15227831435390415
+alt_wage_sample_weights = 0.1417523731956214
+alt_age_controlled = 0.15220649043760842
+alt_weeks_40plus = 0.18096603955400825
+alt_weeks_27plus = 0.1976744801107002
+
+[moment.teacher_premium_within_ba]
+role = "validation"
+value = -0.16136381860447851
+se = 0.0026028167724217854
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "d = 1 teachers against d = 1 non-teacher market workers: the counterpart of 'teachers versus d = 1 non-teachers' when every teacher is forced to d = 1 (the wage analogue of NLSY comparison C, teacher_z_gap_within_ba)"
+comparison = "BA+ teachers against BA+ non-teachers"
+alt_population_weights = -0.16778164984344535
+alt_wage_sample_weights = -0.1704730161713625
+alt_age_controlled = -0.16769121688183208
+alt_weeks_40plus = -0.13794145073015662
+alt_weeks_27plus = -0.12384634705397987
+
+[moment.teacher_premium_within_ba_m]
+role = "validation"
+value = -0.2373946553580928
+se = 0.00532573699682781
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men"
+model = "d = 1 teachers against d = 1 non-teacher market workers: the counterpart of 'teachers versus d = 1 non-teachers' when every teacher is forced to d = 1 (the wage analogue of NLSY comparison C, teacher_z_gap_within_ba)"
+comparison = "BA+ teachers against BA+ non-teachers"
+alt_population_weights = -0.24619036268765626
+alt_wage_sample_weights = -0.24843218235763365
+alt_age_controlled = -0.24984265149450338
+alt_weeks_40plus = -0.21718754536668028
+alt_weeks_27plus = -0.20550790388860163
+
+[moment.teacher_premium_within_ba_f]
+role = "validation"
+value = -0.13677175455055357
+se = 0.0031683901606049027
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "teacher_premium_ba_m/f when every teacher has d = 1"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), women"
+model = "d = 1 teachers against d = 1 non-teacher market workers: the counterpart of 'teachers versus d = 1 non-teachers' when every teacher is forced to d = 1 (the wage analogue of NLSY comparison C, teacher_z_gap_within_ba)"
+comparison = "BA+ teachers against BA+ non-teachers"
+alt_population_weights = -0.14242046521122464
+alt_wage_sample_weights = -0.1452572367547007
+alt_age_controlled = -0.14111945431313194
+alt_weeks_40plus = -0.1128820849496428
+alt_weeks_27plus = -0.09836281544359249
+
+[moment.teacher_premium_core_all]
+role = "validation"
+value = 0.14720811323536145
+se = 0.002273560416902279
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "teachers of the licensure codes against all non-teachers"
+comparison = "core-code teachers against all non-teachers"
+alt_population_weights = 0.14224025313655744
+alt_wage_sample_weights = 0.1320692878258664
+alt_age_controlled = 0.13815080340826807
+alt_weeks_40plus = 0.17114923486546615
+alt_weeks_27plus = 0.18805321106522832
+
+[moment.teacher_premium_core_all_m]
+role = "validation"
+value = 0.0794063236958995
+se = 0.005384567292790909
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), men"
+model = "teachers of the licensure codes against all non-teachers"
+comparison = "core-code teachers against all non-teachers"
+alt_population_weights = 0.07478303809862208
+alt_wage_sample_weights = 0.06570954515383498
+alt_age_controlled = 0.06457027969446098
+alt_weeks_40plus = 0.10116182375597216
+alt_weeks_27plus = 0.1150382667159322
+
+[moment.teacher_premium_core_all_f]
+role = "validation"
+value = 0.16913850388367857
+se = 0.0028440457529675767
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of all non-teacher market workers (cell means weighted by Table 2 counts), women"
+model = "teachers of the licensure codes against all non-teachers"
+comparison = "core-code teachers against all non-teachers"
+alt_population_weights = 0.1640591916613059
+alt_wage_sample_weights = 0.15353325050302313
+alt_age_controlled = 0.16195031725756515
+alt_weeks_40plus = 0.19328080037753725
+alt_weeks_27plus = 0.21083845683422764
+
+[moment.teacher_premium_core_ba]
+role = "validation"
+value = -0.1524322610638122
+se = 0.002402668220951791
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men and women pooled; pooled = average of the two with the K-12 wage-sample weights 0.2444/0.7556"
+model = "teachers of the licensure codes against d = 1 non-teachers"
+comparison = "core-code teachers against BA+ non-teachers"
+alt_population_weights = -0.15885009230277902
+alt_wage_sample_weights = -0.16154145863069616
+alt_age_controlled = -0.16088348890253276
+alt_weeks_40plus = -0.12815268399108562
+alt_weeks_27plus = -0.11317315544817444
+
+[moment.teacher_premium_core_ba_m]
+role = "validation"
+value = -0.23727228787030175
+se = 0.005409872325928596
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), men"
+model = "teachers of the licensure codes against d = 1 non-teachers"
+comparison = "core-code teachers against BA+ non-teachers"
+alt_population_weights = -0.24606799519986522
+alt_wage_sample_weights = -0.2483098148698426
+alt_age_controlled = -0.24958747077317522
+alt_weeks_40plus = -0.2153868166338988
+alt_weeks_27plus = -0.20281639212071845
+
+[moment.teacher_premium_core_ba_f]
+role = "validation"
+value = -0.12499087724315183
+se = 0.003040660001466825
+units = "log points"
+convention = "T2"
+source = "acs"
+model_moment = "none (robustness)"
+definition = "mean log hourly wage of K-12 teachers of the core codes 2310-2330 (96% BA+) minus that of non-teacher market workers with a BA or more (cell means weighted by the Table 2 counts of the BA+ workers), women"
+model = "teachers of the licensure codes against d = 1 non-teachers"
+comparison = "core-code teachers against BA+ non-teachers"
+alt_population_weights = -0.1306395879038229
+alt_wage_sample_weights = -0.13347635944729896
+alt_age_controlled = -0.1321923144114492
+alt_weeks_40plus = -0.1005673241261138
+alt_weeks_27plus = -0.08519883872006506
+
+[moment.teacher_ba_wage_gap]
+role = "validation"
+value = 0.48187186327055986
+se = 0.009371500966869754
+units = "log points"
+convention = "P"
+source = "acs"
+model_moment = "none (pay penalty of a non-BA teaching track)"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus those without (pre-K/K and other instructors, mostly), men and women pooled, wage sample"
+model = "mean log wage of d = 1 teachers minus d = 0 teachers when the model has a non-BA teaching track (its pay penalty, rho_T0, in the model's terms)"
+alt_age_controlled = 0.4737190142686993
+alt_age_and_census_code_controlled = 0.354435948815803
+
+[moment.teacher_ba_wage_gap_m]
+role = "validation"
+value = 0.20167917516143996
+se = 0.021928663066016124
+units = "log points"
+convention = "P"
+source = "acs"
+model_moment = "none (pay penalty of a non-BA teaching track)"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus those without (pre-K/K and other instructors, mostly), men, wage sample"
+model = "mean log wage of d = 1 teachers minus d = 0 teachers when the model has a non-BA teaching track (its pay penalty, rho_T0, in the model's terms)"
+alt_age_controlled = 0.18903087707856747
+alt_age_and_census_code_controlled = 0.1509935863753852
+
+[moment.teacher_ba_wage_gap_f]
+role = "validation"
+value = 0.5664008593606469
+se = 0.009527297746235366
+units = "log points"
+convention = "P"
+source = "acs"
+model_moment = "none (pay penalty of a non-BA teaching track)"
+definition = "mean log hourly wage of K-12 teachers with a BA or more minus those without (pre-K/K and other instructors, mostly), women, wage sample"
+model = "mean log wage of d = 1 teachers minus d = 0 teachers when the model has a non-BA teaching track (its pay penalty, rho_T0, in the model's terms)"
+alt_age_controlled = 0.5612043496269002
+alt_age_and_census_code_controlled = 0.41782515610328463
+
+[moment.grad_teacher_premium]
+role = "validation"
+value = 0.19528872368265263
+se = 0.0042620384415208695
+units = "log points"
+convention = "P (regression)"
+source = "acs"
+model_moment = "none (compare with ma_premium_implied)"
+definition = "log hourly wage of K-12 teachers with a graduate degree minus teachers with exactly a bachelor's degree, controlling for single-year age (and sex)"
+model = "none (no graduate margin); compare with the salary-schedule premium"
+alt_raw = 0.22467097266709324
+alt_men_age = 0.162149352468729
+alt_women_age = 0.2059368122664745
+
+[moment.ma_ba_salary_premium]
+role = "validation"
+value = 0.1564225755340332
+se = 0.006815687184272968
+units = "log points"
+convention = "delta method, experience rows weighted by the number of teachers"
+source = "nces_211_20"
+model_moment = "ma_premium_implied"
+definition = "log of the average base salary of full-time public school teachers with a master's degree over that with a bachelor's degree, 1-5 years of teaching experience"
+model = "theta_s x log(17.5/16) (the schedule premium implied by the credential-lane elasticity); no graduate margin otherwise"
+alt_first_year = 0.12715877022183328
+alt_1_3_years = 0.1607652107002028
+alt_1_9_years = 0.15939340760406884
+
+[moment.teacher_z_gap_employed_nonteachers]
+role = "validation"
+value = 0.6140907206025199
+se = 0.0616495380672505
+units = "latent AFQT SDs"
+convention = "weighted means"
+source = "nlsy79"
+note = "reproduces nlsy_teachers.json (same draws)"
+model_moment = "teacher_z_gap_market_sd"
+definition = "mean latent AFQT of K-12 teachers minus that of employed non-teachers (comparison A), employed sample, 1980 Census codes, majority-of-rounds rule"
+model = "teacher_z_gap_market_sd (mean log z of teachers minus non-teacher workers over s_z)"
+
+[moment.teacher_z_gap_nonteacher_ba]
+role = "validation"
+value = -0.33353189050284987
+se = 0.06250096577503529
+units = "latent AFQT SDs"
+convention = "weighted means"
+source = "nlsy79"
+note = "reproduces nlsy_teachers.json (same draws)"
+model_moment = "teacher_z_gap_ba_sd"
+definition = "mean latent AFQT of K-12 teachers minus that of non-teacher persons with 16+ years (comparison B), employed sample, 1980 Census codes, majority-of-rounds rule"
+model = "teacher z gap against / within BA+ (needs d)"
+
+[moment.teacher_z_gap_within_ba]
+role = "validation"
+value = -0.23842755094199128
+se = 0.061717508828515955
+units = "latent AFQT SDs"
+convention = "weighted means"
+source = "nlsy79"
+note = "reproduces nlsy_teachers.json (same draws)"
+model_moment = "teacher_z_gap_within_ba_sd"
+definition = "mean latent AFQT of K-12 teachers minus that of non-teachers with 16+ years, teachers with 16+ years only (comparison C), employed sample, 1980 Census codes, majority-of-rounds rule"
+model = "teacher z gap against / within BA+ (needs d)"
+
+[moment.p_ba_afqt_tercile_1]
+role = "validation"
+value = 0.04077205660107285
+se = 0.003975277650040928
+units = "share"
+convention = "weighted"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 1 of own OBSERVED AFQT (terciles of the weighted sample of persons observed at 25-34, highest grade >= 9; cut points -0.403, 0.494 observed SDs), at the NLSY79 BA share (0.258, against 0.339 in the ACS)"
+model = "P(d = 1 | tercile) of a NOISY score x = sqrt(R) theta + sqrt(1 - R) u with theta = standardized log z, u standard normal, R = 0.916 (terciles of x over adults); for a noise-free model use alt_latent_scale (terciles of log z itself)"
+alt_at_acs_share = 0.05707491056549671
+alt_latent_scale = 0.026773676279169777
+alt_latent_scale_at_acs_share = 0.051546480519453576
+alt_note = "alt_at_acs_share: the observed-score logit with its level shifted to the ACS BA share; alt_latent_scale: terciles of the latent factor from the errors-in-variables logit (assumes a normal latent factor and a logistic P(BA | theta)); *_at_acs_share: level shifted to the ACS BA share"
+
+[moment.p_ba_afqt_tercile_2]
+role = "validation"
+value = 0.1670774965106247
+se = 0.009387811726891276
+units = "share"
+convention = "weighted"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 2 of own OBSERVED AFQT (terciles of the weighted sample of persons observed at 25-34, highest grade >= 9; cut points -0.403, 0.494 observed SDs), at the NLSY79 BA share (0.258, against 0.339 in the ACS)"
+model = "P(d = 1 | tercile) of a NOISY score x = sqrt(R) theta + sqrt(1 - R) u with theta = standardized log z, u standard normal, R = 0.916 (terciles of x over adults); for a noise-free model use alt_latent_scale (terciles of log z itself)"
+alt_at_acs_share = 0.2771882048418142
+alt_latent_scale = 0.15376349661666858
+alt_latent_scale_at_acs_share = 0.26168734860039194
+alt_note = "alt_at_acs_share: the observed-score logit with its level shifted to the ACS BA share; alt_latent_scale: terciles of the latent factor from the errors-in-variables logit (assumes a normal latent factor and a logistic P(BA | theta)); *_at_acs_share: level shifted to the ACS BA share"
+
+[moment.p_ba_afqt_tercile_3]
+role = "validation"
+value = 0.5668140096594423
+se = 0.016148176362709227
+units = "share"
+convention = "weighted"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "share with 16+ years of schooling in tercile 3 of own OBSERVED AFQT (terciles of the weighted sample of persons observed at 25-34, highest grade >= 9; cut points -0.403, 0.494 observed SDs), at the NLSY79 BA share (0.258, against 0.339 in the ACS)"
+model = "P(d = 1 | tercile) of a NOISY score x = sqrt(R) theta + sqrt(1 - R) u with theta = standardized log z, u standard normal, R = 0.916 (terciles of x over adults); for a noise-free model use alt_latent_scale (terciles of log z itself)"
+alt_at_acs_share = 0.6829579843451135
+alt_latent_scale = 0.5678399239091135
+alt_latent_scale_at_acs_share = 0.7044132533821191
+alt_note = "alt_at_acs_share: the observed-score logit with its level shifted to the ACS BA share; alt_latent_scale: terciles of the latent factor from the errors-in-variables logit (assumes a normal latent factor and a logistic P(BA | theta)); *_at_acs_share: level shifted to the ACS BA share"
+
+[moment.p_ba_afqt_top_minus_bottom]
+role = "validation"
+value = 0.5260419530583694
+se = 0.016334374555520236
+units = "share difference"
+convention = "weighted"
+source = "nlsy79"
+model_moment = "ba_share_by_z"
+definition = "top minus bottom AFQT tercile, share with 16+ years of schooling"
+model = "as p_ba_afqt_tercile_q"
+alt_at_acs_share = 0.6258830737796167
+alt_latent_scale = 0.5410662476299437
+alt_latent_scale_at_acs_share = 0.6528667728626656
+
+[moment.afqt_logit_slope]
+role = "validation"
+value = 1.814768271414048
+se = 0.05716813489978901
+units = "log-odds per observed AFQT SD"
+convention = "weighted logit"
+source = "nlsy79"
+model_moment = "ba_share_by_z (slope form)"
+definition = "slope of the logit of P(16+ years of schooling) on observed AFQT (standardized)"
+model = "slope of logit P(d = 1) on the NOISY score x = sqrt(R) theta + sqrt(1 - R) u (theta = log z standardized, u standard normal, R = 0.916); the observed score is attenuated, so a noise-free model needs afqt_logit_slope_latent instead"
+alt_latent_first_order = 1.896314485856647
+alt_latent_eiv = 1.9985522202641157
+
+[moment.afqt_logit_slope_latent]
+role = "validation"
+value = 1.9985522202641157
+se = 0.06849618329552777
+units = "log-odds per latent AFQT SD"
+convention = "errors-in-variables logit"
+source = "nlsy79"
+model_moment = "ba_share_by_z (slope form)"
+definition = "slope of the logit of P(16+ years of schooling) on the latent AFQT factor (SD units), by maximum likelihood with a normal latent factor and the composite reliability R = 0.916 (Gauss-Hermite integration over the factor given the score); the first-order correction slope_obs / sqrt(R) understates it"
+model = "d logit P(d = 1 | z) / d (log z / s_z): the slope of the logit of the model's BA probability on standardized log z (weighted over adults)"
+alt_first_order = 1.896314485856647
+alt_men = 2.03666470345214
+alt_women = 1.974629979747115
+alt_implied_latent_gap = 1.27425366199166
+
+[moment.tuition_Fc]
+role = "cost"
+value = 0.02079367928748175
+units = "units of Cbar = mean annual expenditures per ADULT ($32,223 = CE $61,224 / 1.9 adults per consumer unit)"
+convention = "(ii-a) total BA cost over 40 years of consumption per adult, undiscounted"
+source = "tuition"
+model_moment = "Fc"
+definition = "central: net tuition and fees (after grants and education tax benefits), public and private nonprofit 4-year weighted by undergraduate enrollment, 4 years, over 40 years of annual consumption per adult: the undiscounted, per-person counterpart of a one-off goods cost paid from adult consumption in a model without an interest rate whose other education parameters are calibrated on annual aggregate flows"
+model = "Fc, goods cost of a BA in Node.m (and Xi), common to all college goers"
+annual_dollars = 6700.394336184684
+total_dollars = 26801.577344738736
+alt_annuitized_3pct_ii_b = 0.035983360442725036
+alt_compounded_3pct_ii_c = 0.03876429676197102
+alt_aggregate_flow_check = 0.03844547757486395
+alt_aggregate_flow_check_se = 0.0027317617483254564
+alt_per_earner_ii_a = 0.014227254249329621
+alt_per_earner_ii_b = 0.02462019398712766
+alt_per_earner_i = 0.1422725424932962
+alt_per_earner_ii_c = 0.02652293988976965
+alt_per_cu_i = 0.10944041730253552
+alt_per_cu_ii_a = 0.010944041730253554
+alt_per_cu_ii_b = 0.01893861075932897
+alt_per_cu_ii_c = 0.02040226145366896
+per_cu_note = "per consumer unit (the first release of this file) understates a per-person cost by the number of adults per unit, 1.9"
+not_for_one_off_costs_i_annual_over_ce_per_adult = 0.20793679287481748
+range_low = 0.011730668937231122
+range_high = 0.08551721032231493
+range_note = "per adult; low = net tuition and fees at public 4-year, 4 years, undiscounted; high = published tuition and fees, all 4-year, discounted at 3%"

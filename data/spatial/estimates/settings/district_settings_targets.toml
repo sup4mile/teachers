@@ -1,0 +1,340 @@
+# district_settings_targets.toml -- audited district moments by setting, for the Julia calibration.
+# Generated 2026-10-02T23:48:11 by data/spatial/district_settings.py; see district_settings.md.
+# value / se / n_cz per moment: weighted mean over CZs of the within-CZ gap (location 2 minus location 1),
+# whole-CZ bootstrap SE (B = 1999, seed 20260929), number of CZs with the statistic. corr = bootstrap correlation
+# of the four targets, in corr_keys order (draws shared across moments within a table).
+
+[meta]
+generated = "2026-10-02T23:48:11"
+script = "data/spatial/district_settings.py"
+year = 2018
+B = 1999
+seed = 20260929
+holdout_seed = 20261002
+min_pupils = 500
+min_group_share = 0.1
+n_common_cz = 186
+hybrid_share = 0.8811478440943717
+
+[locale]
+description = "locale split (city vs suburb), the 188 CZs of the tracked moments"
+n_cz = 188
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.11705014700401188, -0.372188751110774, 0.27732546664369],
+  [-0.11705014700401188, 1.0, 0.40584782469671066, 0.15333513265583207],
+  [-0.372188751110774, 0.40584782469671066, 1.0, -0.0728540552063685],
+  [0.27732546664369, 0.15333513265583207, -0.0728540552063685, 1.0],
+]
+
+[locale.gap_pupils]
+value = 0.3763546672825929
+se = 0.11537539934884848
+n_cz = 188
+
+[locale.gap_salary]
+value = 0.008620482439174196
+se = 0.009158968569601845
+n_cz = 188
+
+[locale.gap_teachers_pp]
+value = -0.017718866687234436
+se = 0.013082144834898024
+n_cz = 188
+
+[locale.gap_income]
+value = 0.11222726669759567
+se = 0.016778769750979593
+n_cz = 188
+
+[locale.poverty_gap]
+value = -0.08877912700255307
+se = 0.00897209371804552
+n_cz = 188
+
+[locale.seda_growth_gap]
+value = 0.003072254589934042
+se = 0.003003100027506025
+n_cz = 187
+
+[locale.score_gap]
+value = 0.2887304108046367
+se = 0.03264974152246413
+n_cz = 187
+
+[revenue]
+description = "revenue split (below / above the CZ's pupil-weighted median of local revenue per pupil)"
+n_cz = 621
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.04117417688209061, -0.08033627667845265, 0.17480940271647397],
+  [-0.04117417688209061, 1.0, 0.24315402569478597, 0.05933335673430816],
+  [-0.08033627667845265, 0.24315402569478597, 1.0, 0.22902220325499237],
+  [0.17480940271647397, 0.05933335673430816, 0.22902220325499237, 1.0],
+]
+
+[revenue.gap_pupils]
+value = -0.024739008373202975
+se = 0.02178565518063394
+n_cz = 621
+
+[revenue.gap_salary]
+value = 0.017841941725537304
+se = 0.009783237212152738
+n_cz = 619
+
+[revenue.gap_teachers_pp]
+value = 0.034812673596619825
+se = 0.0056709109771773064
+n_cz = 621
+
+[revenue.gap_income]
+value = 0.1286332642024378
+se = 0.011411628111258404
+n_cz = 620
+
+[revenue.poverty_gap]
+value = -0.03599230172473134
+se = 0.005544132087127642
+n_cz = 620
+
+[revenue.seda_growth_gap]
+value = 0.007128106812746778
+se = 0.0014185129988562282
+n_cz = 613
+
+[revenue.score_gap]
+value = 0.19944824340273118
+se = 0.022459283289957672
+n_cz = 615
+
+[ses]
+description = "ses split (below / above the CZ's pupil-weighted median SEDA SES)"
+n_cz = 619
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.06573692226868348, -0.1388619926951207, 0.0705573034082448],
+  [-0.06573692226868348, 1.0, 0.05628105108966713, 0.31464228183318743],
+  [-0.1388619926951207, 0.05628105108966713, 1.0, 0.051259698468022336],
+  [0.0705573034082448, 0.31464228183318743, 0.051259698468022336, 1.0],
+]
+
+[ses.gap_pupils]
+value = -0.0012870826932678279
+se = 0.02352260827730007
+n_cz = 619
+
+[ses.gap_salary]
+value = 0.008936632473727352
+se = 0.006083906510325618
+n_cz = 615
+
+[ses.gap_teachers_pp]
+value = -0.00701804755387048
+se = 0.00634318635323864
+n_cz = 618
+
+[ses.gap_income]
+value = 0.23174929596246502
+se = 0.012450380152655871
+n_cz = 618
+
+[ses.poverty_gap]
+value = -0.10176060205867934
+se = 0.0042824768867239064
+n_cz = 619
+
+[ses.seda_growth_gap]
+value = 0.014547365243837143
+se = 0.0016899000845145094
+n_cz = 617
+
+[ses.score_gap]
+value = 0.4047374143379264
+se = 0.019405195973190334
+n_cz = 619
+
+[locale_common]
+description = "locale split on the CZs that are in all three partitions"
+n_cz = 186
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.0924089007636908, -0.37357975997653897, 0.3123390605072825],
+  [-0.0924089007636908, 1.0, 0.4154752262959846, 0.172871028466376],
+  [-0.37357975997653897, 0.4154752262959846, 1.0, -0.036681087895092966],
+  [0.3123390605072825, 0.172871028466376, -0.036681087895092966, 1.0],
+]
+
+[locale_common.gap_pupils]
+value = 0.3772208563901732
+se = 0.11943171121975145
+n_cz = 186
+
+[locale_common.gap_salary]
+value = 0.008671406504364453
+se = 0.009174435232848539
+n_cz = 186
+
+[locale_common.gap_teachers_pp]
+value = -0.01691179942509599
+se = 0.012698149311460556
+n_cz = 186
+
+[locale_common.gap_income]
+value = 0.1123287937543197
+se = 0.016875671410956198
+n_cz = 186
+
+[locale_common.poverty_gap]
+value = -0.08901311147692
+se = 0.009368948547172627
+n_cz = 186
+
+[locale_common.seda_growth_gap]
+value = 0.003023044117682443
+se = 0.0029748999416943137
+n_cz = 186
+
+[locale_common.score_gap]
+value = 0.28915539320519784
+se = 0.03369635197327879
+n_cz = 186
+
+[revenue_common]
+description = "revenue split on the CZs that are in all three partitions"
+n_cz = 186
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.0848754089649618, 0.07154515019294995, 0.05133540682186942],
+  [-0.0848754089649618, 1.0, 0.3168065954274822, 0.06701682816486997],
+  [0.07154515019294995, 0.3168065954274822, 1.0, 0.29437019466632497],
+  [0.05133540682186942, 0.06701682816486997, 0.29437019466632497, 1.0],
+]
+
+[revenue_common.gap_pupils]
+value = -0.0028962130295923
+se = 0.021500343375605756
+n_cz = 186
+
+[revenue_common.gap_salary]
+value = 0.02107462363371608
+se = 0.012608837927010567
+n_cz = 186
+
+[revenue_common.gap_teachers_pp]
+value = 0.0356129468402969
+se = 0.006847031159828333
+n_cz = 186
+
+[revenue_common.gap_income]
+value = 0.1516044619179195
+se = 0.014043697475175712
+n_cz = 186
+
+[revenue_common.poverty_gap]
+value = -0.04203804891097345
+se = 0.007156293718318254
+n_cz = 186
+
+[revenue_common.seda_growth_gap]
+value = 0.008006742097714258
+se = 0.001819076484147366
+n_cz = 186
+
+[revenue_common.score_gap]
+value = 0.23909462765534809
+se = 0.027584130197424703
+n_cz = 186
+
+[ses_common]
+description = "ses split on the CZs that are in all three partitions"
+n_cz = 186
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.051115276518697905, 0.0542657894443194, -0.09457854835638126],
+  [-0.051115276518697905, 1.0, 0.1486726555905666, 0.2547398674986388],
+  [0.0542657894443194, 0.1486726555905666, 1.0, 0.23625492082578697],
+  [-0.09457854835638126, 0.2547398674986388, 0.23625492082578697, 1.0],
+]
+
+[ses_common.gap_pupils]
+value = 0.010375602320322525
+se = 0.02032237868151148
+n_cz = 186
+
+[ses_common.gap_salary]
+value = 0.013626577591529358
+se = 0.007204003962041089
+n_cz = 186
+
+[ses_common.gap_teachers_pp]
+value = -0.008766420560322749
+se = 0.007432428310146958
+n_cz = 186
+
+[ses_common.gap_income]
+value = 0.2724776824062289
+se = 0.013460235866676702
+n_cz = 186
+
+[ses_common.poverty_gap]
+value = -0.1126348044699094
+se = 0.005015239958145686
+n_cz = 186
+
+[ses_common.seda_growth_gap]
+value = 0.015808003388993824
+se = 0.0021939845799406285
+n_cz = 186
+
+[ses_common.score_gap]
+value = 0.47255571504847105
+se = 0.020096943872612467
+n_cz = 186
+
+[locale_holdout_A]
+description = "locale split, pre-registered hold-out half A (the sealed half B is not here)"
+n_cz = 94
+corr_keys = ["gap_pupils", "gap_salary", "gap_teachers_pp", "gap_income"]
+corr = [
+  [1.0, -0.1732331597300734, -0.3536544892809158, -0.029783085728634785],
+  [-0.1732331597300734, 1.0, 0.6375133347403988, 0.5554412766463962],
+  [-0.3536544892809158, 0.6375133347403988, 1.0, 0.34930210512119964],
+  [-0.029783085728634785, 0.5554412766463962, 0.34930210512119964, 1.0],
+]
+
+[locale_holdout_A.gap_pupils]
+value = 0.5220180218880197
+se = 0.15147972601714352
+n_cz = 94
+
+[locale_holdout_A.gap_salary]
+value = 0.00900665520075298
+se = 0.013823798539060766
+n_cz = 94
+
+[locale_holdout_A.gap_teachers_pp]
+value = -0.031207667743180626
+se = 0.014880698638837125
+n_cz = 94
+
+[locale_holdout_A.gap_income]
+value = 0.11830836883225825
+se = 0.023401943286157537
+n_cz = 94
+
+[locale_holdout_A.poverty_gap]
+value = -0.09922320721621733
+se = 0.01549009349358101
+n_cz = 94
+
+[locale_holdout_A.seda_growth_gap]
+value = 0.0069368656243498595
+se = 0.0030393663713810487
+n_cz = 94
+
+[locale_holdout_A.score_gap]
+value = 0.29468644225019175
+se = 0.05627331052097361
+n_cz = 94
+

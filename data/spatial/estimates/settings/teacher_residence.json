@@ -1,0 +1,4761 @@
+{
+ "meta": {
+  "generated": "2026-10-05T02:50:20",
+  "script": "data/spatial/teacher_residence.py",
+  "year": 2018,
+  "B": 1999,
+  "seed": 20260929,
+  "geo_unit": "czone (Dorn 1990 commuting zones)",
+  "resampling": "whole CZ with replacement; the multiplicity matrix of district_settings.py (n = 188, B, seed)",
+  "c24010": {
+   "C24010_001": "total, civilian employed 16+",
+   "C24010_002": "male, civilian employed 16+",
+   "C24010_038": "female, civilian employed 16+",
+   "C24010_014": "male, Educational instruction, and library occupations",
+   "C24010_050": "female, Educational instruction, and library occupations"
+  },
+  "pums_vintage": "ACS 2018 1-year PUMS",
+  "replicate_weights": 80
+ },
+ "districts": {
+  "stats": {
+   "gap_edu_res_emp": {
+    "value": 0.027664095858414377,
+    "se": 0.024695652249974574,
+    "ci95_lo": -0.02148053731170461,
+    "ci95_hi": 0.07361475525309656,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)",
+    "se_acs_sampling": 0.003954293199590995,
+    "se_total": 0.025010231401568557
+   },
+   "gap_edu_res": {
+    "value": 0.18512738581498128,
+    "se": 0.11195272260511416,
+    "ci95_lo": -0.018594334944481237,
+    "ci95_hi": 0.418989080088535,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log EDU residents (workers by residence)",
+    "se_acs_sampling": 0.004131958323335903,
+    "se_total": 0.11202894794776672
+   },
+   "gap_fte": {
+    "value": 0.3806634903179125,
+    "se": 0.1138251111291022,
+    "ci95_lo": 0.16616122549309764,
+    "ci95_hi": 0.6051809672122811,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+   },
+   "net_commute_gap_edu": {
+    "value": -0.19553610450293124,
+    "se": 0.03009249461758321,
+    "ci95_lo": -0.25664687797050495,
+    "ci95_hi": -0.13781780502786395,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+    "identity_max_abs_diff": 3.608224830031759e-16,
+    "se_acs_sampling": 0.004131958323335903,
+    "se_total": 0.0303748466974742
+   },
+   "gap_edu_per_pupil": {
+    "value": -0.21402287147860813,
+    "se": 0.03603099796648906,
+    "ci95_lo": -0.28882546670277603,
+    "ci95_hi": -0.1463394932096883,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log (EDU residents per K-12 pupil)"
+   },
+   "gap_emp_res": {
+    "value": 0.1574632899565669,
+    "se": 0.11389969305287481,
+    "ci95_lo": -0.05877595854697792,
+    "ci95_hi": 0.38670471760864444,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log employed residents"
+   },
+   "gap_pupils_k12": {
+    "value": 0.39915025729358933,
+    "se": 0.11797829257567792,
+    "ci95_lo": 0.1769162085778831,
+    "ci95_hi": 0.6355485279762292,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log K-12 pupils, matched sample"
+   },
+   "gap_fte_per_pupil": {
+    "value": -0.01848676697567688,
+    "se": 0.013130464731375411,
+    "ci95_lo": -0.0444075868662715,
+    "ci95_hi": 0.00719813211758493,
+    "n_cz": 188,
+    "kind": "log",
+    "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+   }
+  },
+  "levels": {
+   "edu_per_fte": {
+    "loc1": {
+     "value": 3.993312088210154,
+     "se": 0.1568234998865721,
+     "ci95_lo": 3.685931449663259,
+     "ci95_hi": 4.28977274464006,
+     "n_cz": 188
+    },
+    "loc2": {
+     "value": 3.1837133369949258,
+     "se": 0.08956098756985426,
+     "ci95_lo": 3.007794916439818,
+     "ci95_hi": 3.361219503517789,
+     "n_cz": 188
+    }
+   },
+   "edu_share_emp": {
+    "loc1": {
+     "value": 0.06030332983083229,
+     "se": 0.0014575376859024655,
+     "ci95_lo": 0.057744372911643825,
+     "ci95_hi": 0.06336933103808749,
+     "n_cz": 188
+    },
+    "loc2": {
+     "value": 0.0615953195835452,
+     "se": 0.0014720978182752244,
+     "ci95_lo": 0.059063622957610196,
+     "ci95_hi": 0.06470956241103805,
+     "n_cz": 188
+    }
+   },
+   "edu_per_pupil": {
+    "loc1": {
+     "value": 0.24429607612007997,
+     "se": 0.011927368685308103,
+     "ci95_lo": 0.2237268970456703,
+     "ci95_hi": 0.26956400174802936,
+     "n_cz": 188
+    },
+    "loc2": {
+     "value": 0.19130454921017548,
+     "se": 0.0067950374555666715,
+     "ci95_lo": 0.17915576368512864,
+     "ci95_hi": 0.20567724978806054,
+     "n_cz": 188
+    }
+   },
+   "fte_per_pupil": {
+    "loc1": {
+     "value": 0.061957068629108346,
+     "se": 0.002099245727517425,
+     "ci95_lo": 0.05783594021507237,
+     "ci95_hi": 0.06575088295989491,
+     "n_cz": 188
+    },
+    "loc2": {
+     "value": 0.060975250145463136,
+     "se": 0.0022965430294904295,
+     "ci95_lo": 0.056507334467371016,
+     "ci95_hi": 0.065285785429552,
+     "n_cz": 188
+    }
+   }
+  },
+  "variants": {
+   "earnings_rule": {
+    "gap_edu_res_emp": {
+     "value": 0.029290835256610553,
+     "se": 0.025378652365081605,
+     "ci95_lo": -0.02134016324082042,
+     "ci95_hi": 0.07707897945063606,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+    },
+    "gap_edu_res": {
+     "value": 0.22806506553617378,
+     "se": 0.11436116759619726,
+     "ci95_lo": 0.010243365809257216,
+     "ci95_hi": 0.4605896124514675,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log EDU residents (workers by residence)"
+    },
+    "gap_fte": {
+     "value": 0.3806634903179125,
+     "se": 0.1138251111291022,
+     "ci95_lo": 0.16616122549309764,
+     "ci95_hi": 0.6051809672122811,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.15259842478173874,
+     "se": 0.0353938793247147,
+     "ci95_lo": -0.22748699137982945,
+     "ci95_hi": -0.0857305004007405,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+     "identity_max_abs_diff": 3.608224830031759e-16
+    },
+    "gap_edu_per_pupil": {
+     "value": -0.17108519175741563,
+     "se": 0.04256707213504209,
+     "ci95_lo": -0.2617062857105822,
+     "ci95_hi": -0.0921799243537959,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (EDU residents per K-12 pupil)"
+    },
+    "gap_emp_res": {
+     "value": 0.19877423027956326,
+     "se": 0.11632914361826885,
+     "ci95_lo": -0.029032226178520554,
+     "ci95_hi": 0.4281177341669071,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log employed residents"
+    },
+    "gap_pupils_k12": {
+     "value": 0.39915025729358933,
+     "se": 0.11797829257567792,
+     "ci95_lo": 0.1769162085778831,
+     "ci95_hi": 0.6355485279762292,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 pupils, matched sample"
+    },
+    "gap_fte_per_pupil": {
+     "value": -0.01848676697567688,
+     "se": 0.013130464731375411,
+     "ci95_lo": -0.0444075868662715,
+     "ci95_hi": 0.00719813211758493,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+    }
+   },
+   "no_overlap_sec": {
+    "gap_edu_res_emp": {
+     "value": 0.025953309331080164,
+     "se": 0.024634102366922282,
+     "ci95_lo": -0.023008960396622185,
+     "ci95_hi": 0.07272225727552371,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+    },
+    "gap_edu_res": {
+     "value": 0.18150291551671927,
+     "se": 0.11251700400212726,
+     "ci95_lo": -0.019814386039732266,
+     "ci95_hi": 0.4160720293641872,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log EDU residents (workers by residence)"
+    },
+    "gap_fte": {
+     "value": 0.3806634903179125,
+     "se": 0.1138251111291022,
+     "ci95_lo": 0.16616122549309764,
+     "ci95_hi": 0.6051809672122811,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.19916057480119329,
+     "se": 0.029831681270944366,
+     "ci95_lo": -0.26091438972703906,
+     "ci95_hi": -0.14051223442562372,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+     "identity_max_abs_diff": 3.608224830031759e-16
+    },
+    "gap_edu_per_pupil": {
+     "value": -0.21764734177687015,
+     "se": 0.03572504587500349,
+     "ci95_lo": -0.29150670066146955,
+     "ci95_hi": -0.14958286384848607,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (EDU residents per K-12 pupil)"
+    },
+    "gap_emp_res": {
+     "value": 0.1555496061856391,
+     "se": 0.11427243329271419,
+     "ci95_lo": -0.06029696093283122,
+     "ci95_hi": 0.38740493386415176,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log employed residents"
+    },
+    "gap_pupils_k12": {
+     "value": 0.39915025729358933,
+     "se": 0.11797829257567792,
+     "ci95_lo": 0.1769162085778831,
+     "ci95_hi": 0.6355485279762292,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 pupils, matched sample"
+    },
+    "gap_fte_per_pupil": {
+     "value": -0.01848676697567688,
+     "se": 0.013130464731375411,
+     "ci95_lo": -0.0444075868662715,
+     "ci95_hi": 0.00719813211758493,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+    }
+   },
+   "unified": {
+    "gap_edu_res_emp": {
+     "value": 0.02144751499335925,
+     "se": 0.02418088877139043,
+     "ci95_lo": -0.026932641738774684,
+     "ci95_hi": 0.06810841129113127,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+    },
+    "gap_edu_res": {
+     "value": 0.09659634946125131,
+     "se": 0.12332501509041345,
+     "ci95_lo": -0.12734120410802444,
+     "ci95_hi": 0.3539907688627581,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log EDU residents (workers by residence)"
+    },
+    "gap_fte": {
+     "value": 0.3126701257669772,
+     "se": 0.12073061628617685,
+     "ci95_lo": 0.09343945603331998,
+     "ci95_hi": 0.5549248279115903,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.2160737763057259,
+     "se": 0.029960861002908665,
+     "ci95_lo": -0.27626929506219516,
+     "ci95_hi": -0.15520064980661813,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+     "identity_max_abs_diff": 3.608224830031759e-16
+    },
+    "gap_edu_per_pupil": {
+     "value": -0.23661544929051131,
+     "se": 0.03570146697326215,
+     "ci95_lo": -0.30916168920625453,
+     "ci95_hi": -0.16875060331109984,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log (EDU residents per K-12 pupil)"
+    },
+    "gap_emp_res": {
+     "value": 0.07514883446789203,
+     "se": 0.12344816780296532,
+     "ci95_lo": -0.15048288239738775,
+     "ci95_hi": 0.32340531034997605,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log employed residents"
+    },
+    "gap_pupils_k12": {
+     "value": 0.3332117987517626,
+     "se": 0.12600162737739004,
+     "ci95_lo": 0.10678801589930749,
+     "ci95_hi": 0.5839856477321561,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log K-12 pupils, matched sample"
+    },
+    "gap_fte_per_pupil": {
+     "value": -0.02054167298478541,
+     "se": 0.013221678398297932,
+     "ci95_lo": -0.04613038508097068,
+     "ci95_hi": 0.0053052060317983875,
+     "n_cz": 183,
+     "kind": "log",
+     "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+    }
+   },
+   "nyc_dropped": {
+    "gap_edu_res_emp": {
+     "value": 0.013856789456272507,
+     "se": 0.021516314889771015,
+     "ci95_lo": -0.029692946203839957,
+     "ci95_hi": 0.05482026072129273,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+    },
+    "gap_edu_res": {
+     "value": 0.4319517771610355,
+     "se": 0.21831308027124208,
+     "ci95_lo": 0.06237247540797314,
+     "ci95_hi": 0.8796079497406828,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log EDU residents (workers by residence)"
+    },
+    "gap_fte": {
+     "value": 0.6438416284096874,
+     "se": 0.23198124475865858,
+     "ci95_lo": 0.24997663581836782,
+     "ci95_hi": 1.1221058591416615,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.2118898512486519,
+     "se": 0.03342326726142226,
+     "ci95_lo": -0.2786163787802084,
+     "ci95_hi": -0.14435755461094565,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+     "identity_max_abs_diff": 4.440892098500626e-16
+    },
+    "gap_edu_per_pupil": {
+     "value": -0.22777355152111853,
+     "se": 0.03465877003154255,
+     "ci95_lo": -0.30182577472923894,
+     "ci95_hi": -0.1606853037926921,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (EDU residents per K-12 pupil)"
+    },
+    "gap_emp_res": {
+     "value": 0.41809498770476305,
+     "se": 0.21746714021694782,
+     "ci95_lo": 0.05377439942830402,
+     "ci95_hi": 0.868541982850691,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log employed residents"
+    },
+    "gap_pupils_k12": {
+     "value": 0.6597253286821539,
+     "se": 0.22173141575442726,
+     "ci95_lo": 0.2768176312250247,
+     "ci95_hi": 1.1123672173724453,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log K-12 pupils, matched sample"
+    },
+    "gap_fte_per_pupil": {
+     "value": -0.015883700272466626,
+     "se": 0.01498152538659767,
+     "ci95_lo": -0.04425054390725756,
+     "ci95_hi": 0.014099527170589307,
+     "n_cz": 188,
+     "kind": "log",
+     "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+    }
+   },
+   "drop_ny_cz": {
+    "gap_edu_res_emp": {
+     "value": 0.014622602821355586,
+     "se": 0.022674142364070313,
+     "ci95_lo": -0.031064570170992258,
+     "ci95_hi": 0.058374909423852976,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "EDU proxy for gap_teach_res_emp (NOT the K-12 model counterpart): Delta log (EDU residents / employed residents)"
+    },
+    "gap_edu_res": {
+     "value": 0.22685005698073216,
+     "se": 0.11053371650106729,
+     "ci95_lo": 0.019003137282666383,
+     "ci95_hi": 0.4611986645624479,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log EDU residents (workers by residence)"
+    },
+    "gap_fte": {
+     "value": 0.42260381756169496,
+     "se": 0.11239084236302832,
+     "ci95_lo": 0.20081251613927617,
+     "ci95_hi": 0.6481852136446956,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log K-12 FTE teachers (workers by workplace), matched sample"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.19575376058096286,
+     "se": 0.03178301096044825,
+     "ci95_lo": -0.26143550060715903,
+     "ci95_hi": -0.13404407637938504,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "EDU proxy for net_commute_gap (NOT the K-12 model counterpart): gap_edu_res - gap_fte = Delta log (EDU residents per K-12 FTE)",
+     "identity_max_abs_diff": 3.608224830031759e-16
+    },
+    "gap_edu_per_pupil": {
+     "value": -0.2245985355042354,
+     "se": 0.03648530979493839,
+     "ci95_lo": -0.3028977949185425,
+     "ci95_hi": -0.1547288023223363,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log (EDU residents per K-12 pupil)"
+    },
+    "gap_emp_res": {
+     "value": 0.2122274541593765,
+     "se": 0.10717051216664818,
+     "ci95_lo": 0.004767650448089979,
+     "ci95_hi": 0.42604932422628866,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log employed residents"
+    },
+    "gap_pupils_k12": {
+     "value": 0.4514485924849675,
+     "se": 0.11295393695381167,
+     "ci95_lo": 0.23533531417200043,
+     "ci95_hi": 0.6759384325004658,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log K-12 pupils, matched sample"
+    },
+    "gap_fte_per_pupil": {
+     "value": -0.028844774923272545,
+     "se": 0.00957617983319154,
+     "ci95_lo": -0.04888253124200639,
+     "ci95_hi": -0.011525313620646942,
+     "n_cz": 187,
+     "kind": "log",
+     "label": "Delta log (K-12 FTE per K-12 pupil), matched sample (the gap_teachers_pp definition)"
+    }
+   },
+   "unmatched": {
+    "gap_edu_res": {
+     "value": 0.18565749690056677,
+     "se": 0.1119613367774843,
+     "ci95_lo": -0.01782376361409855,
+     "ci95_hi": 0.4206220643979106,
+     "n_cz": 188,
+     "label": "Delta log EDU residents, every district with a C24010 record"
+    },
+    "gap_fte": {
+     "value": 0.3739407817785855,
+     "se": 0.11333722197369216,
+     "ci95_lo": 0.16251990740403893,
+     "ci95_hi": 0.6021304508261349,
+     "n_cz": 188,
+     "label": "Delta log K-12 FTE, every district with an audited FTE"
+    },
+    "net_commute_gap_edu": {
+     "value": -0.1882832848780188,
+     "se": 0.03033084447076456,
+     "ci95_lo": -0.24950165423030274,
+     "ci95_hi": -0.12760714518134045,
+     "n_cz": 188,
+     "label": "gap_edu_res - gap_fte on the two maximal samples"
+    }
+   }
+  },
+  "coverage": {
+   "n_cz": 188,
+   "n_districts": 3260,
+   "pupils": 28551744.0,
+   "n_matched": 3199,
+   "share_districts_matched": 0.9812883435582822,
+   "share_pupils_matched": 0.9939132965047599,
+   "share_pupils_with_acs": 0.9950447510316708,
+   "share_pupils_with_fte": 0.9988470756812614,
+   "n_by_layer": {
+    "unified": 2534,
+    "elementary": 518,
+    "secondary": 152,
+    "none": 56
+   },
+   "pupil_share_by_layer": {
+    "unified": 0.9006419012442812,
+    "secondary": 0.03149748050416815,
+    "elementary": 0.06290536928322137,
+    "none": 0.00495524896832922
+   },
+   "employed_res_matched": 102853593.0,
+   "edu_res_matched": 6223796.0,
+   "fte_matched": 1685814.0,
+   "pupils_k12_matched": 27642128.0,
+   "employed_res_share_by_layer": {
+    "unified": 0.8416994824867227,
+    "elementary": 0.07924516550433003,
+    "secondary": 0.07905535200894732
+   },
+   "overlap_factor_employed_residents": 1.0858415890481568,
+   "overlap_factor_by_location": {
+    "1": 1.0661288762292778,
+    "2": 1.102729364127265
+   },
+   "secondary_vs_elementary_employed_residents": {
+    "n_cz_locations": 37,
+    "elementary": 7886677.0,
+    "secondary": 8131127.0,
+    "by_location": {
+     "1": {
+      "elementary": 2789302.0,
+      "secondary": 2890212.0
+     },
+     "2": {
+      "elementary": 5097375.0,
+      "secondary": 5240915.0
+     }
+    }
+   },
+   "n_cz_with_secondary_lea": 28,
+   "pupil_weight_cz_with_secondary_lea": 0.41570644511242466,
+   "n_by_location": {
+    "1": 625,
+    "2": 2635
+   },
+   "n_matched_by_location": {
+    "1": 602,
+    "2": 2597
+   },
+   "nyc": {
+    "czone": 19400.0,
+    "loc_id": 1,
+    "pupils": 960484.0,
+    "matched": true,
+    "edu_res": 257444.0,
+    "emp_res": 4053141.0,
+    "fte": 63352.0
+   },
+   "unmatched_reasons": {
+    "no_acs_record": 56,
+    "no_fte_or_pupils": 6,
+    "pupils_of_unmatched": 173786.0
+   },
+   "n_eff_cz": 41.69249427350392,
+   "top5_weight_share": 0.2579869727047146,
+   "single_count": {
+    "n_matched": 3199,
+    "share_pupils_matched": 0.9939132965047599,
+    "n_secondary_without_residents": 152,
+    "employed_res": 94722466.0,
+    "edu_res": 5757804.0,
+    "fte": 1685814.0,
+    "pupils_k12": 27642128.0,
+    "n_matched_by_location": {
+     "1": 602,
+     "2": 2597
+    }
+   },
+   "tiling": {
+    "national_unified_plus_elementary": 0.9998160545148215,
+    "national_all_layers": 1.0671235642302126,
+    "edu_state_sum": 9277102.0,
+    "emp_state_sum": 153768384.0,
+    "top_states": [
+     {
+      "state": "Montana",
+      "all_layers": 1.8888159464089629,
+      "unified_plus_elementary": 1.0
+     },
+     {
+      "state": "Illinois",
+      "all_layers": 1.3770622509221062,
+      "unified_plus_elementary": 1.0
+     },
+     {
+      "state": "Arizona",
+      "all_layers": 1.3276215389605572,
+      "unified_plus_elementary": 0.9959221635875243
+     },
+     {
+      "state": "California",
+      "all_layers": 1.2683587732642263,
+      "unified_plus_elementary": 0.9999992899671484
+     },
+     {
+      "state": "New Jersey",
+      "all_layers": 1.1866741736099058,
+      "unified_plus_elementary": 1.0
+     },
+     {
+      "state": "New Hampshire",
+      "all_layers": 1.1113468330163518,
+      "unified_plus_elementary": 0.9999917129017689
+     }
+    ]
+   },
+   "ccd_fte_k12_all_regular_districts": 2971983.0,
+   "ccd_pupils_k12_all_regular_districts": 46982484.0
+  },
+  "reproduction": [
+   {
+    "moment": "gap_pupils",
+    "value": 0.3763546672825929,
+    "se": 0.11537539934884848,
+    "n_cz": 188,
+    "reported_value": 0.3764,
+    "reported_se": 0.1154,
+    "ok_value": true,
+    "ok_se": true
+   },
+   {
+    "moment": "gap_salary",
+    "value": 0.008620482439174196,
+    "se": 0.009158968569601845,
+    "n_cz": 188,
+    "reported_value": 0.0086,
+    "reported_se": 0.0092,
+    "ok_value": true,
+    "ok_se": true
+   },
+   {
+    "moment": "gap_teachers_pp",
+    "value": -0.017718866687234436,
+    "se": 0.013082144834898024,
+    "n_cz": 188,
+    "reported_value": -0.0177,
+    "reported_se": 0.0131,
+    "ok_value": true,
+    "ok_se": true
+   },
+   {
+    "moment": "gap_income",
+    "value": 0.11222726669759567,
+    "se": 0.016778769750979593,
+    "n_cz": 188,
+    "reported_value": 0.1122,
+    "reported_se": 0.0168,
+    "ok_value": true,
+    "ok_se": true
+   }
+  ],
+  "full_run": true,
+  "hybrid_share": 0.8811478440943717,
+  "corr_keys": [
+   "gap_pupils",
+   "gap_salary",
+   "gap_teachers_pp",
+   "gap_income",
+   "k12_gap_teach_res_emp",
+   "k12_net_commute_gap",
+   "k12_gap_k12_res",
+   "gap_edu_res_emp",
+   "gap_edu_res",
+   "gap_fte",
+   "net_commute_gap_edu"
+  ],
+  "corr_matrix": [
+   [
+    1.0,
+    -0.11705014700401206,
+    -0.3721887511107738,
+    0.2773254666436899,
+    -0.005274385722293163,
+    -0.06092511123380769,
+    0.9366230369905821,
+    -0.20133856068520342,
+    0.9474252279173928,
+    0.9917341205129063,
+    -0.22654860736595286
+   ],
+   [
+    -0.11705014700401206,
+    1.0,
+    0.40584782469671077,
+    0.15333513265583207,
+    -0.07750827058449886,
+    -0.056935054008720544,
+    -0.08791733986218303,
+    0.07655381006778152,
+    -0.05075901469329429,
+    -0.07467849416831726,
+    0.09363391243572872
+   ],
+   [
+    -0.3721887511107738,
+    0.40584782469671077,
+    1.0,
+    -0.07285405520636856,
+    0.522252736594284,
+    0.34925405073370996,
+    -0.1572567607176511,
+    0.6349345972914927,
+    -0.1966005179854151,
+    -0.26613808103709785,
+    0.2752591136412756
+   ],
+   [
+    0.2773254666436899,
+    0.15333513265583207,
+    -0.07285405520636856,
+    1.0,
+    0.10187778360495878,
+    0.4657068876373194,
+    0.4070921992548306,
+    0.17927705060176818,
+    0.43664466814495895,
+    0.28640787129393386,
+    0.5411034159341127
+   ],
+   [
+    -0.005274385722293163,
+    -0.07750827058449886,
+    0.522252736594284,
+    0.10187778360495878,
+    1.0,
+    0.7636609791812803,
+    0.2737881014121416,
+    0.7737171427527618,
+    0.1337777823282261,
+    0.06024934575864814,
+    0.26979812017783034
+   ],
+   [
+    -0.06092511123380769,
+    -0.056935054008720544,
+    0.34925405073370996,
+    0.4657068876373194,
+    0.7636609791812803,
+    1.0,
+    0.2739168190695853,
+    0.6686324089821755,
+    0.187855768244954,
+    -0.00906911805101936,
+    0.7331814248861407
+   ],
+   [
+    0.9366230369905821,
+    -0.08791733986218303,
+    -0.1572567607176511,
+    0.4070921992548306,
+    0.2737881014121416,
+    0.2739168190695853,
+    1.0,
+    0.05927608542281898,
+    0.9808467375935186,
+    0.9592296500273246,
+    0.020737437263970506
+   ],
+   [
+    -0.20133856068520342,
+    0.07655381006778152,
+    0.6349345972914927,
+    0.17927705060176818,
+    0.7737171427527618,
+    0.6686324089821755,
+    0.05927608542281898,
+    1.0,
+    0.03077087219194344,
+    -0.13485834002856695,
+    0.6245792746035025
+   ],
+   [
+    0.9474252279173928,
+    -0.05075901469329429,
+    -0.1966005179854151,
+    0.43664466814495895,
+    0.1337777823282261,
+    0.187855768244954,
+    0.9808467375935186,
+    0.03077087219194344,
+    1.0,
+    0.9646060506707161,
+    0.07165679413149689
+   ],
+   [
+    0.9917341205129063,
+    -0.07467849416831726,
+    -0.26613808103709785,
+    0.28640787129393386,
+    0.06024934575864814,
+    -0.00906911805101936,
+    0.9592296500273246,
+    -0.13485834002856695,
+    0.9646060506707161,
+    1.0,
+    -0.19389677025112184
+   ],
+   [
+    -0.22654860736595286,
+    0.09363391243572872,
+    0.2752591136412756,
+    0.5411034159341127,
+    0.26979812017783034,
+    0.7331814248861407,
+    0.020737437263970506,
+    0.6245792746035025,
+    0.07165679413149689,
+    -0.19389677025112184,
+    1.0
+   ]
+  ],
+  "corr_keys_toml": [
+   "gap_pupils",
+   "gap_salary",
+   "gap_teachers_pp",
+   "gap_income",
+   "k12_gap_teach_res_emp",
+   "k12_net_commute_gap",
+   "gap_edu_res",
+   "gap_fte"
+  ],
+  "corr_matrix_toml": [
+   [
+    1.0,
+    -0.11705014700401206,
+    -0.3721887511107738,
+    0.2773254666436899,
+    -0.005274385722293163,
+    -0.06092511123380769,
+    0.9474252279173928,
+    0.9917341205129063
+   ],
+   [
+    -0.11705014700401206,
+    1.0,
+    0.40584782469671077,
+    0.15333513265583207,
+    -0.07750827058449886,
+    -0.056935054008720544,
+    -0.05075901469329429,
+    -0.07467849416831726
+   ],
+   [
+    -0.3721887511107738,
+    0.40584782469671077,
+    1.0,
+    -0.07285405520636856,
+    0.522252736594284,
+    0.34925405073370996,
+    -0.1966005179854151,
+    -0.26613808103709785
+   ],
+   [
+    0.2773254666436899,
+    0.15333513265583207,
+    -0.07285405520636856,
+    1.0,
+    0.10187778360495878,
+    0.4657068876373194,
+    0.43664466814495895,
+    0.28640787129393386
+   ],
+   [
+    -0.005274385722293163,
+    -0.07750827058449886,
+    0.522252736594284,
+    0.10187778360495878,
+    1.0,
+    0.7636609791812803,
+    0.1337777823282261,
+    0.06024934575864814
+   ],
+   [
+    -0.06092511123380769,
+    -0.056935054008720544,
+    0.34925405073370996,
+    0.4657068876373194,
+    0.7636609791812803,
+    1.0,
+    0.187855768244954,
+    -0.00906911805101936
+   ],
+   [
+    0.9474252279173928,
+    -0.05075901469329429,
+    -0.1966005179854151,
+    0.43664466814495895,
+    0.1337777823282261,
+    0.187855768244954,
+    1.0,
+    0.9646060506707161
+   ],
+   [
+    0.9917341205129063,
+    -0.07467849416831726,
+    -0.26613808103709785,
+    0.28640787129393386,
+    0.06024934575864814,
+    -0.00906911805101936,
+    0.9646060506707161,
+    1.0
+   ]
+  ],
+  "corr_all": {
+   "gap_pupils": {
+    "gap_pupils": 1.0,
+    "gap_salary": -0.11705,
+    "gap_teachers_pp": -0.372189,
+    "gap_income": 0.277325,
+    "gap_edu_res_emp": -0.201339,
+    "gap_edu_res": 0.947425,
+    "gap_fte": 0.991734,
+    "net_commute_gap_edu": -0.226549,
+    "gap_edu_per_pupil": -0.324032,
+    "gap_emp_res": 0.974884,
+    "gap_pupils_k12": 0.997997,
+    "gap_fte_per_pupil": -0.369961,
+    "k12_gap_teach_res_emp": -0.005274,
+    "k12_net_commute_gap": -0.060925,
+    "k12_gap_k12_res": 0.936623
+   },
+   "gap_salary": {
+    "gap_pupils": -0.11705,
+    "gap_salary": 1.0,
+    "gap_teachers_pp": 0.405848,
+    "gap_income": 0.153335,
+    "gap_edu_res_emp": 0.076554,
+    "gap_edu_res": -0.050759,
+    "gap_fte": -0.074678,
+    "net_commute_gap_edu": 0.093634,
+    "gap_edu_per_pupil": 0.224656,
+    "gap_emp_res": -0.06649,
+    "gap_pupils_k12": -0.116777,
+    "gap_fte_per_pupil": 0.401883,
+    "k12_gap_teach_res_emp": -0.077508,
+    "k12_net_commute_gap": -0.056935,
+    "k12_gap_k12_res": -0.087917
+   },
+   "gap_teachers_pp": {
+    "gap_pupils": -0.372189,
+    "gap_salary": 0.405848,
+    "gap_teachers_pp": 1.0,
+    "gap_income": -0.072854,
+    "gap_edu_res_emp": 0.634935,
+    "gap_edu_res": -0.196601,
+    "gap_fte": -0.266138,
+    "net_commute_gap_edu": 0.275259,
+    "gap_edu_per_pupil": 0.594078,
+    "gap_emp_res": -0.330906,
+    "gap_pupils_k12": -0.367993,
+    "gap_fte_per_pupil": 0.999356,
+    "k12_gap_teach_res_emp": 0.522253,
+    "k12_net_commute_gap": 0.349254,
+    "k12_gap_k12_res": -0.157257
+   },
+   "gap_income": {
+    "gap_pupils": 0.277325,
+    "gap_salary": 0.153335,
+    "gap_teachers_pp": -0.072854,
+    "gap_income": 1.0,
+    "gap_edu_res_emp": 0.179277,
+    "gap_edu_res": 0.436645,
+    "gap_fte": 0.286408,
+    "net_commute_gap_edu": 0.541103,
+    "gap_edu_per_pupil": 0.425703,
+    "gap_emp_res": 0.39031,
+    "gap_pupils_k12": 0.284332,
+    "gap_fte_per_pupil": -0.071943,
+    "k12_gap_teach_res_emp": 0.101878,
+    "k12_net_commute_gap": 0.465707,
+    "k12_gap_k12_res": 0.407092
+   },
+   "gap_edu_res_emp": {
+    "gap_pupils": -0.201339,
+    "gap_salary": 0.076554,
+    "gap_teachers_pp": 0.634935,
+    "gap_income": 0.179277,
+    "gap_edu_res_emp": 1.0,
+    "gap_edu_res": 0.030771,
+    "gap_fte": -0.134858,
+    "net_commute_gap_edu": 0.624579,
+    "gap_edu_per_pupil": 0.752954,
+    "gap_emp_res": -0.186574,
+    "gap_pupils_k12": -0.200756,
+    "gap_fte_per_pupil": 0.634749,
+    "k12_gap_teach_res_emp": 0.773717,
+    "k12_net_commute_gap": 0.668632,
+    "k12_gap_k12_res": 0.059276
+   },
+   "gap_edu_res": {
+    "gap_pupils": 0.947425,
+    "gap_salary": -0.050759,
+    "gap_teachers_pp": -0.196601,
+    "gap_income": 0.436645,
+    "gap_edu_res_emp": 0.030771,
+    "gap_edu_res": 1.0,
+    "gap_fte": 0.964606,
+    "net_commute_gap_edu": 0.071657,
+    "gap_edu_per_pupil": -0.010813,
+    "gap_emp_res": 0.976235,
+    "gap_pupils_k12": 0.952229,
+    "gap_fte_per_pupil": -0.193895,
+    "k12_gap_teach_res_emp": 0.133778,
+    "k12_net_commute_gap": 0.187856,
+    "k12_gap_k12_res": 0.980847
+   },
+   "gap_fte": {
+    "gap_pupils": 0.991734,
+    "gap_salary": -0.074678,
+    "gap_teachers_pp": -0.266138,
+    "gap_income": 0.286408,
+    "gap_edu_res_emp": -0.134858,
+    "gap_edu_res": 0.964606,
+    "gap_fte": 1.0,
+    "net_commute_gap_edu": -0.193897,
+    "gap_edu_per_pupil": -0.25829,
+    "gap_emp_res": 0.977357,
+    "gap_pupils_k12": 0.994223,
+    "gap_fte_per_pupil": -0.264393,
+    "k12_gap_teach_res_emp": 0.060249,
+    "k12_net_commute_gap": -0.009069,
+    "k12_gap_k12_res": 0.95923
+   },
+   "net_commute_gap_edu": {
+    "gap_pupils": -0.226549,
+    "gap_salary": 0.093634,
+    "gap_teachers_pp": 0.275259,
+    "gap_income": 0.541103,
+    "gap_edu_res_emp": 0.624579,
+    "gap_edu_res": 0.071657,
+    "gap_fte": -0.193897,
+    "net_commute_gap_edu": 1.0,
+    "gap_edu_per_pupil": 0.936757,
+    "gap_emp_res": -0.064989,
+    "gap_pupils_k12": -0.218092,
+    "gap_fte_per_pupil": 0.278726,
+    "k12_gap_teach_res_emp": 0.269798,
+    "k12_net_commute_gap": 0.733181,
+    "k12_gap_k12_res": 0.020737
+   },
+   "gap_edu_per_pupil": {
+    "gap_pupils": -0.324032,
+    "gap_salary": 0.224656,
+    "gap_teachers_pp": 0.594078,
+    "gap_income": 0.425703,
+    "gap_edu_res_emp": 0.752954,
+    "gap_edu_res": -0.010813,
+    "gap_fte": -0.25829,
+    "net_commute_gap_edu": 0.936757,
+    "gap_edu_per_pupil": 1.0,
+    "gap_emp_res": -0.173883,
+    "gap_pupils_k12": -0.315664,
+    "gap_fte_per_pupil": 0.597209,
+    "k12_gap_teach_res_emp": 0.413885,
+    "k12_net_commute_gap": 0.738875,
+    "k12_gap_k12_res": -0.039586
+   },
+   "gap_emp_res": {
+    "gap_pupils": 0.974884,
+    "gap_salary": -0.06649,
+    "gap_teachers_pp": -0.330906,
+    "gap_income": 0.39031,
+    "gap_edu_res_emp": -0.186574,
+    "gap_edu_res": 0.976235,
+    "gap_fte": 0.977357,
+    "net_commute_gap_edu": -0.064989,
+    "gap_edu_per_pupil": -0.173883,
+    "gap_emp_res": 1.0,
+    "gap_pupils_k12": 0.979479,
+    "gap_fte_per_pupil": -0.328206,
+    "k12_gap_teach_res_emp": -0.036266,
+    "k12_net_commute_gap": 0.039672,
+    "k12_gap_k12_res": 0.951228
+   },
+   "gap_pupils_k12": {
+    "gap_pupils": 0.997997,
+    "gap_salary": -0.116777,
+    "gap_teachers_pp": -0.367993,
+    "gap_income": 0.284332,
+    "gap_edu_res_emp": -0.200756,
+    "gap_edu_res": 0.952229,
+    "gap_fte": 0.994223,
+    "net_commute_gap_edu": -0.218092,
+    "gap_edu_per_pupil": -0.315664,
+    "gap_emp_res": 0.979479,
+    "gap_pupils_k12": 1.0,
+    "gap_fte_per_pupil": -0.366382,
+    "k12_gap_teach_res_emp": 0.000543,
+    "k12_net_commute_gap": -0.047394,
+    "k12_gap_k12_res": 0.942841
+   },
+   "gap_fte_per_pupil": {
+    "gap_pupils": -0.369961,
+    "gap_salary": 0.401883,
+    "gap_teachers_pp": 0.999356,
+    "gap_income": -0.071943,
+    "gap_edu_res_emp": 0.634749,
+    "gap_edu_res": -0.193895,
+    "gap_fte": -0.264393,
+    "net_commute_gap_edu": 0.278726,
+    "gap_edu_per_pupil": 0.597209,
+    "gap_emp_res": -0.328206,
+    "gap_pupils_k12": -0.366382,
+    "gap_fte_per_pupil": 1.0,
+    "k12_gap_teach_res_emp": 0.517407,
+    "k12_net_commute_gap": 0.347218,
+    "k12_gap_k12_res": -0.156154
+   },
+   "k12_gap_teach_res_emp": {
+    "gap_pupils": -0.005274,
+    "gap_salary": -0.077508,
+    "gap_teachers_pp": 0.522253,
+    "gap_income": 0.101878,
+    "gap_edu_res_emp": 0.773717,
+    "gap_edu_res": 0.133778,
+    "gap_fte": 0.060249,
+    "net_commute_gap_edu": 0.269798,
+    "gap_edu_per_pupil": 0.413885,
+    "gap_emp_res": -0.036266,
+    "gap_pupils_k12": 0.000543,
+    "gap_fte_per_pupil": 0.517407,
+    "k12_gap_teach_res_emp": 1.0,
+    "k12_net_commute_gap": 0.763661,
+    "k12_gap_k12_res": 0.273788
+   },
+   "k12_net_commute_gap": {
+    "gap_pupils": -0.060925,
+    "gap_salary": -0.056935,
+    "gap_teachers_pp": 0.349254,
+    "gap_income": 0.465707,
+    "gap_edu_res_emp": 0.668632,
+    "gap_edu_res": 0.187856,
+    "gap_fte": -0.009069,
+    "net_commute_gap_edu": 0.733181,
+    "gap_edu_per_pupil": 0.738875,
+    "gap_emp_res": 0.039672,
+    "gap_pupils_k12": -0.047394,
+    "gap_fte_per_pupil": 0.347218,
+    "k12_gap_teach_res_emp": 0.763661,
+    "k12_net_commute_gap": 1.0,
+    "k12_gap_k12_res": 0.273917
+   },
+   "k12_gap_k12_res": {
+    "gap_pupils": 0.936623,
+    "gap_salary": -0.087917,
+    "gap_teachers_pp": -0.157257,
+    "gap_income": 0.407092,
+    "gap_edu_res_emp": 0.059276,
+    "gap_edu_res": 0.980847,
+    "gap_fte": 0.95923,
+    "net_commute_gap_edu": 0.020737,
+    "gap_edu_per_pupil": -0.039586,
+    "gap_emp_res": 0.951228,
+    "gap_pupils_k12": 0.942841,
+    "gap_fte_per_pupil": -0.156154,
+    "k12_gap_teach_res_emp": 0.273788,
+    "k12_net_commute_gap": 0.273917,
+    "k12_gap_k12_res": 1.0
+   }
+  },
+  "gap_pupils": {
+   "value": 0.3763546672825929,
+   "se": 0.11537539934884848,
+   "ci95_lo": 0.15766220896455233,
+   "ci95_hi": 0.6041131860973311,
+   "n_cz": 188,
+   "role": "target",
+   "kind": "log",
+   "label": "enrollment, log(M2/M1) (CCD enrollment incl. pre-K)"
+  },
+  "gap_teachers_pp": {
+   "value": -0.017718866687234436,
+   "se": 0.013082144834898024,
+   "ci95_lo": -0.04361942027344692,
+   "ci95_hi": 0.007706555422917719,
+   "n_cz": 188,
+   "role": "target",
+   "kind": "log",
+   "label": "K-12 FTE teachers per K-12 pupil, audit FTE variant 11"
+  },
+  "adopted_targets": {
+   "gap_pupils": {
+    "value": 0.3763546672825929,
+    "se": 0.11537539934884848,
+    "ci95_lo": 0.15766220896455233,
+    "ci95_hi": 0.6041131860973311,
+    "n_cz": 188,
+    "role": "target",
+    "kind": "log",
+    "label": "enrollment, log(M2/M1) (CCD enrollment incl. pre-K)"
+   },
+   "gap_salary": {
+    "value": 0.008620482439174196,
+    "se": 0.009158968569601845,
+    "ci95_lo": -0.009578856178503263,
+    "ci95_hi": 0.026325677772467276,
+    "n_cz": 188,
+    "role": "target",
+    "kind": "log",
+    "label": "CWIFT-deflated teacher salary per K-12 FTE, audit variant 28"
+   },
+   "gap_teachers_pp": {
+    "value": -0.017718866687234436,
+    "se": 0.013082144834898024,
+    "ci95_lo": -0.04361942027344692,
+    "ci95_hi": 0.007706555422917719,
+    "n_cz": 188,
+    "role": "target",
+    "kind": "log",
+    "label": "K-12 FTE teachers per K-12 pupil, audit FTE variant 11"
+   },
+   "gap_income": {
+    "value": 0.11222726669759567,
+    "se": 0.016778769750979593,
+    "ci95_lo": 0.08079931073920729,
+    "ci95_hi": 0.14655088431310354,
+    "n_cz": 188,
+    "role": "target",
+    "kind": "log",
+    "label": "log pooled median earnings, full-time year-round workers (`pm_ftyr_all`)"
+   }
+  },
+  "acs_sampling_se": {
+   "gap_edu_res": 0.004131958323335903,
+   "net_commute_gap_edu": 0.004131958323335903,
+   "gap_edu_res_emp": 0.003954293199590995
+  }
+ },
+ "composition": {
+  "n_sample": 95593,
+  "weighted": 9278703.0,
+  "counts": {
+   "edu": 9278703.0,
+   "k12": 4830619.0,
+   "pub_k12": 3421416.0,
+   "k12p": 5416423.0
+  },
+  "share_by_occ": {
+   "2205": {
+    "label": "postsecondary teachers (25-1000)",
+    "value": 0.14881594981539983,
+    "se": 0.0014461167257473631
+   },
+   "2300": {
+    "label": "preschool and kindergarten teachers (25-2010)",
+    "value": 0.06313425486299108,
+    "se": 0.001098997246835224
+   },
+   "2310": {
+    "label": "elementary and middle school teachers (25-2020)",
+    "value": 0.41230137444856246,
+    "se": 0.0018985872499717618
+   },
+   "2320": {
+    "label": "secondary school teachers (25-2030)",
+    "value": 0.08098427118531545,
+    "se": 0.0010746870806305417
+   },
+   "2330": {
+    "label": "special education teachers (25-2050)",
+    "value": 0.027327957366455203,
+    "se": 0.0007894921389342798
+   },
+   "2350": {
+    "label": "tutors (25-3041)",
+    "value": 0.019955914097045675,
+    "se": 0.0006055655508616233
+   },
+   "2360": {
+    "label": "other teachers and instructors (25-30XX)",
+    "value": 0.07527528362530841,
+    "se": 0.0011501794917640668
+   },
+   "2400": {
+    "label": "archivists, curators and museum technicians (25-4010)",
+    "value": 0.00571987270203605,
+    "se": 0.0002953526503770905
+   },
+   "2435": {
+    "label": "librarians and media collections specialists (25-4022)",
+    "value": 0.018827092536532315,
+    "se": 0.0006170818832802686
+   },
+   "2440": {
+    "label": "library technicians (25-4031)",
+    "value": 0.004082682676662891,
+    "se": 0.00024685546204216205
+   },
+   "2545": {
+    "label": "teaching assistants (25-9040)",
+    "value": 0.1309768186351045,
+    "se": 0.0016583066274912938
+   },
+   "2555": {
+    "label": "other educational instruction and library workers (25-90XX)",
+    "value": 0.012598528048586102,
+    "se": 0.0003886072876245376
+   }
+  },
+  "socp_by_occ": {
+   "2205": [
+    "251000"
+   ],
+   "2300": [
+    "252010"
+   ],
+   "2310": [
+    "252020"
+   ],
+   "2320": [
+    "252030"
+   ],
+   "2330": [
+    "252050"
+   ],
+   "2350": [
+    "253041"
+   ],
+   "2360": [
+    "2530XX"
+   ],
+   "2400": [
+    "254010"
+   ],
+   "2435": [
+    "254022"
+   ],
+   "2440": [
+    "254031"
+   ],
+   "2545": [
+    "259040"
+   ],
+   "2555": [
+    "2590XX"
+   ]
+  },
+  "share_k12": {
+   "value": 0.5206136030003331,
+   "se": 0.001967186899909538
+  },
+  "share_k12p": {
+   "value": 0.5837478578633242,
+   "se": 0.0019901005495896592
+  },
+  "share_pub_k12": {
+   "value": 0.3687386049537311,
+   "se": 0.002080376593029302
+  },
+  "share_pub_k12p": {
+   "value": 0.3772741729097267,
+   "se": 0.002042387096766964
+  },
+  "share_pub_k12_sch": {
+   "value": 0.36742365824189005,
+   "se": 0.00208711185701659
+  },
+  "by_class": {
+   "city": {
+    "k12": {
+     "value": 0.46352780993129583,
+     "se": 0.0035441430734761605
+    },
+    "k12p": {
+     "value": 0.5235612899924111,
+     "se": 0.0034691489366748653
+    },
+    "pub_k12": {
+     "value": 0.3101289305571548,
+     "se": 0.003732860355061864
+    },
+    "pub_k12p": {
+     "value": 0.31792859966210185,
+     "se": 0.003804597343471005
+    },
+    "occ": {
+     "2205": {
+      "value": 0.19598057456148324,
+      "se": 0.002441575818443181
+     },
+     "2300": {
+      "value": 0.06003348006111525,
+      "se": 0.0018005669166853092
+     },
+     "2310": {
+      "value": 0.36628210385687343,
+      "se": 0.0036060164160315053
+     },
+     "2320": {
+      "value": 0.07515943768042165,
+      "se": 0.001935541160168215
+     },
+     "2330": {
+      "value": 0.022086268394000793,
+      "se": 0.001081601230896457
+     },
+     "2350": {
+      "value": 0.02404746465301472,
+      "se": 0.0010843335896227667
+     },
+     "2360": {
+      "value": 0.0796568899770582,
+      "se": 0.0016660928474566184
+     },
+     "2400": {
+      "value": 0.00894137151083826,
+      "se": 0.000698668201108886
+     },
+     "2435": {
+      "value": 0.019152722813779617,
+      "se": 0.0009052933900377936
+     },
+     "2440": {
+      "value": 0.003345649309153888,
+      "se": 0.0004087149526881699
+     },
+     "2545": {
+      "value": 0.1305126449180944,
+      "se": 0.0029051573523375435
+     },
+     "2555": {
+      "value": 0.01480139226416657,
+      "se": 0.0008696789176976773
+     }
+    },
+    "edu_workers_share": {
+     "value": 0.32010141934707903,
+     "se": 0.001778828195154599
+    }
+   },
+   "suburb": {
+    "k12": {
+     "value": 0.5427225684307732,
+     "se": 0.0026962758469626508
+    },
+    "k12p": {
+     "value": 0.6092133983867394,
+     "se": 0.002773992955332385
+    },
+    "pub_k12": {
+     "value": 0.38700882761027566,
+     "se": 0.0024950008111877587
+    },
+    "pub_k12p": {
+     "value": 0.3952824441508685,
+     "se": 0.002413664342884674
+    },
+    "occ": {
+     "2205": {
+      "value": 0.1300300507821156,
+      "se": 0.00188230837281792
+     },
+     "2300": {
+      "value": 0.06649082995596618,
+      "se": 0.0014445669890779463
+     },
+     "2310": {
+      "value": 0.43026705200437637,
+      "se": 0.0026552544180681132
+     },
+     "2320": {
+      "value": 0.08276955945337226,
+      "se": 0.0013938846950012473
+     },
+     "2330": {
+      "value": 0.02968595697302456,
+      "se": 0.0010574299243043764
+     },
+     "2350": {
+      "value": 0.01929249402188642,
+      "se": 0.0007964302003519426
+     },
+     "2360": {
+      "value": 0.07680881849929853,
+      "se": 0.0018359304168958158
+     },
+     "2400": {
+      "value": 0.004169623230212,
+      "se": 0.0003084404852328997
+     },
+     "2435": {
+      "value": 0.01817446903464565,
+      "se": 0.0007088107480271802
+     },
+     "2440": {
+      "value": 0.004357247589258621,
+      "se": 0.00031975297555069234
+     },
+     "2545": {
+      "value": 0.12692401831151975,
+      "se": 0.002069243843191693
+     },
+     "2555": {
+      "value": 0.011029880144324055,
+      "se": 0.0005068981124698829
+     }
+    },
+    "edu_workers_share": {
+     "value": 0.5583284646571832,
+     "se": 0.002103908271703111
+    }
+   },
+   "other": {
+    "k12": {
+     "value": 0.569385281907212,
+     "se": 0.005447353189358889
+    },
+    "k12p": {
+     "value": 0.6252685031112231,
+     "se": 0.005306015321517552
+    },
+    "pub_k12": {
+     "value": 0.4391527402609722,
+     "se": 0.005596881986261683
+    },
+    "pub_k12p": {
+     "value": 0.4508290241335871,
+     "se": 0.005526386249640796
+    },
+    "occ": {
+     "2205": {
+      "value": 0.11090563672581788,
+      "se": 0.0033716067716859565
+     },
+     "2300": {
+      "value": 0.055883221204010944,
+      "se": 0.002561881105503094
+     },
+     "2310": {
+      "value": 0.4509628878390586,
+      "se": 0.005407074784833452
+     },
+     "2320": {
+      "value": 0.08812221135749322,
+      "se": 0.003003737060873736
+     },
+     "2330": {
+      "value": 0.030300182710660248,
+      "se": 0.0018421043243901267
+     },
+     "2350": {
+      "value": 0.012229468986616289,
+      "se": 0.0010645926027870196
+     },
+     "2360": {
+      "value": 0.056695268582897536,
+      "se": 0.002326904768242327
+     },
+     "2400": {
+      "value": 0.004357219287366369,
+      "se": 0.0006913464942488402
+     },
+     "2435": {
+      "value": 0.020966956941099082,
+      "se": 0.001664957303739579
+     },
+     "2440": {
+      "value": 0.004762356462203893,
+      "se": 0.0005775205302317266
+     },
+     "2545": {
+      "value": 0.15081209170461687,
+      "se": 0.004422216085478023
+     },
+     "2555": {
+      "value": 0.014002498198159064,
+      "se": 0.0011618022047117727
+     }
+    },
+    "edu_workers_share": {
+     "value": 0.12157011599573776,
+     "se": 0.0012532965956832472
+    }
+   },
+   "metro": {
+    "k12": {
+     "value": 0.5138638569249966,
+     "se": 0.0020273498498225616
+    },
+    "k12p": {
+     "value": 0.5780016170410113,
+     "se": 0.0020374621199780534
+    },
+    "pub_k12": {
+     "value": 0.35899365575184433,
+     "se": 0.0021509014652437946
+    },
+    "pub_k12p": {
+     "value": 0.3670945650000184,
+     "se": 0.0021073724161820716
+    },
+    "occ": {
+     "2205": {
+      "value": 0.15406253949052165,
+      "se": 0.0015100104085782546
+     },
+     "2300": {
+      "value": 0.06413776011601471,
+      "se": 0.0012081441917651246
+     },
+     "2310": {
+      "value": 0.40695082256839604,
+      "se": 0.001985643646720413
+     },
+     "2320": {
+      "value": 0.07999641748121938,
+      "se": 0.0011889602087670845
+     },
+     "2330": {
+      "value": 0.026916616875381102,
+      "se": 0.0008021127978815362
+     },
+     "2350": {
+      "value": 0.021025213816253593,
+      "se": 0.0006612708425150253
+     },
+     "2360": {
+      "value": 0.07784666083484956,
+      "se": 0.001312088943023885
+     },
+     "2400": {
+      "value": 0.005908456830035248,
+      "se": 0.0003330289744918329
+     },
+     "2435": {
+      "value": 0.01853094645974758,
+      "se": 0.0006222218453217164
+     },
+     "2440": {
+      "value": 0.003988619368421569,
+      "se": 0.00026261867845081733
+     },
+     "2545": {
+      "value": 0.12823172025926638,
+      "se": 0.001684914077557075
+     },
+     "2555": {
+      "value": 0.012404225899893137,
+      "se": 0.0004387068959747639
+     }
+    }
+   }
+  },
+  "split": {
+   "k12": {
+    "diff": {
+     "value": 0.07919475849947732,
+     "se": 0.004636762626059603
+    },
+    "log_ratio": {
+     "value": 0.15773188260995175,
+     "se": 0.009470906591962973
+    }
+   },
+   "k12p": {
+    "diff": {
+     "value": 0.08565210839432824,
+     "se": 0.0046502607426352725
+    },
+    "log_ratio": {
+     "value": 0.15151451338442568,
+     "se": 0.008398000639018945
+    }
+   },
+   "pub_k12": {
+    "diff": {
+     "value": 0.07687989705312087,
+     "se": 0.004301125738151836
+    },
+    "log_ratio": {
+     "value": 0.22145938709434787,
+     "se": 0.013138222799232714
+    }
+   },
+   "pub_k12p": {
+    "diff": {
+     "value": 0.07735384448876664,
+     "se": 0.0043695371962202715
+    },
+    "log_ratio": {
+     "value": 0.2177737296537421,
+     "se": 0.013078337623085724
+    }
+   },
+   "occ": {
+    "2205": {
+     "diff": {
+      "value": -0.06595052377936764,
+      "se": 0.003059111417689626
+     },
+     "log_ratio": {
+      "value": -0.41024996133398495,
+      "se": 0.018934667050067983
+     }
+    },
+    "2300": {
+     "diff": {
+      "value": 0.006457349894850931,
+      "se": 0.0021281956581970627
+     },
+     "log_ratio": {
+      "value": 0.10216163513834964,
+      "se": 0.03424558473123777
+     }
+    },
+    "2310": {
+     "diff": {
+      "value": 0.06398494814750294,
+      "se": 0.004757935299143335
+     },
+     "log_ratio": {
+      "value": 0.16100225501644883,
+      "se": 0.012300515038253551
+     }
+    },
+    "2320": {
+     "diff": {
+      "value": 0.007610121772950618,
+      "se": 0.0022589918153254553
+     },
+     "log_ratio": {
+      "value": 0.09644866145951969,
+      "se": 0.02920685587675188
+     }
+    },
+    "2330": {
+     "diff": {
+      "value": 0.007599688579023767,
+      "se": 0.0014548455133373754
+     },
+     "log_ratio": {
+      "value": 0.29571802902432553,
+      "se": 0.05858989118928384
+     }
+    },
+    "2350": {
+     "diff": {
+      "value": -0.0047549706311283,
+      "se": 0.001303913770040306
+     },
+     "log_ratio": {
+      "value": -0.22031346167930055,
+      "se": 0.059304506459318555
+     }
+    },
+    "2360": {
+     "diff": {
+      "value": -0.0028480714777596727,
+      "se": 0.0024861176952098484
+     },
+     "log_ratio": {
+      "value": -0.036409078007999085,
+      "se": 0.03188795382956054
+     }
+    },
+    "2400": {
+     "diff": {
+      "value": -0.00477174828062626,
+      "se": 0.0007478600608978239
+     },
+     "log_ratio": {
+      "value": -0.7628633110027847,
+      "se": 0.10526180958679085
+     }
+    },
+    "2435": {
+     "diff": {
+      "value": -0.0009782537791339675,
+      "se": 0.000997982140138883
+     },
+     "log_ratio": {
+      "value": -0.052427080063641274,
+      "se": 0.053079329044990534
+     }
+    },
+    "2440": {
+     "diff": {
+      "value": 0.001011598280104733,
+      "se": 0.0004957128042178478
+     },
+     "log_ratio": {
+      "value": 0.26417978305612255,
+      "se": 0.13766533565756348
+     }
+    },
+    "2545": {
+     "diff": {
+      "value": -0.0035886266065746353,
+      "se": 0.0035723262683030796
+     },
+     "log_ratio": {
+      "value": -0.027881491587300022,
+      "se": 0.027717134325846788
+     }
+    },
+    "2555": {
+     "diff": {
+      "value": -0.0037715121198425156,
+      "se": 0.001030317918342978
+     },
+     "log_ratio": {
+      "value": -0.29411328137744164,
+      "se": 0.07664167033751011
+     }
+    }
+   },
+   "postsecondary_etc_share_city": {
+    "value": 0.19598057456148324,
+    "se": 0.002441575818443181
+   }
+  },
+  "dispersion": {
+   "k12": {
+    "mean_w": {
+     "value": 0.5206136030003331,
+     "se": 0.001967186899909538
+    },
+    "sd_w": {
+     "value": 0.13796617357830648,
+     "se": 0.014403936500453766
+    },
+    "sd_w_net_of_sampling": {
+     "value": 0.10186512594848926,
+     "se": 0.019111421935384277
+    },
+    "mean_u": {
+     "value": 0.529511389749327,
+     "se": 0.0020319561365130215
+    },
+    "sd_u": {
+     "value": 0.13602559354920915,
+     "se": 0.01628359311789899
+    },
+    "sd_u_net_of_sampling": {
+     "value": 0.0924786179819789,
+     "se": 0.023197035962925147
+    },
+    "p10": {
+     "value": 0.33506796648783277,
+     "se": 0.020048232217047376
+    },
+    "p25": {
+     "value": 0.43452833581741224,
+     "se": 0.014780429885644418
+    },
+    "p50": {
+     "value": 0.528323389092975,
+     "se": 0.0050372356281055556
+    },
+    "p75": {
+     "value": 0.618499386754093,
+     "se": 0.011333088082879812
+    },
+    "p90": {
+     "value": 0.6895195559073239,
+     "se": 0.02217681753854356
+    },
+    "n_puma": 2351,
+    "mean_sampling_var_w": 0.008658161167337817,
+    "mean_sampling_sd_w": 0.09304924055218192,
+    "mean_edu_sample_per_puma": 40.66056997022544,
+    "min_edu_sample_per_puma": 4
+   },
+   "pub_k12": {
+    "mean_w": {
+     "value": 0.3687386049537311,
+     "se": 0.0020803765930293015
+    },
+    "sd_w": {
+     "value": 0.132820107820689,
+     "se": 0.014086031006263933
+    },
+    "sd_w_net_of_sampling": {
+     "value": 0.09760859184532755,
+     "se": 0.018762726794508123
+    },
+    "mean_u": {
+     "value": 0.37547156889930444,
+     "se": 0.0020884793972271477
+    },
+    "sd_u": {
+     "value": 0.1349210447839138,
+     "se": 0.015347472411881878
+    },
+    "sd_u_net_of_sampling": {
+     "value": 0.09444566401053248,
+     "se": 0.021329379131659828
+    },
+    "p10": {
+     "value": 0.1942831473442405,
+     "se": 0.018942171525222415
+    },
+    "p25": {
+     "value": 0.2751556451584237,
+     "se": 0.00958094133715733
+    },
+    "p50": {
+     "value": 0.3695986649025163,
+     "se": 0.004718290253480204
+    },
+    "p75": {
+     "value": 0.4610389591002887,
+     "se": 0.009393939193787412
+    },
+    "p90": {
+     "value": 0.5393737066569737,
+     "se": 0.018666549576850114
+    },
+    "n_puma": 2351,
+    "mean_sampling_var_w": 0.00811374383947171,
+    "mean_sampling_sd_w": 0.09007632230209951,
+    "mean_edu_sample_per_puma": 40.66056997022544,
+    "min_edu_sample_per_puma": 4
+   }
+  }
+ },
+ "commute": {
+  "n_sample": {
+   "T": 46103,
+   "T_f": 35270,
+   "T_m": 10833,
+   "T@metro": 38096,
+   "T_f@metro": 29107,
+   "T_m@metro": 8989,
+   "T@city": 11922,
+   "T@suburb": 26174,
+   "Tpub": 32979,
+   "Tpub_f": 25045,
+   "Tpub_m": 7934,
+   "Tpub@metro": 26927,
+   "Tpub_f@metro": 20434,
+   "Tpub_m@metro": 6493,
+   "Tpub@city": 8076,
+   "Tpub@suburb": 18851,
+   "O": 1159207,
+   "O_f": 544648,
+   "O_m": 614559,
+   "O@metro": 972023,
+   "O_f@metro": 457523,
+   "O_m@metro": 514500,
+   "O@city": 345611,
+   "O@suburb": 626412,
+   "Obach": 441221,
+   "Obach_f": 218772,
+   "Obach_m": 222449,
+   "Obach@metro": 400300,
+   "Obach_f@metro": 197050,
+   "Obach_m@metro": 203250,
+   "Obach@city": 156263,
+   "Obach@suburb": 244037,
+   "Otherpub": 120189,
+   "Otherpub_f": 66284,
+   "Otherpub_m": 53905,
+   "Otherpub@metro": 96477,
+   "Otherpub_f@metro": 53178,
+   "Otherpub_m@metro": 43299,
+   "Otherpub@city": 33941,
+   "Otherpub@suburb": 62536
+  },
+  "stats": {
+   "T": {
+    "mean": {
+     "value": 22.935228067805117,
+     "se": 0.12118394665011428
+    },
+    "gt30": {
+     "value": 0.18551517315589097,
+     "se": 0.002406929571529834
+    },
+    "ge30": {
+     "value": 0.3019313263302146,
+     "se": 0.003222834659670026
+    },
+    "eq30": {
+     "value": 0.11641615317432362,
+     "se": 0.0020550433348209027
+    },
+    "home": {
+     "value": 0.015158428390367554,
+     "se": 0.0007497419968926863
+    },
+    "out": {
+     "value": 0.20656804370807771,
+     "se": 0.0022788759624860575
+    }
+   },
+   "T_f": {
+    "mean": {
+     "value": 22.447686616942576,
+     "se": 0.13035054107430485
+    },
+    "gt30": {
+     "value": 0.1759163690561678,
+     "se": 0.0028363684832400783
+    },
+    "ge30": {
+     "value": 0.29100370537039344,
+     "se": 0.003490286416823418
+    },
+    "eq30": {
+     "value": 0.11508733631422562,
+     "se": 0.0021910158304146265
+    },
+    "home": {
+     "value": 0.015680536796043587,
+     "se": 0.0008443068475535842
+    },
+    "out": {
+     "value": 0.198012123054366,
+     "se": 0.002397985067000734
+    }
+   },
+   "T_m": {
+    "mean": {
+     "value": 24.44542425830178,
+     "se": 0.24833070587210548
+    },
+    "gt30": {
+     "value": 0.21524818838788765,
+     "se": 0.0047773883784365066
+    },
+    "ge30": {
+     "value": 0.3357804513954109,
+     "se": 0.006400294110679777
+    },
+    "eq30": {
+     "value": 0.12053226300752326,
+     "se": 0.004679797374054326
+    },
+    "home": {
+     "value": 0.01352073203991235,
+     "se": 0.0012957351211476398
+    },
+    "out": {
+     "value": 0.2331143935566321,
+     "se": 0.00443599820773528
+    }
+   },
+   "T@metro": {
+    "mean": {
+     "value": 23.60822229371903,
+     "se": 0.13256402993402383
+    },
+    "gt30": {
+     "value": 0.19395454287377834,
+     "se": 0.0026483215739936177
+    },
+    "ge30": {
+     "value": 0.3158606205601317,
+     "se": 0.0033962293962109596
+    },
+    "eq30": {
+     "value": 0.1219060776863534,
+     "se": 0.0022574021861788878
+    },
+    "home": {
+     "value": 0.015101889425691286,
+     "se": 0.000851554975734371
+    },
+    "out": {
+     "value": 0.2137574491983615,
+     "se": 0.0024473138992625724
+    }
+   },
+   "T_f@metro": {
+    "mean": {
+     "value": 23.055353707426292,
+     "se": 0.13844990281400013
+    },
+    "gt30": {
+     "value": 0.1833122177022183,
+     "se": 0.0031224579533889562
+    },
+    "ge30": {
+     "value": 0.30357573192140924,
+     "se": 0.0037165236593373167
+    },
+    "eq30": {
+     "value": 0.12026351421919096,
+     "se": 0.002505601737313021
+    },
+    "home": {
+     "value": 0.015514353512056064,
+     "se": 0.0009544472921512818
+    },
+    "out": {
+     "value": 0.2046004605703555,
+     "se": 0.0025470408385352508
+    }
+   },
+   "T_m@metro": {
+    "mean": {
+     "value": 25.30419130357998,
+     "se": 0.2863760080223582
+    },
+    "gt30": {
+     "value": 0.226600734267753,
+     "se": 0.005342730012466707
+    },
+    "ge30": {
+     "value": 0.3535455079590957,
+     "se": 0.006994030786601843
+    },
+    "eq30": {
+     "value": 0.12694477369134263,
+     "se": 0.004964231705773033
+    },
+    "home": {
+     "value": 0.013819806595885267,
+     "se": 0.0013943368843748797
+    },
+    "out": {
+     "value": 0.2418994470461279,
+     "se": 0.005069392360702089
+    }
+   },
+   "T@city": {
+    "mean": {
+     "value": 23.34829310240189,
+     "se": 0.22147790633400144
+    },
+    "gt30": {
+     "value": 0.17920009984006785,
+     "se": 0.004315055287156039
+    },
+    "ge30": {
+     "value": 0.3033009622428456,
+     "se": 0.005534236927186464
+    },
+    "eq30": {
+     "value": 0.12410086240277775,
+     "se": 0.00417045302250592
+    },
+    "home": {
+     "value": 0.015213149638696737,
+     "se": 0.0012848646461140036
+    },
+    "out": {
+     "value": 0.15561627372481146,
+     "se": 0.003329045948965619
+    }
+   },
+   "T@suburb": {
+    "mean": {
+     "value": 23.733713803695288,
+     "se": 0.15407205084109923
+    },
+    "gt30": {
+     "value": 0.2010778572109506,
+     "se": 0.0030682892683898057
+    },
+    "ge30": {
+     "value": 0.3219243122872338,
+     "se": 0.0035782518616784124
+    },
+    "eq30": {
+     "value": 0.12084645507628322,
+     "se": 0.00255780554126608
+    },
+    "home": {
+     "value": 0.015048086414091876,
+     "se": 0.0010372964100071995
+    },
+    "out": {
+     "value": 0.24180838511792102,
+     "se": 0.0029291042601562213
+    }
+   },
+   "Tpub": {
+    "mean": {
+     "value": 22.580771646828254,
+     "se": 0.1470001008065468
+    },
+    "gt30": {
+     "value": 0.1798400775870534,
+     "se": 0.0029190303945302457
+    },
+    "ge30": {
+     "value": 0.29329601048124687,
+     "se": 0.0035767687482990756
+    },
+    "eq30": {
+     "value": 0.11345593289419348,
+     "se": 0.0021843854352478157
+    },
+    "home": {
+     "value": 0.010673582335956347,
+     "se": 0.000672666673743322
+    },
+    "out": {
+     "value": 0.19928826700791435,
+     "se": 0.0025907610212118474
+    }
+   },
+   "Tpub_f": {
+    "mean": {
+     "value": 22.121672187530393,
+     "se": 0.15936730114843367
+    },
+    "gt30": {
+     "value": 0.17085799645308222,
+     "se": 0.0033438919672135843
+    },
+    "ge30": {
+     "value": 0.2834114590452902,
+     "se": 0.004043078153170714
+    },
+    "eq30": {
+     "value": 0.11255346259220798,
+     "se": 0.0023957312710192573
+    },
+    "home": {
+     "value": 0.010620307138066947,
+     "se": 0.0007276124693711277
+    },
+    "out": {
+     "value": 0.19007487026164685,
+     "se": 0.002741526792241556
+    }
+   },
+   "Tpub_m": {
+    "mean": {
+     "value": 23.96045438199281,
+     "se": 0.27919159973970414
+    },
+    "gt30": {
+     "value": 0.2068329699013683,
+     "se": 0.005452811714785276
+    },
+    "ge30": {
+     "value": 0.3230010007286598,
+     "se": 0.007321186344110966
+    },
+    "eq30": {
+     "value": 0.11616803082729148,
+     "se": 0.00521591996917626
+    },
+    "home": {
+     "value": 0.010835468622155193,
+     "se": 0.0014062122988963233
+    },
+    "out": {
+     "value": 0.2270261879049676,
+     "se": 0.004879227688682072
+    }
+   },
+   "Tpub@metro": {
+    "mean": {
+     "value": 23.27843057742906,
+     "se": 0.1604053532439868
+    },
+    "gt30": {
+     "value": 0.18885975914522016,
+     "se": 0.00313610975163674
+    },
+    "ge30": {
+     "value": 0.3076839653335094,
+     "se": 0.0038081179886921856
+    },
+    "eq30": {
+     "value": 0.11882420618828922,
+     "se": 0.0024186724271271407
+    },
+    "home": {
+     "value": 0.010415416372152847,
+     "se": 0.0007103662039566785
+    },
+    "out": {
+     "value": 0.20729161176330838,
+     "se": 0.0029020788818136163
+    }
+   },
+   "Tpub_f@metro": {
+    "mean": {
+     "value": 22.764586150130427,
+     "se": 0.17027302185598686
+    },
+    "gt30": {
+     "value": 0.1791603764764219,
+     "se": 0.003541954313668865
+    },
+    "ge30": {
+     "value": 0.2965539737718765,
+     "se": 0.00428399905110493
+    },
+    "eq30": {
+     "value": 0.11739359729545457,
+     "se": 0.0027130645372445803
+    },
+    "home": {
+     "value": 0.010243732920530116,
+     "se": 0.0007627305544455363
+    },
+    "out": {
+     "value": 0.19756761912669937,
+     "se": 0.003001140924506658
+    }
+   },
+   "Tpub_m@metro": {
+    "mean": {
+     "value": 24.804115237890258,
+     "se": 0.3200044697328908
+    },
+    "gt30": {
+     "value": 0.21765874686904416,
+     "se": 0.006054228888244833
+    },
+    "ge30": {
+     "value": 0.3407306551378868,
+     "se": 0.008086098015807647
+    },
+    "eq30": {
+     "value": 0.12307190826884266,
+     "se": 0.005797760318172307
+    },
+    "home": {
+     "value": 0.01093179321198444,
+     "se": 0.0014457353910729642
+    },
+    "out": {
+     "value": 0.23622441240995184,
+     "se": 0.005832309908683765
+    }
+   },
+   "Tpub@city": {
+    "mean": {
+     "value": 23.047400271487035,
+     "se": 0.27338232325228745
+    },
+    "gt30": {
+     "value": 0.17175473143258704,
+     "se": 0.005568780705567418
+    },
+    "ge30": {
+     "value": 0.29501591257814097,
+     "se": 0.006459085851146415
+    },
+    "eq30": {
+     "value": 0.12326118114555396,
+     "se": 0.004916161365804962
+    },
+    "home": {
+     "value": 0.010604888586288146,
+     "se": 0.0014000413746088733
+    },
+    "out": {
+     "value": 0.15207020377371863,
+     "se": 0.004924700245156428
+    }
+   },
+   "Tpub@suburb": {
+    "mean": {
+     "value": 23.382659781563724,
+     "se": 0.1811414585516951
+    },
+    "gt30": {
+     "value": 0.19657668363233277,
+     "se": 0.0037303731467365616
+    },
+    "ge30": {
+     "value": 0.31339915084237213,
+     "se": 0.004346347010929475
+    },
+    "eq30": {
+     "value": 0.11682246721003936,
+     "se": 0.0027350669721780143
+    },
+    "home": {
+     "value": 0.01032958314022557,
+     "se": 0.0008451727192881938
+    },
+    "out": {
+     "value": 0.23218872535172286,
+     "se": 0.0033462276889939303
+    }
+   },
+   "O": {
+    "mean": {
+     "value": 28.2029830507262,
+     "se": 0.027897676905103717
+    },
+    "gt30": {
+     "value": 0.270775394011789,
+     "se": 0.0005981362886156911
+    },
+    "ge30": {
+     "value": 0.4129201921305156,
+     "se": 0.0006666347370270309
+    },
+    "eq30": {
+     "value": 0.14214479811872663,
+     "se": 0.0004189840203639192
+    },
+    "home": {
+     "value": 0.054426534678572294,
+     "se": 0.000272622677560875
+    },
+    "out": {
+     "value": 0.27060980113805727,
+     "se": 0.000559041073782203
+    }
+   },
+   "O_f": {
+    "mean": {
+     "value": 26.43846978659952,
+     "se": 0.03599676056382964
+    },
+    "gt30": {
+     "value": 0.24340754338986048,
+     "se": 0.0007751702696565144
+    },
+    "ge30": {
+     "value": 0.38024986788503135,
+     "se": 0.0009147831157630989
+    },
+    "eq30": {
+     "value": 0.1368423244951709,
+     "se": 0.0006170478273765024
+    },
+    "home": {
+     "value": 0.06059716957654565,
+     "se": 0.0004088912011693768
+    },
+    "out": {
+     "value": 0.2441976674395514,
+     "se": 0.0006339384227462123
+    }
+   },
+   "O_m": {
+    "mean": {
+     "value": 29.696591419457523,
+     "se": 0.04004027346681726
+    },
+    "gt30": {
+     "value": 0.29394147133982346,
+     "se": 0.000755877746988821
+    },
+    "ge30": {
+     "value": 0.4405746567890017,
+     "se": 0.000841589585475121
+    },
+    "eq30": {
+     "value": 0.14663318544917822,
+     "se": 0.0005357587188886484
+    },
+    "home": {
+     "value": 0.049100176577533496,
+     "se": 0.0003921920949850353
+    },
+    "out": {
+     "value": 0.2929766041380968,
+     "se": 0.0007291014741406809
+    }
+   },
+   "O@metro": {
+    "mean": {
+     "value": 28.719557636350824,
+     "se": 0.029513866915745358
+    },
+    "gt30": {
+     "value": 0.27808316751307705,
+     "se": 0.000649531037111152
+    },
+    "ge30": {
+     "value": 0.4254712290954507,
+     "se": 0.0007230412487966888
+    },
+    "eq30": {
+     "value": 0.14738806158237366,
+     "se": 0.0004657296673213781
+    },
+    "home": {
+     "value": 0.055494764244031415,
+     "se": 0.00027379955433973473
+    },
+    "out": {
+     "value": 0.27296982796315766,
+     "se": 0.0006088940971817389
+    }
+   },
+   "O_f@metro": {
+    "mean": {
+     "value": 27.08221597816888,
+     "se": 0.03758948709212294
+    },
+    "gt30": {
+     "value": 0.25245014090239715,
+     "se": 0.0008596194316229286
+    },
+    "ge30": {
+     "value": 0.3941006553978834,
+     "se": 0.0010206838420419955
+    },
+    "eq30": {
+     "value": 0.14165051449548627,
+     "se": 0.0007158388605337168
+    },
+    "home": {
+     "value": 0.061952885492215,
+     "se": 0.00042551925821340456
+    },
+    "out": {
+     "value": 0.2469428173267045,
+     "se": 0.0006827217104782658
+    }
+   },
+   "O_m@metro": {
+    "mean": {
+     "value": 30.1075674245065,
+     "se": 0.04251085133514817
+    },
+    "gt30": {
+     "value": 0.29981283624647037,
+     "se": 0.0008083372971936777
+    },
+    "ge30": {
+     "value": 0.4520647400677611,
+     "se": 0.0009104341335306083
+    },
+    "eq30": {
+     "value": 0.1522519038212907,
+     "se": 0.000598619332484006
+    },
+    "home": {
+     "value": 0.049906560064774126,
+     "se": 0.00039637705059198487
+    },
+    "out": {
+     "value": 0.2950430301679791,
+     "se": 0.0007881893184499874
+    }
+   },
+   "O@city": {
+    "mean": {
+     "value": 27.53160141859411,
+     "se": 0.04996492451795893
+    },
+    "gt30": {
+     "value": 0.24720583270960275,
+     "se": 0.0009174651542297299
+    },
+    "ge30": {
+     "value": 0.3970751957401813,
+     "se": 0.001167483659991051
+    },
+    "eq30": {
+     "value": 0.14986936303057857,
+     "se": 0.0008343833176293027
+    },
+    "home": {
+     "value": 0.05379691436791383,
+     "se": 0.00045080652819381436
+    },
+    "out": {
+     "value": 0.19402187604479532,
+     "se": 0.0009391700664718104
+    }
+   },
+   "O@suburb": {
+    "mean": {
+     "value": 29.42006871599831,
+     "se": 0.03856628060378622
+    },
+    "gt30": {
+     "value": 0.29629083780976834,
+     "se": 0.0008523320800817677
+    },
+    "ge30": {
+     "value": 0.4422157317009158,
+     "se": 0.0008991844711775206
+    },
+    "eq30": {
+     "value": 0.1459248938911475,
+     "se": 0.0006206441215504029
+    },
+    "home": {
+     "value": 0.056492559969331974,
+     "se": 0.0003426277991261115
+    },
+    "out": {
+     "value": 0.31951368388083584,
+     "se": 0.0007882415787161237
+    }
+   },
+   "Obach": {
+    "mean": {
+     "value": 29.62480563315095,
+     "se": 0.04228417904906102
+    },
+    "gt30": {
+     "value": 0.3055832883922871,
+     "se": 0.0008966613465992383
+    },
+    "ge30": {
+     "value": 0.44630036308693677,
+     "se": 0.001010438125107645
+    },
+    "eq30": {
+     "value": 0.1407170746946496,
+     "se": 0.0006053087965686882
+    },
+    "home": {
+     "value": 0.07734267402958747,
+     "se": 0.0005094005490326404
+    },
+    "out": {
+     "value": 0.30446286056276367,
+     "se": 0.0009091572500082046
+    }
+   },
+   "Obach_f": {
+    "mean": {
+     "value": 28.664681457749975,
+     "se": 0.0616207769799431
+    },
+    "gt30": {
+     "value": 0.2900693006312533,
+     "se": 0.0011624199560694257
+    },
+    "ge30": {
+     "value": 0.4312094500458369,
+     "se": 0.0013522865318951398
+    },
+    "eq30": {
+     "value": 0.1411401494145836,
+     "se": 0.0009575183599951532
+    },
+    "home": {
+     "value": 0.08004797930756427,
+     "se": 0.0006910123024263991
+    },
+    "out": {
+     "value": 0.28465567817859183,
+     "se": 0.0012934384856221782
+    }
+   },
+   "Obach_m": {
+    "mean": {
+     "value": 30.542750893610414,
+     "se": 0.0548602484896758
+    },
+    "gt30": {
+     "value": 0.3204157360078466,
+     "se": 0.0012015567745917988
+    },
+    "ge30": {
+     "value": 0.46072832194579827,
+     "se": 0.001365638094421425
+    },
+    "eq30": {
+     "value": 0.14031258593795162,
+     "se": 0.0008360422387946302
+    },
+    "home": {
+     "value": 0.07471297376297469,
+     "se": 0.0006912037483305572
+    },
+    "out": {
+     "value": 0.3234173007341757,
+     "se": 0.001034778905499257
+    }
+   },
+   "Obach@metro": {
+    "mean": {
+     "value": 30.045970705870996,
+     "se": 0.046913500332410166
+    },
+    "gt30": {
+     "value": 0.3120587217666964,
+     "se": 0.0009883512595099436
+    },
+    "ge30": {
+     "value": 0.4559517954095439,
+     "se": 0.0011159467089465794
+    },
+    "eq30": {
+     "value": 0.14389307364284745,
+     "se": 0.0006419435731057775
+    },
+    "home": {
+     "value": 0.07792148225930211,
+     "se": 0.0004935242393546164
+    },
+    "out": {
+     "value": 0.30773601029488445,
+     "se": 0.0009542254671539736
+    }
+   },
+   "Obach_f@metro": {
+    "mean": {
+     "value": 29.087598451233372,
+     "se": 0.06350685796078288
+    },
+    "gt30": {
+     "value": 0.29656451604369966,
+     "se": 0.0012467481840384147
+    },
+    "ge30": {
+     "value": 0.44067934630393657,
+     "se": 0.0014547843740597662
+    },
+    "eq30": {
+     "value": 0.14411483026023694,
+     "se": 0.0010090055167018927
+    },
+    "home": {
+     "value": 0.08071717469887028,
+     "se": 0.000675822793726389
+    },
+    "out": {
+     "value": 0.2867910383040126,
+     "se": 0.0013318706432806444
+    }
+   },
+   "Obach_m@metro": {
+    "mean": {
+     "value": 30.95234952331727,
+     "se": 0.05872712297906935
+    },
+    "gt30": {
+     "value": 0.3267123386598411,
+     "se": 0.0012683719237788593
+    },
+    "ge30": {
+     "value": 0.4703956863849591,
+     "se": 0.0014532470412388055
+    },
+    "eq30": {
+     "value": 0.14368334772511795,
+     "se": 0.0008901853074974611
+    },
+    "home": {
+     "value": 0.07523255199137395,
+     "se": 0.0007085052598113654
+    },
+    "out": {
+     "value": 0.32756241191556873,
+     "se": 0.0010892985448383028
+    }
+   },
+   "Obach@city": {
+    "mean": {
+     "value": 27.90457458412099,
+     "se": 0.06328622580582446
+    },
+    "gt30": {
+     "value": 0.2648561213973356,
+     "se": 0.0013247149675259832
+    },
+    "ge30": {
+     "value": 0.41087607009808635,
+     "se": 0.0016649523086884291
+    },
+    "eq30": {
+     "value": 0.14601994870075075,
+     "se": 0.0011470847172164597
+    },
+    "home": {
+     "value": 0.0747514891714744,
+     "se": 0.0008697290094169225
+    },
+    "out": {
+     "value": 0.2174629723720884,
+     "se": 0.0012942736805417682
+    }
+   },
+   "Obach@suburb": {
+    "mean": {
+     "value": 31.4599986125913,
+     "se": 0.06461947148733586
+    },
+    "gt30": {
+     "value": 0.34322801058444946,
+     "se": 0.0013337427677091258
+    },
+    "ge30": {
+     "value": 0.48571664501334855,
+     "se": 0.0014061381097554028
+    },
+    "eq30": {
+     "value": 0.14248863442889909,
+     "se": 0.0009466773170130872
+    },
+    "home": {
+     "value": 0.08000429055255019,
+     "se": 0.0005774558140866222
+    },
+    "out": {
+     "value": 0.36732419742383604,
+     "se": 0.0012421035384833524
+    }
+   },
+   "Otherpub": {
+    "mean": {
+     "value": 26.247545498168908,
+     "se": 0.0842844195637052
+    },
+    "gt30": {
+     "value": 0.24100230953737167,
+     "se": 0.0017215572330340977
+    },
+    "ge30": {
+     "value": 0.3721294210184862,
+     "se": 0.001944657617312126
+    },
+    "eq30": {
+     "value": 0.13112711148111453,
+     "se": 0.001211224990203439
+    },
+    "home": {
+     "value": 0.01976170235720118,
+     "se": 0.0005150821356428033
+    },
+    "out": {
+     "value": 0.2299671656260204,
+     "se": 0.0016929532610036764
+    }
+   },
+   "Otherpub_f": {
+    "mean": {
+     "value": 25.074819818164254,
+     "se": 0.09563529877576186
+    },
+    "gt30": {
+     "value": 0.22293938624174794,
+     "se": 0.002055232842781463
+    },
+    "ge30": {
+     "value": 0.3508292153637642,
+     "se": 0.002147757205356518
+    },
+    "eq30": {
+     "value": 0.12788982912201624,
+     "se": 0.0015288808509705035
+    },
+    "home": {
+     "value": 0.022904636213334648,
+     "se": 0.0007567317548446011
+    },
+    "out": {
+     "value": 0.20544185507050228,
+     "se": 0.002130830981221516
+    }
+   },
+   "Otherpub_m": {
+    "mean": {
+     "value": 27.642099227414693,
+     "se": 0.135168718232667
+    },
+    "gt30": {
+     "value": 0.2624819423896963,
+     "se": 0.0025900162103484076
+    },
+    "ge30": {
+     "value": 0.39745868747522217,
+     "se": 0.0031022645597912563
+    },
+    "eq30": {
+     "value": 0.13497674508552587,
+     "se": 0.002062751394253898
+    },
+    "home": {
+     "value": 0.015953850990348982,
+     "se": 0.0006706625923049305
+    },
+    "out": {
+     "value": 0.2591374744219595,
+     "se": 0.00254804396570806
+    }
+   },
+   "Otherpub@metro": {
+    "mean": {
+     "value": 27.11857642746259,
+     "se": 0.09420938393725078
+    },
+    "gt30": {
+     "value": 0.25292472632399005,
+     "se": 0.0018894394141628934
+    },
+    "ge30": {
+     "value": 0.3907829780203995,
+     "se": 0.0020585815100422466
+    },
+    "eq30": {
+     "value": 0.1378582516964095,
+     "se": 0.0013045352649163366
+    },
+    "home": {
+     "value": 0.020379231702065882,
+     "se": 0.0005131383342430116
+    },
+    "out": {
+     "value": 0.2373555830387367,
+     "se": 0.001873902635244292
+    }
+   },
+   "Otherpub_f@metro": {
+    "mean": {
+     "value": 25.946101138118976,
+     "se": 0.10927668214814863
+    },
+    "gt30": {
+     "value": 0.23479778765281262,
+     "se": 0.0022617484534218986
+    },
+    "ge30": {
+     "value": 0.3682897670596492,
+     "se": 0.002509884444887234
+    },
+    "eq30": {
+     "value": 0.13349197940683663,
+     "se": 0.0017146181546189596
+    },
+    "home": {
+     "value": 0.023844592195655493,
+     "se": 0.0008408298348760716
+    },
+    "out": {
+     "value": 0.2112854736654624,
+     "se": 0.0024722767753862394
+    }
+   },
+   "Otherpub_m@metro": {
+    "mean": {
+     "value": 28.51119616928298,
+     "se": 0.15492426109555688
+    },
+    "gt30": {
+     "value": 0.2744551866088984,
+     "se": 0.0029381804122724864
+    },
+    "ge30": {
+     "value": 0.4174995237127254,
+     "se": 0.0034133776996618354
+    },
+    "eq30": {
+     "value": 0.14304433710382697,
+     "se": 0.0021749591984625036
+    },
+    "home": {
+     "value": 0.01618218038702952,
+     "se": 0.0006820689359340714
+    },
+    "out": {
+     "value": 0.26832675608801804,
+     "se": 0.002798402767387359
+    }
+   },
+   "Otherpub@city": {
+    "mean": {
+     "value": 26.57127938050851,
+     "se": 0.15347359984816636
+    },
+    "gt30": {
+     "value": 0.2311484595752633,
+     "se": 0.0033041633598120818
+    },
+    "ge30": {
+     "value": 0.3702098614872593,
+     "se": 0.003499506716735399
+    },
+    "eq30": {
+     "value": 0.139061401911996,
+     "se": 0.002437325529992
+    },
+    "home": {
+     "value": 0.022196776781855217,
+     "se": 0.0008770723554065613
+    },
+    "out": {
+     "value": 0.16833994683734657,
+     "se": 0.0027271314192031226
+    }
+   },
+   "Otherpub@suburb": {
+    "mean": {
+     "value": 27.434058385823036,
+     "se": 0.10072535618794035
+    },
+    "gt30": {
+     "value": 0.26547735988542087,
+     "se": 0.0021552373590276144
+    },
+    "ge30": {
+     "value": 0.4026420719613857,
+     "se": 0.0021441725365448873
+    },
+    "eq30": {
+     "value": 0.1371647120759648,
+     "se": 0.0015623515033131555
+    },
+    "home": {
+     "value": 0.019325542861768335,
+     "se": 0.0006596251718101775
+    },
+    "out": {
+     "value": 0.27713088075714715,
+     "se": 0.0022555622884688578
+    }
+   }
+  },
+  "diff_T_minus_O": {
+   "all": {
+    "mean": {
+     "value": -5.267754982921083,
+     "se": 0.11723340637306168
+    },
+    "gt30": {
+     "value": -0.08526022085589804,
+     "se": 0.0024487203769160736
+    },
+    "ge30": {
+     "value": -0.11098886580030104,
+     "se": 0.003230968956410339
+    },
+    "home": {
+     "value": -0.03926810628820474,
+     "se": 0.0008009443874384771
+    },
+    "out": {
+     "value": -0.06404175742997956,
+     "se": 0.0022476113413445685
+    }
+   },
+   "@metro": {
+    "mean": {
+     "value": -5.111335342631794,
+     "se": 0.12891266073464705
+    },
+    "gt30": {
+     "value": -0.08412862463929871,
+     "se": 0.002708859767109333
+    },
+    "ge30": {
+     "value": -0.10961060853531901,
+     "se": 0.003403827375886723
+    },
+    "home": {
+     "value": -0.04039287481834013,
+     "se": 0.0008808495127321486
+    },
+    "out": {
+     "value": -0.05921237876479615,
+     "se": 0.002417834365333956
+    }
+   },
+   "@city": {
+    "mean": {
+     "value": -4.183308316192221,
+     "se": 0.2225449644266931
+    },
+    "gt30": {
+     "value": -0.0680057328695349,
+     "se": 0.004334773468394207
+    },
+    "ge30": {
+     "value": -0.09377423349733571,
+     "se": 0.005523467885647594
+    },
+    "home": {
+     "value": -0.038583764729217096,
+     "se": 0.0013570752951380374
+    },
+    "out": {
+     "value": -0.038405602319983856,
+     "se": 0.003472112313846741
+    }
+   },
+   "@suburb": {
+    "mean": {
+     "value": -5.68635491230302,
+     "se": 0.15368790028195375
+    },
+    "gt30": {
+     "value": -0.09521298059881775,
+     "se": 0.003199123740203131
+    },
+    "ge30": {
+     "value": -0.12029141941368204,
+     "se": 0.0037953144220784713
+    },
+    "home": {
+     "value": -0.0414444735552401,
+     "se": 0.001106107196804904
+    },
+    "out": {
+     "value": -0.07770529876291482,
+     "se": 0.002900292303616113
+    }
+   }
+  },
+  "diff_T_minus_Obach": {
+   "mean": {
+    "value": -6.689577565345832,
+    "se": 0.11483199415430372
+   },
+   "gt30": {
+    "value": -0.12006811523639613,
+    "se": 0.0024713988814825086
+   },
+   "ge30": {
+    "value": -0.1443690367567222,
+    "se": 0.003265375851188586
+   },
+   "home": {
+    "value": -0.06218424563921992,
+    "se": 0.000917752384021889
+   },
+   "out": {
+    "value": -0.09789481685468596,
+    "se": 0.0023884254793811554
+   }
+  },
+  "fe": {
+   "T": {
+    "coef": 17.510862026010425,
+    "se": 0.2842445688990164,
+    "n": 43338,
+    "n_cross": 8875,
+    "share_cross": 0.20656804370807771,
+    "n_puma": 2350,
+    "kind": "pow"
+   },
+   "T@metro": {
+    "coef": 17.114177597337758,
+    "se": 0.31274644562130594,
+    "n": 35738,
+    "n_cross": 7597,
+    "share_cross": 0.2137574491983615,
+    "n_puma": 2005,
+    "kind": "pow"
+   },
+   "Tpub@metro": {
+    "coef": 17.100470779640542,
+    "se": 0.3997502251531346,
+    "n": 25319,
+    "n_cross": 5251,
+    "share_cross": 0.20729161176330838,
+    "n_puma": 1998,
+    "kind": "pow"
+   },
+   "T_f@metro": {
+    "coef": 16.29573354784747,
+    "se": 0.33278874694710936,
+    "n": 27235,
+    "n_cross": 5577,
+    "share_cross": 0.2046004605703555,
+    "n_puma": 2004,
+    "kind": "pow"
+   },
+   "T_m@metro": {
+    "coef": 19.431620946533073,
+    "se": 0.7481941980984643,
+    "n": 8503,
+    "n_cross": 2020,
+    "share_cross": 0.2418994470461279,
+    "n_puma": 1913,
+    "kind": "pow"
+   },
+   "T@suburb": {
+    "coef": 17.307579103433806,
+    "se": 0.36972922830821414,
+    "n": 24603,
+    "n_cross": 5856,
+    "share_cross": 0.24180838511792102,
+    "n_puma": 1273,
+    "kind": "pow"
+   },
+   "T@city": {
+    "coef": 16.52617008407437,
+    "se": 0.7077827697409278,
+    "n": 11135,
+    "n_cross": 1741,
+    "share_cross": 0.15561627372481146,
+    "n_puma": 732,
+    "kind": "pow"
+   },
+   "O": {
+    "coef": 19.429875791406438,
+    "se": 0.08308652393807017,
+    "n": 1073580,
+    "n_cross": 296969,
+    "share_cross": 0.27060980113805727,
+    "n_puma": 2351,
+    "kind": "pow"
+   },
+   "O@metro": {
+    "coef": 18.82678156144328,
+    "se": 0.08875577646539937,
+    "n": 898494,
+    "n_cross": 250580,
+    "share_cross": 0.27296982796315766,
+    "n_puma": 2006,
+    "kind": "pow"
+   },
+   "Obach@metro": {
+    "coef": 20.11710630198102,
+    "se": 0.11401905447472784,
+    "n": 362485,
+    "n_cross": 112747,
+    "share_cross": 0.30773601029488445,
+    "n_puma": 2006,
+    "kind": "pow"
+   },
+   "T@metro:type": {
+    "coef": 16.042731954891877,
+    "se": 0.46774086317958025,
+    "n": 35671,
+    "n_cross": 2968,
+    "share_cross": 0.0853224284683293,
+    "n_puma": 2024,
+    "kind": "type"
+   },
+   "O@metro:type": {
+    "coef": 17.421259275121617,
+    "se": 0.12398108401383119,
+    "n": 894476,
+    "n_cross": 107424,
+    "share_cross": 0.1200606330446314,
+    "n_puma": 2025,
+    "kind": "type"
+   },
+   "T@metro:type_same_class": {
+    "coef": 16.899349841136836,
+    "se": 0.5243330285674591,
+    "n": 28639,
+    "n_cross": 2486,
+    "share_cross": 0.08854250070668573,
+    "n_puma": 1590,
+    "kind": "type"
+   },
+   "T@metro:type_mixed": {
+    "coef": 12.173102260307695,
+    "se": 0.534458537374035,
+    "n": 35066,
+    "n_cross": 8419,
+    "share_cross": 0.24346589379864067,
+    "n_puma": 2002,
+    "kind": "type_mixed"
+   }
+  },
+  "raw_outside_minus_inside": {
+   "T@metro": {
+    "outside": 36.37584743664262,
+    "inside": 20.12454762618457,
+    "diff": 16.251299810458054,
+    "se": 0.3177757211207399,
+    "n": 35738
+   },
+   "O@metro": {
+    "outside": 41.79015583374528,
+    "inside": 23.805081561043927,
+    "diff": 17.985074272701354,
+    "se": 0.08300459396673433,
+    "n": 898494
+   }
+  }
+ },
+ "flows": {
+  "n_sample": 1445532,
+  "k12": {
+   "res": {
+    "city": {
+     "value": 0.008595719114811317,
+     "se": 9.534228922924293e-05
+    },
+    "suburb": {
+     "value": 0.017853855496535714,
+     "se": 0.00013506199139782965
+    },
+    "other": {
+     "value": 0.0038320279764549985,
+     "se": 6.103551070057136e-05
+    }
+   },
+   "work": {
+    "city": {
+     "value": 0.009329479071398465,
+     "se": 0.00010214002779219488
+    },
+    "suburb": {
+     "value": 0.017183972286629365,
+     "se": 0.00013571332410735484
+    },
+    "other": {
+     "value": 0.003768151229774202,
+     "se": 6.257277427875744e-05
+    }
+   },
+   "gap_res": {
+    "value": 0.7309551771262717,
+    "se": 0.013492874135933766
+   },
+   "gap_work": {
+    "value": 0.6107979260013074,
+    "se": 0.01360737011558049
+   },
+   "gap_res_emp": {
+    "value": 0.1278222207244366,
+    "se": 0.013383351923309889
+   },
+   "net_commute_gap": {
+    "value": 0.12015725112496423,
+    "se": 0.00759321336139994
+   },
+   "share_cross_class": {
+    "value": 0.09860503092812056,
+    "se": 0.0013700695653224783
+   },
+   "share_metro_cross": {
+    "value": 0.08411161409235339,
+    "se": 0.0015473589977347097
+   },
+   "x": {
+    "city->city": {
+     "value": 0.007767812240566265,
+     "se": 9.227965339369321e-05
+    },
+    "city->suburb": {
+     "value": 0.0007327308494317975,
+     "se": 2.748711325587529e-05
+    },
+    "city->other": {
+     "value": 9.517602481325491e-05,
+     "se": 9.098512955788377e-06
+    },
+    "suburb->city": {
+     "value": 0.0014613714895327773,
+     "se": 3.611812705542666e-05
+    },
+    "suburb->suburb": {
+     "value": 0.016123690394777238,
+     "se": 0.00012461148450980243
+    },
+    "suburb->other": {
+     "value": 0.0002687936122256986,
+     "se": 1.5784311075918307e-05
+    },
+    "other->city": {
+     "value": 0.0001002953412994224,
+     "se": 8.470414270372828e-06
+    },
+    "other->suburb": {
+     "value": 0.00032755104242032787,
+     "se": 1.3641293659050119e-05
+    },
+    "other->other": {
+     "value": 0.003404181592735248,
+     "se": 6.0741331133332905e-05
+    }
+   },
+   "live_given_work": {
+    "work_city": {
+     "live_city": {
+      "value": 0.8326094287922433,
+      "se": 0.0035459300151692574
+     },
+     "live_suburb": {
+      "value": 0.15664020234665915,
+      "se": 0.0035177028248912336
+     },
+     "live_other": {
+      "value": 0.010750368861097448,
+      "se": 0.0009027433823959067
+     }
+    },
+    "work_suburb": {
+     "live_city": {
+      "value": 0.04264036494064451,
+      "se": 0.0014876334982707718
+     },
+     "live_suburb": {
+      "value": 0.9382982075292849,
+      "se": 0.0016152446228297607
+     },
+     "live_other": {
+      "value": 0.019061427530070642,
+      "se": 0.0007779887044600846
+     }
+    }
+   }
+  },
+  "pub_k12": {
+   "res": {
+    "city": {
+     "value": 0.0057614203577020465,
+     "se": 8.334530864633701e-05
+    },
+    "suburb": {
+     "value": 0.01266044329518302,
+     "se": 0.00010924854756720411
+    },
+    "other": {
+     "value": 0.0029657557252655946,
+     "se": 5.1367262884597884e-05
+    }
+   },
+   "work": {
+    "city": {
+     "value": 0.006213290166417705,
+     "se": 8.483635689190253e-05
+    },
+    "suburb": {
+     "value": 0.01225314628045704,
+     "se": 0.00011171736295581609
+    },
+    "other": {
+     "value": 0.0029211829312759162,
+     "se": 5.412429416303726e-05
+    }
+   },
+   "gap_res": {
+    "value": 0.7872983973319645,
+    "se": 0.016281162675629558
+   },
+   "gap_work": {
+    "value": 0.6790921701339334,
+    "se": 0.015662430021721675
+   },
+   "gap_res_emp": {
+    "value": 0.18416544093012943,
+    "se": 0.016233163014056022
+   },
+   "net_commute_gap": {
+    "value": 0.10820622719803108,
+    "se": 0.007961491385646165
+   },
+   "share_cross_class": {
+    "value": 0.09445052121084341,
+    "se": 0.0016368013470919522
+   },
+   "share_metro_cross": {
+    "value": 0.07968675600851809,
+    "se": 0.0019102000520315329
+   },
+   "x": {
+    "city->city": {
+     "value": 0.005193536742982959,
+     "se": 7.810064879986591e-05
+    },
+    "city->suburb": {
+     "value": 0.0004982910626913791,
+     "se": 2.2340633010871923e-05
+    },
+    "city->other": {
+     "value": 6.959255202770849e-05,
+     "se": 7.221195161005065e-06
+    },
+    "suburb->city": {
+     "value": 0.0009486270429079805,
+     "se": 2.699533336977302e-05
+    },
+    "suburb->suburb": {
+     "value": 0.011517118355234536,
+     "se": 0.00010427298467954353
+    },
+    "suburb->other": {
+     "value": 0.00019469789704050348,
+     "se": 1.4576464234306128e-05
+    },
+    "other->city": {
+     "value": 7.112638052676508e-05,
+     "se": 7.670179964386452e-06
+    },
+    "other->suburb": {
+     "value": 0.0002377368625311255,
+     "se": 1.1207590685745731e-05
+    },
+    "other->other": {
+     "value": 0.002656892482207704,
+     "se": 5.212176213860904e-05
+    }
+   },
+   "live_given_work": {
+    "work_city": {
+     "live_city": {
+      "value": 0.8358754546912319,
+      "se": 0.004195992227022505
+     },
+     "live_suburb": {
+      "value": 0.15267708693780752,
+      "se": 0.004088291112683944
+     },
+     "live_other": {
+      "value": 0.011447458370960527,
+      "se": 0.00121277996866478
+     }
+    },
+    "work_suburb": {
+     "live_city": {
+      "value": 0.040666376723676304,
+      "se": 0.0017477089236659638
+     },
+     "live_suburb": {
+      "value": 0.9399315156796568,
+      "se": 0.0017173130001966954
+     },
+     "live_other": {
+      "value": 0.019402107596666832,
+      "se": 0.0008836015584795595
+     }
+    }
+   }
+  },
+  "edu": {
+   "res": {
+    "city": {
+     "value": 0.017874273769076573,
+     "se": 0.00013100743921139825
+    },
+    "suburb": {
+     "value": 0.033813472125672414,
+     "se": 0.00019612956755181709
+    },
+    "other": {
+     "value": 0.006706140726313285,
+     "se": 8.620444336807481e-05
+    }
+   },
+   "work": {
+    "city": {
+     "value": 0.01956138679569914,
+     "se": 0.00013531331442378998
+    },
+    "suburb": {
+     "value": 0.03232759215426796,
+     "se": 0.00019697169134510215
+    },
+    "other": {
+     "value": 0.006504907671095177,
+     "se": 8.603486495588947e-05
+    }
+   },
+   "gap_res": {
+    "value": 0.6374968472240958,
+    "se": 0.009182788115887752
+   },
+   "gap_work": {
+    "value": 0.5023635501610615,
+    "se": 0.008901004178597871
+   },
+   "gap_res_emp": {
+    "value": 0.03436389082226077,
+    "se": 0.009062657921642368
+   }
+  },
+  "edu_res_vs_pubk12_work": {
+   "gap_edu_res": {
+    "value": 0.6374968472240958,
+    "se": 0.009182788115887752
+   },
+   "gap_pubk12_work": {
+    "value": 0.6790921701339334,
+    "se": 0.015662430021721675
+   },
+   "net_commute_gap": {
+    "value": -0.041595322909837584,
+    "se": 0.012517263042808792
+   },
+   "composition": {
+    "value": -0.14980155010786866,
+    "se": 0.012391590686946206
+   }
+  }
+ },
+ "wages": {
+  "k12": {
+   "median_hourly": 23.837576470588232,
+   "se_median": 0.0,
+   "geometric_mean_hourly": 23.234865461218153,
+   "se_geometric_mean": 0.08354428253629256,
+   "share_at_median": 0.022586562931586614,
+   "n": 32822,
+   "annual_hours_mean": 2247.686400790293,
+   "se_annual_hours_mean": 2.9415028859243737,
+   "n_hours": 32888
+  },
+  "k12_public": {
+   "median_hourly": 24.632162352941176,
+   "se_median": 0.27674265723370695,
+   "geometric_mean_hourly": 24.11518224496464,
+   "se_geometric_mean": 0.09106168235394141,
+   "share_at_median": 0.002402653094752583,
+   "n": 23869,
+   "annual_hours_mean": 2251.977928966501,
+   "se_annual_hours_mean": 3.719908113140906,
+   "n_hours": 23869
+  },
+  "other": {
+   "median_hourly": 22.34772794117647,
+   "se_median": 0.035317552739237375,
+   "geometric_mean_hourly": 23.21545312326948,
+   "se_geometric_mean": 0.027683869224732198,
+   "share_at_median": 0.01581509414829757,
+   "n": 878787,
+   "annual_hours_mean": 2248.0243229620287,
+   "se_annual_hours_mean": 0.7059185181898944,
+   "n_hours": 918138
+  },
+  "other_bachelor": {
+   "median_hourly": 33.76989999999999,
+   "se_median": 0.0,
+   "geometric_mean_hourly": 33.51049087056903,
+   "se_geometric_mean": 0.05060633420196393,
+   "share_at_median": 0.005879568089561196,
+   "n": 351215,
+   "annual_hours_mean": 2279.483845469159,
+   "se_annual_hours_mean": 0.8688046744834009,
+   "n_hours": 362670
+  }
+ },
+ "rk": {
+  "cbar_cu": 61224.13,
+  "adults_per_cu": 1.9,
+  "adults_per_cu_range": [
+   1.8,
+   2.0
+  ],
+  "cbar_adult": 32223.226315789474,
+  "ce_persons": 2.5,
+  "ce_children_under_18": 0.6,
+  "ce_source": "https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-size-2018.xlsx",
+  "cpi_ratio_2018_over_2015": 1.059447212647194,
+  "vtt_2018": {
+   "central": 14.40848209200184,
+   "low": 10.064748520148344,
+   "high": 17.268989566149266
+  },
+  "vtt_2015": {
+   "central": 13.6,
+   "low": 9.5,
+   "high": 16.3,
+   "income_hour": 27.2,
+   "share_central": 0.5,
+   "share_low": 0.35,
+   "share_high": 0.6
+  },
+  "days": {
+   "low": 180.0,
+   "central": 185.0,
+   "high": 190.0
+  },
+  "days_other": {
+   "low": 240.0,
+   "central": 250.0,
+   "high": 260.0
+  },
+  "delta_min": {
+   "central": 16.578454776114818,
+   "low": 13.8,
+   "high": 20.738228497709404,
+   "ci_low": 15.1259598630599,
+   "ci_high": 17.727160630755517
+  },
+  "delta_se": 0.3495291243579108,
+  "delta_min_other": {
+   "central": 18.12402041828245,
+   "low": 15.589810201282187,
+   "high": 19.342518299981034,
+   "se": 0.09630081513957346
+  },
+  "annual_hours": {
+   "teachers": 2247.686400790293,
+   "other_workers": 2248.0243229620287
+  },
+  "delta_estimates": {
+   "pow_crossing_teachers_metro": {
+    "coef": 17.114177597337758,
+    "se": 0.31274644562130594,
+    "n": 35738
+   },
+   "class_crossing_teachers_metro": {
+    "coef": 16.042731954891877,
+    "se": 0.46774086317958025,
+    "n": 35671
+   },
+   "pow_crossing_all_other_workers_metro": {
+    "coef": 18.82678156144328,
+    "se": 0.08875577646539937,
+    "n": 898494
+   },
+   "class_crossing_all_other_workers_metro": {
+    "coef": 17.421259275121617,
+    "se": 0.12398108401383119,
+    "n": 894476
+   },
+   "santelli_grissom_2024_out_of_county": {
+    "coef": 13.8,
+    "se": null,
+    "n": null
+   }
+  },
+  "teacher_median_hourly_wage": 23.837576470588232,
+  "vtt_half_teacher_wage": 11.918788235294116,
+  "central_per_cu": 0.024059695754828393,
+  "central_per_adult": 0.045713421934173944,
+  "central_se_from_delta_per_cu": 0.0005072586379774596,
+  "central_se_from_delta_per_adult": 0.0009637914121571731,
+  "low_per_cu": 0.013611645889754298,
+  "high_per_cu": 0.037046595731671475,
+  "low_per_adult": 0.025862127190533164,
+  "high_per_adult": 0.0703885318901758,
+  "annual_time_cost_central_usd": 1473.0339406540616,
+  "annual_hours_central": 102.23380445270803,
+  "tau_k": {
+   "teachers": {
+    "extra_one_way_minutes": [
+     13.8,
+     16.578454776114818,
+     20.738228497709404
+    ],
+    "days": [
+     180.0,
+     185.0,
+     190.0
+    ],
+    "annual_hours": 2247.686400790293,
+    "value_of_time_share_of_own_wage": [
+     0.35,
+     0.5,
+     0.6
+    ],
+    "central": 0.02274200805253845,
+    "low": 0.012893257702591672,
+    "high": 0.03506061533476715,
+    "central_with_2080_hours": 0.0245754337626702,
+    "se_from_extra_minutes": 0.0004794773860466613
+   },
+   "other_workers": {
+    "extra_one_way_minutes": [
+     15.589810201282187,
+     18.12402041828245,
+     19.342518299981034
+    ],
+    "days": [
+     240.0,
+     250.0,
+     260.0
+    ],
+    "annual_hours": 2248.0243229620287,
+    "value_of_time_share_of_own_wage": [
+     0.35,
+     0.5,
+     0.6
+    ],
+    "central": 0.033592497630693594,
+    "low": 0.01941770296598674,
+    "high": 0.04474199595286153,
+    "central_with_2080_hours": 0.036306130645597845,
+    "se_from_extra_minutes": 0.00017849157249606276
+   }
+  },
+  "sensitivity": {
+   "extra minutes at its low end (smallest estimate)": {
+    "delta_min": 13.8,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.020027427519661883,
+    "r_k_per_adult": 0.038052112287357574,
+    "tau_k": 0.018930576785551267
+   },
+   "extra minutes at its high end (largest estimate)": {
+    "delta_min": 20.738228497709404,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.03009662087855519,
+    "r_k_per_adult": 0.05718357966925486,
+    "tau_k": 0.028448306302332995
+   },
+   "value of time at 35% of hourly household income": {
+    "delta_min": 16.578454776114818,
+    "days": 185.0,
+    "vtt": 10.064748520148344,
+    "r_k_per_cu": 0.016806405122858067,
+    "r_k_per_adult": 0.03193216973343033,
+    "tau_k": 0.015919405636776917
+   },
+   "value of time at 60% of hourly household income": {
+    "delta_min": 16.578454776114818,
+    "days": 185.0,
+    "vtt": 17.268989566149266,
+    "r_k_per_cu": 0.028836253000272268,
+    "r_k_per_adult": 0.0547888807005173,
+    "tau_k": 0.027290409663046144
+   },
+   "value of time at 50% of the teacher median hourly wage": {
+    "delta_min": 16.578454776114818,
+    "days": 185.0,
+    "vtt": 11.918788235294116,
+    "r_k_per_cu": 0.01990233370013254,
+    "r_k_per_adult": 0.03781443403025182,
+    "tau_k": 0.02274200805253845
+   },
+   "days 180": {
+    "delta_min": 16.578454776114818,
+    "days": 180.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.023409433707400597,
+    "r_k_per_adult": 0.04447792404406113,
+    "tau_k": 0.022127359186253626
+   },
+   "days 190": {
+    "delta_min": 16.578454776114818,
+    "days": 190.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.024709957802256186,
+    "r_k_per_adult": 0.046948919824286756,
+    "tau_k": 0.023356656918823274
+   },
+   "days 250 (a full-year worker)": {
+    "delta_min": 16.578454776114818,
+    "days": 250.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.03251310237138972,
+    "r_k_per_adult": 0.061774894505640464,
+    "tau_k": 0.03073244331424115
+   },
+   "extra minutes: crossing a POWPUMA (teachers, metro)": {
+    "delta_min": 17.114177597337758,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.02483717039052921,
+    "r_k_per_adult": 0.04719062374200549,
+    "tau_k": 0.023476902400577076
+   },
+   "extra minutes: crossing a POWPUMA of the other class, city / suburb (teachers)": {
+    "delta_min": 16.042731954891877,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.023282221119127585,
+    "r_k_per_adult": 0.04423622012634241,
+    "tau_k": 0.022007113704499832
+   },
+   "extra minutes: Santelli-Grissom out-of-county, 13.8": {
+    "delta_min": 13.8,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.020027427519661883,
+    "r_k_per_adult": 0.038052112287357574,
+    "tau_k": 0.018930576785551267
+   },
+   "central with the class-of-area minutes at PUMA class cut pc >= 0.25, metro >= 0.5": {
+    "delta_min": 16.221119563318066,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.023541108430588546,
+    "r_k_per_adult": 0.04472810601811823,
+    "tau_k": 0.0222518224232609
+   },
+   "central with the class-of-area minutes at PUMA class cut pc >= 0.75, metro >= 0.5": {
+    "delta_min": 18.055048114352513,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.02620262083146398,
+    "r_k_per_adult": 0.049784979579781556,
+    "tau_k": 0.02476757063011397
+   },
+   "central with the class-of-area minutes at PUMA class cut pc >= 0.9, metro >= 0.5": {
+    "delta_min": 18.92620304752358,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.027466895634542195,
+    "r_k_per_adult": 0.05218710170563017,
+    "tau_k": 0.025962604351455035
+   },
+   "central with the class-of-area minutes at PUMA class cut pc >= 0.5, metro >= 0.9": {
+    "delta_min": 16.45181861155541,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.0238759133919964,
+    "r_k_per_adult": 0.045364235444793156,
+    "tau_k": 0.022568290977392106
+   },
+   "adults per consumer unit 1.8 (CE counts are rounded to one decimal)": {
+    "delta_min": 16.578454776114818,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.024059695754828393,
+    "r_k_per_adult": 0.04330745235869111,
+    "tau_k": 0.02274200805253845
+   },
+   "adults per consumer unit 2.0 (CE counts are rounded to one decimal)": {
+    "delta_min": 16.578454776114818,
+    "days": 185.0,
+    "vtt": 14.40848209200184,
+    "r_k_per_cu": 0.024059695754828393,
+    "r_k_per_adult": 0.048119391509656786,
+    "tau_k": 0.02274200805253845
+   }
+  },
+  "vehicle_cost_note": {
+   "mph": 35.0,
+   "miles_per_year": 3578.183155844781,
+   "usd_per_mile": [
+    0.1,
+    0.3
+   ],
+   "usd": [
+    357.8183155844781,
+    1073.4549467534343
+   ],
+   "per_cu": [
+    0.00584440016680479,
+    0.01753320050041437
+   ],
+   "per_adult": [
+    0.0111043603169291,
+    0.0333130809507873
+   ]
+  }
+ },
+ "k12": {
+  "headline": {
+   "gap_teach_res_emp": {
+    "label": "public K-12 teacher residents / employed residents (gap_teach_res_emp)",
+    "value": 0.29838831279106165,
+    "se": 0.040661806337129416,
+    "se_boot": 0.03653260661883041,
+    "se_survey": 0.017410189933589882,
+    "se_acs": 0.003954293199590995,
+    "se_quadrature_of_district_and_survey": 0.03021572361495499,
+    "ci95_lo": 0.218691172370288,
+    "ci95_hi": 0.3780854532118353,
+    "n_cz": 188,
+    "n_cz_composition": 118,
+    "weight_share_composition": 0.9348742409570497,
+    "corr_district_vs_composition": 0.1524556418322624,
+    "district_gap_edu": 0.027664095858414377,
+    "composition_term": 0.27072421693264725,
+    "per_cz_sum_common_czs": {
+     "value": 0.3009981880526531,
+     "se_boot": 0.03776979521324154,
+     "n_cz": 118
+    },
+    "spec_lo": 0.17746564596628303,
+    "spec_hi": 0.3656468834114655,
+    "spec_n": 15
+   },
+   "net_commute_gap": {
+    "label": "public K-12 teacher residents per K-12 FTE (net_commute_gap)",
+    "value": 0.07518811242971601,
+    "se": 0.03793487693220949,
+    "se_boot": 0.033449470769392156,
+    "se_survey": 0.017410189933589882,
+    "se_acs": 0.004131958323335903,
+    "se_quadrature_of_district_and_survey": 0.034765973966407855,
+    "ci95_lo": 0.0008357536425854101,
+    "ci95_hi": 0.1495404712168466,
+    "n_cz": 188,
+    "n_cz_composition": 118,
+    "weight_share_composition": 0.9348742409570497,
+    "corr_district_vs_composition": -0.23776125012905647,
+    "district_gap_edu": -0.19553610450293124,
+    "composition_term": 0.27072421693264725,
+    "per_cz_sum_common_czs": {
+     "value": 0.069640521566193,
+     "se_boot": 0.034899424122130714,
+     "n_cz": 118
+    },
+    "spec_lo": -0.04573455439506258,
+    "spec_hi": 0.14244668305011987,
+    "spec_n": 15
+   },
+   "gap_k12_res": {
+    "label": "public K-12 teacher residents (gap_edu_res + composition)",
+    "value": 0.45585160274762854,
+    "se": 0.11969190230589463,
+    "se_boot": 0.11834679414540288,
+    "se_survey": 0.017410189933589882,
+    "se_acs": 0.004131958323335903,
+    "se_quadrature_of_district_and_survey": 0.11329839721823656,
+    "ci95_lo": 0.22125547422807507,
+    "ci95_hi": 0.690447731267182,
+    "n_cz": 188,
+    "n_cz_composition": 118,
+    "weight_share_composition": 0.9348742409570497,
+    "corr_district_vs_composition": 0.17624441417206121,
+    "district_gap_edu": 0.18512738581498128,
+    "composition_term": 0.27072421693264725,
+    "per_cz_sum_common_czs": {
+     "value": 0.47705710736386964,
+     "se_boot": 0.125312170885873,
+     "n_cz": 118
+    },
+    "spec_lo": 0.33492893592284995,
+    "spec_hi": 0.5231101733680323,
+    "spec_n": 15
+   }
+  },
+  "specs": [
+   {
+    "key": "headline",
+    "label": "headline: residents counted once, public K-12 / EDU within CZs, PUMA classes 0.5 / 0.5",
+    "group": "headline",
+    "net_commute_gap": 0.07518811242971601,
+    "gap_teach_res_emp": 0.29838831279106165,
+    "gap_k12_res": 0.45585160274762854,
+    "n_cz": 188,
+    "in_range": true
+   },
+   {
+    "key": "earnings_rule",
+    "label": "earnings rule: every LEA takes its own layer's record (residents counted twice)",
+    "group": "district sample or overlap rule",
+    "net_commute_gap": 0.11812579215090852,
+    "gap_teach_res_emp": 0.30001505218925784,
+    "gap_k12_res": 0.49878928246882104,
+    "n_cz": 188,
+    "in_range": true
+   },
+   {
+    "key": "no_overlap_sec",
+    "label": "residents once from unified + secondary records",
+    "group": "district sample or overlap rule",
+    "net_commute_gap": 0.07156364213145397,
+    "gap_teach_res_emp": 0.2966775262637274,
+    "gap_k12_res": 0.4522271324493665,
+    "n_cz": 188,
+    "in_range": true
+   },
+   {
+    "key": "unified",
+    "label": "unified districts only",
+    "group": "district sample or overlap rule",
+    "net_commute_gap": 0.05465044062692134,
+    "gap_teach_res_emp": 0.2921717319260065,
+    "gap_k12_res": 0.36732056639389854,
+    "n_cz": 183,
+    "in_range": true
+   },
+   {
+    "key": "nyc_dropped",
+    "label": "New York City dropped from both counts (not in the range: the New York CZ keeps its weight with almost no city location left, so its gap is dominated by what remains; `drop_ny_cz` is the clean version)",
+    "group": "district sample or overlap rule",
+    "net_commute_gap": 0.05883436568399536,
+    "gap_teach_res_emp": 0.28458100638891975,
+    "gap_k12_res": 0.7026759940936828,
+    "n_cz": 188,
+    "in_range": false
+   },
+   {
+    "key": "drop_ny_cz",
+    "label": "New York CZ left out",
+    "group": "district sample or overlap rule",
+    "net_commute_gap": 0.0749704563516844,
+    "gap_teach_res_emp": 0.28534681975400283,
+    "gap_k12_res": 0.4975742739133794,
+    "n_cz": 187,
+    "in_range": true
+   },
+   {
+    "key": "all_sector",
+    "label": "composition: all-sector K-12 teachers / EDU",
+    "group": "composition term",
+    "net_commute_gap": -0.010854353791164478,
+    "gap_teach_res_emp": 0.21234584657018113,
+    "gap_k12_res": 0.3698091365267481,
+    "n_cz": null,
+    "in_range": true
+   },
+   {
+    "key": "incl_prek",
+    "label": "composition: public K-12 plus preschool / kindergarten (OCCP 2300) / EDU",
+    "group": "composition term",
+    "net_commute_gap": 0.06971979986397825,
+    "gap_teach_res_emp": 0.2929200002253239,
+    "gap_k12_res": 0.45038329018189077,
+    "n_cz": null,
+    "in_range": true
+   },
+   {
+    "key": "national_classes",
+    "label": "composition: national city / suburb PUMA split (not CZ by CZ)",
+    "group": "composition term",
+    "net_commute_gap": 0.02592328259141663,
+    "gap_teach_res_emp": 0.24912348295276224,
+    "gap_k12_res": 0.40658677290932915,
+    "n_cz": null,
+    "in_range": true
+   },
+   {
+    "key": "powpuma_classes",
+    "label": "composition: POWPUMA classes (county based, national)",
+    "group": "composition term",
+    "net_commute_gap": -0.04573455439506258,
+    "gap_teach_res_emp": 0.17746564596628303,
+    "gap_k12_res": 0.33492893592284995,
+    "n_cz": null,
+    "in_range": true
+   },
+   {
+    "key": "group_quarters",
+    "label": "composition: group quarters included (as in C24010)",
+    "group": "composition term",
+    "net_commute_gap": 0.0937805753087112,
+    "gap_teach_res_emp": 0.31698077567005684,
+    "gap_k12_res": 0.4744440656266237,
+    "n_cz": null,
+    "in_range": true
+   },
+   {
+    "key": "cut_0.25_0.5",
+    "label": "composition: PUMA class cut pc >= 0.25, metro >= 0.5",
+    "group": "composition term",
+    "net_commute_gap": 0.057748160437392226,
+    "gap_teach_res_emp": 0.28094836079873786,
+    "gap_k12_res": 0.43841165075530475,
+    "n_cz": 131,
+    "in_range": true
+   },
+   {
+    "key": "cut_0.75_0.5",
+    "label": "composition: PUMA class cut pc >= 0.75, metro >= 0.5",
+    "group": "composition term",
+    "net_commute_gap": 0.14188055882475703,
+    "gap_teach_res_emp": 0.36508075918610267,
+    "gap_k12_res": 0.5225440491426696,
+    "n_cz": 98,
+    "in_range": true
+   },
+   {
+    "key": "cut_0.9_0.5",
+    "label": "composition: PUMA class cut pc >= 0.9, metro >= 0.5",
+    "group": "composition term",
+    "net_commute_gap": 0.14244668305011987,
+    "gap_teach_res_emp": 0.3656468834114655,
+    "gap_k12_res": 0.5231101733680323,
+    "n_cz": 82,
+    "in_range": true
+   },
+   {
+    "key": "cut_0.5_0.9",
+    "label": "composition: PUMA class cut pc >= 0.5, metro >= 0.9",
+    "group": "composition term",
+    "net_commute_gap": 0.07391489300107257,
+    "gap_teach_res_emp": 0.2971150933624182,
+    "gap_k12_res": 0.4545783833189851,
+    "n_cz": 114,
+    "in_range": true
+   },
+   {
+    "key": "per_cz_sum",
+    "label": "district gap plus composition added CZ by CZ on the CZs that have both",
+    "group": "composition term",
+    "net_commute_gap": 0.069640521566193,
+    "gap_teach_res_emp": 0.3009981880526531,
+    "gap_k12_res": 0.47705710736386964,
+    "n_cz": 118,
+    "in_range": true
+   }
+  ],
+  "direct": {
+   "gap_teach_res_emp_within_cz_pums": {
+    "value": 0.31680761009679265,
+    "se_survey": 0.020084334689216884,
+    "n_cz": 118,
+    "weight_share": 0.9348742409570497,
+    "label": "PUMS: public K-12 teachers / employed residents, suburban against city PUMAs of the same CZ, CZ-weighted",
+    "se_cz_bootstrap": 0.03599732619409987,
+    "se": 0.041221208049169414
+   },
+   "gap_teach_res_emp_all_sector_within_cz_pums": {
+    "value": 0.23264559642186905,
+    "se_survey": 0.015297050710830764,
+    "n_cz": 119
+   },
+   "gap_teach_res_emp_powpuma_classes_national": {
+    "value": 0.18416544093012943,
+    "se": 0.016233163014056022
+   },
+   "net_commute_gap_powpuma_classes_national": {
+    "value": 0.10820622719803108,
+    "se": 0.007961491385646165
+   }
+  },
+  "composition": {
+   "pub_k12": {
+    "value": 0.2707242169326472,
+    "se_survey": 0.017410189933589882,
+    "se_cz_bootstrap": 0.02341829871003221,
+    "n_cz": 118,
+    "weight_share": 0.9348742409570497,
+    "n_sample": 64665
+   },
+   "k12": {
+    "value": 0.18468175071176676,
+    "se_survey": 0.011942524617434837,
+    "n_cz": 119
+   },
+   "pub_k12p": {
+    "value": 0.2652559043669095,
+    "se_survey": 0.01699102414489687,
+    "n_cz": 118
+   },
+   "group_quarters": {
+    "value": 0.28931667981164244,
+    "se_survey": 0.018617927958847032,
+    "n_cz": 119,
+    "gq_share_of_edu_workers": 0.012135503702454505,
+    "gq_share_by_class": {
+     "city": 0.017378755637426156,
+     "suburb": 0.008378670824642437,
+     "other": 0.015433426871898717
+    },
+    "n_gq_records": 2166,
+    "n_edu_records": 97759
+   }
+  }
+ },
+ "class_sensitivity": [
+  {
+   "pc_cut": 0.25,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_puma": {
+    "city": 990,
+    "other": 342,
+    "suburb": 1019
+   },
+   "pop_by_class": {
+    "city": 131652354.0,
+    "other": 44696097.0,
+    "suburb": 132397087.0
+   },
+   "share_edu_workers_city": 0.4134193926333518,
+   "s_pub_city": {
+    "value": 0.32333430479845465,
+    "se": 0.003319687963300129
+   },
+   "s_pub_suburb": {
+    "value": 0.3945264400960807,
+    "se": 0.003111891163365914
+   },
+   "delta_log_s_pub": {
+    "value": 0.19899937247377242,
+    "se": 0.013557468139535952
+   },
+   "delta_log_s_k12": {
+    "value": 0.143931157343009,
+    "se": 0.009511204096788472
+   },
+   "within_cz": {
+    "n_edu_sample": 64782,
+    "n_edu_sample_all": 95593,
+    "n_cz_with_pumas": 187,
+    "pub_k12": {
+     "value": 0.25328426494032347,
+     "se": 0.017230776672489463,
+     "n_cz": 131,
+     "weight_share": 0.955572766413148
+    },
+    "k12": {
+     "value": 0.16043871228500958,
+     "se": 0.01248470667301027,
+     "n_cz": 131,
+     "weight_share": 0.955572766413148
+    }
+   },
+   "extra_minutes_class": {
+    "coef": 15.328061529298376,
+    "se": 0.42498810749089133,
+    "n": 35765,
+    "share_cross": 0.10221163200973683
+   },
+   "extra_minutes_class_other": {
+    "coef": 15.589810201282187,
+    "n": 896824,
+    "share_cross": 0.1292359202047177
+   }
+  },
+  {
+   "pc_cut": 0.5,
+   "metro_cut": 0.5,
+   "main": true,
+   "n_puma": {
+    "city": 733,
+    "other": 345,
+    "suburb": 1273
+   },
+   "pop_by_class": {
+    "city": 95951361.0,
+    "other": 45139802.0,
+    "suburb": 167654375.0
+   },
+   "share_edu_workers_city": 0.2995093783017585,
+   "s_pub_city": {
+    "value": 0.3101289305571548,
+    "se": 0.003732860355061864
+   },
+   "s_pub_suburb": {
+    "value": 0.38700882761027566,
+    "se": 0.0024950008111877587
+   },
+   "delta_log_s_pub": {
+    "value": 0.22145938709434787,
+    "se": 0.013138222799232714
+   },
+   "delta_log_s_k12": {
+    "value": 0.15773188260995175,
+    "se": 0.009470906591962973
+   },
+   "within_cz": {
+    "n_edu_sample": 64665,
+    "n_edu_sample_all": 95593,
+    "n_cz_with_pumas": 185,
+    "pub_k12": {
+     "value": 0.2707242169326472,
+     "se": 0.01741018993358988,
+     "n_cz": 118,
+     "weight_share": 0.9348742409570497
+    },
+    "k12": {
+     "value": 0.18468175071176676,
+     "se": 0.011942524617434837,
+     "n_cz": 119,
+     "weight_share": 0.938003471871981
+    }
+   },
+   "extra_minutes_class": {
+    "coef": 16.042731954891877,
+    "se": 0.46774086317958025,
+    "n": 35671,
+    "share_cross": 0.0853224284683293
+   },
+   "extra_minutes_class_other": {
+    "coef": 17.421259275121617,
+    "n": 894476,
+    "share_cross": 0.1200606330446314
+   }
+  },
+  {
+   "pc_cut": 0.75,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_puma": {
+    "city": 542,
+    "other": 345,
+    "suburb": 1464
+   },
+   "pop_by_class": {
+    "city": 70996177.0,
+    "other": 45139802.0,
+    "suburb": 192609559.0
+   },
+   "share_edu_workers_city": 0.22160618455326228,
+   "s_pub_city": {
+    "value": 0.29299871068882916,
+    "se": 0.0037580270309374875
+   },
+   "s_pub_suburb": {
+    "value": 0.3831516155491473,
+    "se": 0.0024350898054858383
+   },
+   "delta_log_s_pub": {
+    "value": 0.26826256527218073,
+    "se": 0.013521452876972566
+   },
+   "delta_log_s_k12": {
+    "value": 0.17821567979387432,
+    "se": 0.010104771472617366
+   },
+   "within_cz": {
+    "n_edu_sample": 64665,
+    "n_edu_sample_all": 95593,
+    "n_cz_with_pumas": 185,
+    "pub_k12": {
+     "value": 0.33741666332768827,
+     "se": 0.02045338867671397,
+     "n_cz": 98,
+     "weight_share": 0.895353642845775
+    },
+    "k12": {
+     "value": 0.22100981504513484,
+     "se": 0.013675290755952566,
+     "n_cz": 99,
+     "weight_share": 0.8984828737607061
+    }
+   },
+   "extra_minutes_class": {
+    "coef": 18.995918631367267,
+    "se": 0.827945509657273,
+    "n": 35671,
+    "share_cross": 0.04360891137771472
+   },
+   "extra_minutes_class_other": {
+    "coef": 18.565246641283476,
+    "n": 894476,
+    "share_cross": 0.06208060324031641
+   }
+  },
+  {
+   "pc_cut": 0.9,
+   "metro_cut": 0.5,
+   "main": false,
+   "n_puma": {
+    "city": 432,
+    "other": 345,
+    "suburb": 1574
+   },
+   "pop_by_class": {
+    "city": 57280194.0,
+    "other": 45139802.0,
+    "suburb": 206325542.0
+   },
+   "share_edu_workers_city": 0.17696902492860356,
+   "s_pub_city": {
+    "value": 0.28546646260390024,
+    "se": 0.003787798606878503
+   },
+   "s_pub_suburb": {
+    "value": 0.37913173023783864,
+    "se": 0.0023625108300859374
+   },
+   "delta_log_s_pub": {
+    "value": 0.2837591646718156,
+    "se": 0.013450032058013546
+   },
+   "delta_log_s_k12": {
+    "value": 0.17982161924096474,
+    "se": 0.009162896410411552
+   },
+   "within_cz": {
+    "n_edu_sample": 64665,
+    "n_edu_sample_all": 95593,
+    "n_cz_with_pumas": 185,
+    "pub_k12": {
+     "value": 0.3379827875530511,
+     "se": 0.02047258977154058,
+     "n_cz": 82,
+     "weight_share": 0.8649271301956196
+    },
+    "k12": {
+     "value": 0.21932136656078915,
+     "se": 0.012407249928436635,
+     "n_cz": 83,
+     "weight_share": 0.8680563611105507
+    }
+   },
+   "extra_minutes_class": {
+    "coef": 20.738228497709404,
+    "se": 0.9598378312280226,
+    "n": 35671,
+    "share_cross": 0.03207495545067284
+   },
+   "extra_minutes_class_other": {
+    "coef": 19.342518299981034,
+    "n": 894476,
+    "share_cross": 0.042700491299898266
+   }
+  },
+  {
+   "pc_cut": 0.5,
+   "metro_cut": 0.9,
+   "main": false,
+   "n_puma": {
+    "city": 733,
+    "other": 460,
+    "suburb": 1158
+   },
+   "pop_by_class": {
+    "city": 95951361.0,
+    "other": 61946545.0,
+    "suburb": 150847632.0
+   },
+   "share_edu_workers_city": 0.2995093783017585,
+   "s_pub_city": {
+    "value": 0.3101289305571548,
+    "se": 0.003732860355061864
+   },
+   "s_pub_suburb": {
+    "value": 0.38473762676668,
+    "se": 0.0025972025414081694
+   },
+   "delta_log_s_pub": {
+    "value": 0.21557349701319184,
+    "se": 0.013238786272130673
+   },
+   "delta_log_s_k12": {
+    "value": 0.15785066376572898,
+    "se": 0.009614065839910844
+   },
+   "within_cz": {
+    "n_edu_sample": 61787,
+    "n_edu_sample_all": 95593,
+    "n_cz_with_pumas": 172,
+    "pub_k12": {
+     "value": 0.2694509975040038,
+     "se": 0.017817154697357517,
+     "n_cz": 114,
+     "weight_share": 0.9308417026994918
+    },
+    "k12": {
+     "value": 0.18309334554535397,
+     "se": 0.012379727767177854,
+     "n_cz": 115,
+     "weight_share": 0.933970933614423
+    }
+   },
+   "extra_minutes_class": {
+    "coef": 15.789459625773063,
+    "se": 0.49635455747530693,
+    "n": 31789,
+    "share_cross": 0.086215870386282
+   },
+   "extra_minutes_class_other": {
+    "coef": 17.315068468567503,
+    "n": 805296,
+    "share_cross": 0.12060354584054184
+   }
+  }
+ ],
+ "nyc_check": {
+  "n_nyc_pumas": 55,
+  "n_nyc_powpumas": 5,
+  "n_k12": 1370,
+  "workers_k12": 146780.0,
+  "n_pub_k12": 873,
+  "workers_pub_k12": 93133.0,
+  "n_all_workers": 39710,
+  "workers_all_workers": 4563370.0,
+  "k12_live_in_nyc": {
+   "value": 0.7398487532361357,
+   "se": 0.013058604861974164
+  },
+  "k12_live_in_workplace_powpuma": {
+   "value": 0.5059067992914567,
+   "se": 0.014560659728465854
+  },
+  "pub_k12_live_in_nyc": {
+   "value": 0.7268529951789376,
+   "se": 0.01581754893932808
+  },
+  "pub_k12_live_in_workplace_powpuma": {
+   "value": 0.5120848678771219,
+   "se": 0.018744624172493753
+  },
+  "all_workers_live_in_nyc": {
+   "value": 0.7653782182904301,
+   "se": 0.002295529777058967
+  },
+  "all_workers_live_in_workplace_powpuma": {
+   "value": 0.4292744178096451,
+   "se": 0.003138285391894853
+  }
+ },
+ "composition_within_cz": {
+  "n_edu_sample": 64665,
+  "n_edu_sample_all": 95593,
+  "n_cz_with_pumas": 185,
+  "pub_k12": {
+   "value": 0.2707242169326472,
+   "se": 0.01741018993358988,
+   "n_cz": 118,
+   "weight_share": 0.9348742409570497
+  },
+  "k12": {
+   "value": 0.18468175071176676,
+   "se": 0.011942524617434837,
+   "n_cz": 119,
+   "weight_share": 0.938003471871981
+  }
+ },
+ "geo": {
+  "n_puma": 2351,
+  "n_powpuma": 982,
+  "n_pc_omb": 690,
+  "n_pc_found": 689,
+  "n_pc_unmatched": 1,
+  "unmatched_examples": [
+   "Macon-Bibb County (state 13, place 49008; Macon-Bibb County, GA)"
+  ],
+  "pop_total": 308745538.0,
+  "n_puma_without_powpuma": 0,
+  "pc_cut": 0.5,
+  "metro_cut": 0.5,
+  "pop_by_class": {
+   "city": 95951361.0,
+   "other": 45139802.0,
+   "suburb": 167654375.0
+  },
+  "n_puma_by_class": {
+   "city": 733,
+   "other": 345,
+   "suburb": 1273
+  },
+  "n_powpuma_by_class": {
+   "city": 146,
+   "other": 313,
+   "suburb": 523
+  },
+  "pc_share_of_metro_pop": 0.37960446353868416
+ },
+ "literature": [
+  {
+   "key": "boyd2005",
+   "ref": "Boyd, Lankford, Loeb and Wyckoff (2005), 'The Draw of Home: How Teachers' Preferences for Proximity Disadvantage Urban Schools', Journal of Policy Analysis and Management 24(1): 113-132 (NBER WP 9953, Sept. 2003)",
+   "url": "https://www.nber.org/papers/w9953",
+   "read": "NBER working paper PDF, text and Tables 2-5",
+   "facts": [
+    "New York State, teachers entering public school teaching 1999-2002: 61% (60.8%) took their first job within 15 miles of their hometown and 85% within 40 miles (Table 2; 90% within 40 miles in New York City)",
+    "urban districts import teachers from the suburbs: 36% of urban teachers have a suburban hometown, 6% of suburban teachers an urban hometown; the ratio of suburban-hometown teachers taking a city job to city-hometown teachers taking a suburban job runs from 2.6 (Buffalo) to 7.5 (New York City) (p. 7)"
+   ]
+  },
+  {
+   "key": "reininger2012",
+   "ref": "Reininger (2012), 'Hometown Disadvantage? It Depends on Where You're From', Educational Evaluation and Policy Analysis 34(2): 127-145",
+   "url": "https://eric.ed.gov/?id=EJ963419",
+   "read": "not read directly: the figure is as summarised at https://www.deansforimpact.org/about/news-and-blog/2017/03/06/13-miles-the-inherent-localism-of-teaching",
+   "facts": [
+    "NELS:88: the median distance between the high school a teacher attended in 10th grade and her residence eight years later is 13 miles, about a quarter of the distance moved by other professionals; 4 miles for teachers who grew up in dense cities"
+   ]
+  },
+  {
+   "key": "ibo_nyc",
+   "ref": "New York City Independent Budget Office, 'Where Do NYC's Teachers and Principals Live Compared With Where They Work?'",
+   "url": "https://www.ibo.nyc.ny.us/iboreports/printnycbtn19.pdf",
+   "read": "the PDF could not be opened from this environment (the old IBO address now redirects to the IBO home page, ibo.nyc.gov); figures and the date (Aug. 15, 2013) as given in the search summary of the report",
+   "facts": [
+    "school year 2011-12: 67% of 70,328 New York City teachers live within the five boroughs; 81% of Staten Island teachers live in the borough where they work, 57% of Brooklyn teachers; teachers in Queens and the Bronx are the most likely to live outside the five boroughs"
+   ]
+  },
+  {
+   "key": "santelli_grissom",
+   "ref": "Santelli and Grissom (2024), 'A Bad Commute: Travel Time to Work Predicts Teacher Turnover and Other Workplace Outcomes', AERA Open 10; working paper: EdWorkingPaper No. 22-691 (Dec. 2022), 'A Bad Commute: Does Travel Time to Work Predict Teacher and Leader Turnover and Other Workplace Outcomes?'",
+   "url": "https://edworkingpapers.com/ai22-691",
+   "read": "EdWorkingPaper No. 22-691 (Dec. 2022), PDF text, pp. 10, 15, 16, 17, 22 (printed page numbers); the 0.8-1.0 percentage points per 5 minutes is as stated in the published AERA Open abstract (via search; the published article was not opened)",
+   "facts": [
+    "Metropolitan Nashville Public Schools (countywide), 2008-09 to 2019-20, home and school addresses with HERE travel times: mean one-way commute 21.8 minutes for teachers (p. 10); 19% of teachers travel 30 minutes or more (p. 15; compare the PUMS share of 30 minutes or more, section 4, not the share above 30); teachers who live out of the county commute 13.8 minutes longer than those who live in it (p. 15)",
+    "working paper: teachers who commute 45 minutes or more each way are 10 percentage points more likely to transfer schools (overall rate 12%) and 3 percentage points more likely to exit the district (overall rate 7%) than teachers in the same school who commute 0-5 minutes (pp. 16-17); predicted transfer probability 8% against 18%, exit 8% against 11% (p. 22). Published version: each 5 minutes of one-way commute raises the transfer probability by 0.8-1.0 percentage points over most of the distribution"
+   ]
+  },
+  {
+   "key": "usdot2016",
+   "ref": "U.S. Department of Transportation (2016), 'The Value of Travel Time Savings: Departmental Guidance for Conducting Economic Evaluations, Revision 2 (2016 Update)', memorandum of Sept. 27, 2016",
+   "url": "https://www.transportation.gov/sites/dot.gov/files/docs/2016%20Revised%20Value%20of%20Travel%20Time%20Guidance.pdf",
+   "read": "read from a web.archive.org copy (transportation.gov refuses scripted requests)",
+   "facts": [
+    "local personal travel (commuting included) is valued at 50% of hourly median household income ($56,516 / 2,080 = $27.20 in 2015), $13.60 an hour (Tables 1, 3, 4; text p. 11); plausible range 35%-60%, $9.50-$16.30 (Tables 2 and 5, pp. 14 and 19); business travel 100% of gross compensation, $25.40"
+   ]
+  },
+  {
+   "key": "nces_days",
+   "ref": "NCES, Digest of Education Statistics 2017, Table 203.90, 'Average daily attendance (ADA) as a percentage of total enrollment, school day length, and school year length in public schools, by school level and state: 2007-08 and 2011-12' (source: SASS Public School Data File, 2007-08 and 2011-12)",
+   "url": "https://nces.ed.gov/programs/digest/d17/tables/dt17_203.90.asp",
+   "read": "web page (United States row)",
+   "facts": [
+    "United States average of 179 days in the school year (SE 0.1) and 1,203 hours, 2011-12 (the table reports school year length for 2011-12 only; 2007-08 has attendance and hours per day, 6.6, only)"
+   ]
+  },
+  {
+   "key": "nces_sass",
+   "ref": "NCES SASS / NTPS tabulations",
+   "url": "https://nces.ed.gov/surveys/ntps/",
+   "read": "searched; nothing found",
+   "facts": [
+    "no NCES SASS / NTPS table of the share of public school teachers living in the district where they teach was found: the surveys report teacher mobility between schools and districts, not residence"
+   ]
+  }
+ ],
+ "pums": {
+  "n_households": 1474819,
+  "weighted_millions": 155.715523,
+  "national_check": {
+   "mean_travel_time_all_persons": 27.14575945541727,
+   "work_at_home_share_all_persons": 0.05235237634611575,
+   "published_mean_travel_time": 27.1,
+   "published_work_at_home_share": 0.053
+  }
+ }
+}

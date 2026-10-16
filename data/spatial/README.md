@@ -360,6 +360,29 @@ same block on pooled ACS 1-year 2016–19 (T7), which `spatial_calibrate.jl` car
 `ACS_2016_19` and `spatial_first_stage.jl --t7 --write` refits
 (`estimates/first_stage_t7.md`). Report: `estimates/acs_occupations.md`.
 
+## Calibration experiments (2026-10) — `estimates/settings/`
+
+Inputs for the experiments in the calibration log (§4, *Calibration experiments*). The
+analysis scripts write a `.md` report and a `.json` file to `estimates/settings/`; the two pull
+scripts (`acs_housing.py`, `crdc_teachers_staff.py`) write parquet files to `raw/`, and
+`crdc_teacher_allocation.py` writes only `settings/sealed/crdc_teacher_allocation.json`.
+
+```bash
+python3 district_settings.py          # audited district targets by partition (locale, revenue, ses,
+                                      # common CZs, hold-out half A), bootstrap SEs and correlations
+set -a; source .env; set +a
+python3 acs_housing.py                # ACS 2014-18 housing-cost tables by school district (raw/)
+python3 housing_costs.py              # suburb-city housing-cost gaps, residence cost in model units
+python3 nlsy_composition.py           # NLSY79 city share and flows by own AFQT and own earnings
+python3 nlsy_teachers.py              # NLSY79 latent AFQT of K-12 teachers vs non-teachers
+python3 crdc_teachers_staff.py        # CRDC 2017-18 teacher counts by school (raw/)
+python3 crdc_teacher_allocation.py    # suburb-city gaps in novice and certified teachers
+```
+
+`district_settings_targets.toml` is what `--district SCHEME` and `--weight corr`
+read. `settings/sealed/` holds the pre-registered hold-out outcomes (CZ half B,
+CRDC); they were opened only after the specifications were chosen.
+
 ## Literature targets
 
 `estimates/literature_targets.md` documents the CFR, BFM and FOO numbers behind

@@ -19,7 +19,7 @@ PANEL = ROOT / "julia/spatial_model/calibration/runs/panel"
 CASES = ROOT / "julia/spatial_model/calibration/slurm/panel_cases.tsv"
 OUT = ROOT / "data/spatial/estimates/sensitivity_panel.md"
 
-NAMES = ["logκ̃", "δκ", "ΔB", "β", "λ", "r_m", "ωf", "γ"]
+NAMES = ["logκ̃", "δκ", "ΔB", "β", "λ", "r_m", "ωf", "γ"]   # the base eight; the extension parameters of a longer ϑ are not reported
 # moments reported from the moment table (model value, then the standardized residual)
 MOMENTS = ["teacher_p9010", "gap_salary", "gap_pupils", "gap_teachers_pp", "move_rate", "gap_income"]
 
@@ -50,7 +50,7 @@ def read_run(d: Path):
 
 
 def fmt_row(name, args, r, base):
-    th = " | ".join(f"{x:.4f}" for x in r["theta"])
+    th = " | ".join(f"{x:.4f}" for x in r["theta"][:len(NAMES)])
     mom = " | ".join(f"{r['rows'].get(k, ('—', '—'))[0]} ({r['rows'].get(k, ('—', '—'))[1]})" for k in MOMENTS)
     return f"| {name} | `{args}` | {r['criterion']:.2f} | {th} | {mom} | {r['score_gap']} | {r['iters']} |"
 
