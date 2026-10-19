@@ -183,7 +183,10 @@ report only as 'nonfinite moments' or a singular Jacobian, so it is an error her
 switches of 2026-10-15 when freed or fixed at a nonzero value: κ_c and b_T (`SPLIT_PARAMETERS`) need `--external
 split=1` and ζ_BA `--external college=1` (a fixed zero is the off value and is accepted). `--free theta_nu` and
 `--fix theta_nu=…` address ϑ's θ_ν (`THETA_SYNONYMS`), the location-taste scale σν = θ_ν μ that overrides the
-external `--external theta_nu` while nonzero; a freed θ_ν starts at the external block's value. `floor_tol` is the largest
+external `--external theta_nu` while nonzero; a freed θ_ν starts at the external block's value. Two diagnostic switches of
+round 2026-10-16 are off by default: `--external lyT_fixed=x` (a `Params` field: every teacher node's income-graded taste
+is graded at ln ŷ = x, inert while By = 0) and `--measure cfr_rho=ρ` (a `Measurement` field, 0 < ρ ≤ 1: the CFR
+bridge's SD of teacher effectiveness is sd(log h_eff)/ρ); each is an error under the other option. `floor_tol` is the largest
 population share
 allowed at the consumption floor, `--floor-tol` (default `FLOOR_MASS_TOL`), which the caller
 hands to `SpatialModel`. With `--district`, the payroll-per-pupil validation target is the
@@ -195,9 +198,18 @@ function problem_setup(opts, ref)
         name in THETA_NAMES && name !== :s_z && error("--external $name: $name is in ϑ; hold it with --fix $name=… instead")
         # the Params fields that theta_to_params sets from ϑ (M3): an external value would be silently overwritten
         name in THETA_SET_FIELDS && error("--external $name: theta_to_params sets $name from ϑ; hold it with --fix instead")
+        # round 2026-10-16: the CFR effectiveness concept is a measurement choice, not a Params field
+        name === :cfr_rho && error("--external cfr_rho: the CFR effectiveness concept is a measurement choice; use --measure cfr_rho=…")
+    end
+    for (name, _) in opts["measure"]
+        name === :lyT_fixed && error("--measure lyT_fixed: it is a model switch (Params); use --external lyT_fixed=…")
     end
     base    = calibration_base(ref; opts["external"]...)
     meas    = calibration_measurement(; opts["measure"]...)
+    # round 2026-10-16: catch a bad diagnostic switch here, not in the first solve (a search would record every point as failed)
+    (0 < meas.cfr_rho ≤ 1) ||
+        error("--measure cfr_rho=$(meas.cfr_rho): the correlation of teachers' log effectiveness with log h_eff must lie in (0, 1]")
+    isinf(base.lyT_fixed) && error("--external lyT_fixed=$(base.lyT_fixed): must be finite (NaN: off)")
     targets = default_targets()
     opts["wtp-consumption"] === nothing || (targets = with_wtp_target(targets, opts["wtp-consumption"]))
     scheme  = get(opts, "district", nothing)

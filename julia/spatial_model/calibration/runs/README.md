@@ -6,6 +6,19 @@ run artifacts by default; add explicit exceptions when retaining new evidence.
 
 ## Preservation for the accepted next phase (2026-10-15)
 
+**Update (2026-10-16).** The user provisionally accepts the next measurement and
+mechanism diagnostics, conditional on preserving previous work, and prefers
+simplicity. College choice and licensure are optional experimental benchmarks;
+new comparisons should include simpler alternatives close to the earlier model.
+The [current preferences and sequence](../calibration_log.md#accepted-preferences-and-next-sequence-2026-10-16)
+qualify the earlier plan below. Historical candidate designations are unchanged.
+
+[`_code/accepted-preferences-20261016/`](_code/accepted-preferences-20261016/README.md)
+holds the three pre-edit documentation files in a hash-verified local archive.
+It supplements the earlier source/evidence checkpoint; it is not a new full
+source or run backup. This documentation update changes no source or fit,
+launches no jobs, and leaves B1 sealed.
+
 The user accepted the [development plan](../calibration_log.md#accepted-development-plan-2026-10-15)
 conditional on preserving previous work. Existing runs, including unsuccessful
 experiments, preregistrations, working logs and code snapshots must remain intact.
@@ -36,7 +49,7 @@ still requires explicit user instruction before opening.
   baseline, including preliminary narrow-box cases. These are not sensitivity
   results for the current exactly identified baseline.
 - `t7-2016-19/`: the historical alternative occupational-sample fit.
-- `exp-c3/c4p/`: C4′, the development candidate (`report.txt`, `theta.toml`, `moments.toml`), and
+- `exp-c3/c4p/`: C4′, the development candidate until round 2026-10-16 (`report.txt`, `theta.toml`, `moments.toml`), and
   `exp-1015/reeval/c4p/`, its re-solve on the 2026-10-15 code.
 - `exp-1015b/s1_r_e_fit/`: S1·R·E's exact fit, the diagnostic benchmark.
 - `exp-1015/audit/README.md`: the teacher-supply audit table.
@@ -95,6 +108,38 @@ candidates listed above are tracked.
     closure update.
   - `tests_c3/`, the C4′ closure check and the smoke test ran on `r1015c3` (r1015c2 plus review fixes). The main
     tree equals `r1015c3`.
+- `exp-1016/`: round 2026-10-16, which covers measurement concepts, the teacher-quality route and the simpler
+  (no-college) comparison:
+  - fits at Nz = 9:
+    - `p_d0`, `p_y_d0`, `p_y_d0_rp04`, `p_tb_y_d0`, `m_y_d0_rp0`;
+    - the CFR-ρ variants `m_y_d0_rho`, `m_y_r_rho` and `p_tb_y_d0_rho` (the selected development candidate);
+    - their Nz = 13 re-solves (`*_nz13`);
+  - `tx_m_y_d0`, `tx_p_tb_y_d0`: diagnostic refits with teachers exempt from the income taste (never selectable),
+    with their Nz = 13 re-solves (`*_nz13`, run 2026-10-17);
+  - `t/`: the fixed-ϑ route diagnostics (`*_Ta`, `*_Tb`);
+  - `jac/`: the identification check of the selection and of its ρ = 1 version;
+  - `ms/`: the 8-start multistart of the selection;
+  - `reeval/`: the ten inventory fits and the five S fits re-evaluated on r1016a, which adds the teacher-sorting moments
+    (the ρ and TX fits ran on r1016a directly). It also holds `s1`, the clean S1 fit of exp-1015 used for the S1
+    removal row;
+  - `reeval_pre/`, `reeval_pre_pair/`: the same on r1015c3, alone and in same-node pairs with r1016a (the bitwise check).
+
+  The selection is P·TB·Y·D0·ρ, the first candidate to meet every criterion (under the round's pre-registered A4 and
+  A5 rules for fits without college and for overidentified fits), and it replaces C4′ as the development candidate. The September fit stays the reference.
+  The new development candidate's files (`exp-1016/p_tb_y_d0_rho/report.txt`, `theta.toml`, `moments.toml`) are local
+  and untracked. Tracking them needs a `.gitignore` exception like C4′'s, which is the user's call.
+
+  The round's files are in `experiments-2026-10g/` (untracked):
+  - the pre-registration and its amendments;
+  - case lists and the working log;
+  - measurement scripts and outputs (`measure/`);
+  - the scorer (`score_1016.py`, `score_final.sh`) and the final scores (`scores_1016.md`, plus the
+    partition-share sensitivity);
+  - the route rule and multistart scripts.
+
+  Code: the five S fits (`p_d0`, `p_y_d0`, `p_y_d0_rp04`, `p_tb_y_d0`, `m_y_d0_rp0`), their `*_nz13` re-solves,
+  `reeval_pre/` and `reeval_pre_pair/` ran on `_code/r1015c3`. Everything else, including the selected `p_tb_y_d0_rho`
+  and both `tx_*` refits, ran on `_code/r1016a`, which the main tree equals.
 - The other experiment directories (`exp-teacher/`, `exp-round3/`, …) hold the original
   Levenberg–Marquardt runs; `exp-final/` reproduces their estimates.
 

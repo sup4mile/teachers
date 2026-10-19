@@ -4,7 +4,15 @@ Companion to [spatial_calibration.md](spatial_calibration.md): target definition
 
 **Current baseline:** the exactly identified 2026-09-29 fit in [`runs/exact-polish-base/`](runs/exact-polish-base/). The October experiments leave it unchanged; their extensions are diagnostic prototypes, not an adopted specification. The log-shock solver correction supersedes all earlier equilibrium results; the outside-equilibrium first stage is unaffected. Verification below refers to saved runs, not new estimation during this documentation update.
 
-**Accepted direction (2026-10-15, after both rounds):** the user provisionally accepted the recommendations, conditional on preserving previous work. Carry M3, estimated wage compression and the S1 supply repair into a small comparison of income-dependent residential sorting and explicit teacher demand. Strengthen residence/commuting acceptance criteria and use finer ability grids. The [accepted development plan](#accepted-development-plan-2026-10-15) supersedes the historical task lists below. Source and selected fit evidence have been checkpointed; no baseline has been replaced and B1 remains sealed.
+**Current direction (2026-10-16):** the user provisionally accepts the latest recommendations, conditional on preserving previous work, with an explicit preference for simplicity and skepticism about college choice and licensure as large departures from the earlier model. Begin with measurement comparisons and re-scoring, then isolate teacher-quality sorting and test minimal changes. Keep richer extensions as benchmarks and compare simpler alternatives; no extension is mandatory merely because it improved past fit. The [accepted preferences and next sequence](#accepted-preferences-and-next-sequence-2026-10-16) govern new work and qualify the October 15 plan. No baseline has been replaced and B1 remains sealed.
+
+**2026-10-16 round (done; [§4](#round-2026-10-16-measurement-concepts-the-teacher-quality-route-and-a-simpler-comparison)).** The pre-registered selection, under the original targets, is **P·TB·Y·D0·ρ**. It is the first candidate of these rounds to meet every criterion (under the round's pre-registered A4 rule for fits without college and A5 rule for overidentified fits), and it becomes the development candidate in place of C4′. The September fit stays the reference.
+- *What it is.* The core model with the S1 split, the income taste Y, the D0 staffing closure and the simple 2026-10-02 teacher block TB in place of college and licensure, with CFR read at ρ = 0.3.
+- *Fit.* 12 free parameters; S_1015 114.6 against C4′'s 315.1 (18 parameters).
+- *Checks passed.* The Nz = 13 grid, identification (condition number 22.4) and an 8-start multistart.
+- *Block removal.* Replacing M3 with TB improves the score by 19.1 with 7 fewer parameters, 14.1 of it in the teacher-pay block that TB targets (5.0 without that block). Removing TB costs 404.5, all of it in the teacher-pay block.
+- *Remaining misses.* V4 and V6z (z −5.3, +4.9), V1 (+3.2) and the gender gap (+5.7). Within race (concept R) the selection instead fits V4 and V6z but overshoots V1 (+8.8 SE) and V6a (−5.5 SE, by construction, since V6a is targeted at its O value). At a fixed workplace, teacher sorting by pay-relevant human capital is 3.4 times the PUMS.
+- *Open.* The race concept and household structure are the user's decisions; sample and payroll alignment, the in-equilibrium first stage and the full bootstrap remain before adoption.
 
 **2026-10-05 round:** a pre-registered comparison of the 10-03 mechanisms selects **C4′** (residence/workplace split + college choice + priced suburban access; [§4](#model-experiments-2026-10-05)). Its validation score is about a third of the baseline's, but the household-sorting misses remain, so the 09-29 fit stays the reference until a specification is adopted.
 
@@ -34,10 +42,10 @@ Companion to [spatial_calibration.md](spatial_calibration.md): target definition
 
 | Issue | Evidence and implication |
 |---|---|
-| Household sorting | Earnings gap −0.010 versus 0.112; score gap 0.061 versus 0.289 SD; poverty +0.2 versus −8.9 pp. Tested parameter and weighting changes do not resolve these misses. C4′ reaches only 0.034, 0.082 and −2.3 pp. The own-AFQT sorting miss replicates in NLSY97 (2026-10-05). Local peer effects in school quality add no sorting (2026-10-07). Persistence does not help either: raising ρz to 0.90 moves V6a by −0.004, because school quality is worth only ≈0.002 utils to parents against σν = 0.25. A BA-graded suburban amenity reaches V6a only by also moving teachers (2026-10-15). With the non-pecuniary staffing closure R it reaches V6a, V6z and poverty with staffing matched (S1·R·E, $S_{1015}$ 105). But it does so as a weakly identified reduced form, with ζ_BA ≈ 1.4 utils. It overshoots earnings and scores, puts teachers' residences in the suburb at five times the data gap, and fails the Nz = 9 grid check (2026-10-15b). |
-| Teacher allocation | Salary fit implies FTE/pupil +0.023 versus −0.018 and SEDA growth 0.012 versus 0.003 SD/grade. With a residence/workplace split and positively selected teachers (C4′): +0.020 and 0.013. The split's staffing-ratio response to suburban pay is ≈31. Audited on 2026-10-15: C4′'s workplace nest is hypersensitive, with a small-district elasticity ≈68 against 1.4–3.7 in the literature. The repair S1 (ρw = 1 plus a commuting friction) gives a full-GE own-location elasticity of 1.6. With realistic supply, however, a salary-matched δκ over-staffs the suburb (FTE +0.064), and an FTE-matched δκ cuts suburban pay (−0.040) and removes the suburb's school-quality edge. The model lacks a demand side or position rationing ([§4](#model-experiments-2026-10-15)). A non-pecuniary workplace taste $b_T$ (closure R) matches FTE and salary together. On its own, like SC, it removes the suburb's school-quality edge (2026-10-15b). |
-| Teacher education and selection | Baseline: schooling ratio 0.76 versus 1.18; teacher pay well below market pay; teachers' ability −0.29 SD versus +0.61. The college choice with licensure (M3) gives 1.14, premia −0.10/+0.01 versus +0.06/+0.09, and ability +0.55 SD (−0.29 versus BA non-teachers, data −0.33), without a schooling floor or teacher utility costs. Still missed: MA premium 0.07 versus 0.16; non-BA teachers' schooling 0.37 versus 0.52. The regular Roy model ($\gamma=1$) brings baseline teacher pay to market pay (premia −0.09/+0.01) but removes selection (0.00 SD) and raises teachers' 90/10 to 3.75 versus 2.77. Under M3 it overpays teachers (+0.25/+0.37) (2026-10-07). |
-| Occupational wages | Cell wage levels and dispersion are missed. The market gender log-wage gap is 0.30 versus 0.10, and 0.36 under M3. |
+| Household sorting | Earnings gap −0.010 versus 0.112; score gap 0.061 versus 0.289 SD; poverty +0.2 versus −8.9 pp. Tested parameter and weighting changes do not resolve these misses. C4′ reaches only 0.034, 0.082 and −2.3 pp. The own-AFQT sorting miss replicates in NLSY97 (2026-10-05). Local peer effects in school quality add no sorting (2026-10-07). Persistence does not help either: raising ρz to 0.90 moves V6a by −0.004, because school quality is worth only ≈0.002 utils to parents against σν = 0.25. A BA-graded suburban amenity reaches V6a only by also moving teachers (2026-10-15). With the non-pecuniary staffing closure R it reaches V6a, V6z and poverty with staffing matched (S1·R·E, $S_{1015}$ 105). But it does so as a weakly identified reduced form, with ζ_BA ≈ 1.4 utils. It overshoots earnings and scores, puts teachers' residences in the suburb at five times the data gap, and fails the Nz = 9 grid check (2026-10-15b). Income-graded sorting (Y) with a staffing closure matches V6a (targeted) and most of V3, and overshoots V1 by about 3 SE. V6z still misses by about 5 SE. V4 misses by 2.3–4.7 SE at ρ = 1 and by 5.3 SE in the selection (P·TB·Y·D0·ρ), where ρ = 0.3 trades V4 for growth. Within race (the R bound), the ρ = 0.3 fits come close on V4 and V6z (selection +0.7 and +1.3 SE), while V1 and V6a overshoot (+8.8 and −5.5 SE, the latter by construction). At ρ = 1 the closure fits instead overshoot V4 and growth by up to 5 and 7 SE (2026-10-16). |
+| Teacher allocation | Salary fit implies FTE/pupil +0.023 versus −0.018 and SEDA growth 0.012 versus 0.003 SD/grade. With a residence/workplace split and positively selected teachers (C4′): +0.020 and 0.013. The split's staffing-ratio response to suburban pay is ≈31. Audited on 2026-10-15: C4′'s workplace nest is hypersensitive, with a small-district elasticity ≈68 against 1.4–3.7 in the literature. The repair S1 (ρw = 1 plus a commuting friction) gives a full-GE own-location elasticity of 1.6. With realistic supply, however, a salary-matched δκ over-staffs the suburb (FTE +0.064), and an FTE-matched δκ cuts suburban pay (−0.040) and removes the suburb's school-quality edge. The model lacks a demand side or position rationing ([§4](#model-experiments-2026-10-15)). A non-pecuniary workplace taste $b_T$ (closure R) matches FTE and salary together. On its own, like SC, it removes the suburb's school-quality edge (2026-10-15b). With Y, teacher quality follows teachers' own predicted income. At a fixed workplace, the selected candidate's teacher pay contrast by residence is 3.4× the PUMS (0.073 versus 0.021), although growth is matched with CFR's ρ = 0.3 (2026-10-16). |
+| Teacher education and selection | Baseline: schooling ratio 0.76 versus 1.18; teacher pay well below market pay; teachers' ability −0.29 SD versus +0.61. The college choice with licensure (M3) gives 1.14, premia −0.10/+0.01 versus +0.06/+0.09, and ability +0.55 SD (−0.29 versus BA non-teachers, data −0.33), without a schooling floor or teacher utility costs. Still missed: MA premium 0.07 versus 0.16; non-BA teachers' schooling 0.37 versus 0.52. The regular Roy model ($\gamma=1$) brings baseline teacher pay to market pay (premia −0.09/+0.01) but removes selection (0.00 SD) and raises teachers' 90/10 to 3.75 versus 2.77. Under M3 it overpays teachers (+0.25/+0.37) (2026-10-07). Without college, the simple teacher block TB (schooling requirement plus ability-graded cost) matches both premia and teachers' latent z (+0.61 SD), all three of them TB's targets (2026-10-16). |
+| Occupational wages | Cell wage levels and dispersion are missed. The market gender log-wage gap is 0.30 versus 0.10, and 0.36 under M3. In the 2026-10-16 selection (TB, no college) it is 0.39, with a cell-wage correlation of 0.11. |
 | Family inputs and participation | Latent sibling correlation 0.33 versus 0.606; non-teaching participation is independent of inherited ability, unlike the data. Parents finance none of their children's investment. A family component shared by siblings would fix the sibling check, but it would not create sorting (2026-10-15 persistence test). |
 | Measurement and inference | ACS/NLSY samples differ; public mobility data cannot isolate within-MSA moves; BFM score units use an assumed ICC; poverty uses a provisional threshold. Teacher payroll is 2.5% of model market income (4.5% under M3), versus ≈1.6% in the data; the comparator is not like-for-like (age and income definitions). Full calibration bootstrap and literature transport uncertainty remain open. |
 
@@ -600,6 +608,159 @@ Under D the FTE gap equals the rule by construction. Its z (+1.4) tests the comm
 
   Part of the V4 and V6z shortfall of a raceless income-sorting model is therefore one of concept. Race composition does not explain the growth overshoot, which misses by about 6 SE against either concept. S1·Y·D0's composition part (0.081) is close to the within-race composition the data imply (≈ 0.09–0.10). Whether race explains the V1 overshoot depends on a within-race V6a, which has not been measured; household structure is the more direct candidate. The pre-registered selection is unaffected; [§5](#next-round-proposed-after-2026-10-15c) has the proposal.
 
+### Round 2026-10-16: measurement concepts, the teacher-quality route and a simpler comparison
+
+This round implements [§5's accepted sequence (2026-10-16)](#accepted-preferences-and-next-sequence-2026-10-16).
+- **Files.** The pre-registration was written before any new statistic or fit. It, its three amendments, the case lists, scripts, working log and final scores (`scores_1016.md`) are in `runs/experiments-2026-10g/` (untracked). Outputs are in `runs/exp-1016/`.
+- **Code.** `runs/_code/r1016a` is r1015c3 plus a diagnostic switch, a measurement choice and new unscored moments, all inert by default. It reproduces r1015c3 bit for bit in 15 same-node pairs. The five S fits (P·D0, P·Y·D0, P·Y·D0·rp04, P·TB·Y·D0 and M·Y·D0·rp0), their Nz = 13 re-solves and `reeval_pre/` ran on r1015c3, as Amendment 1 allows. The ρ fits (the selection among them) and their Nz = 13 re-solves, TX-M and TX-P with theirs, the T diagnostics, `reeval/`, `jac/` and `ms/` ran on r1016a, which the main tree now equals.
+
+The plan, as pre-registered:
+- **Measurement.** Four concepts for the sorting moments:
+  - O, the targets;
+  - R, pooled within race, a bound;
+  - I, per-adult family income for V6a and V3, which matches the model's one-adult households;
+  - RI, both.
+
+  V1, V3 and V6a are new measurements, from ACS district tables by race and the 2018 PUMS. Every fit is re-scored under each concept as a diagnostic. Only I could serve as a refit target, because R would need a within-race first stage.
+- **Teacher-quality route.** New unscored moments: teachers' human capital, pay and predicted income by residence and by workplace, and a decomposition of the teacher h gap. The data checks are PUMS teacher-pay contrasts. Fixed-ϑ re-solves switch the income taste off for teachers (`lyT_fixed`).
+- **Simpler comparison and block removal.** Refits, all but one without college and licensure. P is the core model with the S1 split. The fits are:
+  - P·D0, the closest to September;
+  - P·Y·D0, alone and with r_p = 0.04;
+  - P·TB·Y·D0, with the 2026-10-02 teacher block TB in place of M3;
+  - M·Y·D0 without r_p.
+
+  Round c's S1·Y·D0 and S1·Y·R are the college (M) family at r_p = 0.04 (S1·Y·D0 = M·Y·D0·rp04, as in the PREREG). The CFR variants M·Y·D0·ρ and M·Y·R·ρ are those two fits with ρ = 0.3.
+- **CFR concept.** In the literature, teacher effectiveness correlates only about 0.17–0.32 with pay-relevant characteristics. The variant reads CFR with ρ = 0.3 (`Measurement.cfr_rho`), with no new parameter.
+- **Criteria.** Those of round 2026-10-15c, with three pre-registered changes and one new criterion:
+  - Without college, A4's within-BA part is n/a.
+  - An overidentified fit meets A5's criterion test by LM convergence (relative change < 1e−6 at the last iteration). That is the polish's own stopping tolerance, so the test shows only that the run stopped by convergence rather than at the iteration cap or the damping limit; the multistart is the evidence of a minimum.
+  - k = free parameters − 8. For exactly identified fits this is the old rule (active targets − 8); it gives the overidentified fits (P·TB·Y·D0, the selection and TX-P) k = 4 rather than 5.
+  - New criterion G1: the gender gap may not worsen beyond C4′'s |z| + 1.
+
+  Selection is under O and prefers a qualifier with fewer free parameters unless the richer one lowers S_1015 by at least 10. B1 stays sealed.
+
+**Selection (pre-registered, under O): P·TB·Y·D0·ρ.** It is the first candidate of these rounds to meet every criterion, under the round's rules for fits without college and for overidentified fits (round c's A4 and A5 would fail it: it has no within-BA gap, and its criterion is 1.27). It replaces C4′ as the development candidate. It is not adopted: §5 item 4's remaining checks come first, and the September fit stays the reference.
+- *What it is.* The core model plus four pieces:
+  - the S1 split (ρw = 1, κ_c);
+  - the income taste Y (ζ_y);
+  - the D0 staffing closure;
+  - TB: teaching requires s_T ≥ 0.642 and carries a non-pecuniary cost c_T + c_Tz ln z/s_z (c_Tz per SD of ln z), fitted to the two teacher premia and to teachers' latent z.
+
+  The CFR bridge uses ρ = 0.3. The fit has 12 free parameters (C4′ 18, S1·Y·D0 19) for 13 targets, criterion 1.27.
+- *Checks* (§5 item 4).
+  - Nz = 13 moves no scored moment by more than 0.022 SE.
+  - The standardized Jacobian has full rank, with condition number 22.4 (September baseline 30.3, C4′ 56). Its most collinear columns, r_m and ΔB, still have unique effects of about 10 box widths.
+  - Eight LM polishes from ±15% perturbed starts all return to the fit: ϑ within 5e−5 box widths, criterion within 9e−7.
+  - In equilibrium (the fit's `--consistency` report), the first stage's aggregates hold:
+    - pooled non-teacher 90/10 3.698, against the first stage's 3.735 and the data's 3.737;
+    - non-teacher occupation shares within 0.0064;
+    - teachers' 90/10 2.767 against 2.773;
+    - the NLSY slope and mother–child ρ within 0.03 SE.
+
+    Cell wages (weighted correlation 0.112; C4′ 0.102, September 0.091) and the gender gap (0.388 against the report's 0.103; C4′ 0.356) are still missed, so this check stays open.
+- *Lower score, not selected.* S1·R·E scores lower (105.1) but fails T1–T3 severely, as well as A5's grid check.
+
+| | C4′ | S1·Y·D0 | P·TB·Y·D0 | **P·TB·Y·D0·ρ** | M·Y·D0·ρ |
+|---|---|---|---|---|---|
+| free (k) | 18 (10) | 19 (11) | 12 (4) | **12 (4)** | 19 (11) |
+| S_1015 | 315.1 | 151.6 | 131.5 | **114.6** | 137.9 |
+| β; ζ_y | 0.239; — | 0.241; 0.231 | 0.280; 0.290 | 0.084; 0.315 | 0.072; 0.279 |
+| V1 earnings 0.112 (0.017) | 0.034 | 0.169 | 0.168 | 0.166 | 0.165 |
+| V3 poverty −0.089 (0.009) | −0.023 | −0.074 | −0.069 | −0.064 | −0.066 |
+| V4 scores 0.289 (0.033) | 0.082 | 0.196 | 0.202 | 0.116 | 0.115 |
+| V6z −0.222 (0.036) | −0.007 | −0.043 | −0.044 | −0.046 | −0.046 |
+| growth 0.0031 (0.0030) | 0.0127 | 0.0210 | 0.0220 | 0.0054 | 0.0053 |
+| teacher premia m/f 0.056/0.086 | −0.10/0.00 | −0.12/−0.01 | † | † | −0.11/−0.01 |
+| V11 gender gap 0.105 (0.05) | 0.356 | 0.357 | 0.389 | 0.388 | 0.358 |
+| T1 net commuting 0.075 | −0.023 | −0.044 | 0.008 | 0.014 | −0.044 |
+| ε22 (≤ 3.7) | 13.2 | 3.70 | 3.49 | 3.51 | 3.72 |
+| teachers' latent z (SD) | 0.551 | 0.553 | 0.609 | 0.609 | 0.553 |
+| teacher h gap by workplace | 0.020 | 0.101 | 0.084 | 0.076 | 0.088 |
+| fixed-workplace pay contrast 0.021 (0.009) | 0.029 | 0.086 | 0.082 | 0.073 | 0.074 |
+| fails | baseline | A3, T1 | A3 (growth) | **none** | A6‼, T1 |
+
+Notes:
+- V6a (−0.187) is targeted in every column except C4′'s (−0.034).
+- FTE is 0 under the D0 rule (C4′ +0.020), and payroll is +0.009 (C4′ +0.029).
+- † marks a targeted moment.
+- Teachers' latent z, the teacher h gap and the fixed-workplace pay contrast are not in S_1015. Latent z is A4's criterion and a target of the TB fits.
+
+- *Remaining misses.* The selected fit misses V4 (z −5.3), V6z (+4.9), V1 (+3.2) and the gender gap (+5.7, within G1's limit).
+  - At a fixed workplace, the model still sorts teachers by pay-relevant human capital about 3.4 times as strongly as the PUMS shows (0.073 against 0.021 (0.009)).
+  - ρ fixes growth by lowering β, not by removing that sorting.
+
+**Block removal** (refits; the change in S_1015 when the block is removed):
+- *College and licensure (M3).* Replacing M3 with TB lowers S_1015 by 19.1 with 7 fewer parameters (M·Y·D0 at r_p = 0 → P·TB·Y·D0).
+  - So the simplification the user preferred costs little fit. TB targets the premia and teachers' latent z, which M3 produced untargeted, so most of the gain (−14.1) is in the teacher-pay block. Without that block, which is the comparison the PREREG requires for TB against M3, S_1015 still falls by 5.0 (135.3 → 130.3): seven fewer parameters (−14 in 2k) outweigh a rise of 9.0 in Σz² in the other blocks.
+  - Without either block (P·TB·Y·D0 → P·Y·D0), S_1015 rises by 404.5. The teacher-pay block rises by more than that (+444.1); S without that block falls by 39.7 (130.3 → 90.6). Teachers are then negatively selected (latent z −0.29, A4 ✗) and their premia fall to −0.72/−0.63.
+- *Y.* +347.6 without college, +190.1 with it.
+- *D0.* +658.8: without a staffing closure, Y prices teachers out of the suburb (S1·Y·D0 → S1·Y).
+- *S1.* The clean pair (exp-1015/s1 → C4′) is −78.6. S1 alone (393.7) is worse than C4′: it needs a staffing closure.
+- *ρ.* +16.9 at P·TB·Y·D0: growth z goes from +0.8 to +6.3 and V4 z from −5.3 to −2.7. In the M family, removing ρ raises S_1015 by 13.7 (M·Y·D0·ρ → S1·Y·D0) but lowers it by 22.3 (M·Y·R·ρ → S1·Y·R). At S1·Y·R the growth miss is only z +3.1, so ρ's cost in V4 (z −4.2 → −6.6) dominates.
+- *P·D0*, the specification closest to September (9 parameters), scores 883.5.
+
+**Measurement concepts** (diagnostic; selection stays under O):
+
+| moment | O | R | I | RI |
+|---|---|---|---|---|
+| V1 | 0.112 (0.017) | 0.049 (0.013) | = O | 0.049 |
+| V3 | −0.089 (0.009) | −0.051 (0.006) | −0.085 (0.009) | −0.051 (0.007) |
+| V4; V5 | 0.289; 0.003 | 0.100; 0.001 (seen) | = O | = R |
+| V6a | −0.187 (0.017) | −0.110 (0.014) | −0.173 (0.016) | −0.103 (0.014) |
+| V6z | −0.222 (0.036) | −0.099 (0.040) (seen) | = O | = R |
+| S_1015: C4′ | 315.1 | 143.3 | 299.9 | 135.3 |
+| S_1015: S1·Y·D0 | 151.6 | 251.6 | 151.1 | 255.0 |
+| S_1015: P·TB·Y·D0·ρ | 114.6 | 160.0 | 113.0 | 165.3 |
+
+- *I* (per-adult family income, I1, the primary) barely changes the targets (V6a ×0.92, V3 ×0.95), so the I refit was not triggered.
+  - The pre-registered sensitivity I2 pairs each child with each co-resident parent and ranks by that parent's own earnings, which is the model's adult–child pair taken literally. It flattens V6a to −0.110 (0.011), ×0.59 (×0.58 against O on the same own children), as much as R does (×0.59).
+  - I2 triggers no refit, but whether income is the family's or the individual's matters for V6a as much as race does.
+- *Under R*, the income-taste fits (the 11 selectable Y fits; the teachers-exempt diagnostics TX-M and TX-P aside) overshoot V1 (+8.3 to +9.3 SE; +8.8 at the selection) and V6a (−5.5 SE, by construction, since Y targets the O value). The fits with a staffing closure also overshoot V3 (−2.0 to −5.0 SE; −2.2 at the selection).
+  - Only the three ρ = 0.3 fits, the selection among them, fit V4, V5 and V6z within about 1.3 SE (V6z +1.29 to +1.33).
+  - At ρ = 1 the closure fits overshoot V4 by 1.5–5.0 SE and growth by 2.3–7.1 SE (S1·Y·D0 +4.2 and +6.0, as the PREREG expected). S1·Y, which has no closure, undershoots both by 12–16 SE.
+  - C4′, which barely sorts, scores best there.
+  - So between-race composition decides how much income sorting the targets require. At the selection, V3 and V4 lie between the two concepts, V6a is at O (targeted), V1 exceeds both (0.166 against 0.112 and 0.049), and V6z is weaker than both (−0.046 against −0.222 and −0.099).
+  - R pools V1 and V3 with national group shares, as §M specifies (50 states, DC and Puerto Rico; without Puerto Rico V1_R is 0.0004 lower and V3_R 0.0003 less negative). The first computation used the partition's shares (0.053, −0.053); it is kept as a sensitivity (`scores_1016_partition_shares.md`).
+  - *Cross-checks* (PUMS, reported only): within race, V1 is 0.30 of its all-race value on the PUMS (+0.028 of +0.093), against 0.44 by the district route. The PUMS within-race V3 is −0.055 (0.007), against the district route's −0.051 (0.006).
+- *Teacher pay* (PUMS 2018, age- and sex-adjusted log annual wage, suburb − city):
+  - by residence +0.025 (0.017);
+  - by workplace +0.009 (0.023);
+  - at a fixed workplace +0.021 (0.009);
+  - other workers by residence +0.050 (0.017).
+
+  The workplace contrast is pinned by the targeted salary gap. The fixed-workplace contrast is the discriminating untargeted check.
+
+**Teacher-quality route.**
+- *Source.* At S1·Y·D0, the workplace gap in teachers' mean log h is 0.101; S1·D0, which has no Y, gives 0.014.
+  - About 70% of the gap is the occupational shock ϵ_T. Birth-location Q contributes 12% and ability 5%.
+  - By residence the gap is 0.128, with the same shares (ϵ_T 70%, Q 12%). At the selection it is 0.096, and ϵ_T alone gives 0.098 (ability, −0.010, offsets Q and investment).
+  - Occupation is chosen per birth location before residence, on inclusive values. A suburban-born household mostly stays, so the suburb's taste enters both its options, and teaching gains ζ_y(ln ŷ_T − ln ŷ_O). The suburban-born therefore select into teaching on ϵ_T.
+  - The residence gap (0.128) exceeds the workplace gap, so a hiring margin on crossers is not indicated (H-hire not triggered).
+- *Teachers exempt from the income taste* (diagnostic) reverses the sorting instead of removing it.
+  - At fixed ϑ the workplace gap is −0.141 and growth −0.025. Refitted, the reversal stays: −0.222 with college (TX-M, S_1015 417.7) and −0.293 without it (TX-P, 656.6). Both refits pass the Nz = 13 check (at most 0.024 and 0.025 SE).
+  - Under D0 the closure absorbs the taste level, so T-a (lyT_fixed = lyref) ≈ T-b: G_w −0.143 against −0.141 at S1·Y·D0, and −0.197 against −0.197 at P·TB·Y·D0. Under R, where b_T is a fitted parameter and is not re-solved, it does not. At S1·Y·R, T-a gives G_w −0.070 with FTE +0.139 and growth +0.050, while T-b's growth of +0.002 comes with FTE +0.051.
+  - With the gradient removed only from the teaching option, teaching's relative gain falls with the market option's income, so low-income suburban-born households enter teaching.
+  - The route rule reads "confirmed" only on its one-sided wording, because the rule did not anticipate an overshoot. The evidence for the route is the decomposition together with S1·D0.
+- *Reading.* Teacher quality by location follows the difference between the income grading of the teaching and the market option. Equal grading gives +0.101 and none gives −0.141 (at S1·Y·D0).
+  - By linear interpolation between the base and T-b (not a model run), grading teachers at roughly 60–80% of non-teachers' would put the workplace gap near zero, and growth and the fixed-workplace contrast near the data: 58–71% at S1·Y·D0, 70–79% at P·TB·Y·D0 (both ρ = 1; there is no T-b run at the selection).
+  - A household model would dilute the own-income gradient of both options, so where it lands needs a refit.
+
+**CFR concept, ρ = 0.3.** β falls to ×0.30 in every fit, so school quality explains less of the score and growth gaps. At P·TB·Y·D0, growth z goes from +6.3 to +0.8 and V4 z from −2.7 to −5.3. In the college fits the own-location elasticity ends above A6's bound (3.72 and 3.73, severe): ρ pushes S1·Y·D0 past it (3.699 → 3.716 in M·Y·D0·ρ), while S1·Y·R was already above it at ρ = 1 (3.715 → 3.734 in M·Y·R·ρ). In P·TB·Y·D0, the only specification with a Jacobian at both values of ρ, ρ also sharpens β's identification: β's unique norm rises from 7.0 to 23.4.
+
+**Review.** An Opus review with four independent auditors re-derived the scores, criteria, concept values (then with partition shares) and route statistics that were available before TX-M finished, and found no blocker. A second, read-only verification (2026-10-17) re-derived the national-share concepts and all 21 candidates' scores, criteria and block-removal rows. It found no error in any score or in the selection. Its documentation corrections are applied here, and the two TX re-solves at Nz = 13 it asked for were run. The first review led to these corrections:
+- the national shares for R;
+- the inventory fits S1·R·E and C1 added to the table;
+- the clean S1 removal;
+- the narrower readings of the route verdict and of the exemption above;
+- a record that Amendment 2 followed login-node subset tests, without effect on any outcome.
+
+The working log has the errata.
+
+**Decisions for the user.**
+1. *Race concept.* Under O the selection misses V4 and V6z by about 5 SE. Under R it fits them but overshoots V1 and V6a (V6a by construction, since it is targeted at its O value). A race-consistent target set needs a within-race first stage, or a group dimension in the model.
+2. *Teacher sorting.* The remaining untargeted teacher-sorting miss is the fixed-workplace pay contrast, at 3.4× the data. By the interpolation above (at the ρ = 1 fits; not a model run), teachers' location taste would have to be about 60–80% as income-graded as non-teachers'. Household structure, with spouses' income in the location choice, is the structural candidate; a partial-grading re-solve at fixed ϑ would be a cheap first check of it. The I2 sensitivity shows that the V6a target itself depends on household structure.
+3. *Adoption.* Three checks remain before P·TB·Y·D0·ρ could replace the September baseline: sample and payroll alignment, the in-equilibrium first stage (it holds the first stage's aggregates but misses the gender gap and cell wages; see *Checks*), and the full bootstrap. Opening B1 is the user's call.
+
 ### First internal fit, overidentified (2026-09-29)
 
 Historical reference for Table 5: [`runs/polish-noincome/`](runs/polish-noincome/), nine moments including FTE, criterion 5.15. Salary misses by −1.23 SE and FTE by +1.72 SE; earnings are −0.015 versus 0.112 and scores 0.007 versus 0.289. A second minimum near $r_m=0$ has criterion 28.6. Removing FTE from the criterion yields the single root found above, with a larger FTE validation miss. Detailed reports and search journals remain in `runs/`.
@@ -621,9 +782,38 @@ For any remaining exact-baseline reruns: explicitly activate FTE when targeted; 
 
 ## 5. To-do
 
+### Accepted preferences and next sequence (2026-10-16)
+
+**User decision.** The user provisionally accepts the recommendations following round 2026-10-15c, provided all previous work is preserved. The user prefers to err on the side of simplicity and is skeptical of several recent extensions, specifically college choice and licensure, because they substantially depart from the previous model structure. The user is nevertheless open to trying new mechanisms to make progress. This accepts an experimental direction, not any particular extension or final specification.
+
+**Implications for model selection.**
+
+- Preserve the September exact fit as the reference and retain C4′, S1·R·E and the round-c fits as historical evidence. Their existing designations and selection outcomes are unchanged.
+- Treat M3's college choice and licensure as optional experimental blocks. The October 15 instruction to retain them is no longer a requirement for every new candidate. Their documented gains in teacher schooling and selection remain evidence, but must be weighed against the departure from the original structure.
+- Include a simpler candidate close to the September model and comparisons with extensions removed where feasible. Refit comparable targets, state any changed identification/target map, and report the fit lost or gained when a block is removed. Do not assume simply switching a block off at another model's fitted parameters establishes its best attainable fit.
+- Prefer the smallest change that addresses an identified failure. Record extra parameters, economic assumptions and independent identifying evidence alongside fit; do not select a more complex model on its aggregate score alone. Retain unsuccessful experiments rather than deleting them.
+- New household groups, detailed housing demand and hiring rules are hypotheses to assess. None is adopted by this approval, and no complexity penalty or acceptance threshold is changed retroactively.
+
+**Authorized next sequence.**
+
+1. **Measurement first.** Pre-specify the population, weighting, income and race-composition concepts before the remaining calculations. Re-score existing fits under both the original and alternative definitions. Acknowledge that within-race V4, V5 and V6z have already been inspected. Keep the exercise diagnostic: a replacement target set requires consistent first-stage estimation and a separately specified comparison.
+2. **Isolate teacher-quality sorting.** Measure teacher human capital by residence and workplace, and use the income preference switched off for teachers as a diagnostic. Start from the saved Y/D and staffing-targeted comparators, while retaining the simpler reference. This diagnostic exemption is not itself a proposed permanent economic assumption.
+3. **Test a small, simple comparison.** If the teacher-quality route is confirmed, test a minimal allocation/hiring margin that changes who fills positions, with independent teacher-composition evidence where available. Compare simpler variants before building out college/licensure, explicit household groups or detailed housing. Decide whether those larger additions are needed from the measurement and mechanism evidence.
+4. **Validate before adoption and inference.** Pre-specify targets versus validation and joint acceptance criteria, including staffing, teacher residence/commuting, selection, achievement levels and growth, and the gender wage gap. Use Nz ≥ 9 and a finer-grid check for strongly sorted candidates. Complete identification, sample/payroll alignment and in-equilibrium first-stage checks before the full bootstrap.
+
+**What the current mechanisms mean.**
+
+- **Income-dependent sorting (Y).** Residential sorting means households with different incomes choose different locations. The implemented Y term adds $\zeta_y(\log\hat y-\ell_{y,\mathrm{ref}})$ to the utility of suburban residence, with the city interaction normalized to zero. Here $\hat y$ is the node's predicted pre-tax income and the reference is frozen. For positive $\zeta_y$, higher-income households receive a larger suburban preference. It affects location choice and, through location values, occupation/education choices. It is a reduced-form stand-in for income-dependent willingness to pay for housing or amenities; it does not solve housing quantities, rents or housing supply. Its coefficient is fitted to the parental-income city-share gradient, so matching that gradient is a target fit rather than independent validation.
+- **Teacher demand (D).** The earlier supply-driven allocation lets teachers' choices determine staffing at the posted pay schedules. D instead imposes a rule for the suburb/city gap in teaching positions per pupil (`fte_rule`). The solver adjusts the relative workplace access/rationing term $b_T$ until teachers' workplace choices satisfy that rule. D0 sets the log gap to zero: equal teacher positions per pupil, not equal total teacher counts. The rule is imposed rather than derived from district optimization or a detailed budget, and the existing choice model still determines teacher quality among those filling positions. Thus D is a minimal staffing closure, not yet a full model of district hiring. R is the comparator that fits $b_T$ to the observed FTE gap; at an exact fit it corresponds to D with that observed gap as the rule.
+- **Why test them together?** Y asks whether income-related location preferences can account for household sorting; D asks whether limited teaching positions can prevent household location choices from determining staffing unchecked. The latest tests show their combination improves several moments, but excessive teacher-quality sorting remains. These results do not establish that either device must survive in the final specification.
+
+**Preservation.** All existing source, fitted parameters, moments, outputs, inputs, preregistrations and snapshots remain intact. Never overwrite historical runs; use a new named round, separate output directories, and switches/configurations that preserve prior behavior. Preserve uncommitted work and sealed-data ignore rules. Before this documentation edit, the calibration note, this log and `runs/README.md` were archived and every member verified by SHA-256 in [`runs/_code/accepted-preferences-20261016/`](runs/_code/accepted-preferences-20261016/README.md). This is a local documentation snapshot; the earlier source/evidence checkpoint remains separately available. No source or model output changes in this update.
+
+**Readiness.** Clear to proceed with measurement design, diagnostic re-scoring and the small experimental sequence above without another general approval request. The immediate deliverable is the pre-specified measurement comparison and simple candidate/target map. Final specification choice remains open; approval does not authorize opening sealed B1. Parallel or potentially long computations must use SLURM with the existing credential, logging and provenance requirements. This documentation update launches no estimation or data jobs.
+
 ### Next round (proposed after 2026-10-15c)
 
-This is a proposal. It needs the user's decisions on how the model treats race, and on whether to model the group dimension. The accepted plan's preservation rules apply.
+Historical proposal, provisionally accepted on October 16 subject to the simplicity and preservation preferences above. Measurement diagnostics may proceed; explicit group structure remains an option to assess, not a selected model requirement. The original proposal is retained to distinguish its recommendations from the user's subsequent qualifications.
 
 1. **Decide how the model treats race before adding mechanisms.** Every sorting target mixes in between-race composition, and the model has no race ([round 2026-10-15c](#round-2026-10-15c-income-graded-sorting-y-and-teacher-demand-d)). A raceless model with the full income distribution should produce the part of the between-race location differences that runs through income, but not the rest: segregation, wealth, discrimination and preferences.
    - **(a) Race-consistent re-scoring: a diagnostic and data work only; first.**
@@ -648,6 +838,8 @@ This is a proposal. It needs the user's decisions on how the model treats race, 
 5. **Unchanged.** M3 with γ < 1 and S1; fits at Nz ≥ 9 with Nz = 13 checks; non-homothetic housing (CGHH-style quality tiers) as the structural successor to the reduced-form ζ_y once the concepts are settled.
 
 ### Accepted development plan (2026-10-15)
+
+Historical authorization and sequence. The October 16 preferences above control new work, especially the status of M3 as an optional benchmark rather than a required extension. Preserve this plan and its associated results as the record of that round.
 
 **Decision and scope.** After reviewing both October 15 rounds, the user provisionally accepted the recommendations on condition that previous work remains preserved. Development can proceed without another general approval request. This accepts a research direction, not a fitted specification: retain the September exact baseline, C4′ as the designated development candidate and S1·R·E as a diagnostic benchmark. The historical experiment scores and selection decisions stand. This documentation update launches no model runs.
 

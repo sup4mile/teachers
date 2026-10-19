@@ -147,6 +147,14 @@ child's ability. `expm1` avoids cancellation as ψ → 1.
 #           suburban workplace, BT = (0, b), is the shadow price that rations the positions: `solve_ge` solves b
 #           as an aggregate of the outer fixed point, so that teachers working in each location per pupil differ
 #           by exactly `fte_rule`. The solution carries the equilibrium b in `p.BT`. Off, BT is a parameter
+# One diagnostic switch of round 2026-10-16, off at its default (NaN), composes with all of the above:
+#   lyT_fixed  teachers' income-graded taste at one common income (`teach_node`, `income_taste`): when finite, the taste
+#           term of every TEACHER node is By_r (lyT_fixed − lyref) instead of By_r (ln ŷ − lyref) with the node's own
+#           ln ŷ, so By cannot sort teachers by their own pay (it is a constant per residence and branch for them);
+#           non-teacher nodes are unchanged. It touches the location values of teacher nodes only: consumption, taxes,
+#           Proposition 2′, `predicted_log_income` and `mean_predicted_log_income` do not move. Inert when By = 0.
+#           A diagnostic (`--external lyT_fixed=-3.04`), not a calibrated parameter; NaN: off, and the model is
+#           bit for bit the one without it
 # `occ_sample` records the occupational sample of the calibration's occupational block and is
 # not used here. Nor is `move_util` (2026-10-15): it tells the calibration (`theta_to_params`) to read its
 # moving-cost parameter r_m as a utility cost `τmove` (utils) instead of the goods cost `mcost` (r_m C̄); the
@@ -226,6 +234,7 @@ Base.@kwdef struct Params
     Bd::Vector{Float64} = [0.0, 0.0]   # extra amenity of residence r for BA holders (d = 1), utils; location choice only
     By::Vector{Float64} = [0.0, 0.0]   # taste for residence r per unit of predicted log income ln ŷ − lyref (utils); location choice only
     lyref::Float64      = NaN          # frozen reference of ln ŷ for `By`; must be set when By ≠ 0 (NaN: unset)
+    lyT_fixed::Float64  = NaN          # diagnostic: ln ŷ of every teacher node in the income taste `By` (NaN: off, the node's own)
     # teacher effectiveness h_T z^{−(1−ωz)α} for Q and the CFR experiment (any `college`; 1 = h_T)
     ωz::Float64   = 1.0
     occ_sample::Symbol = :acs2009_13   # occupational sample of the calibration's block (metadata)
@@ -313,6 +322,7 @@ function check_params(p::Params)
     @assert all(isfinite, p.Bd) "Bd must be finite"
     @assert all(isfinite, p.By) "By must be finite"
     @assert all(iszero, p.By) || isfinite(p.lyref) "the income-graded taste By ≠ 0 needs its frozen reference lyref (--external lyref=…)"
+    @assert !isinf(p.lyT_fixed) "lyT_fixed must be finite (NaN: off)"
     if !isnan(p.fte_rule)
         @assert isfinite(p.fte_rule) "fte_rule must be finite (NaN: off)"
         @assert p.split && L == 2 "the teacher-demand closure (fte_rule) needs the split and two locations"
@@ -535,12 +545,14 @@ goods_cost(l, p::Params) = p.mcost[l, :] .+ p.pres .+ p.csub * p.Cbar
 The node of the teaching problem at shock ϵ_T and of the non-teaching problem at X_O*: the
 baseline node (`plain_teach_node`, `plain_nonteach_node`; under `p.split` the `NestedNode` of
 §3b, `nested_teach_node`, `nested_nonteach_node`), and under `p.college` the node of education
-branch `d` ∈ {0, 1} derived from it (`with_education`, §3c); `d` is ignored otherwise.
+branch `d` ∈ {0, 1} derived from it (`with_education`, §3c); `d` is ignored otherwise. With
+`p.lyT_fixed` finite (round 2026-10-16, a diagnostic) the income-graded taste of a teacher node is graded at
+that common ln ŷ instead of the node's own (`income_taste`); every teacher node of the model is built here.
 """
 function teach_node(ϵT, zi, l, g, Λ, p::Params, gr; d = nothing)
     nd = p.split ? nested_teach_node(ϵT, zi, l, g, Λ, p, gr) : plain_teach_node(ϵT, zi, l, g, Λ, p, gr)
     nd = p.college ? with_education(nd, p, d, :teach) : nd
-    return income_taste(nd, p, gr)
+    return isnan(p.lyT_fixed) ? income_taste(nd, p, gr) : income_taste(nd, p, gr; ly = p.lyT_fixed)
 end
 
 function nonteach_node(XO, zi, l, g, Λ, p::Params, gr; d = nothing)
@@ -665,23 +677,27 @@ function predicted_log_income(nd::AbstractNode, p::Params, gr)
 end
 
 """
-    income_taste(nd, p, gr) -> node
+    income_taste(nd, p, gr; ly = nothing) -> node
 
 The node with the income-graded location taste `Params.By` (round 2026-10-15c): its residence-level additive
 term `Λ` (by residence r) gains By_r (ln ŷ − lyref), with ln ŷ the node's predicted log income
 (`predicted_log_income`), a constant of the node. Like `Bz` and `Bd` it enters location choice only. Returns
 `nd` itself when `By` is zero (off), so the model without it is reproduced bit for bit.
+The keyword `ly` (round 2026-10-16, `teach_node` with `Params.lyT_fixed`) replaces the node's own ln ŷ by a
+given number; its default `nothing` evaluates `predicted_log_income` and performs the same floating-point
+operations as before the keyword existed (a default of `predicted_log_income(...)` itself would be evaluated even
+when `By` is zero).
 """
-function income_taste(nd::Node, p::Params, gr)
+function income_taste(nd::Node, p::Params, gr; ly = nothing)
     all(iszero, p.By) && return nd
-    Λ = nd.Λ .+ p.By .* (predicted_log_income(nd, p, gr) - p.lyref)
+    Λ = nd.Λ .+ p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
     return Node(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.l, nd.smin, nd.smax, nd.ϑs)
 end
 
 # The `NestedNode` of §3b, defined below (the only other subtype of `AbstractNode`).
-function income_taste(nd::AbstractNode, p::Params, gr)
+function income_taste(nd::AbstractNode, p::Params, gr; ly = nothing)
     all(iszero, p.By) && return nd
-    Λ = nd.Λ .+ p.By .* (predicted_log_income(nd, p, gr) - p.lyref)
+    Λ = nd.Λ .+ p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
     return NestedNode(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.bw, nd.lP, nd.l, nd.smin, nd.smax, nd.ϑs)
 end
 
@@ -1876,6 +1892,8 @@ function solve_ge(p::Params = Params();
         all(iszero, p.By) || @printf("  income-graded taste: By=%s utils per log point of predicted income (lyref=%.4f)\n",
                                      fmtvec(p.By), p.lyref)
         isnan(p.fte_rule) || @printf("  teacher-demand closure: positions per pupil gap %.4f; BT[2] solved in GE\n", p.fte_rule)
+        isnan(p.lyT_fixed) || @printf("  diagnostic: teachers' income taste graded at ln ŷ = lyT_fixed = %.4f (non-teachers: their own)%s\n",
+                                      p.lyT_fixed, all(iszero, p.By) ? "  [By = 0: inert]" : "")
         flush(stdout)
     end
 

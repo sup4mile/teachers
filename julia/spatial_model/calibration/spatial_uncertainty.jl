@@ -49,7 +49,9 @@
 #                          sampling SE), σ the FOO (2013) SE at η and K (0.296 at K = 12).
 #                          With the M3 entries s_z and σ_ϵ of ϑ nonzero (free or fixed) the externals
 #                          of those names are overridden by ϑ: the default list drops them (with a
-#                          note), an explicit list naming them is an error
+#                          note), an explicit list naming them is an error. The diagnostic switch `lyT_fixed` and the
+#                          measurement choice `cfr_rho` (round 2026-10-16) have no uncertainty: naming either is an
+#                          error (set them with --external lyT_fixed=… and --measure cfr_rho=… to evaluate there)
 #   --ext-step X           central-difference step of an external, in its SEs [0.1]. At the
 #                          baseline 0.03 and 0.1 give moment SEs within about 2% (σ's contribution
 #                          within 1.5%); 0.3 is too coarse (σ's contribution moves by up to 12%, the external SE of gap_income by 9% and of the FTE gap by 7%)
@@ -231,6 +233,13 @@ function external_inputs(opts, base::Params, meas::Measurement; θ = nothing)
             continue
         end
         name in THETA_NAMES && name !== :s_z && error("--externals $nm: $name is in ϑ, not an external input")
+        # round 2026-10-16: a diagnostic switch and a measurement choice have no sampling uncertainty to propagate
+        name === :lyT_fixed &&
+            error("--externals lyT_fixed: a diagnostic switch (round 2026-10-16), not an input with a standard error; evaluate the ",
+                  "delta method at the switched model with --external lyT_fixed=… and leave it out of --externals")
+        name === :cfr_rho &&
+            error("--externals cfr_rho: the CFR effectiveness concept is a measurement choice (--measure cfr_rho=…), not an external ",
+                  "input; it has no standard error and no perturbation of a measurement choice is implemented")
         value = haskey(over, name) ? over[name] : hasproperty(EXTERNAL, name) ? EXTERNAL[name] : getfield(base, name)
         value isa Real || error("--externals $nm: the value $value is not a number")
         # round 2026-10-15c: a switch that is off (fte_rule = NaN) or inert (lyref with By = 0) has nothing to perturb

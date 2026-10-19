@@ -71,6 +71,13 @@ estimated; each is a documented choice (§1 and §3 of the calibration note).
 - `pooled_p9010 = false`: compute the pooled within-occupation 90/10 of non-teachers' wages
   (`pooled_p9010`, a slow second pseudo-sample; NaN otherwise), the σϵ target of the joint
   estimation; `wage_sample = :acs2009_13` picks the wage-sample weights (`WAGE_SAMPLE_COUNTS`).
+- `cfr_rho = 1.0` (round 2026-10-16), 0 < ρ ≤ 1: the correlation of teachers' log effectiveness with
+  log h_eff (the model's teacher quality, `effective_h`) in the CFR bridge. CFR's one SD is one SD of value
+  added, log a = log h_eff + ν with ν independent of everything in the model (absorbed in the level of Q), so
+  sd(log a) = sd(log h_eff | workplace)/ρ and the intervention raises the child's school input by
+  δ = β sd(log a)/K (`teacher_intervention`; only β times the loading of h_eff on a is identified, so the loading
+  is one). It is a measurement concept like χ and K, not a parameter. 1.0: a is h_eff, and the model without
+  it is reproduced bit for bit (`sd/1.0 == sd`). `--measure cfr_rho=0.3`.
 """
 Base.@kwdef struct Measurement
     χ::Float64            = log(1.12)
@@ -86,6 +93,7 @@ Base.@kwdef struct Measurement
     child_grade::Float64  = 4.0
     pooled_p9010::Bool    = false
     wage_sample::Symbol   = :acs2009_13
+    cfr_rho::Float64      = 1.0
 end
 
 "Copy of `m` with the named fields replaced."
@@ -273,6 +281,188 @@ function teacher_logh_sd(st, scope::Symbol)
     throw(ArgumentError("teacher_sd must be :within or :pooled, got :$scope"))
 end
 
+"""
+    teacher_sorting_stats(sol, meas) -> NamedTuple
+
+Who teaches where (round 2026-10-16; a diagnostic of the teacher-quality route, no target uses it). One pass over the
+cells (birth location l, ability z, gender g, education branch) in the loop of `location_stats_split` (and of
+`location_stats` in the bundled model, where r = w = the work location, so only the diagonal is filled), accumulating
+mass-weighted sums over the teachers by residence r and workplace w as L × L matrices indexed `[r, w]`:
+- `m`: mass; `lh`, `le`: Σ log h_T and Σ log h_eff (`effective_h`, the effectiveness behind Q and the CFR
+  experiment); `hb`: Σ h_eff^{β/σ}, what H̃_T aggregates;
+- `lpay`, `pay`: Σ log and Σ level of pre-tax pay (1 − τω) κ_w h_T^γ × pay factor (the `lyT` of `location_stats`);
+- `yh`: Σ ln ŷ, the predicted log income of the teacher's node (`predicted_log_income`, at her birth location,
+  whatever she chooses and whatever `Params.lyT_fixed` is);
+- `dQ`, `dz`, `dϵ`, `ds`, `de`: Σ of the five terms of log h_T = log Q_l + α log z + α log ϵ_T + φ log s + η log e
+  (`teacher_h`): the school quality of the birth location, ability, the occupational shock, schooling and goods
+  investment; `born`: the mass born in location 2 (l = 2);
+and, for the non-teaching market workers by residence r (home producers, weight P(i* = hp | X_O*) when `meas.hp ≠ 0`,
+are left out), the vectors `mO` (mass), `lyO` (Σ log income, the `capO` of `location_stats`) and `yhO` (Σ ln ŷ of
+`nonteach_node`). `resid` is the largest node-level distance between log h_T and the sum of its five terms (round-off).
+The integrals are those of `location_stats` (`integrate_teach` of the same integrands for the masses and log h_T),
+so that the sums over r and over w reproduce its `nT`, `logh` and `pay` up to the order of the additions. The pieces
+of the decomposition are integrated separately and sum to the total up to the quadrature tolerance, not exactly
+(`sorting_moments`, `decomp_resid_max`).
+"""
+function teacher_sorting_stats(sol, meas::Measurement)
+    (; hh, Φ, gr, p) = sol
+    (; Nz, L, nϵT, nXO, ϵTgrid, XOgrid) = gr
+    PT, PO = p.split ? (sol.Pi_TW, sol.Pi_OW) : (sol.Pi_T, sol.Pi_O)
+    pairs_rw = p.split ? [(r, w) for r in 1:L for w in 1:L] : [(w, w) for w in 1:L]
+    expo = p.β / p.σ
+    hp_ok = meas.hp != 0 && meas.hp in gr.nonteach
+    wmkt = [hp_ok ? [1 - argmax_prob(gr, g, XOgrid[k, g], meas.hp) for k in 1:nXO] : ones(nXO) for g in 1:2]
+    m = zeros(L, L); lh = zeros(L, L); le = zeros(L, L); hb = zeros(L, L)
+    lpay = zeros(L, L); pay = zeros(L, L); yh = zeros(L, L)
+    dQ = zeros(L, L); dz = zeros(L, L); dϵ = zeros(L, L); ds = zeros(L, L); de = zeros(L, L); born = zeros(L, L)
+    mO = zeros(L); lyO = zeros(L); yhO = zeros(L)
+    resid = 0.0
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, PT, PO, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
+        iszero(mass) && continue
+        hbr, d = br.h, br.d
+        cm   = choice_maps(hbr, g, l, zi, gr)
+        hT   = hbr.hT[g, l, zi, :]
+        lhT  = log.(hT)
+        hE   = effective_h(hT, zi, p, gr)
+        lhE  = p.ωz == 1.0 ? lhT : log.(hE)
+        hEx  = hE .^ expo
+        lpf  = log.(teacher_pay_factor(hbr.sT[g, l, zi, :], p, d))
+        cQ, cz = log(gr.Q[l]), p.α * log(gr.z[zi])
+        t_ϵ, t_s, t_e = p.α .* gr.lϵT, p.φ .* log.(hbr.sT[g, l, zi, :]), p.η .* log.(hbr.eT[g, l, zi, :])
+        resid = max(resid, maximum(abs, lhT .- (cQ .+ cz .+ t_ϵ .+ t_s .+ t_e)))
+        qyh  = [predicted_log_income(teach_node(ϵTgrid[k], zi, l, g, hbr.Λ, p, gr; d), p, gr) for k in 1:nϵT]
+        for (r, w) in pairs_rw
+            πT  = p.split ? br.πT[g, l, zi, :, r, w] : br.πT[g, l, zi, :, w]
+            lyT = log((1 - p.τω[p.T, g]) * p.κ[w]) .+ p.γ .* lhT .+ lpf
+            mT  = mass * integrate_teach(πT, cm, gr)
+            m[r, w]    += mT
+            lh[r, w]   += mass * integrate_teach(πT .* lhT, cm, gr)
+            le[r, w]   += mass * integrate_teach(πT .* lhE, cm, gr)
+            hb[r, w]   += mass * integrate_teach(πT .* hEx, cm, gr)
+            lpay[r, w] += mass * integrate_teach(πT .* lyT, cm, gr)
+            pay[r, w]  += mass * integrate_teach(πT .* exp.(lyT), cm, gr)
+            yh[r, w]   += mass * integrate_teach(πT .* qyh, cm, gr)
+            dQ[r, w]   += cQ * mT
+            dz[r, w]   += cz * mT
+            dϵ[r, w]   += mass * integrate_teach(πT .* t_ϵ, cm, gr)
+            ds[r, w]   += mass * integrate_teach(πT .* t_s, cm, gr)
+            de[r, w]   += mass * integrate_teach(πT .* t_e, cm, gr)
+            l == 2 && (born[r, w] += mT)
+        end
+        lyOk = log.(hbr.capO[g, l, zi, :])
+        qyhO = [predicted_log_income(nonteach_node(XOgrid[k, g], zi, l, g, hbr.Λ, p, gr; d), p, gr) for k in 1:nXO]
+        for r in 1:L
+            πO = p.split ? vec(sum(br.πO[g, l, zi, :, r, :]; dims = 2)) : br.πO[g, l, zi, :, r]
+            q  = πO .* wmkt[g]
+            mO[r]  += mass * integrate_nonteach(q, cm, gr)
+            lyO[r] += mass * integrate_nonteach(q .* lyOk, cm, gr)
+            yhO[r] += mass * integrate_nonteach(q .* qyhO, cm, gr)
+        end
+    end
+    return (; m, lh, le, hb, lpay, pay, yh, dQ, dz, dϵ, ds, de, born, mO, lyO, yhO, resid)
+end
+
+"""
+    sorting_moments(ts, sol) -> NamedTuple
+
+The `model_moments` keys of round 2026-10-16 that come from the sums of `teacher_sorting_stats` (`ts`), each a suburb
+minus city contrast (index 2 minus 1) or a level; every entry is finite or NaN (an empty cell, a location without
+teachers, or the contrasts that need a workplace for both residences in the bundled model). By residence (`_res`) and
+by workplace (`_work`):
+- `gap_logh_teacher_res`, `gap_logh_teacher_work`: Δ mean log h_T (the work version is `gap_logh_teacher` of
+  `model_moments` up to the order of the additions); `gap_logheff_teacher_res/_work`: Δ mean log h_eff;
+  `gap_Heff_teacher_res/_work`: Δ log E[h_eff^{β/σ}] (log ratio of means);
+- `gap_logpay_teacher_res/_work`: Δ mean log pre-tax pay; `gap_salary_res`: Δ log mean pay by residence (the workplace
+  version is `gap_salary`);
+- `gap_lyhat_teacher_res/_work`: Δ mean ln ŷ of the teachers' nodes; `mean_log_yhat_teach`: the mean ln ŷ of all
+  teachers (the level `Params.lyT_fixed` is set to in the diagnostic T-b); `mean_log_yhat_mkt`: the mean ln ŷ of
+  all market workers (teachers and non-teaching market workers: home producers excluded when `meas.hp ≠ 0`), and
+  `mean_log_yhat_nonteach_mkt` that of the non-teaching ones;
+- `gap_logh_teacher_{res,work}_{Q,z,eps,s,e}`: the contribution of each term of log h_T = log Q_l + α log z + α log ϵ +
+  φ log s + η log e to the Δ mean log h_T (Δ of the mean of the term); `decomp_resid_max`: the largest distance, in log
+  points, between a cell's mean log h_T and the sum of its five terms (integrated separately, so it is the quadrature
+  tolerance, not zero); there is no 'other' term, `teacher_h` having no further factor;
+- `share_born_suburb_res/_work`: the share of the teachers (by residence, by workplace) born in location 2;
+- levels `teacher_logh_res/_work`, `teacher_logpay_res/_work`, `teacher_lyhat_res/_work`, `teacher_Heff_res/_work`
+  (mean log h_T, mean log pay, mean ln ŷ and E[h_eff^{β/σ}] by residence and workplace) and
+  `nonteach_mkt_logy_res`, `nonteach_mkt_lyhat_res`, `nonteach_mkt_mass_res` (non-teaching market workers by residence);
+- `gap_lyhat_mkt_nonteach_res`, `gap_logy_mkt_nonteach_res`: Δ mean ln ŷ and Δ mean log pre-tax income of the
+  non-teaching market workers by residence;
+- `gap_logQ_teach_quality` = σ Δ log E[h_eff^{β/σ} | teacher, w] and `gap_logQ_teach_staffing` = σ Δ log (2 n_w/M_w), with
+  n_w the teachers working at w and M_w = 2 S_w the pupils there (the normalisation of `QT` in `build_grids`; the
+  second is σ times `gap_teachers_pp`): the two parts of Δ log Q_T = `gap_logQ_teach`, and
+  `gap_logQ_teach_check` = `gap_logQ_teach` − quality − staffing, which is at the GE tolerance (the grid is built at the
+  aggregates of the last iteration, the sums here are at the choices);
+- the (r, w) cells flattened column-major, element (w − 1) L + r: `teacher_rw_mass`, `teacher_rw_logh`, `teacher_rw_logpay`;
+- `gap_logpay_teacher_res_fixedw`, `gap_logh_teacher_res_fixedw`: the residence contrast at a given workplace,
+  Σ_w m_w (x[2, w] − x[1, w]) / Σ_w m_w over the workplaces with teachers of both residences (m_w the teacher mass at w);
+  NaN in the bundled model, where nobody crosses.
+"""
+function sorting_moments(ts, sol)
+    (; Φ, gr, p) = sol
+    L = gr.L
+    gap(v) = v[2] - v[1]
+    slog(x) = x > 0 && isfinite(x) ? log(x) : NaN
+    rows(x) = vec(sum(x; dims = 2))                 # by residence r
+    cols(x) = vec(sum(x; dims = 1))                 # by workplace w
+    avg(num, den) = [d > 0 ? n / d : NaN for (n, d) in zip(num, den)]
+    mr, mw = rows(ts.m), cols(ts.m)
+    res_work(x) = (avg(rows(x), mr), avg(cols(x), mw))
+    lh_r, lh_w = res_work(ts.lh)
+    le_r, le_w = res_work(ts.le)
+    lp_r, lp_w = res_work(ts.lpay)
+    yh_r, yh_w = res_work(ts.yh)
+    He_r, He_w = res_work(ts.hb)
+    pay_r = avg(rows(ts.pay), mr)
+    Q_r, Q_w = res_work(ts.dQ); z_r, z_w = res_work(ts.dz); ϵ_r, ϵ_w = res_work(ts.dϵ)
+    s_r, s_w = res_work(ts.ds); e_r, e_w = res_work(ts.de)
+    bo_r, bo_w = res_work(ts.born)
+    parts = ts.dQ .+ ts.dz .+ ts.dϵ .+ ts.ds .+ ts.de
+    cell_resid = [ts.m[r, w] > 0 ? abs(ts.lh[r, w] - parts[r, w]) / ts.m[r, w] : 0.0 for r in 1:L, w in 1:L]
+    cellmean(x) = [ts.m[r, w] > 0 ? x[r, w] / ts.m[r, w] : NaN for r in 1:L, w in 1:L]
+    # the residence contrast at a given workplace, averaged over the workplaces with teachers of both residences
+    tol = 1e-12 * sum(ts.m)
+    ok  = [w for w in 1:L if ts.m[1, w] > tol && ts.m[2, w] > tol]
+    function fixedw(x)
+        isempty(ok) && return NaN
+        mwk = [ts.m[1, w] + ts.m[2, w] for w in ok]
+        return sum(mwk[i] * (x[2, w] - x[1, w]) for (i, w) in enumerate(ok)) / sum(mwk)
+    end
+    # the teacher-quality index: quality of the teachers and staffing (QT = (2 H̃_T/M)^σ with H̃_T = n E[h_eff^{β/σ}])
+    S    = vec(sum(Φ; dims = 1))
+    stf  = [slog(2 * mw[w] / (2 * S[w])) for w in 1:L]
+    g_q  = p.σ * gap(slog.(He_w))
+    g_s  = p.σ * gap(stf)
+    g_QT = log(gr.QT[2]) - log(gr.QT[1])
+    nm_ly, nm_yh = avg(ts.lyO, ts.mO), avg(ts.yhO, ts.mO)
+    tot_t, tot_o = sum(ts.m), sum(ts.mO)
+    return (;
+        gap_logh_teacher_res = gap(lh_r), gap_logh_teacher_work = gap(lh_w),
+        gap_logheff_teacher_res = gap(le_r), gap_logheff_teacher_work = gap(le_w),
+        gap_Heff_teacher_res = gap(slog.(He_r)), gap_Heff_teacher_work = gap(slog.(He_w)),
+        gap_logpay_teacher_res = gap(lp_r), gap_logpay_teacher_work = gap(lp_w),
+        gap_salary_res = gap(slog.(pay_r)),
+        gap_lyhat_teacher_res = gap(yh_r), gap_lyhat_teacher_work = gap(yh_w),
+        mean_log_yhat_teach = tot_t > 0 ? sum(ts.yh) / tot_t : NaN,
+        mean_log_yhat_mkt = tot_t + tot_o > 0 ? (sum(ts.yh) + sum(ts.yhO)) / (tot_t + tot_o) : NaN,
+        mean_log_yhat_nonteach_mkt = tot_o > 0 ? sum(ts.yhO) / tot_o : NaN,
+        gap_lyhat_mkt_nonteach_res = gap(nm_yh), gap_logy_mkt_nonteach_res = gap(nm_ly),
+        gap_logh_teacher_res_Q = gap(Q_r), gap_logh_teacher_work_Q = gap(Q_w),
+        gap_logh_teacher_res_z = gap(z_r), gap_logh_teacher_work_z = gap(z_w),
+        gap_logh_teacher_res_eps = gap(ϵ_r), gap_logh_teacher_work_eps = gap(ϵ_w),
+        gap_logh_teacher_res_s = gap(s_r), gap_logh_teacher_work_s = gap(s_w),
+        gap_logh_teacher_res_e = gap(e_r), gap_logh_teacher_work_e = gap(e_w),
+        decomp_resid_max = max(maximum(cell_resid), ts.resid),
+        share_born_suburb_res = bo_r, share_born_suburb_work = bo_w,
+        teacher_logh_res = lh_r, teacher_logh_work = lh_w, teacher_logpay_res = lp_r, teacher_logpay_work = lp_w,
+        teacher_lyhat_res = yh_r, teacher_lyhat_work = yh_w, teacher_Heff_res = He_r, teacher_Heff_work = He_w,
+        nonteach_mkt_logy_res = nm_ly, nonteach_mkt_lyhat_res = nm_yh, nonteach_mkt_mass_res = copy(ts.mO),
+        gap_logQ_teach_quality = g_q, gap_logQ_teach_staffing = g_s, gap_logQ_teach_check = g_QT - g_q - g_s,
+        teacher_rw_mass = vec(copy(ts.m)), teacher_rw_logh = vec(cellmean(ts.lh)), teacher_rw_logpay = vec(cellmean(ts.lpay)),
+        gap_logpay_teacher_res_fixedw = fixedw(cellmean(ts.lpay)), gap_logh_teacher_res_fixedw = fixedw(cellmean(ts.lh)))
+end
+
 # -----------------------------------------------------------------------------
 # 3. CFR fixed-class-size teacher intervention
 # -----------------------------------------------------------------------------
@@ -285,13 +475,17 @@ child's school input rises by δ = β·sd(log h_T)/K in logs. Each child re-solv
 (e, s) at Q_l e^δ with Λ, taxes and aggregates held fixed. Occupation and
 work-location weights stay at the baseline. The earnings ratio at a node does not
 depend on the destination, so fixing location only fixes the weights.
+With `meas.cfr_rho` = ρ < 1 (round 2026-10-16) the SD that CFR's "one SD of value added" is in the model's
+units is sd(log a) = sd(log h_eff)/ρ, with log a the teacher's effectiveness and ρ its correlation with log h_eff
+(`Measurement`): δ = β sd(log h_eff)/(ρK). ρ = 1 (the default) is the experiment above, bit for bit.
 
 Returns
 - `effect`: log(E y₁ / E y₀) over all children, pre-tax earnings (the target);
 - `effect_nonteach`: the same over non-teachers only;
 - `mean_dlog`: E[log(y₁/y₀)] over all children;
-- `analytic`: β·sd/(K(1−η)), exact for non-teachers when there is no goods cost;
-- `sd_logh`, `δ`.
+- `analytic`: β·sd(log a)/(K(1−η)), exact for non-teachers when there is no goods cost;
+- `sd_logh`: sd(log h_eff) (`teacher_logh_sd`); `sd_eff`: the SD of log a that the intervention uses, `sd_logh/ρ`
+  (equal to `sd_logh` at ρ = 1); `δ`.
 Under the split a teacher's pay depends on where she works, so the work-location weights are the
 workplace marginal of the joint probabilities.
 Under `p.college` both education branches are re-solved with P(d | g, l, z) held fixed (§3c);
@@ -299,13 +493,15 @@ a teacher's income carries her pay factor, which moves with her time share (`pay
 the SD of teacher quality is that of the effectiveness `effective_h` (h_T unless ωz ≠ 1).
 """
 function teacher_intervention(sol, meas::Measurement; stats = location_stats(sol))
+    0 < meas.cfr_rho ≤ 1 || throw(ArgumentError("cfr_rho must lie in (0, 1], got $(meas.cfr_rho)"))
     sol.Pi_T === nothing &&
         return teacher_intervention(merge(sol, (; Pi_T = workplace_probs(sol.Pi_TW), Pi_O = workplace_probs(sol.Pi_OW))),
                                     meas; stats)
     (; hh, Φ, Pi_T, Pi_O, gr, p) = sol
     (; Nz, L, nϵT, nXO, ϵTgrid, XOgrid) = gr
     sd  = teacher_logh_sd(stats, meas.teacher_sd)
-    δ   = p.β * sd / meas.K
+    sd_a = sd / meas.cfr_rho                    # SD of log effectiveness a, corr(log a, log h_eff) = ρ; ρ = 1: sd_a === sd
+    δ   = p.β * sd_a / meas.K
     gr1 = merge(gr, (; Q = gr.Q .* exp(δ)))
     Y0 = Y1 = Y0O = Y1O = D = N = 0.0
     yT = zeros(nϵT); rT = zeros(nϵT)
@@ -338,7 +534,7 @@ function teacher_intervention(sol, meas::Measurement; stats = location_stats(sol
         D   += mass * (dT + dO);   N   += mass * (nTc + nOc)
     end
     return (; effect = log(Y1 / Y0), effect_nonteach = log(Y1O / Y0O), mean_dlog = D / N,
-              analytic = δ / (1 - p.η), sd_logh = sd, δ)
+              analytic = δ / (1 - p.η), sd_logh = sd, sd_eff = sd_a, δ)
 end
 
 # -----------------------------------------------------------------------------
@@ -1550,6 +1746,26 @@ Round 2026-10-15c:
   teacher-demand closure (`Params.fte_rule`) when it is on, else the parameter b_T; NaN when bundled;
 - `mean_log_yhat`: population mean of the predicted log income ln ŷ, the grading variable of the income-graded
   taste `Params.By` (`mean_predicted_log_income`); the calibration freezes `lyref` at its value at a reference fit.
+
+Round 2026-10-16 (diagnostics, unscored; appended after `mean_log_yhat`; none is a target, and the moments above are
+unchanged by them). Gaps are suburb minus city (index 2 minus 1); `_res` is by residence r and `_work` by workplace w
+(identical in the bundled model, r = w = the work location). They come from `teacher_sorting_stats` and
+`sorting_moments`, which define them:
+- `cfr_rho`, `cfr_sd_eff`: `Measurement.cfr_rho` and the SD of teachers' log effectiveness the CFR experiment uses,
+  sd(log h_eff | w)/ρ (`teacher_intervention`; `teacher_sd` stays sd(log h_eff)); `lyT_fixed`: `Params.lyT_fixed` (NaN: off);
+- teachers' sorting: `gap_logh_teacher_res/_work` (Δ mean log h_T; the work version is `gap_logh_teacher`),
+  `gap_logheff_teacher_res/_work` (log h_eff), `gap_Heff_teacher_res/_work` (Δ log E[h_eff^{β/σ}]),
+  `gap_logpay_teacher_res/_work` (mean log pre-tax pay), `gap_salary_res` (Δ log mean pay by residence),
+  `gap_lyhat_teacher_res/_work`, `mean_log_yhat_teach`, `mean_log_yhat_mkt`, `mean_log_yhat_nonteach_mkt` (ln ŷ);
+- the decomposition of Δ mean log h_T into log Q_l, α log z, α log ϵ, φ log s and η log e:
+  `gap_logh_teacher_{res,work}_{Q,z,eps,s,e}`, with `decomp_resid_max` (quadrature residual) and
+  `share_born_suburb_res/_work` (share of the teachers born in location 2);
+- the teacher-quality index: `gap_logQ_teach_quality` + `gap_logQ_teach_staffing` + `gap_logQ_teach_check` = `gap_logQ_teach`;
+- the (r, w) cells, column-major: `teacher_rw_mass`, `teacher_rw_logh`, `teacher_rw_logpay`, and the contrasts at a given
+  workplace `gap_logpay_teacher_res_fixedw`, `gap_logh_teacher_res_fixedw` (NaN if bundled);
+- non-teaching market workers by residence (home producers out): `gap_lyhat_mkt_nonteach_res`, `gap_logy_mkt_nonteach_res`;
+- levels: `teacher_logh_res/_work`, `teacher_logpay_res/_work`, `teacher_lyhat_res/_work`, `teacher_Heff_res/_work`,
+  `nonteach_mkt_logy_res`, `nonteach_mkt_lyhat_res`, `nonteach_mkt_mass_res`.
 """
 function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh_maxit = 1000)
     (; Φ, πbar, gr, p) = sol
@@ -1601,6 +1817,7 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
     dΛ = sol.hh.Λ[:, 2] .- sol.hh.Λ[:, 1]       # value of the suburb's school quality, by z
     qv = quality_value(sol)
     edu = college_stats(sol, ms, ss, tsel, hpg; teacher_weights = meas.teacher_weights)    # `cs` is the commuting shares
+    tsm = sorting_moments(teacher_sorting_stats(sol, meas), sol)                          # round 2026-10-16 diagnostics
 
     return (;
         male_teach_share   = sum(st.nT[1, :]) / sum(st.nT[1, :] .+ st.nO[1, :]),
@@ -1677,7 +1894,9 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
         commute_dir_teach = cdr.teach, commute_dir_nonteach = cdr.nonteach,
         teacher_own_elasticity = tsr.own, teacher_cross_elasticity = tsr.cross,
         move_rate_by_own_z = mz.move, c2s_by_own_z = mz.c2s, s2c_by_own_z = mz.s2c,
-        teacher_shadow_b = p.split ? p.BT[2] - p.BT[1] : NaN, mean_log_yhat = mean_predicted_log_income(sol))
+        teacher_shadow_b = p.split ? p.BT[2] - p.BT[1] : NaN, mean_log_yhat = mean_predicted_log_income(sol),
+        cfr_rho = meas.cfr_rho, cfr_sd_eff = cfr.sd_eff, lyT_fixed = p.lyT_fixed,
+        tsm...)
 end
 
 # -----------------------------------------------------------------------------

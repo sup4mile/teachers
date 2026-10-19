@@ -385,11 +385,14 @@ end
 "Time elasticity φ matching the non-teacher time share s_O at zero goods cost (§1)."
 phi_from_schooling(sO; μ = 1.0, η = 0.080) = sO * (1 - η) / (μ * (1 - sO))
 
-"Analytic CFR mapping (§3): Δlog y ≈ β sd / (K(1−η)) for non-teachers without goods costs."
-cfr_analytic(β, sd; K = 12.0, η = 0.080) = β * sd / (K * (1 - η))
+"""
+Analytic CFR mapping (§3): Δlog y ≈ β sd / (K(1−η)) for non-teachers without goods costs. With the effectiveness
+concept `ρ` of `Measurement.cfr_rho` (round 2026-10-16) the SD of log effectiveness is sd/ρ; ρ = 1 is the mapping above.
+"""
+cfr_analytic(β, sd; K = 12.0, η = 0.080, ρ = 1.0) = β * (sd / ρ) / (K * (1 - η))
 
-"Invert `cfr_analytic` for β: an initialization, not an estimate."
-beta_from_cfr(effect, sd; K = 12.0, η = 0.080) = effect * K * (1 - η) / sd
+"Invert `cfr_analytic` for β: an initialization, not an estimate (`ρ` as there)."
+beta_from_cfr(effect, sd; K = 12.0, η = 0.080, ρ = 1.0) = effect * K * (1 - η) / (sd / ρ)
 
 "Move probability at equal attributes and gross consumption, goods ratio r_m = m/C (audit §3)."
 move_probability(r_m, θν = 0.25) = 1 / (1 + exp(-log1p(-r_m) / θν))
@@ -1252,8 +1255,11 @@ function diagnostics_table(io::IO, m)
     @printf(io, "  teacher log-wage premium men %+.3f, women %+.3f [+0.056, +0.086];  market gender gap %.3f [0.105];  teachers' mean log z vs non-teachers %+.3f SD (vs market workers %+.3f);  Δ mean log h_T by work location %+.4f\n",
             m.teacher_premium_m, m.teacher_premium_f, m.gender_gap_market, m.teacher_z_gap_sd, m.teacher_z_gap_market_sd,
             m.gap_logh_teacher)
-    @printf(io, "  CFR pieces: sd(log h_T) = %.4f;  non-teachers %.5f;  analytic %.5f\n",
+    @printf(io, "  CFR pieces: sd(log h_T) = %.4f;  non-teachers %.5f;  analytic %.5f",
             m.teacher_sd, m.cfr_nonteach, m.cfr_analytic)
+    (hasproperty(m, :cfr_rho) && m.cfr_rho != 1.0) &&      # round 2026-10-16: effectiveness concept ρ (Measurement.cfr_rho)
+        @printf(io, ";  ρ = %.3f, so the intervention's SD of log effectiveness is sd/ρ = %.4f", m.cfr_rho, m.cfr_sd_eff)
+    println(io)
     @printf(io, "  WTP share by location %s;  students/teacher %s (model only);  t = %s;  M = %s\n",
             fmtvec(m.wtp_share_l), fmtvec(m.students_per_teacher), fmtvec(m.t), fmtvec(m.M))
     @printf(io, "  levels (model only): mean C = %.6f, mean h = %.6f;  stationarity dev %.1e\n",
@@ -1299,6 +1305,38 @@ function diagnostics_table(io::IO, m)
         @printf(io, "              non-BA teaching track: BA − non-BA teachers' mean log wage %+.3f (men %+.3f, women %+.3f) [0.482 (0.0094), men 0.202, women 0.566; controlled 0.354];  teacher 90/10 all %.3f (men %.3f, women %.3f) [2.773 (2.597, 2.830)], BA teachers only %.3f (men %.3f, women %.3f) [2.417 (2.449, 2.406)]\n",
                 m.teacher_ba_wage_gap, m.teacher_ba_wage_gap_m, m.teacher_ba_wage_gap_f, m.teacher_p9010, m.teacher_p9010_g[1], m.teacher_p9010_g[2],
                 m.teacher_p9010_ba, m.teacher_p9010_ba_g[1], m.teacher_p9010_ba_g[2])
+    end
+    # round 2026-10-16: who teaches where (diagnostics from `teacher_sorting_stats`, `sorting_moments`; none is a target)
+    if hasproperty(m, :gap_logh_teacher_work) && isfinite(m.gap_logh_teacher_work) && isfinite(m.gap_logh_teacher_res)
+        sg(x) = @sprintf("%+.4f", x)
+        rw(a, b) = sg(a) * " | " * sg(b)
+        @printf(io, "  teacher sorting, suburb − city, residence | workplace: mean log h_T %s;  mean log h_eff %s;  log E[h_eff^(β/σ)] %s;  mean log pay %s;  mean ln ŷ %s;  log mean pay %s | %s\n",
+                rw(m.gap_logh_teacher_res, m.gap_logh_teacher_work), rw(m.gap_logheff_teacher_res, m.gap_logheff_teacher_work),
+                rw(m.gap_Heff_teacher_res, m.gap_Heff_teacher_work), rw(m.gap_logpay_teacher_res, m.gap_logpay_teacher_work),
+                rw(m.gap_lyhat_teacher_res, m.gap_lyhat_teacher_work), sg(m.gap_salary_res), sg(m.gap_salary))
+        @printf(io, "              Δ mean log h_T = log Q_l + α log z + α log ϵ + φ log s + η log e: residence %s;  workplace %s  [quadrature residual %.1e];  born in the suburb: residence %s, workplace %s\n",
+                join((sg(m[Symbol("gap_logh_teacher_res_", t)]) for t in (:Q, :z, :eps, :s, :e)), " + "),
+                join((sg(m[Symbol("gap_logh_teacher_work_", t)]) for t in (:Q, :z, :eps, :s, :e)), " + "),
+                m.decomp_resid_max, fmtvec(m.share_born_suburb_res), fmtvec(m.share_born_suburb_work))
+        isfinite(m.gap_logQ_teach_quality) && isfinite(m.gap_logQ_teach_staffing) &&
+            @printf(io, "              Δ log Q_T = %+.4f = quality σ Δlog E[h_eff^(β/σ)] %+.4f + staffing σ Δlog(teachers per pupil) %+.4f  (check %.1e)\n",
+                    m.gap_logQ_teach, m.gap_logQ_teach_quality, m.gap_logQ_teach_staffing, m.gap_logQ_teach_check)
+        isfinite(m.gap_logpay_teacher_res_fixedw) && isfinite(m.gap_logh_teacher_res_fixedw) &&
+            @printf(io, "              at a given workplace, suburban − city residents: mean log pay %+.4f, mean log h_T %+.4f;  (r, w) cells 11, 21, 12, 22: teachers %s, mean log h_T %s, mean log pay %s\n",
+                    m.gap_logpay_teacher_res_fixedw, m.gap_logh_teacher_res_fixedw, fmtvec(m.teacher_rw_mass),
+                    fmtvec(m.teacher_rw_logh), fmtvec(m.teacher_rw_logpay))
+        isfinite(m.gap_logy_mkt_nonteach_res) && isfinite(m.gap_lyhat_mkt_nonteach_res) &&
+            @printf(io, "              non-teaching market workers, suburb − city residents: mean log income %+.4f, mean ln ŷ %+.4f;  mean ln ŷ of teachers %.4f, of market workers %.4f, of non-teaching market workers %.4f\n",
+                    m.gap_logy_mkt_nonteach_res, m.gap_lyhat_mkt_nonteach_res, m.mean_log_yhat_teach, m.mean_log_yhat_mkt,
+                    m.mean_log_yhat_nonteach_mkt)
+    end
+    if hasproperty(m, :lyT_fixed) && hasproperty(m, :cfr_rho) && (isfinite(m.lyT_fixed) || m.cfr_rho != 1.0)
+        sw = String[]
+        isfinite(m.lyT_fixed) &&
+            push!(sw, @sprintf("lyT_fixed = %.4f (every teacher node's income taste is graded at this ln ŷ; inert while By = 0)", m.lyT_fixed))
+        m.cfr_rho != 1.0 &&
+            push!(sw, @sprintf("cfr_rho = %.3f (CFR bridge: sd of log effectiveness = sd(log h_eff)/ρ = %.4f)", m.cfr_rho, m.cfr_sd_eff))
+        println(io, "  diagnostic switches of round 2026-10-16: ", join(sw, ";  "))
     end
     @printf(io, "  consumption support: min C = %.3e;  %d (node, l′) pairs at the floor, chosen by a population share %.1e (no feasible location: %.1e)\n",
             m.minC, m.n_binding, m.floor_mass, m.infeasible_mass)
