@@ -164,7 +164,7 @@ end
  check that vec(Φ) is its dominant left eigenvector with eigenvalue 1."
 function phi_stationarity_residual(sol)
     (; Nz, Πz, L) = sol.gr
-    πbar = sol.πbar
+    πbar = hasproperty(sol, :πbar_kid) ? sol.πbar_kid : sol.πbar   # the kernel follows the parents (§3d)
     n = L * Nz
     idx(l, zi) = (l - 1) * Nz + zi
     P = zeros(n, n)
@@ -176,7 +176,9 @@ function phi_stationarity_residual(sol)
         φ[idx(l, zi)] = sol.Φ[zi, l]
     end
     eig_res = maximum(abs, vec(φ' * P) .- φ) / sum(φ)
-    row_dev = maximum(abs, vec(sum(P, dims = 2)) .- 1)
+    # §3d's ability gradient: a row (l0, zi) sums to the children per young P(child | z)/pkid, not to 1
+    rowsum = iszero(sol.p.pkid_z) ? ones(n) : [sol.gr.pk[zi] / sol.p.pkid for l in 1:L for zi in 1:Nz]
+    row_dev = maximum(abs, vec(sum(P, dims = 2)) .- rowsum)
     return (; eig_res, row_dev, mass = sum(φ))
 end
 

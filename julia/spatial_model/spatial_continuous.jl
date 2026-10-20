@@ -155,6 +155,38 @@ child's ability. `expm1` avoids cancellation as ψ → 1.
 #           Proposition 2′, `predicted_log_income` and `mean_predicted_log_income` do not move. Inert when By = 0.
 #           A diagnostic (`--external lyT_fixed=-3.04`), not a calibrated parameter; NaN: off, and the model is
 #           bit for bit the one without it
+# One switch of 2026-10-18 (the fertility shock, §3d), off at its default (1), composes with all of the above:
+#   pkid    probability that an adult has a child. The shock d ∈ {0, 1} is drawn at the transition, with the
+#           location taste shocks ν and independently of everything else, so occupation, (s, e) and income are
+#           chosen before it is known; it multiplies the altruism term: a parent values location l′ by
+#           μ log C + Λ(z, l′) + (taste terms), a childless adult by μ log C + (taste terms). The young therefore
+#           maximise the expected inclusive value pkid·V̄₁ + (1 − pkid)·V̄₀ (`fert_value_derivs`), whose derivatives
+#           weight destinations by the mixed probabilities π = pkid·π₁ + (1 − pkid)·π₀, so Proposition 2′ holds
+#           with Ξ at π and the X_O* collapse is untouched. Adults (workers, taxpayers, teachers) locate with π;
+#           children are born to parents only, 1/pkid each, so the population is stationary and the young of the
+#           next generation locate with the parents' π₁ (`parent_probs`, `stationary_phi`): Φ, M and the pupils
+#           follow π₁, every worker-side aggregate follows π. The childless keep the taste terms (Bz, Bd, By) and
+#           the amenity B. 1: everyone has a child, the model without the shock bit for bit
+#   pkid_z  ability gradient of the fertility shock (2026-10-18b; needs pkid < 1): P(child | z) =
+#           logistic(a + pkid_z x), x = (log z − m)/s_z the adult's own log ability in units of its ergodic SD (m, s_z
+#           the ergodic mean and SD of the Rouwenhorst chain), so pkid_z is the logit slope per ability SD. z is set
+#           at birth, before every choice, so the node's weight on the parent's inclusive value is P(child | z) and the
+#           warm glow's level, common to every choice of the cell, still drops out of all choices. Every parent has
+#           1/pkid children whatever her z, so children per adult rise with ability (children as a normal good,
+#           through ability's loading on income). The intercept a solves ρ(diag(P(child | z)) Πz) = pkid, so the
+#           stationary population is constant and the share of parents among adults is exactly pkid. The young's
+#           ability distribution is then the Perron vector of diag(P(child | z)) Πz, tilted toward the more fertile
+#           (`fertility_probs`, `gr.pk`), and the parents' arrays carry the weight P(child | z)/pkid (`parent_probs`).
+#           0: P(child) = pkid for everyone, bit for bit the shock above
+# One switch of 2026-10-19 (the education-based teacher salary schedule), off at its default (NaN), composes with
+# everything above except `college` (whose BA teachers have their own schedule, `ϑs`):
+#   schedT  total elasticity of a teacher's pay in her time share s under a salary schedule that pays for credentials:
+#           pay κ_w h^γ (s/sBA)^{schedT − γφ}, so that pay ∝ s^schedT at given (Q, z, ϵ_T, e): schooling is paid by the
+#           schedule's lane elasticity, the rest of h by the compression γ. The pay is normalised at the BA, s = sBA
+#           (16/25), where it is κ_w h^γ as without the schedule. It acts through the node's extra elasticity
+#           ϑs = schedT − γφ (`teach_schedule`, either sign), so the time share solves Proposition 2′ with b = μ schedT
+#           (1 + Ξ) (`time_share`) and `pay_factor` / `teacher_logpay_shift` carry it into the wage moments. NaN: off,
+#           and the model is bit for bit the one without it
 # `occ_sample` records the occupational sample of the calibration's occupational block and is
 # not used here. Nor is `move_util` (2026-10-15): it tells the calibration (`theta_to_params`) to read its
 # moving-cost parameter r_m as a utility cost `τmove` (utils) instead of the goods cost `mcost` (r_m C̄); the
@@ -235,6 +267,9 @@ Base.@kwdef struct Params
     By::Vector{Float64} = [0.0, 0.0]   # taste for residence r per unit of predicted log income ln ŷ − lyref (utils); location choice only
     lyref::Float64      = NaN          # frozen reference of ln ŷ for `By`; must be set when By ≠ 0 (NaN: unset)
     lyT_fixed::Float64  = NaN          # diagnostic: ln ŷ of every teacher node in the income taste `By` (NaN: off, the node's own)
+    pkid::Float64       = 1.0          # fertility shock (§3d): probability that an adult has a child, who alone values Λ (1: off)
+    pkid_z::Float64     = 0.0          # its logit slope per ergodic SD of log z, mean held at pkid (§3d; 0: off, P(child) = pkid)
+    schedT::Float64     = NaN          # salary schedule without college: teachers' total pay elasticity in s, pay κ h^γ (s/sBA)^{schedT − γφ} (NaN: off)
     # teacher effectiveness h_T z^{−(1−ωz)α} for Q and the CFR experiment (any `college`; 1 = h_T)
     ωz::Float64   = 1.0
     occ_sample::Symbol = :acs2009_13   # occupational sample of the calibration's block (metadata)
@@ -323,6 +358,11 @@ function check_params(p::Params)
     @assert all(isfinite, p.By) "By must be finite"
     @assert all(iszero, p.By) || isfinite(p.lyref) "the income-graded taste By ≠ 0 needs its frozen reference lyref (--external lyref=…)"
     @assert !isinf(p.lyT_fixed) "lyT_fixed must be finite (NaN: off)"
+    @assert 0.0 < p.pkid ≤ 1.0 "pkid, the probability of having a child, must lie in (0, 1] (1: off)"
+    @assert isfinite(p.pkid_z) "pkid_z must be finite"
+    @assert iszero(p.pkid_z) || p.pkid < 1.0 "pkid_z, the ability gradient of the fertility shock, needs pkid < 1"
+    # the peer reference of `peer_log_ability` is the ergodic distribution of Πz, which pkid_z ≠ 0 tilts
+    @assert iszero(p.pkid_z) || iszero(p.ψa) "pkid_z ≠ 0 is not implemented with peer effects (ψa ≠ 0)"
     if !isnan(p.fte_rule)
         @assert isfinite(p.fte_rule) "fte_rule must be finite (NaN: off)"
         @assert p.split && L == 2 "the teacher-demand closure (fte_rule) needs the split and two locations"
@@ -335,6 +375,11 @@ function check_params(p::Params)
     @assert 0.0 ≤ p.sBA < 1.0 "sBA must lie in [0, 1)"
     @assert p.σd > 0.0 && p.Fc ≥ 0.0 && p.ϑs ≥ 0.0 && p.ωz ≥ 0.0 "σd must be positive; Fc, ϑs and ωz nonnegative"
     p.college && !iszero(p.ϑs) && @assert p.sBA > 0.0 "the salary schedule (s/sBA)^ϑs needs sBA > 0"
+    if !isnan(p.schedT)
+        @assert isfinite(p.schedT) && p.schedT > 0.0 "schedT, the schedule's pay elasticity in s, must be positive and finite (NaN: off)"
+        @assert !p.college "schedT is the schedule without college; under `college` the BA teachers' schedule is ϑs"
+        @assert p.sBA > 0.0 "the salary schedule schedT is normalised at s = sBA, which must be positive"
+    end
     @assert 0.0 ≤ p.sT0 < 1.0 "sT0 must lie in [0, 1)"
     p.college && p.sBA > 0.0 && @assert p.sT0 ≤ p.sBA "the floor of non-BA teachers, sT0, may not exceed the BA schooling sBA (their cap)"
     # The X_O* collapse needs a common τe across non-teaching occupations.
@@ -375,6 +420,32 @@ function stationary(Π; tol = 1e-12, max_iter = 10_000)
     return π ./ sum(π)
 end
 
+"""
+    fertility_probs(p, z, Πz) -> Vector
+
+P(child | z) at the ability nodes (§3d). Without the ability gradient (`p.pkid_z` = 0) every node has `p.pkid`. With it,
+P(child | z) = logistic(a + pkid_z x), x = (log z − m)/s with m and s the mean and SD of log z under the ergodic
+distribution of `Πz`, and the intercept a solves ρ(diag(P(child | z)) Πz) = pkid by bisection. Since every parent has
+1/pkid children, ρ is the growth factor of the population (the z-marginal of the next generation's kernel is
+diag(P(child | z)) Πz/pkid whatever the location choices), so that root keeps the population stationary and makes the
+share of parents among adults, the mean of P(child | z) under the Perron vector, exactly pkid.
+"""
+function fertility_probs(p::Params, z, Πz)
+    iszero(p.pkid_z) && return fill(p.pkid, length(z))
+    erg = stationary(Πz)
+    lz  = log.(z)
+    m   = dot(erg, lz)
+    x   = (lz .- m) ./ sqrt(dot(erg, (lz .- m) .^ 2))
+    pk(a) = @. 1 / (1 + exp(-(a + p.pkid_z * x)))
+    root(a) = maximum(real, eigvals(Diagonal(pk(a)) * Πz))
+    lo, hi = -50.0, 50.0                          # ρ rises in a from 0 to 1
+    while hi - lo > 1e-13
+        mid = (lo + hi) / 2
+        root(mid) < p.pkid ? (lo = mid) : (hi = mid)
+    end
+    return pk((lo + hi) / 2)
+end
+
 "Force a vector to be strictly increasing (for spline inversion)."
 function make_increasing(v::AbstractVector)
     w = collect(float.(v))
@@ -402,7 +473,9 @@ default):
 - `lϵT`, `lXO`: the grids in logs, the coordinate of every spline and integral;
 - `logΘ[i,g]`: log Θ_{i,g}, to recover h_O from X_O*;
 - `PT`: the pupils' shares M_l/ΣM, the teachers' positions of the residence/workplace split
-  (§3b; unused otherwise).
+  (§3b; unused otherwise);
+- `pk`: P(child | z) at the ability nodes (§3d, `fertility_probs`; `p.pkid` at every node without the
+  ability gradient, and 1 without the shock).
 """
 function build_grids(p::Params; H̃T, M, t, la = zeros(length(p.B)), Nz = 5, nϵT = 64, nXO = 64,
                      q_lo = 1e-5, q_hi = 1 - 1e-6)
@@ -432,7 +505,8 @@ function build_grids(p::Params; H̃T, M, t, la = zeros(length(p.B)), Nz = 5, nϵ
     end
     return (; z, Πz, Nz, Q, QT, la = collect(Float64, la), t, I, L, dT, ϵTgrid, dO, XOgrid,
               lϵT = log.(ϵTgrid), lXO = log.(XOgrid),
-              logΘ, nonteach, nϵT, nXO, PT = max.(M, M_FLOOR) ./ sum(max.(M, M_FLOOR)))
+              logΘ, nonteach, nϵT, nXO, PT = max.(M, M_FLOOR) ./ sum(max.(M, M_FLOOR)),
+              pk = fertility_probs(p, z, Πz))
 end
 
 """
@@ -523,10 +597,31 @@ struct Node <: AbstractNode
     smin::Float64         # lower bound on the time share (teaching: `sT_min`)
     smax::Float64         # upper bound on the time share (§3c, no BA: `sBA`; Inf = none)
     ϑs::Float64           # extra elasticity of income in s (§3c, BA teachers' salary schedule)
+    Λ0::Vector{Float64}   # §3d: the additive term of the childless, `Λ` without the altruism term (unused at pk = 1)
+    pk::Float64           # §3d: probability of having a child, P(child | z) = `gr.pk[zi]` (`Params.pkid`, `pkid_z`; 1: everyone, the term `Λ`)
 end
 
 "A node without the §3c fields: no upper bound on s and no extra elasticity (the baseline)."
 Node(c, γb, τe, m, Λ, l, smin) = Node(c, γb, τe, m, Λ, l, smin, Inf, 0.0)
+
+"A node without the fertility shock (§3d): everyone has a child, so the childless term is never used."
+Node(c, γb, τe, m, Λ, l, smin, smax, ϑs) = Node(c, γb, τe, m, Λ, l, smin, smax, ϑs, Λ, 1.0)
+
+"""
+    fertile(p) -> Bool
+
+Whether the fertility shock is on (§3d, `Params.pkid` < 1): some adults have no child and do not value Λ.
+"""
+fertile(p::Params) = p.pkid < 1.0
+
+"""
+    childless_term(Λz, zi, p, gr) -> Vector
+
+The additive location term of a childless adult at ability node `zi` (§3d): the node's taste term `Λz` without the
+altruism term Λ(z, ·), i.e. the ability-graded taste Bz log z alone (the BA amenity `Bd` and the income taste `By` are
+added later to both terms, by `with_education` and `income_taste`). Without the shock it is `Λz` itself, never read.
+"""
+childless_term(Λz, zi, p::Params, gr) = fertile(p) ? p.Bz .* log(gr.z[zi]) : Λz
 
 """
     goods_cost(l, p)
@@ -561,20 +656,35 @@ function nonteach_node(XO, zi, l, g, Λ, p::Params, gr; d = nothing)
     return income_taste(nd, p, gr)
 end
 
+"""
+    teach_schedule(p) -> (scale, ϑ)
+
+The education-based salary schedule without college (`p.schedT`, 2026-10-19): the extra elasticity ϑ = schedT − γφ of a
+teacher's pay in s and the income scale sBA^{−ϑ}, so that pay κ h^γ (s/sBA)^ϑ ∝ s^schedT. (1.0, 0.0) when off, and
+under `college`, whose nodes take their schedule from `with_education`.
+"""
+teach_schedule(p::Params) = isnan(p.schedT) || p.college ? (1.0, 0.0) :
+    (ϑ = p.schedT - p.γ * p.φ; (p.sBA^(-ϑ), ϑ))
+
 "The baseline teaching node (§3)."
 function plain_teach_node(ϵT, zi, l, g, Λ, p::Params, gr)
     k = (1 - p.τω[p.T, g]) * (gr.Q[l] * (gr.z[zi] * ϵT)^p.α)^p.γ
     c = [(1 - gr.t[lp]) * p.κ[lp] * k for lp in 1:gr.L]
-    return Node(c, p.γ, p.τe[p.T, g], goods_cost(l, p), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]), l,
-                p.sT_min)
+    Λz = Λ[zi, :] .+ p.Bz .* log(gr.z[zi])
+    isnan(p.schedT) && return Node(c, p.γ, p.τe[p.T, g], goods_cost(l, p), Λz, l,
+                                   p.sT_min, Inf, 0.0, childless_term(Λz, zi, p, gr), gr.pk[zi])
+    scale, ϑ = teach_schedule(p)
+    return Node(c .* scale, p.γ, p.τe[p.T, g], goods_cost(l, p), Λz, l,
+                p.sT_min, Inf, ϑ, childless_term(Λz, zi, p, gr), gr.pk[zi])
 end
 
 "The baseline non-teaching node (§3)."
 function plain_nonteach_node(XO, zi, l, g, Λ, p::Params, gr)
     k = gr.Q[l] * gr.z[zi]^p.α * XO
     c = [(1 - gr.t[lp]) * k for lp in 1:gr.L]
+    Λz = Λ[zi, :] .+ p.Bz .* log(gr.z[zi])
     return Node(c, 1.0, p.τe[gr.nonteach[1], g], goods_cost(l, p),
-                Λ[zi, :] .+ p.Bz .* log(gr.z[zi]), l, 0.0)
+                Λz, l, 0.0, Inf, 0.0, childless_term(Λz, zi, p, gr), gr.pk[zi])
 end
 
 function consumption(nd::Node, s, e, p::Params)
@@ -690,15 +800,20 @@ when `By` is zero).
 """
 function income_taste(nd::Node, p::Params, gr; ly = nothing)
     all(iszero, p.By) && return nd
-    Λ = nd.Λ .+ p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
-    return Node(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.l, nd.smin, nd.smax, nd.ϑs)
+    τy = p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
+    Λ = nd.Λ .+ τy
+    # §3d: the childless have the income taste too (their term without the shock is never read)
+    return Node(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.l, nd.smin, nd.smax, nd.ϑs,
+                nd.pk < 1.0 ? nd.Λ0 .+ τy : Λ, nd.pk)
 end
 
 # The `NestedNode` of §3b, defined below (the only other subtype of `AbstractNode`).
 function income_taste(nd::AbstractNode, p::Params, gr; ly = nothing)
     all(iszero, p.By) && return nd
-    Λ = nd.Λ .+ p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
-    return NestedNode(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.bw, nd.lP, nd.l, nd.smin, nd.smax, nd.ϑs)
+    τy = p.By .* ((ly === nothing ? predicted_log_income(nd, p, gr) : ly) - p.lyref)
+    Λ = nd.Λ .+ τy
+    return NestedNode(nd.c, nd.γb, nd.τe, nd.m, Λ, nd.bw, nd.lP, nd.l, nd.smin, nd.smax, nd.ϑs,
+                      nd.pk < 1.0 ? nd.Λ0 .+ τy : Λ, nd.pk)
 end
 
 "Robust fallback for the goods margin: bounded Brent search over u = log e."
@@ -723,6 +838,7 @@ locally concave, or a step leaves [lo, hi]. Returns (e, V̄, C, π).
 """
 function solve_e(nd::Node, s, u0, p::Params;
                  lo = log(1e-8), hi = log(1e4), maxit = 30, gtol = 1e-10)
+    nd.pk < 1.0 && return solve_e_fert(nd, s, u0, p; lo, hi, maxit, gtol)     # §3d
     a  = p.η * nd.γb
     y1 = nd.c .* s^(p.φ * nd.γb)        # income at e = 1
     iszero(nd.ϑs) || (y1 = y1 .* s^nd.ϑs)   # §3c: BA teachers' salary schedule
@@ -843,10 +959,15 @@ struct NestedNode <: AbstractNode
     smin::Float64         # lower bound on the time share (teaching: `sT_min`)
     smax::Float64         # upper bound on the time share (§3c, no BA: `sBA`; Inf = none)
     ϑs::Float64           # extra elasticity of income in s (§3c, BA teachers' salary schedule)
+    Λ0::Vector{Float64}   # §3d: the childless's term by residence, `Λ` without the altruism term (unused at pk = 1)
+    pk::Float64           # §3d: probability of having a child, P(child | z) = `gr.pk[zi]` (1: everyone)
 end
 
 "A `NestedNode` without the §3c fields: no upper bound on s and no extra elasticity (no college)."
 NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin) = NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin, Inf, 0.0)
+
+"A `NestedNode` without the fertility shock (§3d)."
+NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin, smax, ϑs) = NestedNode(c, γb, τe, m, Λ, bw, lP, l, smin, smax, ϑs, Λ, 1.0)
 
 "A vector over residences r, stacked over the destinations d = (r − 1)L + w."
 by_residence(x) = repeat(x; inner = length(x))
@@ -868,9 +989,14 @@ which is equivalent at a calibrated point); see §3b.
 """
 function nested_teach_node(ϵT, zi, l, g, Λ, p::Params, gr)
     k = (1 - p.τω[p.T, g]) * (gr.Q[l] * (gr.z[zi] * ϵT)^p.α)^p.γ
-    return NestedNode(commuting_income(gr.t, p.κ, k, p.τk), p.γ, p.τe[p.T, g],
-                      by_residence(goods_cost(l, p)), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]),
-                      p.BT, log.(gr.PT), l, p.sT_min)
+    Λz = Λ[zi, :] .+ p.Bz .* log(gr.z[zi])
+    isnan(p.schedT) && return NestedNode(commuting_income(gr.t, p.κ, k, p.τk), p.γ, p.τe[p.T, g],
+                                         by_residence(goods_cost(l, p)), Λz,
+                                         p.BT, log.(gr.PT), l, p.sT_min, Inf, 0.0, childless_term(Λz, zi, p, gr), gr.pk[zi])
+    scale, ϑ = teach_schedule(p)       # 2026-10-19: the salary schedule without college
+    return NestedNode(commuting_income(gr.t, p.κ, k * scale, p.τk), p.γ, p.τe[p.T, g],
+                      by_residence(goods_cost(l, p)), Λz,
+                      p.BT, log.(gr.PT), l, p.sT_min, Inf, ϑ, childless_term(Λz, zi, p, gr), gr.pk[zi])
 end
 
 """
@@ -886,9 +1012,10 @@ job-access term in the residential choice and the inclusive-value gap (`option_v
 """
 function nested_nonteach_node(XO, zi, l, g, Λ, p::Params, gr)
     k = gr.Q[l] * gr.z[zi]^p.α * XO
+    Λz = Λ[zi, :] .+ p.Bz .* log(gr.z[zi])
     return NestedNode(commuting_income(gr.t, ones(gr.L), k, p.τk), 1.0, p.τe[gr.nonteach[1], g],
-                      by_residence(goods_cost(l, p)), Λ[zi, :] .+ p.Bz .* log(gr.z[zi]),
-                      zeros(gr.L), log.(p.jobs), l, 0.0)
+                      by_residence(goods_cost(l, p)), Λz,
+                      zeros(gr.L), log.(p.jobs), l, 0.0, Inf, 0.0, childless_term(Λz, zi, p, gr), gr.pk[zi])
 end
 
 function consumption(nd::NestedNode, s, e, p::Params)
@@ -987,6 +1114,7 @@ end
 "`solve_e` for a `NestedNode`: the same Newton step and fallback with the derivatives of `nested_value_derivs`."
 function solve_e(nd::NestedNode, s, u0, p::Params;
                  lo = log(1e-8), hi = log(1e4), maxit = 30, gtol = 1e-10)
+    nd.pk < 1.0 && return solve_e_fert(nd, s, u0, p; lo, hi, maxit, gtol)     # §3d
     u = clamp(isfinite(u0) ? u0 : log(1e-3), lo, hi)
     for _ in 1:maxit
         d = nested_value_derivs(nd, s, u, p)
@@ -997,6 +1125,138 @@ function solve_e(nd::NestedNode, s, u0, p::Params;
         (isfinite(u) && lo ≤ u ≤ hi) || break
     end
     return solve_e_bracket(nd, s, p; lo, hi)
+end
+
+# -----------------------------------------------------------------------------
+# 3d. The fertility shock (`Params.pkid`, 2026-10-18)
+#
+# At the transition, with the location taste shocks ν and independently of them and of the agent's state, an adult
+# learns whether she has a child (probability pkid) or not. A parent values destination l′ by W₁ = μ log C + Λ (the
+# node's `Λ`: the altruism term plus the taste terms), a childless adult by W₀ = μ log C + Λ0 (the node's `Λ0`: the
+# taste terms alone). Consumption is the same for both, since the occupation and (s, e) are chosen before the shock.
+# The young therefore maximise the expected inclusive value
+#     V̄ = pkid V̄₁ + (1 − pkid) V̄₀,      V̄_d = σν log Σ_l′ exp((W_d + B − τmove)/σν)   (under the split: §3b's logsums),
+# whose derivatives in u = log e are the same mixtures of the two types' derivatives: g = E_π[w] at the mixed
+# probabilities π = pkid π₁ + (1 − pkid) π₀, and H = pkid H₁ + (1 − pkid) H₀. The per-destination derivatives w do not
+# depend on the type, so Proposition 2′ holds with Ξ = Σ π m/C at the mixed π, and nothing in the X_O* collapse changes.
+# Adults (workers, taxpayers, teachers) locate with π (`node_probs`, `location_probs`); children are born to parents
+# only, 1/pkid each, and go to school where their parent lives, so the next generation locates with π₁ (`parent_probs`).
+# Off (pkid = 1) no node reaches this section.
+# With the ability gradient (`Params.pkid_z` ≠ 0, 2026-10-18b) the node's weight is P(child | z) = `gr.pk[zi]`
+# (`fertility_probs`) instead of pkid: z is set at birth, so the weight is common to the occupation and location choices
+# of a cell and everything above holds node by node. Every parent still has 1/pkid children, so a node's children per
+# adult are P(child | z)/pkid, and the parents' arrays (`parent_probs`) carry that weight on π₁: the next generation's
+# kernel is then diag(P(child | z)/pkid) times the old one, whose Perron root is 1 by the choice of the intercept, and
+# Φ is its Perron vector (`stationary_phi`).
+# -----------------------------------------------------------------------------
+"The node of a childless adult (§3d): the node with its childless term `Λ0` as its additive term, and pk = 1."
+childless(nd::Node) = Node(nd.c, nd.γb, nd.τe, nd.m, nd.Λ0, nd.l, nd.smin, nd.smax, nd.ϑs, nd.Λ0, 1.0)
+childless(nd::NestedNode) =
+    NestedNode(nd.c, nd.γb, nd.τe, nd.m, nd.Λ0, nd.bw, nd.lP, nd.l, nd.smin, nd.smax, nd.ϑs, nd.Λ0, 1.0)
+
+"""
+    plain_value_derivs(nd, s, u, p) -> (; V̄, g, H, C, π, ok)
+
+V̄ and its first two derivatives in u = log e at fixed s of a `Node` for one fertility type (its additive term `Λ`):
+the terms of the Newton step of `solve_e`. `ok` is false when a destination is at the consumption floor, where
+`solve_e` falls back to the bracket. `nested_value_derivs` is the `NestedNode` version.
+"""
+function plain_value_derivs(nd::Node, s, u, p::Params)
+    a  = p.η * nd.γb
+    y1 = nd.c .* s^(p.φ * nd.γb)            # income at e = 1
+    iszero(nd.ϑs) || (y1 = y1 .* s^nd.ϑs)   # §3c: BA teachers' salary schedule
+    e  = exp(u)
+    y  = y1 .* e^a
+    mc = (1 + nd.τe) * e
+    C  = y .- mc .- nd.m
+    V̄, π = logsum_probs(location_values(nd, C, p), nd.l, p)
+    any(≤(C_FLOOR), C) && return (; V̄, g = NaN, H = NaN, C, π, ok = false)
+    w = @. p.μ * (a * y - mc) / C
+    g = dot(π, w)
+    H = (dot(π, w .^ 2) - g^2) / p.σν + dot(π, @. p.μ * (a^2 * y - mc) / C - w^2 / p.μ)
+    return (; V̄, g, H, C, π, ok = true)
+end
+
+"The value derivatives of one fertility type: `plain_value_derivs` or `nested_value_derivs`."
+value_derivs(nd::Node, s, u, p::Params) = plain_value_derivs(nd, s, u, p)
+value_derivs(nd::NestedNode, s, u, p::Params) = nested_value_derivs(nd, s, u, p)
+
+"""
+    fert_value_derivs(nd, s, u, p) -> (; V̄, g, H, C, π, π1, ok)
+
+The expected inclusive value pk V̄₁ + (1 − pk) V̄₀ of a node with the fertility shock and its first two derivatives in
+u = log e (§3d): the mixtures, with the node's weight pk, of the parent's (`nd` itself) and the childless's
+(`childless(nd)`) `value_derivs`. `π` is the mixed probability vector, `π1` the parent's.
+"""
+function fert_value_derivs(nd::AbstractNode, s, u, p::Params)
+    d1 = value_derivs(nd, s, u, p)
+    d0 = value_derivs(childless(nd), s, u, p)
+    q  = nd.pk
+    return (; V̄ = q * d1.V̄ + (1 - q) * d0.V̄, g = q * d1.g + (1 - q) * d0.g, H = q * d1.H + (1 - q) * d0.H,
+              C = d1.C, π = q .* d1.π .+ (1 - q) .* d0.π, π1 = d1.π, ok = d1.ok && d0.ok)
+end
+
+"Inclusive value and probabilities of one fertility type of a node at consumption `C` (`logsum_probs`, `nested_logsum_probs`)."
+type_logsum(nd::Node, C, p::Params) = logsum_probs(location_values(nd, C, p), nd.l, p)
+function type_logsum(nd::NestedNode, C, p::Params)
+    V̄, π = nested_logsum_probs(location_values(nd, C, p), nd.l, nd, p)
+    return V̄, π
+end
+
+"""
+    fert_logsum(nd, C, p) -> (V̄, π, π1, π0)
+
+The expected inclusive value of a node with the fertility shock at consumption `C` and its mixed, parents' and
+childless's location probabilities (§3d).
+"""
+function fert_logsum(nd::AbstractNode, C, p::Params)
+    V1, π1 = type_logsum(nd, C, p)
+    V0, π0 = type_logsum(childless(nd), C, p)
+    q = nd.pk
+    return q * V1 + (1 - q) * V0, q .* π1 .+ (1 - q) .* π0, π1, π0
+end
+
+"`solve_e_bracket` with the fertility shock (§3d): a bounded Brent search over u = log e of the expected inclusive value."
+function solve_e_bracket_fert(nd::AbstractNode, s, p::Params; lo, hi)
+    V(u) = fert_logsum(nd, consumption(nd, s, exp(u), p), p)[1]
+    e = exp(Optim.minimizer(optimize(u -> -V(u), lo, hi)))
+    C = consumption(nd, s, e, p)
+    V̄, π = fert_logsum(nd, C, p)
+    return e, V̄, C, π
+end
+
+"""
+`solve_e` with the fertility shock (§3d): the Newton step of `solve_e` on the expected inclusive value
+(`fert_value_derivs`), with the same exits and fallback (`solve_e_bracket_fert`). Returns (e, V̄, C, π) with the
+mixed π, which is what Ξ needs.
+"""
+function solve_e_fert(nd::AbstractNode, s, u0, p::Params; lo, hi, maxit, gtol)
+    u = clamp(isfinite(u0) ? u0 : log(1e-3), lo, hi)
+    for _ in 1:maxit
+        d = fert_value_derivs(nd, s, u, p)
+        d.ok || break
+        abs(d.g) < gtol && return exp(u), d.V̄, d.C, d.π
+        d.H ≥ -1e-14 && break
+        u -= d.g / d.H
+        (isfinite(u) && lo ≤ u ≤ hi) || break
+    end
+    return solve_e_bracket_fert(nd, s, p; lo, hi)
+end
+
+"""
+    node_probs(nd, C, p; who = :all) -> Vector
+
+Location probabilities of node `nd` at consumption `C`, over the destinations l′ (under the split, the pairs
+d = (r − 1)L + w): `who = :all` those of all adults (with the fertility shock the mixed π of §3d), `:parents` the
+parents' π₁ (where the children are born and go to school), `:childless` π₀. Without the shock the three are the
+node's logit probabilities, computed as `location_probs` always has.
+"""
+function node_probs(nd::AbstractNode, C, p::Params; who::Symbol = :all)
+    who in (:all, :parents, :childless) || throw(ArgumentError("who must be :all, :parents or :childless, got :$who"))
+    nd.pk < 1.0 || return type_logsum(nd, C, p)[2]
+    who === :parents   && return type_logsum(nd, C, p)[2]
+    who === :childless && return type_logsum(childless(nd), C, p)[2]
+    return fert_logsum(nd, C, p)[2]
 end
 
 # -----------------------------------------------------------------------------
@@ -1070,10 +1330,12 @@ weight 1 holding `hh` (and `πT`, `πO` as passed), so a loop over it is the bas
 
 """
 Multiplier of a teacher's pay κ h^γ in education branch `d` at time share `s`: the salary
-schedule (s/sBA)^ϑs for BA teachers, e^{−ρT0} without a BA; 1 without college.
+schedule (s/sBA)^ϑs for BA teachers, e^{−ρT0} without a BA; without college 1, or the schedule
+(s/sBA)^{schedT − γφ} when `p.schedT` is set (2026-10-19, `teach_schedule`).
 """
 @inline pay_factor(s, p::Params, d) =
-    !p.college ? 1.0 : d == 1 ? (iszero(p.ϑs) ? 1.0 : (s / p.sBA)^p.ϑs) : exp(-p.ρT0)
+    !p.college ? (isnan(p.schedT) ? 1.0 : (s / p.sBA)^teach_schedule(p)[2]) :
+    d == 1 ? (iszero(p.ϑs) ? 1.0 : (s / p.sBA)^p.ϑs) : exp(-p.ρT0)
 
 "`pay_factor` at each time share of the vector `sT`."
 teacher_pay_factor(sT, p::Params, d) = [pay_factor(s, p, d) for s in sT]
@@ -1083,10 +1345,15 @@ teacher_pay_factor(sT, p::Params, d) = [pay_factor(s, p, d) for s in sT]
 
 Log of the pay factor at the log shocks `u` for the teachers of cell (g, l, zi) of branch `hb`
 (the time-share spline over the log-shock grid `luT`, as `micro_sample` splines log h): 0 without
-college, −ρT0 without a BA, ϑs (log s − log sBA) for BA teachers.
+college (or (schedT − γφ)(log s − log sBA) with the schedule `p.schedT`, 2026-10-19), −ρT0 without a BA,
+ϑs (log s − log sBA) for BA teachers.
 """
 function teacher_logpay_shift(hb, g, l, zi, luT, u, p::Params, d)
-    !p.college && return 0.0
+    if !p.college
+        isnan(p.schedT) && return 0.0
+        ls = Spline1D(luT, log.(hb.sT[g, l, zi, :]))
+        return teach_schedule(p)[2] .* (ls(u) .- log(p.sBA))
+    end
     d == 0 && return -p.ρT0
     iszero(p.ϑs) && return 0.0
     ls = Spline1D(luT, log.(hb.sT[g, l, zi, :]))
@@ -1121,13 +1388,16 @@ node's inclusive value and so the college choice (see `education_amenity`).
 """
 function with_education(nd::Node, p::Params, d, kind::Symbol)
     scale, m, smin, smax, ϑs = education_terms(nd.m, p, d, kind)
-    return Node(nd.c .* scale, nd.γb, nd.τe, m, education_amenity(nd.Λ, p, d), nd.l, smin, smax, ϑs)
+    Λ = education_amenity(nd.Λ, p, d)
+    return Node(nd.c .* scale, nd.γb, nd.τe, m, Λ, nd.l, smin, smax, ϑs,
+                nd.pk < 1.0 ? education_amenity(nd.Λ0, p, d) : Λ, nd.pk)       # §3d: the childless have the BA amenity too
 end
 
 function with_education(nd::NestedNode, p::Params, d, kind::Symbol)
     scale, m, smin, smax, ϑs = education_terms(nd.m, p, d, kind)
-    return NestedNode(nd.c .* scale, nd.γb, nd.τe, m, education_amenity(nd.Λ, p, d), nd.bw, nd.lP, nd.l,
-                      smin, smax, ϑs)
+    Λ = education_amenity(nd.Λ, p, d)
+    return NestedNode(nd.c .* scale, nd.γb, nd.τe, m, Λ, nd.bw, nd.lP, nd.l,
+                      smin, smax, ϑs, nd.pk < 1.0 ? education_amenity(nd.Λ0, p, d) : Λ, nd.pk)
 end
 
 """
@@ -1298,10 +1568,10 @@ function college_child_Ef(l, g, zi, hh, p::Params, gr)
     return P1 * Ef(hh.br1, 1) + (1 - P1) * Ef(hh.br0, 0)
 end
 
-"The pairs ((πT₁, πT₀), (πO₁, πO₀)) of work-location probabilities of the two education branches (`location_probs`)."
-function college_location_probs(hh, p::Params, gr)
-    pr1 = location_probs(hh.br1, p, gr; d = 1)
-    pr0 = location_probs(hh.br0, p, gr; d = 0)
+"The pairs ((πT₁, πT₀), (πO₁, πO₀)) of work-location probabilities of the two education branches (`location_probs`; `who` as there)."
+function college_location_probs(hh, p::Params, gr; who::Symbol = :all)
+    pr1 = location_probs(hh.br1, p, gr; d = 1, who)
+    pr0 = location_probs(hh.br0, p, gr; d = 0, who)
     return (pr1[1], pr0[1]), (pr1[2], pr0[2])
 end
 
@@ -1570,11 +1840,13 @@ Logit work-location probabilities πT[g, l, zi, k, l'] and πO[g, l, zi, k, l'] 
 Under `Params.split` the joint residence × workplace probabilities πT[g, l, zi, k, r, w] and
 πO[g, l, zi, k, r, w] (`nested_location_probs`). Under `p.college` a pair ((πT₁, πT₀), (πO₁, πO₀)) for
 the two education branches (`college_location_probs`), each of them the arrays of the baseline or,
-under the split, the joint ones; `d` selects a branch's arrays `hh` (§3c).
+under the split, the joint ones; `d` selects a branch's arrays `hh` (§3c). `who` (§3d, `node_probs`) picks
+the adults' probabilities (`:all`, the default: with the fertility shock, the mixture of parents and the
+childless), the parents' (`:parents`) or the childless's (`:childless`); without the shock all three are the same.
 """
-function location_probs(hh, p::Params, gr; d = nothing)
-    p.college && d === nothing && return college_location_probs(hh, p, gr)
-    p.split && return nested_location_probs(hh, p, gr; d)
+function location_probs(hh, p::Params, gr; d = nothing, who::Symbol = :all)
+    p.college && d === nothing && return college_location_probs(hh, p, gr; who)
+    p.split && return nested_location_probs(hh, p, gr; d, who)
     (; Nz, L, nϵT, nXO) = gr
     πT = zeros(2, L, Nz, nϵT, L)
     πO = zeros(2, L, Nz, nXO, L)
@@ -1582,27 +1854,55 @@ function location_probs(hh, p::Params, gr; d = nothing)
         for k in 1:nϵT
             nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p)
-            πT[g, l, zi, k, :] .= logsum_probs(location_values(nd, C, p), l, p)[2]
+            πT[g, l, zi, k, :] .= node_probs(nd, C, p; who)
         end
         for k in 1:nXO
             nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p)
-            πO[g, l, zi, k, :] .= logsum_probs(location_values(nd, C, p), l, p)[2]
+            πO[g, l, zi, k, :] .= node_probs(nd, C, p; who)
         end
     end
     return πT, πO
 end
 
 """
-    stationary_phi(πT, πO, hh, p, gr) -> (Φ, πbar)
+    parent_probs(hh, p, gr, πT, πO) -> (πTk, πOk)
 
-`πbar[l, zi, l']` is the migration probability born-in-l → work-in-l', integrated
-over the occupation choice and averaged over gender. `Φ[zi, l]` is the per-gender
-stationary mass of the kernel P((l,z) → (l',z')) = πbar[l, z, l'] Πz[z, z']. Under `p.college`
-πbar mixes the education branches with the weights P(d | g, l, z) (§3c).
+The parents' location probabilities (§3d): where the next generation is born and goes to school, in the layout of
+`location_probs`. Without the fertility shock every adult is a parent, and they are the adults' `πT`, `πO` as given.
+With the ability gradient (`p.pkid_z` ≠ 0) each node's π₁ carries the weight P(child | z)/pkid (`gr.pk`), so that an
+entry is P(parent in l′ | node)/pkid, the node's children in l′ per adult: everything that reads the parents' arrays
+(Φ, the parents' and children's samples, the parents' WTP) then counts children and parents. The weight is 1 without
+the gradient, which is not applied, so the arrays are bit for bit π₁.
 """
-function stationary_phi(πT, πO, hh, p::Params, gr)
-    (; Nz, L, Πz) = gr
+function parent_probs(hh, p::Params, gr, πT, πO)
+    fertile(p) || return (πT, πO)
+    πTk, πOk = location_probs(hh, p, gr; who = :parents)
+    iszero(p.pkid_z) && return (πTk, πOk)
+    c = gr.pk ./ p.pkid
+    return fertility_weighted(πTk, c), fertility_weighted(πOk, c)
+end
+
+"Location probabilities [g, l, zi, …] (or the pair of the education branches) times `c[zi]` (§3d, `parent_probs`)."
+function fertility_weighted(π::AbstractArray, c)
+    out = copy(π)
+    for zi in axes(out, 3)
+        selectdim(out, 3, zi) .*= c[zi]
+    end
+    return out
+end
+fertility_weighted(π::Tuple, c) = map(x -> fertility_weighted(x, c), π)
+
+"""
+    migration_probs(πT, πO, hh, p, gr) -> πbar
+
+`πbar[l, zi, l']`, the probability born-in-l → work-in-l' (under the split: lives-in-l′) at the location
+probabilities `πT`, `πO`, integrated over the occupation choice and averaged over gender; under `p.college` it
+mixes the education branches with the weights P(d | g, l, z) (§3c). With the adults' probabilities it is the
+migration of the young; with the parents' (§3d, `parent_probs`) the kernel of the next generation's birthplace.
+"""
+function migration_probs(πT, πO, hh, p::Params, gr)
+    (; Nz, L) = gr
     πbar = zeros(L, Nz, L)
     for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
         cm = choice_maps(br.h, g, l, zi, gr)
@@ -1611,13 +1911,43 @@ function stationary_phi(πT, πO, hh, p::Params, gr)
             πbar[l, zi, lp] += br.w * (IT + IO) / 2
         end
     end
+    return πbar
+end
+
+"""
+    stationary_phi(πT, πO, hh, p, gr) -> (Φ, πbar)
+
+`πbar[l, zi, l']` is the migration probability born-in-l → work-in-l' at `πT`, `πO` (`migration_probs`).
+`Φ[zi, l]` is the per-gender stationary mass of the kernel P((l,z) → (l',z')) = πbar[l, z, l'] Πz[z, z'],
+the young by birthplace. With the fertility shock (§3d) pass the parents' probabilities (`parent_probs`): children are
+born where their parent lives, so the kernel is the parents' and the returned πbar is the parents' migration. With
+its ability gradient (`p.pkid_z` ≠ 0) those carry the weight P(child | z)/pkid, so the rows of the kernel sum to it
+(not to 1) and πbar[l, zi, l′] is the children in l′ per young of (l, zi); Φ is the kernel's Perron vector, by a power
+iteration normalised at every step (the root is 1 by `fertility_probs`, up to the quadrature error of the rows).
+"""
+function stationary_phi(πT, πO, hh, p::Params, gr)
+    (; Nz, L, Πz) = gr
+    πbar = migration_probs(πT, πO, hh, p, gr)
     idx(l, zi) = (l - 1) * Nz + zi
     P = zeros(L * Nz, L * Nz)
     for l in 1:L, zi in 1:Nz, lp in 1:L, zpi in 1:Nz
         P[idx(l, zi), idx(lp, zpi)] = πbar[l, zi, lp] * Πz[zi, zpi]
     end
-    Φ = stationary(P) .* (p.Mtot / 2)
+    Φ = (fertile(p) && !iszero(p.pkid_z) ? perron_left(P) : stationary(P)) .* (p.Mtot / 2)
     return reshape(Φ, Nz, L), πbar
+end
+
+"Left Perron vector of a nonnegative matrix K, summing to 1: power iteration v ← v′K/Σ(v′K) (§3d's tilted kernel)."
+function perron_left(K; tol = 1e-13, max_iter = 100_000)
+    v = fill(1 / size(K, 1), size(K, 1))
+    for _ in 1:max_iter
+        v_new = vec(v' * K)
+        v_new ./= sum(v_new)
+        converged = maximum(abs, v_new .- v) < tol
+        v = v_new
+        converged && break
+    end
+    return v
 end
 
 """
@@ -1627,10 +1957,11 @@ Local peer ability by location, log ā_l = E[log z | young in l] − E*[log z]: 
 ability of the students of l (the young schooled there, Φ[:, l]; under the split, where the household
 lives) relative to its ergodic mean under Πz. ā_l is the geometric mean of the students' z relative to
 the economy's. Since z′ ~ Πz(z, ·) whatever the location, the young as a whole have the ergodic
-distribution of z in a stationary equilibrium, so the log ā_l average to zero over the young (up to
+distribution of z in a stationary equilibrium (without the fertility shock's ability gradient), so the log ā_l average to zero over the young (up to
 the quadrature error of Φ, of the order of its stationarity deviation) and the peer factor ā_l^{ψa}
 of `build_grids` shifts school quality between locations without changing its overall level. An
-empty location gets 0.
+empty location gets 0. With the fertility shock's ability gradient (§3d, `pkid_z` ≠ 0) the young are tilted away
+from the ergodic distribution, which is why that switch is not allowed with peer effects (`check_params`).
 """
 function peer_log_ability(Φ, gr)
     lz  = log.(gr.z)
@@ -1698,9 +2029,10 @@ pair_probs(π, g, l, zi, k) = vec(permutedims(π[g, l, zi, k, :, :]))
     nested_location_probs(hh, p, gr; d = nothing) -> (πTW, πOW)
 
 Joint residence × workplace probabilities πTW[g, l, zi, k, r, w] and πOW[g, l, zi, k, r, w] at
-the policies: `location_probs` under the split (`d`: the arrays of education branch `d` under `college`).
+the policies: `location_probs` under the split (`d`: the arrays of education branch `d` under `college`; `who`: the
+adults', the parents' or the childless's, §3d).
 """
-function nested_location_probs(hh, p::Params, gr; d = nothing)
+function nested_location_probs(hh, p::Params, gr; d = nothing, who::Symbol = :all)
     (; Nz, L, nϵT, nXO) = gr
     πT = zeros(2, L, Nz, nϵT, L, L)
     πO = zeros(2, L, Nz, nXO, L, L)
@@ -1708,12 +2040,12 @@ function nested_location_probs(hh, p::Params, gr; d = nothing)
         for k in 1:nϵT
             nd = teach_node(gr.ϵTgrid[k], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sT[g, l, zi, k], hh.eT[g, l, zi, k], p)
-            πT[g, l, zi, k, :, :] .= reshape(nested_logsum_probs(location_values(nd, C, p), l, nd, p)[2], L, L)'
+            πT[g, l, zi, k, :, :] .= reshape(node_probs(nd, C, p; who), L, L)'
         end
         for k in 1:nXO
             nd = nonteach_node(gr.XOgrid[k, g], zi, l, g, hh.Λ, p, gr; d)
             C  = consumption(nd, hh.sO[g, l, zi, k], hh.eO[g, l, zi, k], p)
-            πO[g, l, zi, k, :, :] .= reshape(nested_logsum_probs(location_values(nd, C, p), l, nd, p)[2], L, L)'
+            πO[g, l, zi, k, :, :] .= reshape(node_probs(nd, C, p; who), L, L)'
         end
     end
     return πT, πO
@@ -1726,6 +2058,10 @@ Under `college` the marginals are taken branch by branch and the baseline method
 """
 stationary_phi(πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
     stationary_phi(residence_probs(πT), residence_probs(πO), hh, p, gr)
+
+"`migration_probs` for joint probabilities: born-in-l → lives-in-r, from the residence marginals."
+migration_probs(πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
+    migration_probs(residence_probs(πT), residence_probs(πO), hh, p, gr)
 
 """
 `aggregates` for joint probabilities. The tax base is by residence, the teachers' side by workplace:
@@ -1776,12 +2112,21 @@ The location-choice objects of a solution under the split: the joint probabiliti
 stationary distribution. `Pi_T` and `Pi_O` are `nothing`, so that a consumer that has not been
 migrated to the split throws instead of reading the wrong object. Under `p.college` the four
 probability objects are pairs, one entry per education branch (`cell_branches`).
+With the fertility shock (§3d) the probabilities are the adults' and `πbar` is their migration born-in-l →
+lives-in-r, while Φ is the stationary distribution of the parents' kernel; the parents' objects are `Pi_TWk`,
+`Pi_OWk`, `Pi_Trk`, `Pi_Ork` and `πbar_kid` (without the shock, the adults' own; `Pi_Tk = Pi_Ok = nothing`). With the
+shock's ability gradient (`pkid_z` ≠ 0) they carry the weight P(child | z)/pkid (`parent_probs`): children per adult,
+not probabilities.
 """
 function split_probs(hh, p::Params, gr)
     Pi_TW, Pi_OW = location_probs(hh, p, gr)
-    Φ, πbar = stationary_phi(Pi_TW, Pi_OW, hh, p, gr)
-    return (; Pi_T = nothing, Pi_O = nothing, Pi_Tr = residence_probs(Pi_TW), Pi_Or = residence_probs(Pi_OW),
-              Pi_TW, Pi_OW, Φ, πbar)
+    Pi_TWk, Pi_OWk = parent_probs(hh, p, gr, Pi_TW, Pi_OW)
+    Φ, πbar_kid = stationary_phi(Pi_TWk, Pi_OWk, hh, p, gr)
+    πbar = fertile(p) ? migration_probs(Pi_TW, Pi_OW, hh, p, gr) : πbar_kid
+    Pi_Tr, Pi_Or = residence_probs(Pi_TW), residence_probs(Pi_OW)
+    Pi_Trk, Pi_Ork = fertile(p) ? (residence_probs(Pi_TWk), residence_probs(Pi_OWk)) : (Pi_Tr, Pi_Or)
+    return (; Pi_T = nothing, Pi_O = nothing, Pi_Tr, Pi_Or, Pi_TW, Pi_OW, Φ, πbar,
+              Pi_Tk = nothing, Pi_Ok = nothing, Pi_TWk, Pi_OWk, Pi_Trk, Pi_Ork, πbar_kid)
 end
 
 """
@@ -1886,6 +2231,8 @@ function solve_ge(p::Params = Params();
                            fmtvec(p.jobs), fmtvec(p.BT))
         p.college && @printf("  college: σd=%.3f sBA=%.3f ρc=%.3f ρT0=%.3f ϑs=%.3f Fc=%.4f cC=%.3f cCz=%.3f ωz=%.2f sT0=%.3f cT0=%.3f\n",
                              p.σd, p.sBA, p.ρc, p.ρT0, p.ϑs, p.Fc, p.cC, p.cCz, p.ωz, p.sT0, p.cT0)
+        isnan(p.schedT) || @printf("  salary schedule: schedT=%.4f (pay κ h^γ (s/sBA)^%.4f, sBA=%.4f; teachers' s at Ξ = 0: %.4f)\n",
+                                   p.schedT, teach_schedule(p)[2], p.sBA, time_share(p.γ, p, 0.0, teach_schedule(p)[2]))
         iszero(p.ψa) || @printf("  peers: ψa=%.3f (Q_l = (2H̃_T/M_l)^σ ā_l^ψa)\n", p.ψa)
         iszero(p.κc) || @printf("  commuting friction: κc=%.4f utils per commuting pair (r ≠ w)\n", p.κc)
         all(iszero, p.Bd) || @printf("  BA amenity: Bd=%s utils (residence r, BA holders)\n", fmtvec(p.Bd))
@@ -1894,6 +2241,8 @@ function solve_ge(p::Params = Params();
         isnan(p.fte_rule) || @printf("  teacher-demand closure: positions per pupil gap %.4f; BT[2] solved in GE\n", p.fte_rule)
         isnan(p.lyT_fixed) || @printf("  diagnostic: teachers' income taste graded at ln ŷ = lyT_fixed = %.4f (non-teachers: their own)%s\n",
                                       p.lyT_fixed, all(iszero, p.By) ? "  [By = 0: inert]" : "")
+        fertile(p) && @printf("  fertility shock: P(child) = pkid = %.4f; only parents value Λ, children follow the parents (§3d)\n", p.pkid)
+        fertile(p) && !iszero(p.pkid_z) && @printf("    ability-graded: logit slope pkid_z = %.4f per ergodic SD of log z; 1/pkid children per parent\n", p.pkid_z)
         flush(stdout)
     end
 
@@ -1924,7 +2273,8 @@ function solve_ge(p::Params = Params();
                                                 verbose = verbose && it == 1, hh0))
         s_relaxed = max(s_relaxed, hh0.s_relaxed)
         t_pi  = @elapsed ((πT, πO) = location_probs(hh0, p, gr))
-        t_phi = @elapsed ((Φ, _) = stationary_phi(πT, πO, hh0, p, gr))
+        # §3d: the young are the parents' children (the adults' πT, πO without the fertility shock)
+        t_phi = @elapsed ((Φ, _) = stationary_phi(parent_probs(hh0, p, gr, πT, πO)..., hh0, p, gr))
         t_agg = @elapsed ((HTn, Mn, tn) = aggregates(Φ, πT, πO, hh0, p, gr))
 
         # An empty location has no meaningful budget: hold its tax fixed.
@@ -1981,9 +2331,12 @@ function solve_ge(p::Params = Params();
     p.split && return (; hh, split_probs(hh, p, gr)..., HT, M, t, la, gr, p, converged,
                          s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed))
     Pi_T, Pi_O = location_probs(hh, p, gr)
-    Φ, πbar = stationary_phi(Pi_T, Pi_O, hh, p, gr)
+    Pi_Tk, Pi_Ok = parent_probs(hh, p, gr, Pi_T, Pi_O)          # §3d: the adults' own without the fertility shock
+    Φ, πbar_kid = stationary_phi(Pi_Tk, Pi_Ok, hh, p, gr)
+    πbar = fertile(p) ? migration_probs(Pi_T, Pi_O, hh, p, gr) : πbar_kid
     return (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, la, gr, p, converged,
-              s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed))
+              s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed),
+              Pi_Tk, Pi_Ok, πbar_kid)     # §3d: with pkid_z ≠ 0 these three carry P(child | z)/pkid (`parent_probs`)
 end
 
 # -----------------------------------------------------------------------------
@@ -2310,6 +2663,20 @@ function report_ge(sol)
         print("    born $l :")
         for lp in 1:L; @printf("  ->%d %.4f", lp, row[lp]); end
         println()
+    end
+    if fertile(p)            # §3d: the parents' rows (where the next generation is born) and the adults by location
+        (; πbar_kid) = sol
+        @printf("  parents (P(child) = %.4f)%s:\n", p.pkid,
+                iszero(p.pkid_z) ? "" : @sprintf(", children per young (P(child | z) = %s, slope %.3f)", fmtvec(gr.pk), p.pkid_z))
+        for l in 1:L
+            row = [dot(Φ[:, l], πbar_kid[l, :, lp]) / sum(@view Φ[:, l]) for lp in 1:L]
+            print("    born $l :")
+            for lp in 1:L; @printf("  ->%d %.4f", lp, row[lp]); end
+            println()
+        end
+        adults = [sum(Φ[zi, l] * πbar[l, zi, lp] for l in 1:L, zi in 1:Nz) for lp in 1:L]
+        @printf("  adults by location %s (shares %s) vs the young %s\n", fmtvec(2 .* adults),
+                fmtvec(adults ./ sum(adults)), fmtvec(vec(sum(Φ; dims = 1)) ./ sum(Φ)))
     end
 
     println("\n  Teaching share among young born in l (endogenous G_l):")

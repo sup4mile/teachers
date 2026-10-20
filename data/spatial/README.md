@@ -342,6 +342,26 @@ lagged-score controls. T3 measures city–suburb transitions between ages 12–1
 (0.216) is the calibration's residential-transition target. Report:
 `estimates/nlsy_extensions.md`.
 
+## Fertility — `nlsy_fertility.py` (2026-10-18)
+
+```bash
+sbatch julia/spatial_model/calibration/slurm/nlsy_fertility.sh --extract   # from the repository root
+```
+
+The NLSY79 share of adults (both genders) who ever have a biological child: the largest
+NUMKID ("children ever born") over rounds, for respondents last seen at age ≥ 45, with
+last-round weights and a household-cluster bootstrap. The result, 0.802 (SE 0.005;
+women 0.831, men 0.775), is the probability `pkid` of the model's fertility-shock
+experiment. Report: `estimates/nlsy_fertility.md`.
+
+`nlsy_fertility_gradient.py` (2026-10-18b; `.venv/bin/python nlsy_fertility_gradient.py`, about 2 minutes,
+serial) measures how that probability varies with latent AFQT and with own permanent earnings, on the same
+completed-fertility sample merged with the ability panel (`nlsy_ability.block_a`'s `afqt_c` and reliability). Pooled,
+P(ever a child) falls by 2.4 pp per latent SD (SE 0.6; logit −0.150): women −4.4 pp, men −0.5 pp. Own earnings
+(ages 30–44, latent AFQT held fixed) have opposite signs by gender: women −7.7 pp and men +9.9 pp per log point.
+These give the slope `pkid_z` of the ability-graded fertility experiment. Report:
+`estimates/nlsy_fertility_gradient.md`.
+
 ## Occupational block from ACS microdata — `acs_occupations.py` (T4, T7)
 
 ```bash

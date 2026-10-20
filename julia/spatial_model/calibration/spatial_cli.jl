@@ -24,7 +24,11 @@ const ALIASES = Dict("logkappa" => "logκ̃", "dkappa" => "δκ", "dB" => "ΔB",
                      # closure R: teachers' suburban workplace taste b_T (Params `BT`), already ASCII ("b_T"; "bT" also reads)
                      "kappa_c" => "κ_c", "zeta_BA" => "ζ_BA", "zeta_ba" => "ζ_BA", "bT" => "b_T",
                      # round 2026-10-15c: the income-graded suburban taste ζ_y (Params `By`) and its frozen reference `lyref`
-                     "zeta_y" => "ζ_y", "ly_ref" => "lyref")
+                     "zeta_y" => "ζ_y", "ly_ref" => "lyref",
+                     # 2026-10-18: the fertility shock, P(child) (Params `pkid`; an external input, 1 = off)
+                     "p_kid" => "pkid",
+                     # 2026-10-18b: its ability gradient, the logit slope per SD of log z (Params `pkid_z`; 0 = off)
+                     "p_kid_z" => "pkid_z")
 
 "`name=value` → Symbol => value; the value is a Float64 when it parses as one, else a Symbol."
 function parse_assignment(s)

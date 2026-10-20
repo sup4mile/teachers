@@ -256,7 +256,7 @@ function margin_masses(sol, w, s; hh_tol, hh_maxit)
     πT2, πO2 = location_probs(hh2, p2, gr)
     out[:c] = teacher_counts(hh, Φ, πT2, gr, p)
     out[:d] = teacher_counts(hh2, Φ, πT2, gr, p2)
-    Φ2, _ = stationary_phi(πT2, πO2, hh2, p2, gr)
+    Φ2, _ = stationary_phi(parent_probs(hh2, p2, gr, πT2, πO2)..., hh2, p2, gr)   # the parents' kernel (model §3d)
     out[:e] = teacher_counts(hh2, Φ2, πT2, gr, p2)
     return out
 end

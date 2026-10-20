@@ -133,7 +133,8 @@ Nodes ℓ = log z and stationary probabilities π: the model's Rouwenhorst grid
 (`rouwenhorst`, `stationary`) for an integer Nz, or a 64-node Gauss–Hermite rule for
 N(0, s_z²) at `Nz = :continuous`. Rouwenhorst end nodes are ±√(Nz − 1) s_z and the
 stationary law is binomial, so neither depends on ρz given s_z. In the GE, Φ summed
-over locations is this stationary law, since each parent has one child.
+over locations is this stationary law, since children per adult do not depend on z (one each, or 1/pkid per parent
+under the uniform fertility shock); with the shock's ability gradient (`pkid_z` ≠ 0) it is tilted instead (§3d).
 """
 function zdist(Nz, s_z; ρz = NLSY.rho_pc)
     iszero(s_z) && return (; ℓ = [0.0], π = [1.0])

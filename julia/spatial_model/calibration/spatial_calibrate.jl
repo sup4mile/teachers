@@ -1264,6 +1264,14 @@ function diagnostics_table(io::IO, m)
             fmtvec(m.wtp_share_l), fmtvec(m.students_per_teacher), fmtvec(m.t), fmtvec(m.M))
     @printf(io, "  levels (model only): mean C = %.6f, mean h = %.6f;  stationarity dev %.1e\n",
             m.mean_C, m.mean_h, m.stationarity_dev)
+    # 2026-10-18: the fertility shock (Params.pkid < 1): pupils (`M`, `pop_share`) and adults by location come apart
+    (hasproperty(m, :pkid) && m.pkid < 1) &&
+        @printf(io, "  fertility shock: P(child) = %.4f;  adults by location %s (log gap %.4f) vs pupils %s (gap_pupils %.4f);  parents' share of adults %s (log gap %.4f);  parents' WTP share %.5f [BFM households with children ≈ 0.0074]\n",
+                m.pkid, fmtvec(m.adult_share), m.gap_adults, fmtvec(m.pop_share), m.gap_pupils,
+                fmtvec(m.parent_share_l), m.gap_parent_share, m.wtp_share_parents)
+    (hasproperty(m, :pkid_z) && m.pkid < 1 && m.pkid_z != 0) &&
+        @printf(io, "  ability-graded fertility: logit slope %.4f per ability SD;  P(child | z) %s;  young's mean log z %+.4f ergodic SDs\n",
+                m.pkid_z, fmtvec(m.pk_z), m.fert_tilt_sd)
     @printf(io, "  model levels: population shares %s [suburb 0.579 of partitioned pupils];  t %s, salaries over market income %.4f %s [≈ 0.016; the §1 0.023 includes benefits];  Q %s\n",
             fmtvec(m.pop_share), fmtvec(m.t), m.t_market, fmtvec(m.t_market_l), fmtvec(m.Q))
     @printf(io, "              home production men %.3f, women %.3f;  mean s: teachers %.4f, non-teachers %.4f;  WTP income elasticity %.3f [BFM 0.379], within z %.3f [≈ 1 under log utility] (slope %.4f), share by parental-income tercile %s\n",

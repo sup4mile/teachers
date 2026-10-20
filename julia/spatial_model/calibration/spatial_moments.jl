@@ -589,18 +589,28 @@ nonnegative values can undershoot zero, and did report negative masses. The quad
 split at the grid nodes (`integrate_teach`), which a step-like integrand needs. Under the split
 the pairs are (residence, workplace), a parent's WTP is by her residence (where the child goes
 to school) and the audit counts the pairs.
+With the fertility shock (§3d of the model) only parents pay: the numerator integrates a over the parents
+(the share `pkid` of adults, at the parents' location probabilities `Pi_Tk`, `Pi_Ok`) and the childless
+contribute a = 0, while the denominator stays the mean consumption of all adults, so `share` remains BFM's
+mean over all households. With its ability gradient (`pkid_z`) the parents' arrays carry P(child | z)/pkid
+(`parent_probs`), so `pkid` times them is the parents' mass P(child | z) π₁ node by node.
 """
 function school_quality_wtp(sol, meas::Measurement)
     sol.p.split && return school_quality_wtp_split(sol, meas)
     (; hh, Φ, Pi_T, Pi_O, gr, p) = sol
     (; Nz, L, nϵT, nXO, ϵTgrid, XOgrid) = gr
     (; frac, x) = wtp_fraction(sol, meas)             # a/C by (parent z, l′)
+    fert = fertile(p)
+    PTk, POk = fert ? (sol.Pi_Tk, sol.Pi_Ok) : (Pi_T, Pi_O)
     Csum = zeros(L); Asum = zeros(L); Hsum = zeros(L)
+    Ksum = zeros(L); HKsum = zeros(L)                 # the parents' consumption and housing (`share_parents`)
     minC = Inf; n_binding = 0; floor_mass = 0.0; infeasible_mass = 0.0
     CT = zeros(nϵT, L); CO = zeros(nXO, L)
+    KT = zeros(nϵT, L); KO = zeros(nXO, L)            # the parents' π C (fertility shock only)
     FT = zeros(nϵT);    FO = zeros(nXO)
     XT = zeros(nϵT);    XO = zeros(nXO)
-    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, Pi_T, Pi_O, p, g, l, zi)
+    for l in 1:L, zi in 1:Nz, g in 1:2,
+        (br, bk) in zip(cell_branches(hh, Pi_T, Pi_O, p, g, l, zi), cell_branches(hh, PTk, POk, p, g, l, zi))
         hb, d = br.h, br.d
         for k in 1:nϵT
             nd = teach_node(ϵTgrid[k], zi, l, g, hb.Λ, p, gr; d)
@@ -610,6 +620,7 @@ function school_quality_wtp(sol, meas::Measurement)
             XT[k] = all(b)                       # no feasible location at this node
             FT[k] = all(b) ? 0.0 : sum(br.πT[g, l, zi, k, b]; init = 0.0)
             CT[k, :] .= br.πT[g, l, zi, k, :] .* C
+            fert && (KT[k, :] .= bk.πT[g, l, zi, k, :] .* C)
         end
         for k in 1:nXO
             nd = nonteach_node(XOgrid[k, g], zi, l, g, hb.Λ, p, gr; d)
@@ -619,6 +630,7 @@ function school_quality_wtp(sol, meas::Measurement)
             XO[k] = all(b)
             FO[k] = all(b) ? 0.0 : sum(br.πO[g, l, zi, k, b]; init = 0.0)
             CO[k, :] .= br.πO[g, l, zi, k, :] .* C
+            fert && (KO[k, :] .= bk.πO[g, l, zi, k, :] .* C)
         end
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
@@ -628,14 +640,19 @@ function school_quality_wtp(sol, meas::Measurement)
         for lp in 1:L
             c = mass * sum(integrate_choice(CT[:, lp], CO[:, lp], cm, gr))
             Csum[lp] += c
-            Asum[lp] += c * frac[zi, lp]
+            ck = fert ? mass * p.pkid * sum(integrate_choice(KT[:, lp], KO[:, lp], cm, gr)) : c   # the parents' consumption
+            Ksum[lp] += ck
+            Asum[lp] += ck * frac[zi, lp]
             h = p.pres[lp] + p.csub * p.Cbar
             iszero(h) || (Hsum[lp] += h * mass *
                           sum(integrate_choice(br.πT[g, l, zi, :, lp], br.πO[g, l, zi, :, lp], cm, gr)))
+            fert && !iszero(h) && (HKsum[lp] += h * mass * p.pkid *
+                                   sum(integrate_choice(bk.πT[g, l, zi, :, lp], bk.πO[g, l, zi, :, lp], cm, gr)))
         end
     end
     return (; share = sum(Asum) / sum(Csum .+ Hsum), share_l = Asum ./ (Csum .+ Hsum), minC, n_binding,
-              floor_mass = floor_mass / sum(Φ), infeasible_mass = infeasible_mass / sum(Φ), x)
+              floor_mass = floor_mass / sum(Φ), infeasible_mass = infeasible_mass / sum(Φ), x,
+              share_parents = fert ? sum(Asum) / sum(Ksum .+ HKsum) : sum(Asum) / sum(Csum .+ Hsum))
 end
 
 """
@@ -647,12 +664,17 @@ function school_quality_wtp_split(sol, meas::Measurement)
     (; hh, Φ, Pi_TW, Pi_OW, Pi_Tr, Pi_Or, gr, p) = sol
     (; Nz, L, nϵT, nXO, ϵTgrid, XOgrid) = gr
     (; frac, x) = wtp_fraction(sol, meas)             # a/C by (parent z, residence r)
+    fert = fertile(p)                                 # §3d: only parents pay (`school_quality_wtp`)
+    PTk, POk = fert ? (sol.Pi_TWk, sol.Pi_OWk) : (Pi_TW, Pi_OW)
     Csum = zeros(L); Asum = zeros(L); Hsum = zeros(L)
+    Ksum = zeros(L); HKsum = zeros(L)                 # the parents' consumption and housing (`share_parents`)
     minC = Inf; n_binding = 0; floor_mass = 0.0; infeasible_mass = 0.0
     CT = zeros(nϵT, L); CO = zeros(nXO, L)            # Σ_w π_{rw} C_{rw} by residence r
+    KT = zeros(nϵT, L); KO = zeros(nXO, L)            # the same at the parents' π (fertility shock only)
     FT = zeros(nϵT);    FO = zeros(nXO)
     XT = zeros(nϵT);    XO = zeros(nXO)
-    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, Pi_TW, Pi_OW, p, g, l, zi)
+    for l in 1:L, zi in 1:Nz, g in 1:2,
+        (br, bk) in zip(cell_branches(hh, Pi_TW, Pi_OW, p, g, l, zi), cell_branches(hh, PTk, POk, p, g, l, zi))
         hb, d = br.h, br.d
         for k in 1:nϵT
             nd = teach_node(ϵTgrid[k], zi, l, g, hb.Λ, p, gr; d)
@@ -663,6 +685,7 @@ function school_quality_wtp_split(sol, meas::Measurement)
             XT[k] = all(b)                       # no feasible pair at this node
             FT[k] = all(b) ? 0.0 : sum(π[b]; init = 0.0)
             CT[k, :] .= vec(sum(reshape(π .* C, L, L); dims = 1))
+            fert && (KT[k, :] .= vec(sum(reshape(pair_probs(bk.πT, g, l, zi, k) .* C, L, L); dims = 1)))
         end
         for k in 1:nXO
             nd = nonteach_node(XOgrid[k, g], zi, l, g, hb.Λ, p, gr; d)
@@ -673,6 +696,7 @@ function school_quality_wtp_split(sol, meas::Measurement)
             XO[k] = all(b)
             FO[k] = all(b) ? 0.0 : sum(π[b]; init = 0.0)
             CO[k, :] .= vec(sum(reshape(π .* C, L, L); dims = 1))
+            fert && (KO[k, :] .= vec(sum(reshape(pair_probs(bk.πO, g, l, zi, k) .* C, L, L); dims = 1)))
         end
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
@@ -683,14 +707,21 @@ function school_quality_wtp_split(sol, meas::Measurement)
         for r in 1:L
             c = mass * sum(integrate_choice(CT[:, r], CO[:, r], cm, gr))
             Csum[r] += c
-            Asum[r] += c * frac[zi, r]
+            ck = fert ? mass * p.pkid * sum(integrate_choice(KT[:, r], KO[:, r], cm, gr)) : c     # the parents' consumption
+            Ksum[r] += ck
+            Asum[r] += ck * frac[zi, r]
             h = p.pres[r] + p.csub * p.Cbar
             iszero(h) || (Hsum[r] += h * mass *
                           sum(integrate_choice(πTr[g, l, zi, :, r], πOr[g, l, zi, :, r], cm, gr)))
+            if fert && !iszero(h)
+                πTrk, πOrk = branch_probs(sol.Pi_Trk, p, d), branch_probs(sol.Pi_Ork, p, d)
+                HKsum[r] += h * mass * p.pkid * sum(integrate_choice(πTrk[g, l, zi, :, r], πOrk[g, l, zi, :, r], cm, gr))
+            end
         end
     end
     return (; share = sum(Asum) / sum(Csum .+ Hsum), share_l = Asum ./ (Csum .+ Hsum), minC, n_binding,
-              floor_mass = floor_mass / sum(Φ), infeasible_mass = infeasible_mass / sum(Φ), x)
+              floor_mass = floor_mass / sum(Φ), infeasible_mass = infeasible_mass / sum(Φ), x,
+              share_parents = fert ? sum(Asum) / sum(Ksum .+ HKsum) : sum(Asum) / sum(Csum .+ Hsum))
 end
 
 """
@@ -712,12 +743,20 @@ output included (the convention of `move_by_parent_income`).
 - `share[q]`: mean a over mean total consumption C + p_{l′} + c̲, the denominator of
   `school_quality_wtp`, within `nq`-tile q of y; slices straddling a cut are split
   uniformly, as in `move_by_parent_income`.
+With the fertility shock (§3d of the model) pass the parents' sample `msk` (`micro_sample(sol; who = :parents)`, the
+same points as `ms`): the childless pay nothing, so a point's a is the parents' a times the share of its adults who
+are parents, pkid·msk.w/ms.w (with the ability gradient, P(child | z) π₁/π, since `msk` then carries P(child | z)/pkid). The slopes are those over all adults (a is replaced by its mean at each point, which
+has the same covariance with the point's income).
 """
-function wtp_by_parent_income(sol, ms, meas::Measurement; nq = 3)
+function wtp_by_parent_income(sol, ms, meas::Measurement; nq = 3, msk = nothing)
     (; p) = sol
     frac = wtp_fraction(sol, meas).frac
     y    = exp.(ms.logw)
     a    = ms.C .* [frac[ms.zi[k], ms.lp[k]] for k in eachindex(ms.w)]
+    if msk !== nothing && fertile(p)
+        length(msk.w) == length(ms.w) || throw(ArgumentError("msk must be the parents' sample of the same points as ms"))
+        a = a .* [ms.w[k] > 0 ? clamp(p.pkid * msk.w[k] / ms.w[k], 0.0, 1.0) : 0.0 for k in eachindex(ms.w)]
+    end
     ȳ, ā = wmean(y, ms.w), wmean(a, ms.w)
     slope = sum(ms.w .* (y .- ȳ) .* (a .- ā)) / sum(ms.w .* (y .- ȳ) .^ 2)
     # z-node fixed effects: demean y and a within each ability node, then the same slope
@@ -842,10 +881,17 @@ carries P(d | g, l, z), its field `d` is its education (1 = BA; 1 for all withou
 a teacher's `logw` carries her pay factor (`teacher_logpay_shift`: ϑs (log s − log sBA) for
 BA teachers, −ρT0 without a BA) and a BA non-teacher's `logw` is her capacity with the
 credential premium e^{ρc}.
+`who` (the fertility shock, §3d of the model): `:all`, the adults, as above; `:parents`, the same points weighted
+by the parents' location probabilities (`Pi_Tk`, `Pi_Ok`), so that each point counts the children of its
+parents (1/pkid per parent): the sample of children by their parent's characteristics and location, whose
+weights also sum to sum(Φ). With the ability gradient (`pkid_z`) those arrays carry P(child | z)/pkid
+(`parent_probs`), so the children of the more fertile abilities weigh more. The two samples have the same points in the same order; without the shock they
+are the same sample.
 """
-function micro_sample(sol; n = 600, groups = nothing)
-    sol.p.split && return micro_sample_split(sol; n, groups)
-    (; hh, Φ, Pi_T, Pi_O, gr) = sol
+function micro_sample(sol; n = 600, groups = nothing, who::Symbol = :all)
+    sol.p.split && return micro_sample_split(sol; n, groups, who)
+    (; hh, Φ, gr) = sol
+    Pi_T, Pi_O = sample_probs(sol, who)
     (; Nz, L, ϵTgrid, XOgrid, dT) = gr
     groups = something(groups, [gr.nonteach])
     G   = length(groups)
@@ -889,9 +935,10 @@ function micro_sample(sol; n = 600, groups = nothing)
             splO = Spline1D(lx, log.(hb.capO[g, l, zi, :]))
             lcO, lcOe = splO(vm), splO(v)
             CT, CO = cell_consumption(sol, g, l, zi; hb, d)
+            hi = sample_prob_cap(sol, who, zi)
             for lp in 1:L
-                πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, lp]; k = 1)(umT), 0.0, 1.0)
-                πO = clamp.(Spline1D(lx, br.πO[g, l, zi, :, lp]; k = 1)(vm), 0.0, 1.0)
+                πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, lp]; k = 1)(umT), 0.0, hi)
+                πO = clamp.(Spline1D(lx, br.πO[g, l, zi, :, lp]; k = 1)(vm), 0.0, hi)
                 cT, cO = Spline1D(luT, CT[:, lp])(umT), Spline1D(lx, CO[:, lp])(vm)
                 push_pts!(g, l, zi, lp, 0, log((1 - sol.p.τω[sol.p.T, g]) * sol.p.κ[lp]), lwT, lwTe, cT, wT .* πT, d)
                 for k in 1:G
@@ -903,9 +950,49 @@ function micro_sample(sol; n = 600, groups = nothing)
     return out
 end
 
-"`micro_sample` under the split: one point set per (residence, workplace) pair, with the field `lw` (and `d`, as `micro_sample`)."
-function micro_sample_split(sol; n = 600, groups = nothing)
-    (; hh, Φ, Pi_TW, Pi_OW, gr) = sol
+"""
+    sample_probs(sol, who) -> (πT, πO)
+
+The location probabilities with which a pseudo-sample of `who` weights its points (§3d of the model): `:all` the
+adults' (`Pi_T`, `Pi_O`; under the split `Pi_TW`, `Pi_OW`), `:parents` the parents' (`Pi_Tk`, `Pi_Ok`; `Pi_TWk`,
+`Pi_OWk`), which are the adults' own without the fertility shock. With its ability gradient (`pkid_z` ≠ 0) the parents'
+arrays carry P(child | z)/pkid (`parent_probs`), so they can exceed 1 (`sample_prob_cap`).
+"""
+function sample_probs(sol, who::Symbol)
+    who in (:all, :parents) || throw(ArgumentError("who must be :all or :parents, got :$who"))
+    (who === :all || !fertile(sol.p)) && return sol.p.split ? (sol.Pi_TW, sol.Pi_OW) : (sol.Pi_T, sol.Pi_O)
+    return sol.p.split ? (sol.Pi_TWk, sol.Pi_OWk) : (sol.Pi_Tk, sol.Pi_Ok)
+end
+
+"""
+    sample_prob_cap(sol, who, zi) -> Float64
+
+Upper bound of the interpolated location probabilities of a pseudo-sample at ability node `zi` (`micro_sample`): 1,
+except for the parents' sample with the fertility shock's ability gradient (§3d of the model), whose arrays carry
+P(child | z)/pkid (`parent_probs`) and so run up to that weight.
+"""
+sample_prob_cap(sol, who::Symbol, zi) =
+    (who === :parents && fertile(sol.p) && !iszero(sol.p.pkid_z)) ? sol.gr.pk[zi] / sol.p.pkid : 1.0
+
+"""
+    logz_sd(sol) -> Float64
+
+The SD of log z that the moments "in SDs of log z" divide by: the ergodic s_z = σξ/√(1 − ρz²), except with the
+fertility shock's ability gradient (§3d of the model), where the young's ability distribution is tilted and the SD is
+that of log z under Φ's z-marginal, the population counterpart of the data's SD.
+"""
+function logz_sd(sol)
+    (; p, gr, Φ) = sol
+    (fertile(p) && !iszero(p.pkid_z)) || return p.σξ / sqrt(1 - p.ρz^2)
+    w  = vec(sum(Φ; dims = 2)) ./ sum(Φ)
+    lz = log.(gr.z)
+    return sqrt(dot(w, (lz .- dot(w, lz)) .^ 2))
+end
+
+"`micro_sample` under the split: one point set per (residence, workplace) pair, with the field `lw` (and `d`, `who`, as `micro_sample`)."
+function micro_sample_split(sol; n = 600, groups = nothing, who::Symbol = :all)
+    (; hh, Φ, gr) = sol
+    Pi_TW, Pi_OW = sample_probs(sol, who)
     (; Nz, L, ϵTgrid, XOgrid, dT) = gr
     groups = something(groups, [gr.nonteach])
     G   = length(groups)
@@ -950,10 +1037,11 @@ function micro_sample_split(sol; n = 600, groups = nothing)
             splO = Spline1D(lx, log.(hb.capO[g, l, zi, :]))
             lcO, lcOe = splO(vm), splO(v)
             CT, CO = cell_consumption(sol, g, l, zi; hb, d)
+            hi = sample_prob_cap(sol, who, zi)
             for r in 1:L, w in 1:L
                 dest = (r - 1) * L + w
-                πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, r, w]; k = 1)(umT), 0.0, 1.0)
-                πO = clamp.(Spline1D(lx, br.πO[g, l, zi, :, r, w]; k = 1)(vm), 0.0, 1.0)
+                πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, r, w]; k = 1)(umT), 0.0, hi)
+                πO = clamp.(Spline1D(lx, br.πO[g, l, zi, :, r, w]; k = 1)(vm), 0.0, hi)
                 cT, cO = Spline1D(luT, CT[:, dest])(umT), Spline1D(lx, CO[:, dest])(vm)
                 push_pts!(g, l, zi, r, w, 0, log((1 - sol.p.τω[sol.p.T, g]) * sol.p.κ[w]), lwT, lwTe, cT, wT .* πT, d)
                 for k in 1:G
@@ -1060,7 +1148,7 @@ end
 Loading of log Q_l in the latent score signal log z + c log Q_l, c = b s_z/χ with
 b = 1/(1 − η) and s_z = σξ/√(1 − ρz²) (calibration note §1, *Scale and χ*).
 """
-score_loading(p::Params, χ) = p.σξ / sqrt(1 - p.ρz^2) / ((1 - p.η) * χ)
+score_loading(p::Params, χ) = p.σξ / sqrt(1 - p.ρz^2) / ((1 - p.η) * χ)   # ergodic s_z, also under §3d's ability gradient (≤ 0.9% off at pkid_z = 0.5)
 
 """
     wls_slope(X, y, w; ba = nothing) -> Float64
@@ -1108,7 +1196,9 @@ by its SD over the cohort:
   indicator) over the slope among BA non-teacher market workers, the NLSY79 check of γ
   (closed form γ(1−η)/(1−γη) without selection on the education margin).
 """
-function ability_moments(sol, ms, meas::Measurement; hpgrp::Int)
+function ability_moments(sol, ms, meas::Measurement; hpgrp::Int, msk = ms)
+    # `msk`: the parents' pseudo-sample (§3d of the model, `micro_sample(sol; who = :parents)`), over which the
+    # parent–child correlations run; `ms` itself without the fertility shock
     (; Φ, gr, p) = sol
     (; z, Q, Πz, Nz, L) = gr
     c  = score_loading(p, meas.χ)
@@ -1139,7 +1229,7 @@ function ability_moments(sol, ms, meas::Measurement; hpgrp::Int)
         # parent mass by (zi, l, l′), then the child's z′ ~ Πz and schooling location l′
         P = zeros(Nz, L, L)
         for k in findall(sel)
-            P[ms.zi[k], ms.l[k], ms.lp[k]] += ms.w[k]
+            P[msk.zi[k], msk.l[k], msk.lp[k]] += msk.w[k]
         end
         P ./= sum(P)
         m1 = m2 = s11 = s22 = s12 = 0.0
@@ -1155,7 +1245,7 @@ function ability_moments(sol, ms, meas::Measurement; hpgrp::Int)
     # with ψa ≠ 0, peers)
     EZ(l) = sum(Φ[:, l] .* log.(z)) / sum(Φ[:, l])
     return (; score_gap = (ES(2) - ES(1)) / wsd(Ss), score_gap_noQ = (EZ(2) - EZ(1)) / wsd(Ss),
-              wage_slope = β[2], rho_pc = parent_child(ms.g .== 2), rho_pc_all = parent_child(trues(length(ms.w))),
+              wage_slope = β[2], rho_pc = parent_child(msk.g .== 2), rho_pc_all = parent_child(trues(length(msk.w))),
               c, sd_S = sd, wage_slope_ba = slope_ba, teacher_slope_ratio = slope_T / slope_C)
 end
 
@@ -1166,6 +1256,8 @@ Child-poverty validation (Table 4): children live with their parent in l′, and
 child is poor when the parent's pre-tax income (home production included) is below
 the `pov_rate` quantile of all adults' income. Returns the suburb-minus-city gap in
 the poor share (in shares, not pp), the shares by l′ and the log income line.
+With the fertility shock (§3d of the model) `model_moments` passes the parents' sample (each point weighted by its
+children), so the line is the `pov_rate` quantile of the children's parents' income: `pov_rate` of the children are poor.
 """
 function poverty_gap(ms, pov_rate, L)
     line  = mquantile(ms, trues(length(ms.w)), (pov_rate,))[1]
@@ -1179,9 +1271,11 @@ end
 
 Children's move rate, schooled in one location and living in the other as adults, by
 `nq`-tile of the parent's pre-tax income (home production included; quantiles over
-all adults): the NLSY transitions by parental income (T3). A parent at (zi, l′) has a
+all adults, or over parents with the fertility shock): the NLSY transitions by parental income (T3). A parent at (zi, l′) has a
 child of ability z′ ~ Πz[zi, :] schooled in l′, who moves with probability
 1 − π̄[l′, z′, l′]. Slices straddling a cut are split uniformly (`micro_sample`).
+With the fertility shock (§3d of the model) `ms` is the parents' sample (children by their parent), and π̄ = `sol.πbar`
+is the young's own migration as adults, which mixes parents and the childless.
 """
 function move_by_parent_income(sol, ms; nq = 3)
     (; πbar, gr) = sol
@@ -1200,11 +1294,11 @@ end
     parent_income_composition(sol, ms; nq = 3) -> (; city_share, c2s, s2c)
 
 Residential composition and directional flows of children by `nq`-tile of the
-parent's pre-tax income (home production included; quantiles over all adults), the
-NLSY counterparts of T3 (nlsy_extensions.md, section B): `city_share[q]`, the share of
+parent's pre-tax income (home production included; quantiles over all adults, or over
+parents with the fertility shock), the NLSY counterparts of T3 (nlsy_extensions.md, section B): `city_share[q]`, the share of
 children schooled in location 1; `c2s[q]` and `s2c[q]`, the shares of children
 schooled in 1 (in 2) who live in 2 (in 1) as adults. Children are schooled where the
-parent lives and draw z′ ~ Πz, as in `move_by_parent_income`.
+parent lives and draw z′ ~ Πz, as in `move_by_parent_income` (with the fertility shock, `ms` is the parents' sample).
 """
 function parent_income_composition(sol, ms; nq = 3)
     (; πbar, gr) = sol
@@ -1306,7 +1400,7 @@ non-teachers and home producers by ability node and education branch, `[zi, d = 
 """
 function teacher_selection(sol, hp::Int)
     (; hh, Φ, gr, p) = sol
-    s_z = p.σξ / sqrt(1 - p.ρz^2)
+    s_z = logz_sd(sol)                                     # SD of log z (§3d: the tilted one with pkid_z ≠ 0)
     lz  = log.(gr.z)
     Tb = zeros(gr.Nz, 2); Ob = zeros(gr.Nz, 2); Hb = zeros(gr.Nz, 2)
     pHP = hp == 0 ? nothing : [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:gr.nXO] for g in 1:2]
@@ -1345,7 +1439,7 @@ Residential composition behind the spatial gaps (calibration experiments, 2026-1
 function composition_stats(sol, ms, hpgrp::Int)
     (; Φ, πbar, gr, p) = sol
     (; z, Q, Nz, L) = gr
-    s_z = p.σξ / sqrt(1 - p.ρz^2)
+    s_z = logz_sd(sol)                                     # SD of log z (§3d: the tilted one with pkid_z ≠ 0)
     lz  = log.(z)
     young = [dot(Φ[:, l], lz) / sum(Φ[:, l]) for l in 1:L]
     A     = [sum(Φ[zi, l] * πbar[l, zi, lp] for l in 1:L) for zi in 1:Nz, lp in 1:L]
@@ -1429,8 +1523,11 @@ function option_values(sol)
     (; Nz, L, nϵT, nXO, ϵTgrid, XOgrid) = gr
     diag_d = [(r - 1) * L + r for r in 1:L]                # the pairs (r, r)
     function value(nd, s, e)
-        W = location_values(nd, consumption(nd, s, e, p), p)
+        C = consumption(nd, s, e, p)
+        W = location_values(nd, C, p)
         _, _, πr, _, I = nested_logsum_probs(W, nd.l, nd, p)
+        # fertility shock (§3d): weights of all adults; I_r − W_rr is the same for parents and the childless
+        nd.pk < 1.0 && (πr = vec(sum(reshape(node_probs(nd, C, p), L, L); dims = 1)))
         return dot(πr, I .- W[diag_d])
     end
     oT = zeros(nϵT); oO = zeros(nXO)
@@ -1595,6 +1692,21 @@ end
 # -----------------------------------------------------------------------------
 # 6. All moments
 # -----------------------------------------------------------------------------
+
+"""
+    fertility_tilt(Φ, gr) -> Float64
+
+Mean log ability of the young (Φ) relative to the ergodic distribution of `gr.Πz`, in ergodic SDs of log z: zero
+without the fertility shock's ability gradient (§3d of the model; up to the stationarity error), and the shift of the
+ability distribution toward the more fertile with it.
+"""
+function fertility_tilt(Φ, gr)
+    erg = stationary(gr.Πz)
+    lz  = log.(gr.z)
+    m   = dot(erg, lz)
+    return (dot(vec(sum(Φ; dims = 2)), lz) / sum(Φ) - m) / sqrt(dot(erg, (lz .- m) .^ 2))
+end
+
 """
     model_moments(sol, meas = Measurement(); hh_tol = 1e-7, hh_maxit = 1000) -> NamedTuple
 
@@ -1650,7 +1762,13 @@ Validation and diagnostics:
 - `students_per_teacher`, `t`, `Q`, `QT` (its teacher part), `M` (model levels without a data counterpart);
 - `mean_C`, `mean_h`: drift from the frozen C̄ and h̄ (`mean_C` is net of the subsistence `csub` C̄;
   model units only);
-- `stationarity_dev`: max |adults_l − students_l|/students_l (quadrature accuracy);
+- `stationarity_dev`: max |adults_l − students_l|/students_l (quadrature accuracy; with the fertility shock, the
+  parents' children against the students);
+- the fertility shock (§3d of the model): `pkid`, `adult_share`, `gap_adults` (adults by location, which differ from
+  the pupils), `parent_share_l`, `gap_parent_share` (parents per adult by location; children per adult are these over
+  pkid), `wtp_share_parents` (the parents' own WTP share); with its ability gradient `pkid_z` (the logit slope),
+  `pk_z` (P(child | z) at the nodes) and `fert_tilt_sd` (the young's mean log z over the ergodic one, in SDs:
+  `fertility_tilt`);
 - `minC`, `n_binding`, `floor_mass`, `infeasible_mass`: consumption support (see
   `school_quality_wtp`): the population shares that choose a floored location although a feasible
   one exists, and that have no feasible location.
@@ -1779,17 +1897,20 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
     grp = ms_groups(gr, meas.hp)
     hpg = hp_group(grp, meas.hp)
     ms  = micro_sample(sol; n = meas.nquad, groups = grp)
+    # §3d of the model: children by their parent, the sample of the child-side moments (`ms` itself without the shock)
+    fert = fertile(p)
+    msk = fert ? micro_sample(sol; n = meas.nquad, groups = grp, who = :parents) : ms
     tw  = teacher_wage_stats(ms, meas.teacher_weights)
     inc = income_stats(ms, hpg, L)
-    ab  = ability_moments(sol, ms, meas; hpgrp = hpg)
-    pov = poverty_gap(ms, meas.pov_rate, L)
-    pic = parent_income_composition(sol, ms)
+    ab  = ability_moments(sol, ms, meas; hpgrp = hpg, msk)
+    pov = poverty_gap(msk, meas.pov_rate, L)
+    pic = parent_income_composition(sol, msk)
     cmp = composition_stats(sol, ms, hpg)
     zc  = own_z_composition(Φ)
     mz  = gr.L == 2 ? move_by_own_z(sol) : (; move = fill(NaN, 3), c2s = fill(NaN, 3), s2c = fill(NaN, 3))
     tsel = teacher_selection(sol, meas.hp)
     hps = meas.hp == 0 ? nothing : home_production_stats(sol, meas.hp; stats = st)
-    wti = wtp_by_parent_income(sol, ms, meas)
+    wti = wtp_by_parent_income(sol, ms, meas; msk = fert ? msk : nothing)
     cs  = commute_shares(ms, hpg)
     ov  = option_values(sol)
     tsr = teacher_supply_response(sol; hh_tol, hh_maxit)
@@ -1811,6 +1932,10 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
     M  = 2 .* S
     P  = [sum(Φ[zi, l] * πbar[l, zi, lp] for zi in 1:Nz) for l in 1:L, lp in 1:L]
     P ./= sum(P; dims = 2)                      # rows integrate to 1 + O(quadrature error)
+    # §3d: the parents by location (their children are the next generation's students, so the stationarity check
+    # compares their children with S), and the adults by location, which differ from the students under the shock
+    kids    = fert ? [sum(Φ[zi, l] * sol.πbar_kid[l, zi, lp] for l in 1:L, zi in 1:Nz) for lp in 1:L] : S
+    parents = p.pkid .* kids
     gap_logQ = gap(gr.Q)
     la = peer_log_ability(Φ, gr)                # the students' log ā_l, the peer input at this Φ
     ss = s_summary(sol)
@@ -1843,7 +1968,7 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
         gap_income_log_median_market = meas.hp == 0 ? NaN : inc.log_median_market[2] - inc.log_median_market[1],
         wage_slope = ab.wage_slope, rho_pc = ab.rho_pc, score_loading = ab.c,
         poverty_share_l = pov.share,
-        move_rate_by_parent_income = move_by_parent_income(sol, ms),
+        move_rate_by_parent_income = move_by_parent_income(sol, msk),
         city_share_by_parent_income = pic.city_share,
         city_share_gradient = pic.city_share[end] - pic.city_share[1],
         c2s_by_parent_income = pic.c2s, s2c_by_parent_income = pic.s2c,
@@ -1867,7 +1992,10 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
         students_per_teacher = S ./ nTl,
         t = copy(sol.t), Q = copy(gr.Q), QT = copy(gr.QT), M,
         mean_C = mean_consumption(sol), mean_h = mean_child_h(sol),
-        stationarity_dev = maximum(abs.(adults .- S) ./ S),
+        stationarity_dev = fert ? maximum(abs.(kids .- S) ./ S) : maximum(abs.(adults .- S) ./ S),
+        pkid = p.pkid, adult_share = adults ./ sum(adults), gap_adults = gap(adults), wtp_share_parents = wtp.share_parents,
+        pkid_z = p.pkid_z, pk_z = copy(gr.pk), fert_tilt_sd = fertility_tilt(Φ, gr),
+        parent_share_l = parents ./ adults, gap_parent_share = log(parents[2] / adults[2]) - log(parents[1] / adults[1]),
         minC = wtp.minC, n_binding = wtp.n_binding, floor_mass = wtp.floor_mass,
         infeasible_mass = wtp.infeasible_mass,
         pop_share = M ./ sum(M),
@@ -1980,7 +2108,7 @@ function college_stats(sol, ms, ss, tsel, hpgrp::Int; teacher_weights = Measurem
                   teacher_ba_wage_gap = NaN, teacher_ba_wage_gap_m = NaN, teacher_ba_wage_gap_f = NaN,
                   s_T_mean_nonba = NaN, teacher_p9010_ba = NaN, teacher_p9010_ba_g = fill(NaN, 2))
     end
-    s_z = p.σξ / sqrt(1 - p.ρz^2)
+    s_z = logz_sd(sol)                                     # SD of log z (§3d: the tilted one with pkid_z ≠ 0)
     lz  = log.(gr.z)
     (; T, O, H) = tsel                                     # [zi, d = 1 / d = 0]
     mean_lz(x) = dot(x, lz) / sum(x)
@@ -2122,7 +2250,9 @@ function occupation_consistency(sol, meas::Measurement; n = meas.nquad)
     shares = [sum(ms.w[within(k, g)]) / sum(ms.w[(ms.grp .> 0) .& (ms.g .== g)]) for k in 1:nt, g in 1:2]
     R  = [k == hpg ? NaN : p9010(ms, within(k, g)) for k in 1:nt, g in 1:2]
     tw = teacher_wage_stats(ms, meas.teacher_weights)
-    ab = ability_moments(sol, ms, meas; hpgrp = hpg)
+    # mother–child ρ over children by parent with the fertility shock, as in `model_moments`
+    msk = fertile(sol.p) ? micro_sample(sol; n, groups, who = :parents) : ms
+    ab = ability_moments(sol, ms, meas; hpgrp = hpg, msk)
     cellmean(sel) = (i = findall(sel); wmean(ms.logw[i], ms.w[i]))
     ml = [k == hpg ? NaN : cellmean(within(k, g)) for k in 1:nt, g in 1:2]
     tl = [cellmean((ms.grp .== 0) .& (ms.g .== g)) for g in 1:2]

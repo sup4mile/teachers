@@ -4,6 +4,38 @@ This directory retains selected outputs cited in the [calibration note](../spati
 and [calibration log](../calibration_log.md). The local `.gitignore` excludes other
 run artifacts by default; add explicit exceptions when retaining new evidence.
 
+## Mechanism adoption scope (2026-10-19)
+
+For now, the only additional mechanisms eligible for adoption are residence/workplace
+separation with commuting, local housing costs, fertility/parenthood shocks,
+education-based teacher salary schedules, teacher education/licensure requirements,
+and peer effects. The first-pass 2026-09-29 calibration in `exact-polish-base/`
+remains the baseline. Eligibility adopts no extension, implementation or candidate;
+a baseline change still needs supporting evidence and an explicit user decision.
+All other added mechanisms remain outside the current adoption scope. Earlier
+development plans and candidate designations below are historical evidence, not
+exceptions to this restriction. In particular, C4′ and P·TB·Y·D0·ρ contain excluded
+mechanisms and are not eligible for adoption as packages. Preserve their runs and
+all other historical evidence. See the [full decision and implementation qualifications](../calibration_log.md#mechanism-adoption-scope-2026-10-19).
+
+## Baseline policy (2026-10-18)
+
+The first-pass standard calibration in [`exact-polish-base/`](exact-polish-base/)
+(exactly identified 2026-09-29 fit; first-pass commit `d88afb4`, 2026-09-30)
+remains the baseline until the user definitively says otherwise. Preserve its
+parameters, inputs and moment definitions. All subsequent candidates and
+measurement alternatives remain experimental; passing checks does not authorize
+adoption. Changing the baseline or the restored model spec requires convincing
+evidence and an explicit user decision. This policy controls the earlier plans
+and candidate designations below.
+
+The [model spec](../../../../notes/spatial_teachers_model_eps0.md) is restored
+byte-for-byte from `d88afb4`, identical to its July 28 version. Keep experimental
+specifications in calibration or separate experimental notes. The four pre-edit
+documents, including the uncommitted spec additions, are hash-verified in
+[`_code/baseline-policy-20261018/`](_code/baseline-policy-20261018/README.md).
+Code and historical outputs remain intact.
+
 ## Preservation for the accepted next phase (2026-10-15)
 
 **Update (2026-10-16).** The user provisionally accepts the next measurement and
@@ -140,6 +172,42 @@ candidates listed above are tracked.
   Code: the five S fits (`p_d0`, `p_y_d0`, `p_y_d0_rp04`, `p_tb_y_d0`, `m_y_d0_rp0`), their `*_nz13` re-solves,
   `reeval_pre/` and `reeval_pre_pair/` ran on `_code/r1015c3`. Everything else, including the selected `p_tb_y_d0_rho`
   and both `tx_*` refits, ran on `_code/r1016a`, which the main tree equals.
+- `fertility-20261018/`: the fertility-shock experiment (2026-10-18, `--external pkid=0.802`;
+  [log](../calibration_log.md#fertility-shock-2026-10-18)):
+  - `fit/`: the September problem re-estimated with the shock; `fixed_theta/`: the September ϑ at pkid = 0.802;
+  - `grid-Nz_9/`, `grid-Nz_15/`, `grid-neT_96_nXO_96/`: re-solves at the fit, as `exact-grid-*`;
+  - `ms/`: LM from the 15 starts of `exact-ms/` (`ms/cases.tsv`);
+  - `dev_fixed_theta/`, `dev_fit/`: the development candidate P·TB·Y·D0·ρ at pkid = 0.802, at its ϑ and refitted;
+  - `postreview/`: both fits re-evaluated after the review's diagnostic fixes;
+  - `tests/`: the code checks (toy economy; old against new code at pkid = 1);
+  - `LOG.md`: specification, commands and job IDs.
+
+  The code before the switch is frozen in `_code/pre-fertility-20261018/`. The main tree adds it, off by default
+  (pkid = 1 reproduces the old code bit for bit). Everything here is untracked; tracking `fit/` would need a
+  `.gitignore` exception, which is the user's call.
+- `fertgrad-20261018/`: the ability-graded fertility shock (2026-10-18b, `--external pkid=0.802 --external pkid_z=…`;
+  [log](../calibration_log.md#ability-graded-fertility-shock-2026-10-18b)):
+  - `fixed_{m015,p015,p050}/`, `fit_{…}/`: the September problem at the uniform-shock refit's ϑ and refitted, at
+    pkid_z = −0.15 (the NLSY79 cross-section), +0.15 (a normal-good income effect) and +0.5 (a strong bound);
+  - `grid_*`: Nz = 9 and 15 re-solves of the refits;
+  - `dev_fixed_{…}/`, `dev_fit_{…}/`: the development candidate P·TB·Y·D0·ρ at the three slopes;
+  - `tests/`: the code checks (toy economy; old against new code at pkid_z = 0); `compare.py`: the comparison
+    tables; `submit.sh`: every submission; `LOG.md`: specification, review, commands and job IDs.
+
+  The code before the switch is frozen in `_code/pre-fertgrad-20261018/`. The main tree adds it, off by default
+  (pkid_z = 0 reproduces the 2026-10-18 shock bit for bit). Everything here is untracked.
+- `factorial-20261019/` and `exp-factorial/`: the 2⁶ factorial of the six eligible mechanisms (2026-10-19;
+  [log](../calibration_log.md#factorial-round-the-six-eligible-mechanisms-in-every-combination-2026-10-19)):
+  - `factorial-20261019/`: `PREREG.md`, `LOG.md` (jobs, commands), `lit_memo.md` (magnitudes), `design.json`,
+    `gen_cases.py` (case lists and warm starts in `starts/`), `panel_snap.sh`, `factorial_score.py` →
+    `scores.md`/`scores.csv`, `tests/sched_check.jl` (old against new code with `schedT` off);
+  - `exp-factorial/<case>`: the 64 exact refits at Nz = 9, named by their mechanisms (C commuting, H housing,
+    F fertility, S salary schedule, L licensure, P peers; `none` is C0 at Nz = 9), `<case>_nz13` their Nz = 13
+    re-solves, `HSP__*`/`CHSP__*`/`*SLP__sched_low` the magnitude sensitivities, `HSP_ms1–4` and `HSP_jac` the
+    multistart and identification checks.
+
+  The code before `Params.schedT` is frozen in `_code/pre-factorial-20261019/`; the runs used `_code/factorial-r1/`.
+  The main tree adds the switch, off by default (NaN reproduces the old code bit for bit). Everything here is untracked.
 - The other experiment directories (`exp-teacher/`, `exp-round3/`, …) hold the original
   Levenberg–Marquardt runs; `exp-final/` reproduces their estimates.
 

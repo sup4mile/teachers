@@ -77,9 +77,11 @@ function fixed_q_solution(sol, QT; hh_tol = SOLVER.hh_tol, hh_maxit = SOLVER.hh_
     p.split && return merge(sol, (; hh, split_probs(hh, p, gr2)..., gr = gr2, s_resid = hh.s_resid,
                                     s_passes = hh.s_passes, s_relaxed = hh.s_relaxed))
     Pi_T, Pi_O = location_probs(hh, p, gr2)
-    Φ, πbar = stationary_phi(Pi_T, Pi_O, hh, p, gr2)
-    return merge(sol, (; hh, Pi_T, Pi_O, Φ, πbar, gr = gr2, s_resid = hh.s_resid, s_passes = hh.s_passes,
-                         s_relaxed = hh.s_relaxed))
+    Pi_Tk, Pi_Ok = parent_probs(hh, p, gr2, Pi_T, Pi_O)          # the fertility shock (model §3d), as in `solve_ge`
+    Φ, πbar_kid = stationary_phi(Pi_Tk, Pi_Ok, hh, p, gr2)
+    πbar = fertile(p) ? migration_probs(Pi_T, Pi_O, hh, p, gr2) : πbar_kid
+    return merge(sol, (; hh, Pi_T, Pi_O, Φ, πbar, Pi_Tk, Pi_Ok, πbar_kid, gr = gr2, s_resid = hh.s_resid,
+                         s_passes = hh.s_passes, s_relaxed = hh.s_relaxed))
 end
 
 const ROWS = [(:gap_income, "earnings gap (median, market)", 0.1122), (:gap_meanlog_mkt, "mean-log wage gap (market)", NaN),
