@@ -1,0 +1,11 @@
+# CCS simple-baseline round, 2026-11-01 (runs/ccs-simple-20261101/LOG.md): the mother–child ρ_pc ceiling of the simple
+# model (K_d = 1, ρ = 1, ψ = 0). Fixed-ϑ evaluations (panel.sh with PANEL_MAX_ITER=0, CODE=…/runs/_code/ccs-r1,
+# PANEL_OUT=…/runs/exp-ccs-simple/rhoz) at its exact refit runs/exp-ccs/refit/ccs1_psi0, with the AR(1) persistence ρz
+# of log ability raised from the external 0.5766 (T2b). `--external rho_z=x` holds the stationary SD s_z = 0.1956
+# (external_params: σξ = innovation_sd(s_z, ρz) = s_z √(1 − ρz²)), so the Rouwenhorst nodes, the score loading
+# c = s_z/((1 − η)χ) and the draw's share of the adult score variance stay put and only the persistence moves.
+# rhoz_05766 is the control (the refit point itself). The grid pad is the refit's (0.6).
+rhoz_05766	--external ccs=1 --external ccs_draws=1 --grid ccs_pad=0.6
+rhoz_075	--external ccs=1 --external ccs_draws=1 --external rho_z=0.75 --grid ccs_pad=0.6
+rhoz_090	--external ccs=1 --external ccs_draws=1 --external rho_z=0.90 --grid ccs_pad=0.6
+rhoz_097	--external ccs=1 --external ccs_draws=1 --external rho_z=0.97 --grid ccs_pad=0.6

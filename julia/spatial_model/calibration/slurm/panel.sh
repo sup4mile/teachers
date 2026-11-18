@@ -10,6 +10,8 @@
 # PANEL_CASES and PANEL_OUT, e.g.
 #   PANEL_CASES=julia/spatial_model/calibration/slurm/cases_exact_panel.tsv \
 #   PANEL_OUT=julia/spatial_model/calibration/runs/panel-exact sbatch --array=1-$n%16 ... panel.sh <fit>
+# CODE (2026-10-26) runs a frozen code tree runs/_code/<name> instead of the main tree (unset: the main tree), so
+# that the code cannot change under pending array tasks, e.g. CODE=julia/spatial_model/calibration/runs/_code/ccs-r1.
 #SBATCH -J sp-panel
 #SBATCH -p econ-grad
 #SBATCH -t 08:00:00
@@ -26,6 +28,8 @@ line=$(grep -v '^#' "$cases" | sed -n "${SLURM_ARRAY_TASK_ID}p")
 name=$(cut -f1 <<< "$line")
 read -r -a case_args <<< "$(cut -f2 <<< "$line")"
 echo "case $SLURM_ARRAY_TASK_ID: $name: ${case_args[*]}"
-exec julia --project=julia/spatial_model/calibration/estimation julia/spatial_model/calibration/spatial_diagnose.jl \
+root="${CODE:-.}"
+echo "code root: $root"
+exec julia --project=julia/spatial_model/calibration/estimation "$root/julia/spatial_model/calibration/spatial_diagnose.jl" \
     --theta "$base" --polish --max-iter "${PANEL_MAX_ITER:-30}" --consistency --out "$outroot/$name" \
     "${case_args[@]}" "$@"

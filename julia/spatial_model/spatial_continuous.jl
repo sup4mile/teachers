@@ -21,10 +21,23 @@
 #      carries two sets of policies and P₁(g, l, z); everything that integrates over a cell
 #      (location probabilities, Φ, aggregates, Λ, the moments) mixes them with the weights
 #      P(d | g, l, z).  With `college` off nothing of this is reached.
-#   5. Local peer effects (`Params.ψa`, off by default).  School quality carries the students' mean
-#      ability, Q_l = (2H̃_T/M_l)^σ ā_l^{ψa}, where log ā_l is the mean log z of the young schooled
-#      in l relative to its ergodic mean (`peer_log_ability`); ā is a fourth outer aggregate.
-#   The outer loop is a damped fixed point in (H̃_T, M, t), and ā when ψa ≠ 0.
+#   5. Local peer effects (`Params.ψa`, off by default).  School quality carries a peer input P_l,
+#      Q_l = (2H̃_T/M_l)^σ P_l^{ψa}.  By default P_l is the students' mean ability ā_l, log ā_l the mean
+#      log z of the young schooled in l relative to its ergodic mean (`peer_log_ability`); `peer_input`
+#      = :hc makes it the adults' human capital by residence, and `peer_total` the group's total
+#      (number × geometric mean) instead of its mean (`peer_log_input`, specifications A–D).  log P
+#      is a fourth outer aggregate.
+#   6. Constant class size (`Params.ccs`, off by default; §3e, 2026-10-26).  Classes are equal-sized within a
+#      location, N_l = S_l/n_T,l, and students are assigned to teachers at random, so school quality
+#      q = Q̄_l r is a state of the young: ln Q̄_l = β E[ln h_eff | teacher in l] − σ ln N_l and ln r the
+#      mean-zero teacher draw.  By Proposition 5 the node at (Q̄_l r, ϵ) is the node at Q̄_l with the effective
+#      shocks ϵ̃_T = r^{1/α} ϵ_T, X̃_O = r X_O, so the nodes are solved once, on effective-shock grids widened by
+#      a pad, and each node x = ln r of the n_q-point Gauss rule R_l (matched to the moments of ln r) only
+#      shifts the shock laws (`ccs_law`); every integral over a cell is the R_l-mixture of the draw integrals
+#      (`MixedMaps`, `over_draws`).  The outer state replaces H̃_T by (ln Q̄_l, the teachers' central moments of
+#      ln h_eff) by location (`ccs_teacher_moments`).
+#   The outer loop is a damped fixed point in (H̃_T, M, t), and log P when ψa ≠ 0; under `ccs`, in
+#   (ln Q̄, teacher moments, M, t), with H̃_T still computed as the efficient-equivalent index.
 #
 # Notation: ε (\varepsilon) is the parental cost share; ϵ (\epsilon) is the
 # idiosyncratic ability shock.
@@ -117,6 +130,24 @@ child's ability. `expm1` avoids cancellation as ψ → 1.
 #           moments, the value of a location to parents). ā_l is the geometric
 #           mean of the students' z relative to the economy's (`peer_log_ability`), so it moves quality
 #           across locations, not its overall level. 0: off, and Q is the teacher index alone
+#   peer_input, peer_total (2026-10-25)  the peer input P_l of Q = Q_T P^{ψa} (`peer_log_input`; the solver's
+#           fourth aggregate `la` is log P_l). `peer_input = :ability` (the default) is the students' ā_l above;
+#           `:hc` is the adults' human capital by residence, log P_l = E[log h | adult resident of l] −
+#           E[log h | all adults]: every old agent who lives in l (teachers, market non-teachers and home producers,
+#           both genders, both education branches under `college`, by residence r under the split, the childless
+#           under the fertility shock), with her own h, acquired when young where she was born (h_T, or h_O =
+#           Q (z ϵ_{i*})^α s^φ e^η; `adult_log_h`). The reference is the endogenous economy-wide mean, so the
+#           factor moves quality across locations as ā does (a level reference would feed Q back into its own
+#           level through h, explosively for ψa ≥ 1). `peer_total = true` makes P the group's total, number ×
+#           geometric mean, relative to an average location's: it adds the scale term log(n_l/n̄) of the students
+#           n_l = Σ_z Φ[z, l] (or log(m_l/m̄) of the adult residents). Specifications A (:ability, mean; the
+#           default), B (:ability, total), C (:hc, mean), D (:hc, total). At ψa = 0 both switches are inert, bit
+#           for bit, and so is the default at any ψa. Unlike A and C, the scale term also moves the level: the
+#           students' mean log Q rises by ψa Σ_l s_l log(L s_l) ≥ 0 (s_l the shares; +0.0174 ψa at the baseline's
+#           0.407/0.593). Adults equal students by location in a stationary equilibrium without the fertility shock,
+#           so there D − C = B − A exactly. Under :hc the adults carry their origin's Q, so Δlog P ≈ κ Δlog Q +
+#           composition with κ the net stayer share (≈ 0.5 at the baseline): Q gaps multiply by 1/(1 − ψa κ), and the
+#           damped fixed point cannot converge once ψa κ ≥ 1 (ψa ≈ 2), whatever the damping (review 2026-10-25)
 # Two further switches (2026-10-15), each off at its default, compose with all of the above:
 #   κc      utility friction of commuting (`split` only): a worker who lives in r and works at w ≠ r loses
 #           κc utils on top of the time cost τk. It is an additive term of the location values of the
@@ -187,6 +218,32 @@ child's ability. `expm1` avoids cancellation as ψ → 1.
 #           ϑs = schedT − γφ (`teach_schedule`, either sign), so the time share solves Proposition 2′ with b = μ schedT
 #           (1 + Ξ) (`time_share`) and `pay_factor` / `teacher_logpay_shift` carry it into the wage moments. NaN: off,
 #           and the model is bit for bit the one without it
+# One switch of 2026-10-26 (constant class size, §3e), off at its default, composes with everything above except `college`:
+#   ccs     constant class size with random teacher assignment, in place of the efficient class sizes of Proposition 1:
+#           classes are equal-sized within a location, N_l = S_l/n_T,l (S_l = Σ_z Φ[z, l] the pupils, by residence =
+#           school location under the split; n_T,l the teachers who work in l), and every student of l is assigned at
+#           random, independently of (z, ϵ, g), to K_d = `ccs_draws` teachers, one per school block, so that
+#           ln q = ln Q̄_l + ln r with ln Q̄_l = β μ_l − σ ln N_l, μ_l = E[ln h_eff | teacher works in l] (`effective_h`), and
+#           ln r = (β/K_d) Σ_t (ln h_eff,t − μ_l), mean zero with cumulants κ_m(ln r) = β^m κ_m(ln h_eff | l)/K_d^{m−1}
+#           (`draw_cumulants`). q is a state of the young, seen with (z, ϵ) before (s, e, i); Q = Q̄ × the peer factor.
+#           Proposition 5: the problem at (g, l, z, ϵ, q) is the one at Q̄_l with the effective shocks ϵ̃_T = r^{1/α} ϵ_T and
+#           X̃_O = r X_O, because q enters only through h = q (z ϵ)^α s^φ e^η. The nodes are therefore solved once, on the
+#           effective-shock grids widened by a pad that covers |x| (|x|/α for ϵ_T), with `gr.Q` = Q̄ (no node function
+#           changes), and the draw x = ln r only shifts the laws of the effective shocks (`ccs_law`): every integral over a
+#           cell is the mixture over the n_q nodes of R_l, the Gauss rule matched to the moments of ln r (`gauss_from_moments`,
+#           Golub–Welsch), and an integrand that depends on the law (E[Θ_{i*} | X̃_O*]) or on the true shock (ϵ = ϵ̃ e^{−x/α})
+#           goes through `over_draws`. Parents value a location by the whole teacher distribution (`child_Ef` mixes R_l).
+#           The outer fixed point carries (ln Q̄_l, the teachers' central moments of ln h_eff to order 2n_q) by location
+#           (`ccs_teacher_moments`); H̃_T is still computed, the efficient-equivalent index (2H̃_T/M)^σ of the same teachers.
+#           Under CCS `gr.dT` and `gr.dO` are `nothing`, so a consumer that has not been taught the draws throws instead of
+#           integrating at r = 1. false: Proposition 1, the model without it bit for bit (`college` is rejected: its
+#           choice would need P₁ by draw)
+#   ccs_nq  number n_q of Gauss nodes of R_l (3; 1 is the mean-field model q = Q̄_l, which still differs from Proposition 1
+#           in the level of Q̄ and in N_l)
+#   ccs_draws  K_d, the independent teacher draws that compose q (1: one teacher for the whole of school; 12: one a year)
+#   ccs_rho the CFR reliability ρ of measured teacher effectiveness (1: none): with ρ < 1 effectiveness is ln a = ln h_eff + ν,
+#           which the randomly assigned students receive too, so the per-teacher variance gains κ₂(ν) = κ₂(ln h_eff | l)
+#           (1/ρ² − 1), Gaussian, before the β/K_d scaling (the CCS cases set it to the calibration's `cfr_rho`)
 # `occ_sample` records the occupational sample of the calibration's occupational block and is
 # not used here. Nor is `move_util` (2026-10-15): it tells the calibration (`theta_to_params`) to read its
 # moving-cost parameter r_m as a utility cost `τmove` (utils) instead of the goods cost `mcost` (r_m C̄); the
@@ -216,7 +273,9 @@ Base.@kwdef struct Params
     σ::Float64 = 0.25                  # curvature of the teacher-quality index Q
     γ::Float64 = 0.80                  # human-capital elasticity of the teaching wage
     β::Float64 = 0.15                  # H̃_T aggregates teachers' h^{β/σ}
-    ψa::Float64 = 0.0                  # peer effect: elasticity of h in local mean ability ā_l (0: off)
+    ψa::Float64 = 0.0                  # peer effect: elasticity of h in the local peer input P_l (0: off)
+    peer_input::Symbol = :ability      # P_l: the students' ability (:ability, ā_l) or the adults' human capital by residence (:hc)
+    peer_total::Bool   = false         # P_l is the peer group's total, number × geometric mean (false: its mean)
     κ::Vector{Float64} = [0.75, 0.9]   # teaching-wage shifter by location
     # preferences
     μ::Float64    = 1.00               # weight on log consumption
@@ -270,6 +329,11 @@ Base.@kwdef struct Params
     pkid::Float64       = 1.0          # fertility shock (§3d): probability that an adult has a child, who alone values Λ (1: off)
     pkid_z::Float64     = 0.0          # its logit slope per ergodic SD of log z, mean held at pkid (§3d; 0: off, P(child) = pkid)
     schedT::Float64     = NaN          # salary schedule without college: teachers' total pay elasticity in s, pay κ h^γ (s/sBA)^{schedT − γφ} (NaN: off)
+    # constant class size with random teacher assignment (§3e, 2026-10-26); `ccs_nq` … `ccs_rho` matter only if `ccs`
+    ccs::Bool           = false        # equal classes within a location, N_l = S_l/n_T,l; q = Q̄_l r a state of the young (false: Proposition 1)
+    ccs_nq::Int         = 3            # Gauss nodes of the draw rule R_l (1: mean field)
+    ccs_draws::Int      = 1            # K_d, independent teacher draws composing q (1: one teacher; 12: one a year)
+    ccs_rho::Float64    = 1.0          # CFR reliability ρ: the draw's teacher variance is κ₂(ln h_eff)/ρ² (1: no ν)
     # teacher effectiveness h_T z^{−(1−ωz)α} for Q and the CFR experiment (any `college`; 1 = h_T)
     ωz::Float64   = 1.0
     occ_sample::Symbol = :acs2009_13   # occupational sample of the calibration's block (metadata)
@@ -352,6 +416,7 @@ function check_params(p::Params)
     @assert 0.0 ≤ p.sT_min < 1.0 "sT_min must lie in [0, 1)"
     @assert p.csub ≥ 0.0 "csub must be nonnegative"
     @assert isfinite(p.ψa) "ψa must be finite"
+    @assert p.peer_input in (:ability, :hc) "peer_input must be :ability (the students' ability) or :hc (the adults' human capital), got :$(p.peer_input)"
     @assert 0.0 ≤ p.τk < 1.0 "τk must lie in [0, 1)"
     @assert p.κc ≥ 0.0 && isfinite(p.κc) "κc must be nonnegative and finite"
     @assert all(isfinite, p.Bd) "Bd must be finite"
@@ -361,7 +426,8 @@ function check_params(p::Params)
     @assert 0.0 < p.pkid ≤ 1.0 "pkid, the probability of having a child, must lie in (0, 1] (1: off)"
     @assert isfinite(p.pkid_z) "pkid_z must be finite"
     @assert iszero(p.pkid_z) || p.pkid < 1.0 "pkid_z, the ability gradient of the fertility shock, needs pkid < 1"
-    # the peer reference of `peer_log_ability` is the ergodic distribution of Πz, which pkid_z ≠ 0 tilts
+    # the peer reference of `peer_log_ability` is the ergodic distribution of Πz, which pkid_z ≠ 0 tilts; the
+    # adults' specifications (peer_input = :hc) are not implemented with it either, so the switch is excluded for all
     @assert iszero(p.pkid_z) || iszero(p.ψa) "pkid_z ≠ 0 is not implemented with peer effects (ψa ≠ 0)"
     if !isnan(p.fte_rule)
         @assert isfinite(p.fte_rule) "fte_rule must be finite (NaN: off)"
@@ -380,6 +446,11 @@ function check_params(p::Params)
         @assert !p.college "schedT is the schedule without college; under `college` the BA teachers' schedule is ϑs"
         @assert p.sBA > 0.0 "the salary schedule schedT is normalised at s = sBA, which must be positive"
     end
+    # §3e (2026-10-26): constant class size
+    @assert !(p.ccs && p.college) "constant class size (ccs) is not implemented with `college`: the college choice would need P₁ by teacher draw"
+    @assert p.ccs_nq ≥ 1 "ccs_nq, the number of Gauss nodes of the teacher-draw rule, must be at least 1"
+    @assert p.ccs_draws ≥ 1 "ccs_draws, the number K_d of independent teacher draws, must be at least 1"
+    @assert 0.0 < p.ccs_rho ≤ 1.0 "ccs_rho, the CFR reliability of teacher effectiveness, must lie in (0, 1] (1: no ν)"
     @assert 0.0 ≤ p.sT0 < 1.0 "sT0 must lie in [0, 1)"
     p.college && p.sBA > 0.0 && @assert p.sT0 ≤ p.sBA "the floor of non-BA teachers, sT0, may not exceed the BA schooling sBA (their cap)"
     # The X_O* collapse needs a common τe across non-teaching occupations.
@@ -458,11 +529,12 @@ end
 """
     build_grids(p; H̃T, M, t, la, Nz, nϵT, nXO, q_lo, q_hi)
 
-Grids and shock laws at aggregates (H̃_T, M, t) and local peer ability `la` = log ā_l (zeros by
+Grids and shock laws at aggregates (H̃_T, M, t) and the local peer input `la` = log P_l (zeros by
 default):
 - `z`, `Πz`: Rouwenhorst ability nodes and transitions;
 - `Q`: school quality, the index of the technology h = Q_l (z ϵ)^α s^φ e^η: the teacher-quality
-  index `QT` = (2H̃_T/M)^σ times the peer factor ā_l^{ψa} (`peer_log_ability`). With ψa = 0 (the
+  index `QT` = (2H̃_T/M)^σ times the peer factor P_l^{ψa}, whatever the specification of P
+  (`peer_log_input`: by default the students' mean ability ā_l, `peer_log_ability`). With ψa = 0 (the
   default) `Q` equals `QT` and `la` has no effect; `la` is returned as given;
 - `dT`, `ϵTgrid`: law of ϵ_T ~ LogNormal(−σϵ²/2, σϵ) and a log-spaced grid between its
   `q_lo` and `q_hi` quantiles. Teachers come from the upper tail of ϵ_T; a grid spaced
@@ -476,14 +548,26 @@ default):
   (§3b; unused otherwise);
 - `pk`: P(child | z) at the ability nodes (§3d, `fertility_probs`; `p.pkid` at every node without the
   ability gradient, and 1 without the shock).
+
+Constant class size (`p.ccs`, §3e, 2026-10-26; the keywords `ccs` and `pad` are read only then): `QT` = Q̄ = exp(`ccs.lQT`)
+(the teacher index of equal classes, ln Q̄_l = β μ_l − σ ln N_l, a state of the solver; without `ccs` it starts at the efficient
+σ ln(2H̃_T/M)), and `ccs.c[l]` are the central moments of ln h_eff among the teachers who work in l, orders 0..2n_q in
+`c[l][1:2n_q+1]` with `c[l][1]` = 1 (`ccs_teacher_moments`; `nothing`, or a zero variance, gives the degenerate draw).
+The shock grids are the effective-shock grids, those above widened at both ends by `pad` (log units of r) with the base
+spacing: ⌈pad/α/Δ⌉ nodes for ϵ_T and a common ⌈pad/Δ_g⌉ (max over g) for X_O*, each gender keeping its own Δ_g, so that
+`pad` = 0 is the base grid itself and `nϵT`, `nXO` count the widened grids. The pad must cover max |x| of the rules
+(`solve_ge`'s `ccs_pad`). The top-level `dT` and `dO` are `nothing` (§3e's safety convention), and `gr.ccs` =
+(; x, w, laws, base, pad, lQT, c, nq, draws, rho) carries, by location l, the nodes `x[l]` (of ln r) and weights `w[l]` of
+R_l (`ccs_rule`), the laws `laws[l][k]` = `ccs_law(…, x[l][k], p)` of the effective shocks under draw k, and `base`, the
+law at r = 1 (that of the true shocks). With `ccs` off the grids are built by exactly the operations they always were.
 """
 function build_grids(p::Params; H̃T, M, t, la = zeros(length(p.B)), Nz = 5, nϵT = 64, nXO = 64,
-                     q_lo = 1e-5, q_hi = 1 - 1e-6)
+                     q_lo = 1e-5, q_hi = 1 - 1e-6, ccs = nothing, pad = 0.0)
     I, L = length(p.A), length(p.B)
     z, Πz = rouwenhorst(Nz, p.ρz, p.σξ)
     # H̃_T is an integral of a spline and can undershoot zero when a location has
-    # almost no teachers; the floor keeps Q real there.
-    QT = (2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) .^ p.σ
+    # almost no teachers; the floor keeps Q real there. §3e: under constant class size Q_T is Q̄ = exp(lQT).
+    QT = p.ccs ? exp.(ccs_lQT(p, ccs, H̃T, M)) : (2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) .^ p.σ
     Q  = iszero(p.ψa) ? copy(QT) : QT .* exp.(p.ψa .* la)
 
     dT     = LogNormal(-p.σϵ^2 / 2, p.σϵ)
@@ -503,6 +587,8 @@ function build_grids(p::Params; H̃T, M, t, la = zeros(length(p.B)), Nz = 5, nϵ
         hi = quantile_xo(dO, nonteach, g, q_hi)
         XOgrid[:, g] = exp.(range(log(lo), log(hi), nXO))
     end
+    p.ccs && return ccs_grids(p, (; z, Πz, Nz, Q, QT, la = collect(Float64, la), t, I, L, ϵTgrid, XOgrid, logΘ, nonteach,
+                                    PT = max.(M, M_FLOOR) ./ sum(max.(M, M_FLOOR)), pk = fertility_probs(p, z, Πz)), ccs, pad)
     return (; z, Πz, Nz, Q, QT, la = collect(Float64, la), t, I, L, dT, ϵTgrid, dO, XOgrid,
               lϵT = log.(ϵTgrid), lXO = log.(XOgrid),
               logΘ, nonteach, nϵT, nXO, PT = max.(M, M_FLOOR) ./ sum(max.(M, M_FLOOR)),
@@ -1655,12 +1741,13 @@ function cap_infeasible(WTv, WOv, infT, infO)
 end
 
 """
-    choice_maps(hh, g, l, zi, gr) -> ChoiceMaps
+    choice_maps(hh, g, l, zi, gr) -> ChoiceMaps (or MixedMaps under CCS)
 
 The choice maps of cell (g, l, zi) of a household solution. At the nodes with no feasible destination
 (`hh.infeasT`, `hh.infeasO`) the values are capped first (`cap_infeasible`); a cell without such a
 node, and an `hh` without the flags, use the raw values. `choice_maps(WTv, WOv, g, gr)` builds the
-maps from value vectors as they are.
+maps from value vectors as they are. When `gr` carries the teacher-draw laws of constant class size (`ccs_on`, §3e)
+the cell form returns a `MixedMaps` over the draws of R_l, l being the cell's school location (its birth location).
 """
 function choice_maps(hh, g, l, zi, gr)
     WTv, WOv = hh.WT[g, l, zi, :], hh.WO[g, l, zi, :]
@@ -1668,6 +1755,7 @@ function choice_maps(hh, g, l, zi, gr)
         infT, infO = hh.infeasT[g, l, zi, :], hh.infeasO[g, l, zi, :]
         (any(infT) || any(infO)) && ((WTv, WOv) = cap_infeasible(WTv, WOv, infT, infO))
     end
+    ccs_on(gr) && return mixed_maps(WTv, WOv, g, l, gr)       # §3e
     return choice_maps(WTv, WOv, g, gr)
 end
 
@@ -1727,6 +1815,287 @@ integrate_choice(qT, qO, cm::ChoiceMaps, gr; k = 3) =
     (integrate_teach(qT, cm, gr; k), integrate_nonteach(qO, cm, gr; k))
 
 # -----------------------------------------------------------------------------
+# 3e. Constant class size (`Params.ccs`, 2026-10-26)
+#
+# (Placed after §4 because it builds on the choice maps.) Classes are equal-sized within a location, N_l = S_l/n_T,l,
+# and each student of l is assigned at random to K_d teachers (`ccs_draws`), so school quality is
+#     ln q = ln Q̄_l + ln r,   ln Q̄_l = β μ_l − σ ln N_l,   μ_l = E[ln h_eff | teacher works in l],
+#     ln r = (β/K_d) Σ_t (ln h_eff,t − μ_l),   κ_m(ln r) = β^m κ_m(ln h_eff | l)/K_d^{m−1}   (`draw_cumulants`),
+# and q is a state of the young, seen with (z, ϵ) before (s, e, i). With `ccs_rho` = ρ < 1 the students also receive
+# the CFR noise ν of teacher effectiveness, which adds κ₂(ν) = κ₂(ln h_eff | l)(1/ρ² − 1) to κ₂ before the scaling.
+# Proposition 5 (effective shocks): q enters the young's problem only through h = q (z ϵ_i)^α s^φ e^η, so the problem at
+# (g, l, z, ϵ, q = Q̄ r) is the problem at Q̄ with ϵ̃_T = r^{1/α} ϵ_T and X̃_O = r X_O: W_T(ϵ_T; q) = W̄_T(r^{1/α} ϵ_T),
+# W_O(X_O*; q) = W̄_O(r X_O*), and likewise every policy, h_T and the income capacity. The nodes are therefore solved once,
+# at gr.Q = Q̄ on the effective-shock grids (widened by a pad, `build_grids`), with no change to any node function, and a
+# draw x = ln r changes only the laws of the effective shocks (`ccs_law`):
+#     ϵ̃_T ~ LogNormal(−σϵ²/2 + x/α, σϵ),    X̃_{O,i} ~ LogNormal(log Θ_{i,g} − ασϵ²/2 + x, ασϵ),
+# under which every integral of §4 is exact for that draw: the occupation weights, the densities, the end masses and
+# `argmax_mean`, since P(i* = i | X̃* = x̃, r) ∝ f_i(x̃/r)/F_i(x̃/r) is the ratio of the shifted laws. The law of x in
+# location l is represented by R_l, the n_q-point Gauss rule matched to the moments of ln r (`gauss_from_moments`;
+# n_q = 1 is the mean field), and the integral over a cell is the R_l-mixture of the draw integrals (`MixedMaps`,
+# the cell form of `choice_maps` under CCS). Integrands that depend on the draw itself, through the law (E over Θ_{i*}
+# given X̃_O*: `argmax_mean`, `EΘpow`, `Eϵ_nonteach`) or through the true shock ϵ = ϵ̃ e^{−x/α}, go through `over_draws`.
+# Safety convention: under CCS the top-level `gr.dT` and `gr.dO` are `nothing`, so a consumer that has not been taught
+# the draws (a ChoiceMaps built from the top-level grid, a direct `pdf(gr.dT, …)`) throws instead of integrating at r = 1.
+# -----------------------------------------------------------------------------
+"""
+    ccs_on(gr) -> Bool
+
+Whether the grid `gr` carries the teacher-draw laws of constant class size (`build_grids` under `Params.ccs`, §3e). The
+switch is read from the grid, not from `Params`, because `choice_maps` and the integrals have no `p`; a draw's law
+(`ccs_law`) has no `ccs` field and reads false.
+"""
+ccs_on(gr) = hasproperty(gr, :ccs) && gr.ccs !== nothing
+
+"ln Q̄ by location for `build_grids` under CCS: `ccs.lQT`, or without a state the efficient σ ln(2H̃_T/M) (as the baseline's Q_T)."
+ccs_lQT(p::Params, ccs, H̃T, M) = ccs === nothing ? p.σ .* log.(2 .* max.(H̃T, M_FLOOR) ./ max.(M, M_FLOOR)) :
+                                                    collect(Float64, ccs.lQT)
+
+"""
+    moments_to_cumulants(m) -> κ
+
+Cumulants κ_1..κ_n of the distribution with moments `m` of orders 0..n (`m[j + 1]` the order j, `m[1]` the mass; raw or
+central), by κ_n = μ_n − Σ_{k=1}^{n−1} C(n−1, k−1) κ_k μ_{n−k} with μ = m/m[1]. From order 2 on they do not depend on
+the centre.
+"""
+function moments_to_cumulants(m::AbstractVector)
+    μ = m ./ m[1]
+    n = length(m) - 1
+    κ = zeros(n)
+    for j in 1:n
+        s = μ[j + 1]
+        for k in 1:j-1
+            s -= binomial(j - 1, k - 1) * κ[k] * μ[j - k + 1]
+        end
+        κ[j] = s
+    end
+    return κ
+end
+
+"Moments of orders 0..n (mass 1) of the distribution with cumulants κ_1..κ_n: μ_n = Σ_{k=1}^{n} C(n−1, k−1) κ_k μ_{n−k}."
+function cumulants_to_moments(κ::AbstractVector)
+    n = length(κ)
+    μ = zeros(n + 1)
+    μ[1] = 1.0
+    for j in 1:n
+        s = 0.0
+        for k in 1:j
+            s += binomial(j - 1, k - 1) * κ[k] * μ[j - k + 1]
+        end
+        μ[j + 1] = s
+    end
+    return μ
+end
+
+"""
+    draw_cumulants(c, β, K_d, ρ = 1.0) -> κ
+    draw_moments(c, β, K_d, ρ = 1.0) -> m
+
+The law of the teacher draw ln r of one location (§3e) from the central moments `c` of ln h_eff among its teachers
+(orders 0..n in `c[1:n+1]`; `ccs_teacher_moments`): their cumulants (`moments_to_cumulants`), κ₂ raised by the CFR
+noise κ₂(ν) = κ₂(1/ρ² − 1) (that is, κ₂/ρ²; ν Gaussian, so the higher cumulants are unchanged), then scaled to the mean
+of K_d independent draws times β, κ_m(ln r) = β^m κ_m/K_d^{m−1}, with κ_1 = 0 (ln r is centred at μ_l, which is in Q̄).
+`draw_moments` returns the moments of ln r, orders 0..n (`cumulants_to_moments`): central, with `m[1]` = 1 and `m[2]` = 0.
+"""
+function draw_cumulants(c::AbstractVector, β, K_d, ρ = 1.0)
+    κ = moments_to_cumulants(c)
+    κ[1] = 0.0
+    length(κ) ≥ 2 && (κ[2] /= ρ^2)
+    for m in eachindex(κ)
+        κ[m] *= β^m / Float64(K_d)^(m - 1)
+    end
+    return κ
+end
+
+draw_moments(c::AbstractVector, β, K_d, ρ = 1.0) = cumulants_to_moments(draw_cumulants(c, β, K_d, ρ))
+
+"""
+    gauss_from_moments(m, n; sd_tol = 1e-12, diag_tol = 1e-7) -> (x, w)
+
+The n-point Gauss rule (nodes `x`, weights `w` summing to 1) of the distribution with moments `m` of orders 0..K
+(`m[j + 1]` the order j, K ≥ 2n − 1; raw or central, any mass), by Golub–Welsch: the moments are standardized
+(s_j = E[(X − μ)^j]/sd^j), H = [s_{i+j−2}] is the (n+1)×(n+1) Hankel matrix with upper Cholesky factor R, and the
+Jacobi matrix has the diagonal α_j = r_{j,j+1}/r_{j,j} − r_{j−1,j}/r_{j−1,j−1} and the off-diagonal β_j = r_{j+1,j+1}/r_{j,j};
+its eigenvalues are the standardized nodes and the squared first components of its eigenvectors the weights. The rule
+matches the moments of orders 0..2n − 1. Only the first n rows of R enter the recurrence, and they need neither
+s_{2n} nor the last pivot r_{n+1,n+1} (the Cholesky of the leading n×n block plus one forward substitution for the
+last column), so a measure with exactly n support points (r_{n+1,n+1} = 0) still gets its exact n-point rule. If the
+leading block is not positive definite, or a pivot r_{j,j} falls below `diag_tol` (the measure has fewer than n points
+up to rounding), a node is dropped and the rule rebuilt. n = 1 and a standard deviation below `sd_tol` (the test is on
+the variable whose moments are given: for the teacher draw, ln r after the β scaling, so a β sweep does not switch
+the order of the rule) return the one-point rule at the mean, ([μ], [1.0]).
+"""
+function gauss_from_moments(m::AbstractVector, n::Int; sd_tol = 1e-12, diag_tol = 1e-7)
+    K = length(m) - 1
+    μ = m[2] / m[1]
+    # central moments about μ, normalised to mass 1
+    cm = [sum(binomial(j, i) * (m[i + 1] / m[1]) * (-μ)^(j - i) for i in 0:j) for j in 0:K]
+    sd = K ≥ 2 && cm[3] > 0.0 ? sqrt(cm[3]) : 0.0
+    (n ≤ 1 || !(sd ≥ sd_tol)) && return ([μ], [1.0])
+    s = [cm[j + 1] / sd^j for j in 0:K]
+    for nn in min(n, (K + 1) ÷ 2):-1:2
+        H = [s[i + j - 1] for i in 1:nn, j in 1:nn]          # orders 0..2nn−2
+        F = cholesky(Symmetric(H); check = false)
+        issuccess(F) || continue
+        R = F.U
+        all(R[j, j] > diag_tol for j in 1:nn) || continue
+        r = zeros(nn)                                         # the last column r_{j,nn+1}: orders nn−1..2nn−1
+        for j in 1:nn
+            r[j] = (s[j + nn] - sum(R[k, j] * r[k] for k in 1:j-1; init = 0.0)) / R[j, j]
+        end
+        a = [(j < nn ? R[j, j + 1] : r[nn]) / R[j, j] - (j > 1 ? R[j - 1, j] / R[j - 1, j - 1] : 0.0) for j in 1:nn]
+        b = [R[j + 1, j + 1] / R[j, j] for j in 1:nn-1]
+        E = eigen(SymTridiagonal(a, b))
+        w = E.vectors[1, :] .^ 2
+        (all(isfinite, E.values) && all(isfinite, w) && all(>(0.0), w)) || continue
+        return (μ .+ sd .* E.values, w ./ sum(w))
+    end
+    return ([μ], [1.0])
+end
+
+"""
+    ccs_rule(c, p) -> (; x, w)
+
+R_l, the rule of the teacher draw of a location with teacher central moments `c` (orders 0..2n_q of ln h_eff; `nothing`:
+none): the `p.ccs_nq`-point Gauss rule (`gauss_from_moments`) of the moments of ln r (`draw_moments` with `p.β`,
+`p.ccs_draws`, `p.ccs_rho`). Nodes `x` are values of x = ln r; a degenerate draw (β = 0, homogeneous teachers, n_q = 1) is
+([0.0], [1.0]).
+"""
+function ccs_rule(c, p::Params)
+    c === nothing && return (; x = [0.0], w = [1.0])
+    x, w = gauss_from_moments(draw_moments(c, p.β, p.ccs_draws, p.ccs_rho), p.ccs_nq)
+    return (; x, w)
+end
+
+"""
+    ccs_law(g0, x, p) -> NamedTuple
+
+The law-only grid object of the teacher draw x = ln r (§3e): the laws of the effective shocks, `dT` = LogNormal(−σϵ²/2 +
+x/α, σϵ) and `dO[i, g]` = LogNormal(log Θ_{i,g} − ασϵ²/2 + x, ασϵ), with the (shared, not copied) effective-shock grids of
+`g0` (`ϵTgrid`, `lϵT`, `XOgrid`, `lXO`, `nϵT`, `nXO`), `nonteach`, `logΘ` and `x`. It is what the integrals of §4 read as
+`gr` (`integrate_teach`, `integrate_nonteach`, `Fxo`, `fxo`, `argmax_mean`) and what the per-draw `ChoiceMaps` of a
+`MixedMaps` hold, and it has no Q, z, t or `ccs` field, so passing it where a full grid is needed throws. At x = 0 the
+laws are those of the true shocks, built by the same operations as `build_grids` without CCS. (The plan's `ccs_law(gr0,
+x)` takes `p` as well: the ϵ_T shift is x/α.)
+"""
+function ccs_law(g0, x::Real, p::Params)
+    I = size(g0.logΘ, 1)
+    dT = LogNormal(-p.σϵ^2 / 2 + x / p.α, p.σϵ)
+    dO = Matrix{LogNormal{Float64}}(undef, I, 2)
+    for g in 1:2, i in g0.nonteach
+        dO[i, g] = LogNormal(g0.logΘ[i, g] - p.α * p.σϵ^2 / 2 + x, p.α * p.σϵ)
+    end
+    return (; dT, dO, ϵTgrid = g0.ϵTgrid, lϵT = g0.lϵT, XOgrid = g0.XOgrid, lXO = g0.lXO, nonteach = g0.nonteach,
+              logΘ = g0.logΘ, nϵT = g0.nϵT, nXO = g0.nXO, x = Float64(x))
+end
+
+"`n` nodes below and above the increasing vector `v` of log nodes, at the spacing `Δ`, kept exact in the middle: exp of the result."
+pad_grid(v, Δ, n) = n == 0 ? copy(v) : vcat(exp.(log(v[1]) .- Δ .* (n:-1:1)), v, exp.(log(v[end]) .+ Δ .* (1:n)))
+
+"""
+    ccs_grids(p, g0, ccs, pad) -> gr
+
+The grids of `build_grids` under CCS (§3e) from the base grids `g0`: the effective-shock grids widened at both ends by
+`pad` with the base spacing (`pad_grid`; ⌈pad/α/Δ⌉ nodes for ϵ_T, a common ⌈pad/Δ_g⌉ = max over g for X_O*), the rule
+R_l of every location from `ccs.c` (`ccs_rule`), the laws of its draws (`ccs_law`), and `dT = dO = nothing`.
+"""
+function ccs_grids(p::Params, g0, ccs, pad)
+    pad ≥ 0.0 || throw(ArgumentError("the CCS grid pad must be nonnegative, got $pad"))
+    L = g0.L
+    lT0 = log.(g0.ϵTgrid)
+    ΔT  = (lT0[end] - lT0[1]) / (length(lT0) - 1)
+    nT  = pad > 0.0 ? ceil(Int, pad / p.α / ΔT) : 0
+    ϵTgrid = pad_grid(g0.ϵTgrid, ΔT, nT)
+    ΔO  = [(log(g0.XOgrid[end, g]) - log(g0.XOgrid[1, g])) / (size(g0.XOgrid, 1) - 1) for g in 1:2]
+    nO  = pad > 0.0 ? maximum(ceil(Int, pad / ΔO[g]) for g in 1:2) : 0
+    XOgrid = nO == 0 ? copy(g0.XOgrid) : hcat((pad_grid(g0.XOgrid[:, g], ΔO[g], nO) for g in 1:2)...)
+    gl = (; ϵTgrid, lϵT = log.(ϵTgrid), XOgrid, lXO = log.(XOgrid), nonteach = g0.nonteach, logΘ = g0.logΘ,
+            nϵT = length(ϵTgrid), nXO = size(XOgrid, 1))
+    c     = ccs === nothing ? nothing : ccs.c
+    rules = [ccs_rule(c === nothing ? nothing : c[l], p) for l in 1:L]
+    laws  = [[ccs_law(gl, x, p) for x in r.x] for r in rules]
+    lQT   = log.(g0.QT)
+    return (; g0.z, g0.Πz, g0.Nz, g0.Q, g0.QT, g0.la, g0.t, g0.I, g0.L, dT = nothing, gl.ϵTgrid, dO = nothing,
+              gl.XOgrid, gl.lϵT, gl.lXO, g0.logΘ, g0.nonteach, gl.nϵT, gl.nXO, g0.PT, g0.pk,
+              ccs = (; x = [r.x for r in rules], w = [r.w for r in rules], laws, base = ccs_law(gl, 0.0, p),
+                       pad = Float64(pad), lQT = ccs === nothing ? lQT : collect(Float64, ccs.lQT),
+                       c = c === nothing ? nothing : [copy(v) for v in c], nq = p.ccs_nq, draws = p.ccs_draws, rho = p.ccs_rho))
+end
+
+"""
+    MixedMaps
+
+The choice maps of one cell under CCS (§3e): the per-draw `ChoiceMaps` `maps[k]`, which share the splines of the cell's
+values (the nodes are the same for every draw, Proposition 5) and each hold the law of draw k (`maps[k].gr`, a
+`ccs_law`), the weights `w` and nodes `x` (of ln r) of the cell's rule R_l, the gender `g`, and the values `WTv`, `WOv`
+(capped as by `choice_maps`). `integrate_teach`, `integrate_nonteach` and `integrate_choice` take it in place of a
+`ChoiceMaps` and return Σ_k w_k × the draw-k integral, for a quantity given at the effective-shock nodes that does not
+depend on the draw (masses, location probabilities, policies, values, h_T, the income capacity); a quantity that does
+goes through `over_draws`. `teach_wt` and `nonteach_wt` have no method for it: P(teach) at a shock depends on whether
+the shock is effective or true, so it is taken per draw.
+"""
+struct MixedMaps{C<:ChoiceMaps}
+    maps::Vector{C}
+    w::Vector{Float64}
+    x::Vector{Float64}
+    g::Int
+    WTv::Vector{Float64}; WOv::Vector{Float64}
+end
+
+"The `MixedMaps` of a cell born in `l` from its (capped) values: the splines once, then one `ChoiceMaps` per law of R_l."
+function mixed_maps(WTv, WOv, g, l, gr)
+    laws = gr.ccs.laws[l]
+    cm1  = choice_maps(WTv, WOv, g, laws[1])
+    maps = [k == 1 ? cm1 : ChoiceMaps(cm1.splWT, cm1.splWO, cm1.splWTinv, cm1.splWOinv, cm1.WTv, cm1.WOv, g, laws[k])
+            for k in eachindex(laws)]
+    return MixedMaps(maps, gr.ccs.w[l], gr.ccs.x[l], g, cm1.WTv, cm1.WOv)
+end
+
+"`integrate_teach` over the draws of a `MixedMaps`: Σ_k w_k ∫ (draw k's law); the top-level `gr` is not read."
+function integrate_teach(q, cm::MixedMaps, gr; k = 3)
+    I = 0.0
+    for j in eachindex(cm.w)
+        I += cm.w[j] * integrate_teach(q, cm.maps[j], cm.maps[j].gr; k)
+    end
+    return I
+end
+
+"`integrate_nonteach` over the draws of a `MixedMaps` (as `integrate_teach`)."
+function integrate_nonteach(q, cm::MixedMaps, gr; k = 3)
+    I = 0.0
+    for j in eachindex(cm.w)
+        I += cm.w[j] * integrate_nonteach(q, cm.maps[j], cm.maps[j].gr; k)
+    end
+    return I
+end
+
+"`integrate_choice` over the draws of a `MixedMaps`."
+integrate_choice(qT, qO, cm::MixedMaps, gr; k = 3) =
+    (integrate_teach(qT, cm, gr; k), integrate_nonteach(qO, cm, gr; k))
+
+"""
+    over_draws(f, cm, gr)
+
+The draw mixture of `f(cm_k, law_k, x_k)` (§3e): Σ_k w_k f(cm.maps[k], law k, x_k) for a `MixedMaps`, where law k
+(`cm.maps[k].gr`, a `ccs_law`) is what the integrals and `argmax_mean` / `EΘpow` / `Eϵ_nonteach` must be given as `gr`,
+and x_k = ln r_k recovers the true shocks, ϵ_T = ϵ̃_T e^{−x/α} and X_O = X̃_O e^{−x}; `f(cm, gr, 0.0)` for a plain
+`ChoiceMaps`, so code written with it is the baseline's at r = 1. `f` may return a number, a tuple or an array (the sum
+broadcasts). Use it for any integrand that depends on the law of the draw or on the true shock, and with the do-block
+syntax: `over_draws(cm, gr) do cmk, law, x … end`.
+"""
+over_draws(f, cm::ChoiceMaps, gr) = f(cm, gr, 0.0)
+function over_draws(f, cm::MixedMaps, gr)
+    acc = cm.w[1] .* f(cm.maps[1], cm.maps[1].gr, cm.x[1])
+    for k in 2:length(cm.w)
+        acc = acc .+ cm.w[k] .* f(cm.maps[k], cm.maps[k].gr, cm.x[k])
+    end
+    return acc
+end
+
+"SD of ln r under the rule (x, w) of a location (the matched SD for n_q ≥ 2; 0 for the one-point rule)."
+rule_sd(x, w) = sqrt(max(sum(w .* x .^ 2) - sum(w .* x)^2, 0.0))
+
+# -----------------------------------------------------------------------------
 # 5. Altruism term
 #
 #   Λ(z, l') = λ Σ_{z'} Πz(z, z') · ½ Σ_{g'} E[f(h') | l', g', z'],
@@ -1740,12 +2109,22 @@ function Ewarm_nonteach(cap, x, g, p::Params, gr)
     return expm1(u) / (1 - p.ψ)
 end
 
+"""
+    child_Ef(l, g, zi, hh, p, gr)
+
+E[f(h′)] of a child born in l with gender g and ability node zi, over the child's occupation choice. Under constant
+class size (§3e) it is also the expectation over the teacher draw, Σ_k w_k E[f(h′) | r_k] with R_l (`over_draws`): the
+non-teachers' E[f(h_O) | X̃_O*] is taken under each draw's law of Θ_{i*} (h_O = capO/Θ_{i*} at the effective node holds
+for every draw), so parents value a location by its whole teacher distribution. Without CCS it is one pass at `gr`.
+"""
 function child_Ef(l, g, zi, hh, p::Params, gr)
     p.college && return college_child_Ef(l, g, zi, hh, p, gr)
     cm = choice_maps(hh, g, l, zi, gr)
     fT = warm.(hh.hT[g, l, zi, :], p.ψ, p.href)
-    fO = [Ewarm_nonteach(hh.capO[g, l, zi, k], gr.XOgrid[k, g], g, p, gr) for k in 1:gr.nXO]
-    return sum(integrate_choice(fT, fO, cm, gr))
+    return over_draws(cm, gr) do cmk, law, _
+        fO = [Ewarm_nonteach(hh.capO[g, l, zi, k], law.XOgrid[k, g], g, p, law) for k in 1:law.nXO]
+        sum(integrate_choice(fT, fO, cmk, law))
+    end
 end
 
 function compute_lambda(hh, p::Params, gr)
@@ -1962,11 +2341,129 @@ the quadrature error of Φ, of the order of its stationarity deviation) and the 
 of `build_grids` shifts school quality between locations without changing its overall level. An
 empty location gets 0. With the fertility shock's ability gradient (§3d, `pkid_z` ≠ 0) the young are tilted away
 from the ergodic distribution, which is why that switch is not allowed with peer effects (`check_params`).
+It is the peer input of the default specification A (`peer_log_input`), and the children's ability by location in
+every specification (`log_abar` of the moments).
 """
 function peer_log_ability(Φ, gr)
     lz  = log.(gr.z)
     ref = dot(stationary(gr.Πz), lz)
     return [(m = sum(view(Φ, :, l)); m > 0 ? dot(view(Φ, :, l), lz) / m - ref : 0.0) for l in 1:gr.L]
+end
+
+"""
+    adult_log_h(Φ, πT, πO, hh, p, gr) -> (; m, H, Hbar)
+
+The adults by residence and their own human capital (2026-10-25): `m[l]` the mass of the adults who live in l,
+`H[l]` = E[log h | adult resident of l] (NaN for an empty location) and `Hbar` = E[log h | all adults], the
+m-weighted mean of `H`, so that Σ_l m_l (H_l − Hbar) = 0 up to rounding. The adults are the young of Φ at the
+location choices `πT`, `πO`, which must be the adults' (`location_probs` with `who = :all`: under the fertility shock,
+§3d, the childless are adults too), over every birth location, ability node, gender, occupation (teachers, market
+non-teachers and home producers) and, under `college`, education branch with the weights P(d | g, l, z)
+(`cell_branches`); under the split (joint probabilities) by residence r, from the residence marginals (method below).
+h is the adult's own, acquired when young in her birth location: h_T for teachers (`hh.hT`); for non-teachers
+h_O = Q_l (z ϵ_{i*})^α s^φ e^η = capO/(e^{ρc d} Θ_{i*}) (`capO` carries the credential premium of a BA, `credential`),
+and given X_O* = x every choice depends on x alone, so the occupation that attains the max has P(i* = i | x) ∝
+f_i(x)/F_i(x) among the choosers too and E[log h_O | x, choices] = log(capO/e^{ρc d}) − E[log Θ_{i*} | x]
+(`argmax_mean`, exact for any number of occupations); this is `mean_child_h`'s h_O in logs. The masses and integrals
+are those of the solver's choice maps (`integrate_choice`, cubic splines in the log shock, as `migration_probs` and
+`location_stats` integrate), so `m` is the location (residence) mass of the adults that `migration_probs` implies.
+Under constant class size (§3e) h is at the effective node, the true h for every draw, and E[log Θ_{i*} | X̃_O*] is taken
+under each draw's law (`over_draws`).
+"""
+function adult_log_h(Φ, πT, πO, hh, p::Params, gr)
+    (; Nz, L, nXO) = gr
+    ccs = ccs_on(gr)
+    EΘ = ccs ? nothing :
+         [[argmax_mean(identity, gr, g, gr.XOgrid[k, g]) for k in 1:nXO] for g in 1:2]   # E[log Θ_{i*} | X_O*], by gender
+    m = zeros(L); S = zeros(L)
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
+        iszero(mass) && continue
+        cm  = choice_maps(br.h, g, l, zi, gr)
+        lhT = log.(br.h.hT[g, l, zi, :])
+        if ccs                                   # §3e: log(capO/e^{ρc d}); E[log Θ_{i*}] by draw below
+            lcO = log.(br.h.capO[g, l, zi, :] ./ credential(p, br.d))
+            for lp in 1:L
+                πTv, πOv = br.πT[g, l, zi, :, lp], br.πO[g, l, zi, :, lp]
+                mT, mO = integrate_choice(πTv, πOv, cm, gr)
+                sT = integrate_teach(πTv .* lhT, cm, gr)
+                sO = over_draws(cm, gr) do cmk, law, _
+                    EΘk = [argmax_mean(identity, law, g, law.XOgrid[k, g]) for k in 1:nXO]
+                    integrate_nonteach(πOv .* (lcO .- EΘk), cmk, law)
+                end
+                m[lp] += mass * (mT + mO)
+                S[lp] += mass * (sT + sO)
+            end
+            continue
+        end
+        lhO = log.(br.h.capO[g, l, zi, :] ./ credential(p, br.d)) .- EΘ[g]
+        for lp in 1:L
+            πTv, πOv = br.πT[g, l, zi, :, lp], br.πO[g, l, zi, :, lp]
+            mT, mO = integrate_choice(πTv, πOv, cm, gr)
+            sT, sO = integrate_choice(πTv .* lhT, πOv .* lhO, cm, gr)
+            m[lp] += mass * (mT + mO)
+            S[lp] += mass * (sT + sO)
+        end
+    end
+    return (; m, H = [m[l] > 0 ? S[l] / m[l] : NaN for l in 1:L], Hbar = sum(S) / sum(m))
+end
+
+"""
+    peer_spec(p) -> String
+
+The peer specification of `p` (2026-10-25), "A" … "D" (`peer_log_input`): A the students' mean ability (the default),
+B their total, C the adults' mean human capital, D their total.
+"""
+peer_spec(p::Params) = p.peer_input === :ability ? (p.peer_total ? "B" : "A") : (p.peer_total ? "D" : "C")
+
+"Description of the peer specification of `p` (`peer_spec`)."
+peer_spec_name(p::Params) = string(p.peer_total ? "total " : "mean ",
+                                   p.peer_input === :ability ? "ability of the students" : "human capital of the adult residents")
+
+"""
+    peer_terms(Φ, πT, πO, hh, p, gr; adults) -> (; mean, scale, mass)
+
+The two terms of the peer input log P_l (`peer_log_input`) by `p.peer_input`, whatever `p.peer_total`: `mass` the
+peer group's size by location (the students n_l = Σ_z Φ[z, l] for :ability, the adult residents m_l for :hc),
+`scale` = log(mass_l/(Σ_l mass_l/L)) its log relative to an average location's, and `mean` its mean term, log ā_l
+(`peer_log_ability`) for :ability and H_l − Hbar (`adult_log_h`) for :hc. An empty location gets 0 in both terms.
+`adults` passes `adult_log_h(Φ, πT, πO, hh, p, gr)` if it is already at hand (read only for :hc).
+"""
+function peer_terms(Φ, πT, πO, hh, p::Params, gr;
+                    adults = p.peer_input === :hc ? adult_log_h(Φ, πT, πO, hh, p, gr) : nothing)
+    if p.peer_input === :ability
+        mterm = peer_log_ability(Φ, gr)
+        mass  = vec(sum(Φ; dims = 1))
+    else
+        mass  = adults.m
+        mterm = [mass[l] > 0 ? adults.H[l] - adults.Hbar : 0.0 for l in 1:gr.L]
+    end
+    avg = sum(mass) / gr.L
+    return (; mean = mterm, scale = [mass[l] > 0 ? log(mass[l] / avg) : 0.0 for l in 1:gr.L], mass)
+end
+
+"""
+    peer_log_input(Φ, πT, πO, hh, p, gr; adults) -> Vector
+
+The peer input log P_l of school quality Q_l = Q_T,l P_l^{ψa} (`build_grids`; the solver's aggregate `la`) at the
+stationary distribution Φ and the adults' location probabilities `πT`, `πO` (`location_probs`; the joint ones under
+the split, pairs under `college`) of the household block `hh`, by `p.peer_input` and `p.peer_total` (2026-10-25):
+- A (`:ability`, mean; the default): log ā_l = E[log z | student of l] − E*[log z], `peer_log_ability(Φ, gr)` itself,
+  so that the default is the model without the switches bit for bit;
+- B (`:ability`, total): log(n_l/n̄) + log ā_l, n_l = Σ_z Φ[z, l] the students of l and n̄ = Σ_l n_l/L;
+- C (`:hc`, mean): E[log h | adult resident of l] − E[log h | all adults] (`adult_log_h`), against the endogenous
+  adult-mass-weighted mean, so that Σ_l m_l log P_l = 0 and the factor moves quality across locations, not its
+  level (as ā does in A; a fixed reference would feed Q back into its own level through h, explosively for ψa ≥ 1);
+- D (`:hc`, total): log(m_l/m̄) + C, m_l the adult residents of l and m̄ = Σ_l m_l/L.
+"Total" is number × geometric mean relative to an average location's (n̄ times the reference mean), so that B − A and
+D − C are exactly the scale term (`peer_terms`). `πT`, `πO` and `hh` are read by C and D only. An empty location gets
+0, as in `peer_log_ability`. `adults` as in `peer_terms`.
+"""
+function peer_log_input(Φ, πT, πO, hh, p::Params, gr;
+                        adults = p.peer_input === :hc ? adult_log_h(Φ, πT, πO, hh, p, gr) : nothing)
+    p.peer_input === :ability && !p.peer_total && return peer_log_ability(Φ, gr)    # A: exactly the pre-switch input
+    t = peer_terms(Φ, πT, πO, hh, p, gr; adults)
+    return p.peer_total ? t.mean .+ t.scale : t.mean
 end
 
 """
@@ -2062,6 +2559,10 @@ stationary_phi(πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
 "`migration_probs` for joint probabilities: born-in-l → lives-in-r, from the residence marginals."
 migration_probs(πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
     migration_probs(residence_probs(πT), residence_probs(πO), hh, p, gr)
+
+"`adult_log_h` for joint probabilities: the adults by residence r, from the residence marginals (wherever they work)."
+adult_log_h(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr) =
+    adult_log_h(Φ, residence_probs(πT), residence_probs(πO), hh, p, gr)
 
 """
 `aggregates` for joint probabilities. The tax base is by residence, the teachers' side by workplace:
@@ -2162,6 +2663,97 @@ function fte_gap(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr)
     return log(n[2] / S[2]) - log(n[1] / S[1])
 end
 
+"""
+    ccs_teacher_moments(Φ, πT, πO, hh, p, gr; c0 = nothing, order = 2 p.ccs_nq) -> (; n, μ, c)
+
+The teachers by workplace w and their effectiveness (§3e, 2026-10-26): `n[w]` the teacher mass, `μ[w]` = E[ln h_eff |
+teacher works in w] (`effective_h`) and `c[w]` the central moments of ln h_eff about μ[w], orders 0..`order` in
+`c[w][1:order+1]`, normalised to mass 1 (`c[w][1]` = 1, `c[w][2]` = 0); NaN for a workplace without teachers. These are the
+state of constant class size: ln Q̄_w = β μ_w − σ ln(S_w/n_w) and the rule R_w (`ccs_rule`). Cells are mass-weighted by
+Φ[zi, l]/2 per gender (both genders, every birth location and, with `cell_branches`, branch), as `aggregates` does, and
+`πT` are the work-location probabilities (the adults'; the joint ones under the split, method below, by workplace).
+For each (cell, draw, workplace) ONE vector-valued `quadgk` pass integrates, in the log effective shock u and split at
+the grid nodes,
+    pdf(dT, eᵘ) eᵘ · teach_wt_log(cm_k, u) · π_w(u) · (lh(u) − c0_w)^j,    j = 0..order,
+with π_w the linear (k = 1, so nonnegative) spline of the location probabilities and lh the cubic spline of ln h_eff, plus
+the end-point masses as `integrate_teach` adds them; the draws are mixed with `over_draws` (one pass at `gr` without CCS,
+so a baseline solution works too: the moments of its teachers). `n` and `μ` themselves come from `integrate_teach` (cubic
+splines of π and π ln h_eff, as `aggregates` integrates H̃_T), so at β = 0 the CCS n_T equals the baseline's H̃_T; the
+pass's own mass and mean differ from them at the spline error (≈ 1e-6) and are used only to normalise and centre
+`c`. Every power is integrated against the same nonnegative
+discrete measure (the Gauss–Kronrod nodes and weights the pass chose, the end masses), so the raw moments about c0 are a
+moment sequence and their Hankel matrix is positive semidefinite by construction; the shift to central moments about μ
+(binomial) is exact algebra on that measure. (Separate `integrate_teach` calls per power would build a spline per power and
+need not be.) `c0` is the centre, ideally the previous μ; `nothing` (or any non-finite entry) first runs an order-1 pass
+about 0 for it.
+"""
+function ccs_teacher_moments(Φ, πT, πO, hh, p::Params, gr; c0 = nothing, order::Int = 2 * p.ccs_nq)
+    (; Nz, L, lϵT) = gr
+    if c0 === nothing || !all(isfinite, c0)
+        c0 = order ≤ 1 ? zeros(L) : ccs_teacher_moments(Φ, πT, πO, hh, p, gr; c0 = zeros(L), order = 1).μ
+        c0 = [isfinite(v) ? v : 0.0 for v in c0]
+    end
+    J = order
+    raw = [zeros(J + 1) for _ in 1:L]
+    n, s1 = zeros(L), zeros(L)
+    for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, πT, πO, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
+        iszero(mass) && continue
+        cm  = choice_maps(br.h, g, l, zi, gr)
+        lh  = log.(effective_h(br.h.hT[g, l, zi, :], zi, p, gr))
+        slh = Spline1D(lϵT, lh)
+        for w in 1:L
+            πv = br.πT[g, l, zi, :, w]
+            all(iszero, πv) && continue
+            # n and μ as `aggregates` and `location_stats` integrate them (cubic): at β = 0 the CCS n_T is the baseline's
+            # H̃_T, so the two models nest to rounding
+            n[w]  += mass * integrate_teach(πv, cm, gr)
+            s1[w] += mass * integrate_teach(πv .* lh, cm, gr)
+            sπ = Spline1D(lϵT, πv; k = 1)
+            v  = over_draws(cm, gr) do cmk, law, _
+                teacher_moment_pass(cmk, law, slh, sπ, lh, πv, c0[w], J)
+            end
+            raw[w] .+= mass .* v
+        end
+    end
+    μ = [n[w] > 0.0 ? s1[w] / n[w] : NaN for w in 1:L]
+    c = map(1:L) do w
+        raw[w][1] > 0.0 || return fill(NaN, J + 1)
+        m = raw[w] ./ raw[w][1]                  # raw moments about c0, mass 1 (the pass's own measure)
+        d = m[2]                                  # μ − c0
+        [sum(binomial(j, i) * m[i + 1] * (-d)^(j - i) for i in 0:j) for j in 0:J]
+    end
+    return (; n, μ, c)
+end
+
+"""
+    teacher_moment_pass(cm, law, slh, sπ, lh, πv, c0, J) -> Vector
+
+One vector-valued quadrature pass of `ccs_teacher_moments` for a cell, a draw (`cm`, `law`: a `ChoiceMaps` and the
+law it holds) and a workplace: ∫ pdf(dT, eᵘ) eᵘ P(teach | u) π_w(u) (lh(u) − c0)^j du, j = 0..J, over the grid (split at
+its nodes) plus the end-point masses at the grid's end values, as `integrate_teach` does.
+"""
+function teacher_moment_pass(cm::ChoiceMaps, law, slh, sπ, lh, πv, c0, J)
+    (; dT, ϵTgrid, lϵT) = law
+    function f(u)
+        wt = teach_wt_log(cm, u)
+        wt <= 0.0 && return zeros(J + 1)
+        ϵ = exp(u)
+        a = pdf(dT, ϵ) * ϵ * wt * max(sπ(u), 0.0)
+        d = slh(u) - c0
+        return [a * d^j for j in 0:J]
+    end
+    I  = quadgk(f, lϵT...)[1]
+    lo, hi = ϵTgrid[1], ϵTgrid[end]
+    a1 = cdf(dT, lo) * πv[1] * teach_wt(cm, lo)
+    a2 = ccdf(dT, hi) * πv[end] * teach_wt(cm, hi)
+    return I .+ a1 .* (lh[1] - c0) .^ (0:J) .+ a2 .* (lh[end] - c0) .^ (0:J)
+end
+
+"`ccs_teacher_moments` for joint probabilities (the split): the teachers by workplace w, from the workplace marginals."
+ccs_teacher_moments(Φ, πT::JointProbs, πO::JointProbs, hh, p::Params, gr; kw...) =
+    ccs_teacher_moments(Φ, workplace_probs(πT), workplace_probs(πO), hh, p, gr; kw...)
+
 "Initial slope ∂(FTE gap)/∂b of the teacher-demand closure, per util (refined by secant steps in `solve_ge`)."
 const FTE_SLOPE0 = 3.0
 "Bounds on the closure's slope. Too small a slope overshoots, so the lower bound is the binding safeguard."
@@ -2179,9 +2771,169 @@ const FTE_SECANT_ERR, FTE_SECANT_DB = 1e-4, 1e-4
 fmtvec(v) = "(" * join((@sprintf("%.4f", x) for x in v), ", ") * ")"
 reldiff(new, old; floor = 1e-3) = maximum(abs.(new .- old) ./ max.(abs.(old), floor))
 
+# Constant class size in the outer loop (§3e, 2026-10-26): the state (ln Q̄, teacher moments c, centre μ) by location,
+# its start, its implied update, the change of the rules, the grid pad and the warm start across grid sizes.
+"The degenerate teacher moments of order 0..2n_q (mass 1, no dispersion): the cold start of `c`, a one-point rule."
+ccs_degenerate(p::Params) = vcat(1.0, zeros(2 * p.ccs_nq))
+
+"""
+    ccs_start(p, HT, M, init) -> (; lQT, c, μ)
+
+The CCS state at the start of `solve_ge`. With a warm start `init` of the same L (a CCS or a baseline solution): ln Q̄
+from `init.ccs.lQT` if it carries it, otherwise the efficient σ ln(2H̃_T/M) of `init`; the moments `c` and centres `μ`
+recomputed from `init` with `ccs_teacher_moments` at `p`'s order (at `init`'s own grid and laws, so a different n_q or
+pad, or a baseline `init`, is never misread), degenerate where `init` has no teachers. Without it: the baseline's initial
+quality σ ln(2H̃_T/M) at the default H̃_T, M (`HT`, `M` as passed), degenerate moments and no centre (NaN).
+"""
+function ccs_start(p::Params, HT, M, init)
+    L = length(HT)
+    if init !== nothing && length(init.HT) == L
+        lQT = hasproperty(init, :ccs) && init.ccs !== nothing ? collect(Float64, init.ccs.lQT) :
+              p.σ .* log.(2 .* max.(init.HT, M_FLOOR) ./ max.(init.M, M_FLOOR))
+        tm = ccs_teacher_moments(init.Φ, sol_probs(init)..., init.hh, p, init.gr)
+        ok = [tm.n[l] > M_FLOOR && isfinite(tm.μ[l]) && all(isfinite, tm.c[l]) for l in 1:L]
+        return (; lQT, c = [ok[l] ? tm.c[l] : ccs_degenerate(p) for l in 1:L], μ = [ok[l] ? tm.μ[l] : NaN for l in 1:L])
+    end
+    return (; lQT = p.σ .* log.(2 .* max.(HT, M_FLOOR) ./ max.(M, M_FLOOR)),
+              c = [ccs_degenerate(p) for _ in 1:L], μ = fill(NaN, L))
+end
+
+"""
+    ccs_implied(tm, Φ, live, lQT, c, μ, p) -> (; lQT, c, μ, ok)
+
+The undamped CCS state implied by the teacher moments `tm` (`ccs_teacher_moments`) at the stationary distribution Φ:
+ln Q̄_l = β μ_l − σ ln(S_l/n_T,l) with S_l = Σ_z Φ[z, l] the pupils, the moments `tm.c` and the centres `tm.μ`. A location
+that is not `live` or has no teachers (n_T ≤ M_FLOOR, or non-finite moments) holds its current state, as `solve_ge` holds
+t and log P there (`ok` false).
+"""
+function ccs_implied(tm, Φ, live, lQT, c, μ, p::Params)
+    S  = vec(sum(Φ; dims = 1))
+    L  = length(S)
+    ok = [live[l] && tm.n[l] > M_FLOOR && isfinite(tm.μ[l]) && all(isfinite, tm.c[l]) for l in 1:L]
+    return (; lQT = [ok[l] ? p.β * tm.μ[l] - p.σ * log(S[l] / tm.n[l]) : lQT[l] for l in 1:L],
+              c = [ok[l] ? copy(tm.c[l]) : copy(c[l]) for l in 1:L],
+              μ = [ok[l] ? tm.μ[l] : μ[l] for l in 1:L], ok)
+end
+
+"""
+    ccs_rule_change(rules, c, p) -> Float64
+
+The largest change, over the locations, between the rules `rules` (a grid's `gr.ccs`, with fields `x`, `w` by location)
+and those of the moments `c` (`ccs_rule`): max |Δx|, |Δw| when a location's rule keeps its order, 1.0 when it changes
+order (a node dropped or restored), which holds the outer loop until the order settles.
+"""
+function ccs_rule_change(rules, c, p::Params)
+    Δ = 0.0
+    for l in eachindex(c)
+        r = ccs_rule(c[l], p)
+        if length(r.x) == length(rules.x[l])
+            Δ = max(Δ, maximum(abs, r.x .- rules.x[l]), maximum(abs, r.w .- rules.w[l]))
+        else
+            Δ = max(Δ, 1.0)
+        end
+    end
+    return Δ
+end
+
+"max_l,k |x_k| over the rules of the moments `c` by location (`ccs_rule`)."
+ccs_max_x(c, p::Params) = maximum(maximum(abs, ccs_rule(v, p).x) for v in c)
+
+"The automatic CCS grid pad of the moments `c`: 1.25 × max_l,k |x_k| of their rules, rounded up to a multiple of 0.05."
+ccs_auto_pad(c, p::Params) = max(0.0, 0.05 * ceil(1.25 * ccs_max_x(c, p) / 0.05 - 1e-9))
+
+"The damped moments (1 − d) c + d cn by location: the moments of the mixture of the two centred laws, so PSD stays PSD."
+ccs_damp(c, cn, damping) = [(1 - damping) .* c[l] .+ damping .* cn[l] for l in eachindex(c)]
+
+"SD(ln r) of the rules of a CCS grid, by location (`rule_sd`)."
+ccs_sds(gr) = [rule_sd(gr.ccs.x[l], gr.ccs.w[l]) for l in 1:gr.L]
+
+"Linear interpolation at `xn` of the values `v` on the increasing nodes `xo`, flat beyond both ends."
+function interp_flat(xo, v, xn)
+    n = length(xo)
+    out = zeros(length(xn))
+    for (i, x) in enumerate(xn)
+        if x <= xo[1]
+            out[i] = v[1]
+        elseif x >= xo[n]
+            out[i] = v[n]
+        else
+            j = searchsortedlast(xo, x)
+            θ = (x - xo[j]) / (xo[j + 1] - xo[j])
+            out[i] = (1 - θ) * v[j] + θ * v[j + 1]
+        end
+    end
+    return out
+end
+
+"""
+    ccs_regrid_warm(hh0, gr_old, gr_new) -> hh0′
+
+The warm start of `solve_household` carried across a change of the CCS grid (a wider pad, or a warm start from a
+solution on other grids): the policies (eT, sT) and (eO, sO) of `hh0`, solved on `gr_old`, interpolated onto `gr_new`
+in the log shock, linearly (log e for e; flat beyond the ends), with Λ as it is. Returns `hh0` itself when the grid
+sizes already match, when either is missing, or when the (g, l, z) layout differs (`solve_household` then cold-starts).
+"""
+function ccs_regrid_warm(hh0, gr_old, gr_new)
+    (hh0 === nothing || gr_old === nothing) && return hh0
+    (; Nz, L, nϵT, nXO) = gr_new
+    (size(hh0.eT) == (2, L, Nz, nϵT) && size(hh0.eO) == (2, L, Nz, nXO)) && return hh0
+    (size(hh0.eT, 4) == length(gr_old.lϵT) && size(hh0.eO, 4) == size(gr_old.lXO, 1)) || return hh0
+    (size(hh0.eT)[1:3] == (2, L, Nz) && size(hh0.eO)[1:3] == (2, L, Nz)) || return hh0
+    eT = zeros(2, L, Nz, nϵT); sT = zeros(2, L, Nz, nϵT)
+    eO = zeros(2, L, Nz, nXO); sO = zeros(2, L, Nz, nXO)
+    for g in 1:2, l in 1:L, zi in 1:Nz
+        e = hh0.eT[g, l, zi, :]
+        all(>(0.0), e) && (eT[g, l, zi, :] .= exp.(interp_flat(gr_old.lϵT, log.(e), gr_new.lϵT)))
+        sT[g, l, zi, :] .= interp_flat(gr_old.lϵT, hh0.sT[g, l, zi, :], gr_new.lϵT)
+        e = hh0.eO[g, l, zi, :]
+        all(>(0.0), e) && (eO[g, l, zi, :] .= exp.(interp_flat(gr_old.lXO[:, g], log.(e), gr_new.lXO[:, g])))
+        sO[g, l, zi, :] .= interp_flat(gr_old.lXO[:, g], hh0.sO[g, l, zi, :], gr_new.lXO[:, g])
+    end
+    return (; eT, sT, eO, sO, Λ = hh0.Λ)
+end
+
+"""
+    ccs_solution(hh, p, gr, HT, M, t, la, converged, s_relaxed, lQT, c, μ, pad) -> sol
+
+The solution of `solve_ge` under CCS: the baseline's (or, under the split, `split_probs`') objects at the final household
+solve, plus `ccs` = (; lQT, c, nT, μ, N, x, w, pad, nq, draws, rho, sd, lQT_now, c_now): `lQT` and `c`, the state the
+returned grid was built at (ln Q̄ by location and the teachers' central moments of ln h_eff, orders 0..2n_q); `nT`, `μ`
+and `c_now` the teacher mass, mean and central moments by workplace measured at the returned solution
+(`ccs_teacher_moments`), `N` = S/n_T the class size, `lQT_now` = β μ − σ ln N the ln Q̄ they imply (= `lQT` at a fixed
+point); `x`, `w` the nodes and weights of the rules R_l (as `gr.ccs`), `sd` their SD(ln r) (`rule_sd`), and `pad`, `nq`,
+`draws`, `rho` the grid pad and the switches; `lQeff` = σ ln(H̃_T/S) = ln (2H̃_T/M)^σ with H̃_T measured at the returned
+solution (`aggregates`), the efficient-equivalent quality the same teachers would give under Proposition 1. The
+solution's `HT` is that measured H̃_T, not the loop's damped `HT` (under CCS H̃_T is not a state and not in the
+convergence error, so the damped value can trail it).
+"""
+function ccs_solution(hh, p::Params, gr, HT, M, t, la, converged, s_relaxed, lQT, c, μ, pad)
+    if p.split
+        sol = (; hh, split_probs(hh, p, gr)..., HT, M, t, la, gr, p, converged,
+                 s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed)
+        πT, πO = sol.Pi_TW, sol.Pi_OW
+    else
+        Pi_T, Pi_O = location_probs(hh, p, gr)
+        Pi_Tk, Pi_Ok = parent_probs(hh, p, gr, Pi_T, Pi_O)
+        Φ, πbar_kid = stationary_phi(Pi_Tk, Pi_Ok, hh, p, gr)
+        πbar = fertile(p) ? migration_probs(Pi_T, Pi_O, hh, p, gr) : πbar_kid
+        sol = (; hh, Pi_T, Pi_O, Φ, πbar, HT, M, t, la, gr, p, converged,
+                 s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed, Pi_Tk, Pi_Ok, πbar_kid)
+        πT, πO = Pi_T, Pi_O
+    end
+    tm = ccs_teacher_moments(sol.Φ, πT, πO, hh, p, gr; c0 = μ)
+    S  = vec(sum(sol.Φ; dims = 1))
+    N  = [tm.n[l] > M_FLOOR ? S[l] / tm.n[l] : NaN for l in 1:gr.L]
+    HTnow = aggregates(sol.Φ, πT, πO, hh, p, gr)[1]
+    return merge(sol, (; HT = HTnow, ccs = (; lQT = copy(lQT), c = [copy(v) for v in c], nT = tm.n, μ = tm.μ, N,
+                                  x = gr.ccs.x, w = gr.ccs.w, pad, nq = p.ccs_nq, draws = p.ccs_draws, rho = p.ccs_rho,
+                                  sd = ccs_sds(gr),
+                                  lQT_now = p.β .* tm.μ .- p.σ .* log.(N), c_now = tm.c,
+                                  lQeff = p.σ .* log.(max.(HTnow, M_FLOOR) ./ max.(S, M_FLOOR)))))
+end
+
 """
     solve_ge(p = Params(); Nz, nϵT, nXO, damping, tol, maxit, hh_tol, hh_maxit,
-             verbose, init, q_lo, q_hi)
+             verbose, init, q_lo, q_hi, la_start, ccs_pad)
 
 Each iteration rebuilds the grids at the current (H̃_T, M, t), solves the household
 problem (warm-started from the previous iteration), computes location choices, Φ
@@ -2194,10 +2946,16 @@ any household sweep of the whole solve (`solve_household`). Under `p.split` the 
 carries `Pi_T = Pi_O = nothing` and, in their place, the residence marginals `Pi_Tr`, `Pi_Or`
 and the joint residence × workplace probabilities `Pi_TW`, `Pi_OW` (`split_probs`); the
 aggregates H̃_T and the wage bill are by workplace, M and the tax rate t by residence.
-With peer effects (`p.ψa ≠ 0`) the local peer ability `la` = log ā_l (`peer_log_ability`) is a
-fourth aggregate: the grids are built at it, it is recomputed from Φ, damped like the others and
-converges in absolute change; it starts at 0 (no sorting) or at `init.la`. With ψa = 0 it stays at 0
-and the iterations are those of the model without peers. The solution carries `la`, the value its
+With peer effects (`p.ψa ≠ 0`) the local peer input `la` = log P_l (`peer_log_input`: by default the students'
+mean ability log ā_l, `peer_log_ability`; specifications B–D by `p.peer_input`, `p.peer_total`) is a
+fourth aggregate: the grids are built at it, it is recomputed from Φ and the iteration's adults' location
+probabilities and household block, damped like the others and converges in absolute change; it starts at
+`init.la` or, without a warm start that carries it, at `la_start`·(−1, +1) (city, suburb; two locations): under A
+and C 0, the default, is no sorting, and a positive value starts from a suburb-sorted state, which can select that
+branch when a strong peer effect makes the stationary equilibrium multiple (2026-10-25). Under B and D the scale
+term alone puts the gap in log P near the pupils' log gap (0.376 at the baseline), so a suburb-sorted start needs
+la_start above half of it, and small values only change the path. With ψa = 0 it stays at 0 whatever
+`la_start`, and the iterations are those of the model without peers. The solution carries `la`, the value its
 grid (and so its Q) was built at.
 With the teacher-demand closure (`p.fte_rule` finite, round 2026-10-15c) the teachers' value of the suburban
 workplace b = BT[2] is a further aggregate: each iteration measures the FTE-per-pupil gap at the choices
@@ -2210,13 +2968,29 @@ contaminated the tiny b steps and the slope fell until b cycled at ±`FTE_STEP_M
 requires |fte_rule − gap| < tol. b starts at `p.BT[2]` (or at `init.p.BT[2]`), and the returned `p` carries the
 equilibrium b in `BT`, so that everything downstream (moments, partial-equilibrium re-solves) holds it fixed.
 Without the closure the iterations are those of the model without it.
+With constant class size (`p.ccs`, §3e, 2026-10-26) H̃_T is no longer a state (it is still computed and damped, the
+efficient-equivalent index (2H̃_T/M)^σ of the same teachers): the outer state adds ln Q̄_l and the teachers' central
+moments c_l of ln h_eff (orders 0..2n_q) by location. Each iteration builds the grids at them (`build_grids` with
+`ccs = (; lQT, c)` and the pad), measures the teachers by workplace (`ccs_teacher_moments`, centred at the previous μ) and
+takes the damped step to ln Q̄ = β μ − σ ln(S/n_T) and to their moments (`ccs_implied`; a convex combination of centred
+moment vectors is the mixture's, so the Hankel matrices stay PSD), holding an empty location's state as t and log P are.
+The error drops the H̃_T term and adds max |Δ ln Q̄| and the change of the rules (`ccs_rule_change`), BEFORE the closure's
+`FTE_SETTLE` gate and its secant record (so b does not move while ln Q̄ and the moments do). Start: a warm start (CCS or
+baseline) gives ln Q̄ (`init.ccs.lQT`, or its efficient σ ln(2H̃_T/M)) and moments recomputed from it (`ccs_start`); a cold
+start has the baseline's initial quality and degenerate moments. `ccs_pad` (log units of r) is the grid pad: `:auto` =
+1.25 max_l,k |x| rounded up to 0.05 and only ever widened, or a fixed number; when the grid grows the household warm
+start is interpolated onto it (`ccs_regrid_warm`). The solution carries `ccs` (`ccs_solution`); `verify_solution` checks
+max |x| ≤ pad. Without `ccs` none of this is reached and the iterations are those of the model without it.
 """
 function solve_ge(p::Params = Params();
                   Nz = 5, nϵT = 64, nXO = 64, damping = 0.3, tol = 1e-5,
                   maxit = 1000, hh_tol = 1e-6, hh_maxit = 1000, verbose = true,
-                  init = nothing, q_lo = 1e-5, q_hi = 1 - 1e-6)
+                  init = nothing, q_lo = 1e-5, q_hi = 1 - 1e-6, la_start = 0.0, ccs_pad = :auto)
     check_params(p)
     I, L = length(p.A), length(p.B)
+    (ccs_pad === :auto || (ccs_pad isa Real && ccs_pad ≥ 0)) ||
+        throw(ArgumentError("ccs_pad must be :auto or a nonnegative number (log units of r), got $ccs_pad"))
+    (iszero(p.ψa) || iszero(la_start)) || @assert L == 2 "la_start starts the peer input at la_start·(−1, +1): it needs two locations (city, suburb)"
     grid_kw = (; Nz, nϵT, nXO, q_lo, q_hi)
 
     if verbose
@@ -2233,7 +3007,8 @@ function solve_ge(p::Params = Params();
                              p.σd, p.sBA, p.ρc, p.ρT0, p.ϑs, p.Fc, p.cC, p.cCz, p.ωz, p.sT0, p.cT0)
         isnan(p.schedT) || @printf("  salary schedule: schedT=%.4f (pay κ h^γ (s/sBA)^%.4f, sBA=%.4f; teachers' s at Ξ = 0: %.4f)\n",
                                    p.schedT, teach_schedule(p)[2], p.sBA, time_share(p.γ, p, 0.0, teach_schedule(p)[2]))
-        iszero(p.ψa) || @printf("  peers: ψa=%.3f (Q_l = (2H̃_T/M_l)^σ ā_l^ψa)\n", p.ψa)
+        iszero(p.ψa) || @printf("  peers: ψa=%.3f, specification %s, the %s (Q_l = (2H̃_T/M_l)^σ P_l^ψa)%s\n", p.ψa,
+                                peer_spec(p), peer_spec_name(p), iszero(la_start) ? "" : @sprintf("; cold start log P = %.4f·(−1, +1)", la_start))
         iszero(p.κc) || @printf("  commuting friction: κc=%.4f utils per commuting pair (r ≠ w)\n", p.κc)
         all(iszero, p.Bd) || @printf("  BA amenity: Bd=%s utils (residence r, BA holders)\n", fmtvec(p.Bd))
         all(iszero, p.By) || @printf("  income-graded taste: By=%s utils per log point of predicted income (lyref=%.4f)\n",
@@ -2243,32 +3018,56 @@ function solve_ge(p::Params = Params();
                                       p.lyT_fixed, all(iszero, p.By) ? "  [By = 0: inert]" : "")
         fertile(p) && @printf("  fertility shock: P(child) = pkid = %.4f; only parents value Λ, children follow the parents (§3d)\n", p.pkid)
         fertile(p) && !iszero(p.pkid_z) && @printf("    ability-graded: logit slope pkid_z = %.4f per ergodic SD of log z; 1/pkid children per parent\n", p.pkid_z)
+        p.ccs && @printf("  constant class size (§3e): N_l = S_l/n_T,l, random assignment; n_q = %d Gauss nodes, K_d = %d teacher draws, ρ = %.3f; pad %s\n",
+                         p.ccs_nq, p.ccs_draws, p.ccs_rho, ccs_pad === :auto ? ":auto" : @sprintf("%.3f", ccs_pad))
         flush(stdout)
     end
 
     HT = fill(1.0, L); M = fill(p.Mtot / L, L); t = fill(0.10, L)
-    la = zeros(L)                                 # log ā_l, an aggregate only with peer effects
+    la = zeros(L)                                 # log P_l, the peer input: an aggregate only with peer effects
     peer = !iszero(p.ψa)
+    la_warm = false                               # whether a warm start supplies la
     closure = p.split && !isnan(p.fte_rule)       # teacher-demand closure: b = BT[2] is an aggregate
     b = closure ? p.BT[2] : NaN                  # (BT has one entry per location: read it only under the closure)
     hh0 = nothing
     if init !== nothing
         if length(init.HT) == L
             HT .= init.HT; M .= init.M; t .= init.t
-            peer && hasproperty(init, :la) && (la .= init.la)
+            peer && hasproperty(init, :la) && (la .= init.la; la_warm = true)
             closure && hasproperty(init, :p) && (b = init.p.BT[2])
             hh0 = init.hh
         elseif verbose
             @printf("  ⚠ warm start ignored: init has L=%d ≠ %d\n", length(init.HT), L)
         end
     end
+    peer && !la_warm && !iszero(la_start) && (la .= la_start .* [-1.0, 1.0])   # a sorted cold start (2026-10-25)
     closure && (p = with_params(p; BT = [p.BT[1], b]))
     slope, b_prev, f_prev, e_prev, r_prev = FTE_SLOPE0, NaN, NaN, NaN, NaN
+    ccs = p.ccs                                   # §3e: constant class size, state (ln Q̄, moments, centres) by location
+    if ccs
+        cs = ccs_start(p, HT, M, init)            # HT, M are init's when it is a warm start of the same L
+        lQT, cmom, cμ = cs.lQT, cs.c, cs.μ
+        pad = ccs_pad === :auto ? 0.0 : Float64(ccs_pad)
+        gr_prev = init !== nothing && length(init.HT) == L ? init.gr : nothing   # the grid hh0 was solved on
+        pad_warned = false
+    end
 
     converged = false
     s_relaxed = 0
     for it in 1:maxit
-        gr = build_grids(p; H̃T = HT, M, t, la, grid_kw...)
+        if ccs                                    # §3e: the pad covers the rules of the current moments (:auto only widens it)
+            ccs_pad === :auto && (pad = max(pad, ccs_auto_pad(cmom, p)))
+            if verbose && !pad_warned && ccs_pad !== :auto
+                xmax = ccs_max_x(cmom, p)
+                if xmax > pad
+                    @printf("  ⚠ CCS: max |x| = %.4f exceeds the fixed pad %.4f (ccs_pad): the draws' laws leave the grid\n", xmax, pad)
+                    pad_warned = true
+                end
+            end
+        end
+        gr = ccs ? build_grids(p; H̃T = HT, M, t, la, grid_kw..., ccs = (; lQT, c = cmom), pad) :
+                   build_grids(p; H̃T = HT, M, t, la, grid_kw...)
+        ccs && (hh0 = ccs_regrid_warm(hh0, gr_prev, gr); gr_prev = gr)
         t_hh = @elapsed (hh0 = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit,
                                                 verbose = verbose && it == 1, hh0))
         s_relaxed = max(s_relaxed, hh0.s_relaxed)
@@ -2281,12 +3080,20 @@ function solve_ge(p::Params = Params();
         live = Mn .≥ M_FLOOR
         tn[.!live] .= t[.!live]
         t_err = any(live) ? maximum(abs, tn[live] .- t[live]) : 0.0
-        err = max(reldiff(HTn, HT), reldiff(Mn, M), t_err)
-        if peer                                   # the students' mean ability, in absolute change
-            lan = peer_log_ability(Φ, gr)
-            lan[.!live] .= la[.!live]             # nor peers: hold an empty location's ā too
+        err = ccs ? max(reldiff(Mn, M), t_err) : max(reldiff(HTn, HT), reldiff(Mn, M), t_err)   # §3e: H̃_T is not a state
+        if peer                                   # the peer input log P (A: the students' mean ability), in absolute change
+            lan = peer_log_input(Φ, πT, πO, hh0, p, gr)
+            lan[.!live] .= la[.!live]             # nor peers: hold an empty location's log P too
             err = max(err, maximum(abs, lan .- la))
             @. la = (1 - damping) * la + damping * lan
+        end
+        if ccs          # §3e: ln Q̄ and the teacher moments, in absolute change of ln Q̄ and of the rules (before the closure's gate)
+            tm   = ccs_teacher_moments(Φ, πT, πO, hh0, p, gr; c0 = cμ)
+            imp  = ccs_implied(tm, Φ, live, lQT, cmom, cμ, p)
+            err  = max(err, maximum(abs, imp.lQT .- lQT), ccs_rule_change(gr.ccs, imp.c, p))
+            @. lQT = (1 - damping) * lQT + damping * imp.lQT
+            cmom = ccs_damp(cmom, imp.c, damping)   # the mixture's moments: stays PSD
+            cμ   = imp.μ
         end
 
         fte = NaN
@@ -2313,9 +3120,11 @@ function solve_ge(p::Params = Params();
 
         if verbose
             @printf("GE %3d  err=%.3e  H̃_T=%s  M=%s  t=%s%s%s  [hh=%.1fs pi=%.1fs phi=%.1fs agg=%.1fs]\n",
-                    it, err, fmtvec(HT), fmtvec(M), fmtvec(t), peer ? "  log ā=" * fmtvec(la) : "",
+                    it, err, fmtvec(HT), fmtvec(M), fmtvec(t), peer ? "  log P=" * fmtvec(la) : "",
                     closure ? @sprintf("  FTE gap=%.5f b=%.5f (slope %.2f)", fte, b, slope) : "",
                     t_hh, t_pi, t_phi, t_agg)
+            ccs && @printf("        CCS: ln Q̄=%s  SD(ln r)=%s  nodes=%s  pad=%.2f (nϵT=%d, nXO=%d)\n", fmtvec(lQT),
+                           fmtvec(ccs_sds(gr)), "(" * join(length.(gr.ccs.x), ", ") * ")", pad, gr.nϵT, gr.nXO)
             flush(stdout)
         end
         if err < tol
@@ -2326,8 +3135,12 @@ function solve_ge(p::Params = Params();
     end
     verbose && !converged && println("  ⚠ GE did not converge in $maxit iterations.")
 
-    gr = build_grids(p; H̃T = HT, M, t, la, grid_kw...)
+    ccs && ccs_pad === :auto && (pad = max(pad, ccs_auto_pad(cmom, p)))
+    gr = ccs ? build_grids(p; H̃T = HT, M, t, la, grid_kw..., ccs = (; lQT, c = cmom), pad) :
+               build_grids(p; H̃T = HT, M, t, la, grid_kw...)
+    ccs && (hh0 = ccs_regrid_warm(hh0, gr_prev, gr))
     hh = solve_household(p, gr; tol = hh_tol, maxit = hh_maxit, hh0)
+    ccs && return ccs_solution(hh, p, gr, HT, M, t, la, converged, max(s_relaxed, hh.s_relaxed), lQT, cmom, cμ, pad)
     p.split && return (; hh, split_probs(hh, p, gr)..., HT, M, t, la, gr, p, converged,
                          s_resid = hh.s_resid, s_passes = hh.s_passes, s_relaxed = max(s_relaxed, hh.s_relaxed))
     Pi_T, Pi_O = location_probs(hh, p, gr)
@@ -2351,7 +3164,9 @@ exceeds δ in every (node, work location), so smooth_log equals log (under the s
 rate is on the clamp [0, tclamp]; (iii) the (e, s) fixed point converged. It also
 reports how many nodes needed the relaxed (e, s) update (`solve_node`) in the largest
 sweep, which is not a failure. Returns true if all hold. Condition (i) is what limits how large `mcost` can be:
-the goods cost bites first on low-ability movers.
+the goods cost bites first on low-ability movers. Under constant class size (§3e) it also checks that the grid pad
+covers every node of the draw rules, max |x| ≤ pad (otherwise a draw's law leaves the effective-shock grid), and
+reports it; the pad nodes are in (i) and (iii) like any other.
 """
 function verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
     (; hh, t, gr, p, s_resid, s_passes, s_relaxed) = sol
@@ -2389,6 +3204,17 @@ function verify_solution(sol; δ = C_FLOOR, tclamp = TAX_CAP, s_atol = 1e-8)
             ok = false
         end
     end
+    if ccs_on(gr)                                 # §3e: the pad must cover the draws
+        xmax = maximum(maximum(abs, x) for x in gr.ccs.x)
+        if xmax > gr.ccs.pad + 1e-12
+            @printf("  ⚠ CCS: max |x| = %.4f of the draw rules exceeds the grid pad %.4f: the shifted laws leave the grid\n",
+                    xmax, gr.ccs.pad)
+            ok = false
+        else
+            @printf("  CCS: draw rules within the grid pad, max |x| = %.4f ≤ pad = %.4f (nϵT = %d, nXO = %d)\n",
+                    xmax, gr.ccs.pad, gr.nϵT, gr.nXO)
+        end
+    end
     ok && @printf("  ✓ feasibility audit passed: min C = %.4e > δ = %.1e; taxes interior t = %s; s residual %.1e (≤ %d passes)\n",
                   minC, δ, fmtvec(t), s_resid, s_passes)
     return ok
@@ -2412,8 +3238,13 @@ on the ϵ_T and X_O* grids for that cell and education branch `br` (a `cell_bran
 `br.h` the household arrays, `br.πT`, `br.πO` the location probabilities (the joint ones under the
 split), `br.d` the label); under `p.college` the branches are mixed with the weights
 P(d | g, l, z) (§3c).
+With `law = true` (§3e, 2026-10-26) the quantity may depend on the teacher draw: the closures are called as
+`qT(br, g, l, zi, law, x)`, `qO(…, law, x)` for every draw (x = ln r, `law` its `ccs_law`, to be passed wherever an
+integral or `argmax_mean` takes `gr`) and the cell's integral is their R_l-mixture (`over_draws`); without CCS they are
+called once with (`gr`, 0.0). With `law = false` (the default) the closures take (br, g, l, zi) as always, and the
+quantity must not depend on the draw.
 """
-function cell_mean(sol, qT, qO)
+function cell_mean(sol, qT, qO; law::Bool = false)
     (; hh, Φ, gr, p) = sol
     PT, PO = sol_probs(sol)
     onesT, onesO = ones(gr.nϵT), ones(gr.nXO)
@@ -2422,7 +3253,14 @@ function cell_mean(sol, qT, qO)
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
         cm = choice_maps(br.h, g, l, zi, gr)
-        num += mass * sum(integrate_choice(qT(br, g, l, zi), qO(br, g, l, zi), cm, gr))
+        if law
+            v = over_draws(cm, gr) do cmk, lw, x
+                sum(integrate_choice(qT(br, g, l, zi, lw, x), qO(br, g, l, zi, lw, x), cmk, lw))
+            end
+            num += mass * v
+        else
+            num += mass * sum(integrate_choice(qT(br, g, l, zi), qO(br, g, l, zi), cm, gr))
+        end
         den += mass * sum(integrate_choice(onesT, onesO, cm, gr))
     end
     return num / den
@@ -2451,11 +3289,13 @@ end
 Mean human capital h̄ at `sol`. The warm-glow reference `href` is frozen at this
 value (`HBAR_BENCH` at `nesting_params()`) so that ψ changes only the curvature of
 the kernel, not its level. Non-teachers' capacity is net of the credential premium (§3c).
+Under constant class size (§3e) E[Θ_{i*}^{−1} | X̃_O*] is taken under each draw's law (`cell_mean` with `law = true`).
 """
 function mean_child_h(sol)
     (; hh, gr, p) = sol
-    hO(br, g, l, zi) = [br.h.capO[g, l, zi, k] / credential(p, br.d) * EΘpow(gr, g, gr.XOgrid[k, g], 0.0)
-                        for k in 1:gr.nXO]
+    hO(br, g, l, zi, lw = gr, x = 0.0) = [br.h.capO[g, l, zi, k] / credential(p, br.d) * EΘpow(lw, g, lw.XOgrid[k, g], 0.0)
+                                         for k in 1:lw.nXO]
+    ccs_on(gr) && return cell_mean(sol, (br, g, l, zi, _...) -> br.h.hT[g, l, zi, :], hO; law = true)
     return cell_mean(sol, (br, g, l, zi) -> br.h.hT[g, l, zi, :], hO)
 end
 
@@ -2561,6 +3401,17 @@ function student_ability_moments(sol)
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
         cm  = choice_maps(br.h, g, l, zi, gr)
+        if cm isa MixedMaps                      # §3e: the true shocks, ϵ_T = ϵ̃_T e^{−x/α} and ϵ_{i*} = ϵ̃_{i*} e^{−x/α}
+            mT, mO = integrate_choice(onesT, onesO, cm, gr)
+            IaT, IaO = over_draws(cm, gr) do cmk, law, x
+                sc = exp(-x / p.α)
+                integrate_choice(z[zi] .* law.ϵTgrid .* sc,
+                                 [z[zi] * Eϵ_nonteach(law, g, law.XOgrid[k, g], p.α) * sc for k in 1:nXO], cmk, law)
+            end
+            ΦT[zi, l] += mass * mT; ΦO[zi, l] += mass * mO
+            aT[l]     += mass * IaT; aO[l]    += mass * IaO
+            continue
+        end
         aTv = z[zi] .* gr.ϵTgrid
         aOv = [z[zi] * Eϵ_nonteach(gr, g, gr.XOgrid[k, g], p.α) for k in 1:nXO]
         mT, mO = integrate_choice(onesT, onesO, cm, gr)
@@ -2598,9 +3449,12 @@ in closed form, which avoids the comb artefacts of binning quadrature nodes:
 - teaching: f_ϵ(a/z)/z · P(teach | ϵ_T = a/z);
 - non-teaching: Σ_i f_ϵ(ϵ) ∏_{j≠i} F_j(Θ_i ϵ^α) · P(don't teach | X_O* = Θ_i ϵ^α),
   where the product is the probability that occupation i attains the max.
+Under constant class size (§3e) a and the densities are those of the true shocks (the laws at r = 1, `gr.ccs.base`), and
+the occupation weights the R_l-mixture of each draw's, at the effective shocks ϵ e^{x/α} and X_O e^{x} (`over_draws`).
 """
 function student_ability_density(sol, l, agrid)
     (; hh, Φ, gr, p) = sol
+    ccs_on(gr) && return ccs_student_ability_density(sol, l, agrid)
     (; z, Nz, dT, dO, nonteach, logΘ) = gr
     fT = zeros(length(agrid)); fO = zeros(length(agrid))
     for zi in 1:Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
@@ -2616,6 +3470,32 @@ function student_ability_density(sol, l, agrid)
                 wins = prod((cdf(dO[j, g], x) for j in nonteach if j != i); init = 1.0)
                 fO[ia] += fϵ * wins * nonteach_wt(cm, x)
             end
+        end
+    end
+    mass = sum(@view Φ[:, l])
+    return fT ./ mass, fO ./ mass
+end
+
+"`student_ability_density` under constant class size (§3e): true-shock densities, draw-mixed occupation weights."
+function ccs_student_ability_density(sol, l, agrid)
+    (; hh, Φ, gr, p) = sol
+    (; z, Nz, nonteach, logΘ) = gr
+    (; dT, dO) = gr.ccs.base                    # the laws of the true shocks (r = 1)
+    fT = zeros(length(agrid)); fO = zeros(length(agrid))
+    for zi in 1:Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
+        mass = Φ[zi, l] / 2 * br.w
+        iszero(mass) && continue
+        cm = choice_maps(br.h, g, l, zi, gr)
+        for (ia, a) in enumerate(agrid)
+            ϵ  = a / z[zi]
+            fϵ = mass * pdf(dT, ϵ) / z[zi]
+            xs = [exp(logΘ[i, g]) * ϵ^p.α for i in nonteach]
+            ws = [prod((cdf(dO[j, g], xs[ii]) for j in nonteach if j != i); init = 1.0) for (ii, i) in enumerate(nonteach)]
+            tw, ow = over_draws(cm, gr) do cmk, _, x
+                (teach_wt(cmk, ϵ * exp(x / p.α)), sum(ws[ii] * nonteach_wt(cmk, xs[ii] * exp(x)) for ii in eachindex(xs)))
+            end
+            fT[ia] += fϵ * tw
+            fO[ia] += fϵ * ow
         end
     end
     mass = sum(@view Φ[:, l])
@@ -2639,8 +3519,29 @@ function report_ge(sol)
     @printf("  M      = %s      [total %.4f]\n", fmtvec(M), sum(M))
     @printf("  t      = %s\n", fmtvec(t))
     @printf("  Q      = %s\n", fmtvec(Q))
-    iszero(p.ψa) || @printf("  peers  : ψa = %.3f;  log ā = %s (at Φ: %s);  teacher part Q_T = %s\n",
-                            p.ψa, fmtvec(gr.la), fmtvec(peer_log_ability(Φ, gr)), fmtvec(gr.QT))
+    if ccs_on(gr) && hasproperty(sol, :ccs)     # §3e: constant class size
+        cc   = sol.ccs
+        Qeff = exp.(cc.lQeff)                       # (2H̃_T/M)^σ at the solution's teachers
+        @printf("  CCS    : n_q = %d nodes, K_d = %d teacher draws, ρ = %.3f, pad = %.2f;  teachers n_T = %s, μ = E[ln h_eff | l] = %s\n",
+                cc.nq, cc.draws, cc.rho, cc.pad, fmtvec(cc.nT), fmtvec(cc.μ))
+        @printf("           class size N_l = S_l/n_T,l = %s;  Q̄_l = %s (ln Q̄ = %s; implied now %s);  SD(ln q | l) = %s\n",
+                fmtvec(cc.N), fmtvec(gr.QT), fmtvec(cc.lQT), fmtvec(cc.lQT_now), fmtvec(cc.sd))
+        @printf("           efficient-equivalent Q^eff = (2H̃_T/M)^σ = %s;  ln Q^eff − ln Q̄ = %s\n",
+                fmtvec(Qeff), fmtvec(cc.lQeff .- cc.lQT))
+        for l in 1:L
+            @printf("           R_%d: x = %s  w = %s\n", l, fmtvec(cc.x[l]), fmtvec(cc.w[l]))
+        end
+    end
+    if !iszero(p.ψa)         # 2026-10-25: the specification, and log P at Φ split into its mean and scale terms
+        PT, PO = sol_probs(sol)
+        ad = adult_log_h(Φ, PT, PO, hh, p, gr)
+        pt = peer_terms(Φ, PT, PO, hh, p, gr; adults = ad)
+        @printf("  peers  : ψa = %.3f, specification %s (the %s);  log P = %s (at Φ: %s = mean %s + scale %s);  teacher part Q_T = %s\n",
+                p.ψa, peer_spec(p), peer_spec_name(p), fmtvec(gr.la), fmtvec(peer_log_input(Φ, PT, PO, hh, p, gr; adults = ad)),
+                fmtvec(pt.mean), fmtvec(p.peer_total ? pt.scale : zeros(L)), fmtvec(gr.QT))
+        @printf("           students' log ā = %s;  adult residents' mean log h − economy mean = %s (adults %s)\n",
+                fmtvec(peer_log_ability(Φ, gr)), fmtvec(ad.H .- ad.Hbar), fmtvec(ad.m))
+    end
 
     ergodic = stationary(Πz)
     println("\n  Endogenous ability distribution  G_l(z)   (vs ergodic G*):")

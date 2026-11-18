@@ -2,34 +2,46 @@
 
 Companion to [spatial_calibration.md](spatial_calibration.md): target definitions, evidence mappings, validation and next experiments. Tables 1–5 retain their original numbering.
 
-**Current mechanism adoption scope (user instruction, 2026-10-19).** Only six additional mechanisms are eligible for adoption: residence/workplace separation with commuting, local housing costs, fertility/parenthood shocks, education-based teacher salary schedules, teacher education/licensure requirements, and peer effects. The first-pass 2026-09-29 exact calibration remains the baseline. This narrows the earlier development plans; it adopts no extension, parameterization or fitted candidate. All other added mechanisms remain outside the current adoption scope. [Decision and rationale](#mechanism-adoption-scope-2026-10-19).
+**Current mechanism adoption scope (2026-10-19).** Only six additional mechanisms are eligible for adoption: residence/workplace separation with commuting, local housing costs, fertility/parenthood shocks, education-based teacher salary schedules, teacher education/licensure requirements, and peer effects. The first-pass 2026-09-29 exact calibration remains the baseline. This narrows the earlier development plans; it adopts no extension, parameterization or fitted candidate. All other added mechanisms remain outside the current adoption scope. [Decision and rationale](#mechanism-adoption-scope-2026-10-19).
 
-**Baseline policy (user instruction, 2026-10-18).** Keep the first-pass standard calibration as the baseline until the user definitively says otherwise: the exactly identified 2026-09-29 fit in [`runs/exact-polish-base/`](runs/exact-polish-base/), recorded in the first-pass commit `d88afb4` (2026-09-30). Preserve its specification, fitted parameters, inputs, targets and untargeted validation outcomes. Alternative fits and development-candidate selections remain experimental. Passing acceptance criteria or improving a score is evidence for review, not permission to replace the baseline. A change requires convincing evidence and an explicit user decision; this instruction takes precedence over earlier development plans and adoption language in this log.
+**Baseline policy (2026-10-18).** Keep the first-pass standard calibration as the baseline until the authors decide otherwise: the exactly identified 2026-09-29 fit in [`runs/exact-polish-base/`](runs/exact-polish-base/), recorded in the first-pass commit `d88afb4` (2026-09-30). Preserve its specification, fitted parameters, inputs, targets and untargeted validation outcomes. Alternative fits and development-candidate selections remain experimental. Passing acceptance criteria or improving a score is evidence for review, not permission to replace the baseline. A change requires convincing evidence and an explicit decision by the authors; this instruction takes precedence over earlier development plans and adoption language in this log.
 
-**Model spec restored (2026-10-18).** [`spatial_teachers_model_eps0.md`](../../../notes/spatial_teachers_model_eps0.md) is restored byte-for-byte from `d88afb4`; its content is identical to `c87c113` (2026-07-28) and the September 28 calibration-infrastructure commit `bc080f7`. Keep this spec unchanged until model changes are supported with confidence and explicitly approved by the user. Record experiments in calibration or separate experimental notes. The four pre-edit documentation files, including the spec's uncommitted October additions, are preserved and hash-verified in [`runs/_code/baseline-policy-20261018/`](runs/_code/baseline-policy-20261018/README.md). Existing code, fitted results and run directories are unchanged; no model jobs were launched.
+**Model spec restored (2026-10-18).** [`spatial_teachers_model_eps0.md`](../../../notes/spatial_teachers_model_eps0.md) is restored byte-for-byte from `d88afb4`; its content is identical to `c87c113` (2026-07-28) and the September 28 calibration-infrastructure commit `bc080f7`. Keep this spec unchanged until model changes are supported with confidence and explicitly approved by the authors. Record experiments in calibration or separate experimental notes. The four pre-edit documentation files, including the spec's uncommitted October additions, are preserved and hash-verified in [`runs/_code/baseline-policy-20261018/`](runs/_code/baseline-policy-20261018/README.md). Existing code, fitted results and run directories are unchanged; no model jobs were launched.
 
 **Current baseline:** the exactly identified 2026-09-29 fit above. The October experiments leave it unchanged; their extensions are diagnostic prototypes, not an adopted specification. The log-shock solver correction supersedes all earlier equilibrium results; the outside-equilibrium first stage is unaffected. Verification below refers to saved runs, not new estimation during this documentation update.
 
-**Experimental direction (2026-10-16; historical, subject to the 2026-10-19 adoption scope and 2026-10-18 baseline policy above):** the user provisionally accepts the latest recommendations, conditional on preserving previous work, with an explicit preference for simplicity and skepticism about college choice and licensure as large departures from the earlier model. Begin with measurement comparisons and re-scoring, then isolate teacher-quality sorting and test minimal changes. Keep richer extensions as benchmarks and compare simpler alternatives; no extension is mandatory merely because it improved past fit. The [accepted preferences and next sequence](#accepted-preferences-and-next-sequence-2026-10-16) qualify the October 15 plan within this experimental scope. No baseline has been replaced and B1 remains sealed.
+**Experimental direction (2026-10-16; historical, subject to the 2026-10-19 adoption scope and 2026-10-18 baseline policy above):** the latest recommendations are provisionally accepted, conditional on preserving previous work, with an explicit preference for simplicity and skepticism about college choice and licensure as large departures from the earlier model. Begin with measurement comparisons and re-scoring, then isolate teacher-quality sorting and test minimal changes. Keep richer extensions as benchmarks and compare simpler alternatives; no extension is mandatory merely because it improved past fit. The [accepted preferences and next sequence](#accepted-preferences-and-next-sequence-2026-10-16) qualify the October 15 plan within this experimental scope. No baseline has been replaced and B1 remains sealed.
 
-**Fertility shock (2026-10-18; done; [§4](#fertility-shock-2026-10-18)).** As the user asked, a binary child shock was built as the switch `Params.pkid`: it is drawn with the location taste shock and multiplies the altruism term, and P(child) = 0.802, the NLSY79 completed-fertility rate. The September problem was then re-estimated.
+**Fertility shock (2026-10-18; done; [§4](#fertility-shock-2026-10-18)).** A binary child shock was built as the switch `Params.pkid`: it is drawn with the location taste shock and multiplies the altruism term, and P(child) = 0.802, the NLSY79 completed-fertility rate. The September problem was then re-estimated.
 - *Fit.* It fits exactly again (criterion 7.5e−17) and passes the grid, multistart and identification checks.
 - *Effect.* The shock is nearly neutral. λ rises by 1/0.802 (0.125 → 0.155) to restore the all-household WTP target. Every other parameter moves by at most 1.1e−4, and every target and validation outcome by at most 3e−4.
 - *Why.* The childless live almost exactly where parents do, because school quality is worth about 5e−4 utils against σν = 0.25.
 - *Development candidate.* The same holds there (S_1015 114.7 against 114.6).
 - *Baseline.* Unchanged; the model spec note is not edited.
 
-**Ability-graded fertility shock (2026-10-18b; done; [§4](#ability-graded-fertility-shock-2026-10-18b)).** As the user asked, P(child) was made to depend on ability, to reflect children as a normal good. The switch is `Params.pkid_z`, the logit slope per ability SD, with the mean held at 0.802 and 1/0.802 children per parent. The September problem and the development candidate were then re-estimated at three slopes.
+**Ability-graded fertility shock (2026-10-18b; done; [§4](#ability-graded-fertility-shock-2026-10-18b)).** P(child) was made to depend on ability, to reflect children as a normal good. The switch is `Params.pkid_z`, the logit slope per ability SD, with the mean held at 0.802 and 1/0.802 children per parent. The September problem and the development candidate were then re-estimated at three slopes.
 - *Evidence.* In the NLSY79 cross-section, P(ever a child) falls with latent AFQT: −2.4 pp per SD, a logit slope of −0.15. The fall comes from women; for men the slope is flat. Own earnings net of AFQT raise men's probability (+9.9 pp per log point) and lower women's (−7.7). The normal-good finding is a causal income effect, which the cross-section confounds with the price of time. Slopes run: −0.15 (the data), +0.15 (normal good) and +0.5 (a strong bound).
 - *Baseline.* All three refits are exact. At ±0.15, λ moves by 1.7%, r_m by 1.2% and log κ̃ by 0.004; every other parameter moves by at most 7e−4. Every untargeted moment outside the first stage moves by at most 0.03 SE. The first-stage mother–child ρ moves −0.07 SE at ±0.15 and −0.74 SE at +0.5.
 - *Development candidate.* Income sorting gives the richer suburb more (or fewer) children per adult, and low mobility accumulates that into population. ΔB absorbs it: ±0.004, and −0.014 at +0.5. S_1015 is 114.6–116.3, against 114.7.
 - *Reading.* The gradient changes who the children are, not where adults live, so the calibration is unchanged at the supported slopes. The baseline and the spec note are unchanged.
 
-**Factorial round (2026-10-19; done; [§4](#factorial-round-the-six-eligible-mechanisms-in-every-combination-2026-10-19)).** As the user asked, all 64 combinations of the six eligible mechanisms were refitted exactly at Nz = 9, with externally fixed magnitudes and every scored moment untargeted. The schedule needed a new switch for the model without college, `Params.schedT`.
+**Factorial round (2026-10-19; done; [§4](#factorial-round-the-six-eligible-mechanisms-in-every-combination-2026-10-19)).** All 64 combinations of the six eligible mechanisms were refitted exactly at Nz = 9, with externally fixed magnitudes and every scored moment untargeted. The schedule needed a new switch for the model without college, `Params.schedT`.
 - *Best fit.* Housing cost + salary schedule (HS): S13 364 against the baseline's 864. The schedule fixes teacher schooling and most of the pay gap, and the housing charge offsets the suburban over-staffing that follows. Licensure substitutes for the schedule (HL 398). Fertility and peers add nothing (≤ 3 points).
 - *Sorting on income.* No combination reaches a third of the data's income-sorting gaps. Commuting gives the most (CHS: 32%), but mostly through school quality in over-staffed suburban schools (growth z +12 to +16). The composition part is at most 0.013 log points, and children's ability gap at most 0.009 SD.
 - *The housing charge.* It is the only mechanism that sorts by composition, and the effect rises with the charge (Q-adjusted gap 0.025 at r_p = 0.035, 0.054 at 0.058). It sorts on income draws, not ability.
-- *Baseline.* Unchanged; adoption remains the user's decision.
+- *Baseline.* Unchanged; adoption remains the authors' decision.
+
+**Peer-effect strength and specification (2026-10-25; done; [§4](#peer-effect-strength-and-specification-2026-10-25)).** The peer effect was made much stronger and given three alternative inputs: the total ability of a location's students, and the mean or total human capital of its adults. The switches are `Params.peer_input` and `Params.peer_total`, off by default. Every case was refitted exactly to the September targets.
+- *Strength.* No multiple equilibria were found up to ψa = 64, and no stationary equilibrium at 128. At the baseline the peer effect amplifies a slight reverse ability sorting, so every sorting moment worsens (S13 864 → 1263 at ψa 64). Under HS the sign flips: HS + A at ψa 32 scores 335.6 against 364.1, through the sorting, score and staffing moments, with growth worse.
+- *Total ability.* It adds ψa times the pupils' log gap to Δlog Q, a quality gap created by enrollment. Income sorting reaches SI 0.50 at ψa 1, partly by income composition (Q-adjusted wage gap 0.038), but the score, growth and FTE gaps are far off (S13 3949).
+- *Adults' human capital.* The mean version carries quality across generations, with a multiplier 1/(1 − 0.5ψa); there is no convergent equilibrium beyond ψa ≈ 2. Otherwise it behaves like mean ability. The total version is the mean version plus total ability's scale term (SI 0.62 at ψa 1).
+- *Reading.* No specification sorts households by ability (children's ability gap ≤ 0.008 SD). Income composition sorts only in the totals at ψa ≈ 1, with score and growth gaps far off, and SEDA growth bounds every specification. The baseline is unchanged.
+
+**CCS with the six eligible mechanisms (2026-11-02; done; [§4](#ccs-with-the-six-eligible-mechanisms-2026-11-02)).** Constant class size was combined with the eligible mechanisms. The variants were the simple model, $K_d$ = 12 and θ (ρ 0.3), and every fit was refitted exactly: 161 refits, all 64 combinations under simple CCS and under $K_d$ = 12.
+- *Compatibility.* Every mechanism is correctly supported under CCS, and all fits are exact. The only code change is inert diagnostic keys (the pad and the adults' own draw by residence).
+- *$K_d$ = 12.* Nearly neutral and additive: CCS costs 18–34 S13 points, and the mechanisms' effects are the factorial's. Best HS/HSP 383 against 364.
+- *$K_d$ = 1.* The first-stage miss (ρ_pc ≈ 0.30) costs 406–429 in every combination; no mechanism fixes it. S, L and C pass the registered "mitigates" rule only through z² convexity. θ adds nothing beyond relabelling.
+- *Sorting.* CCS amplifies no mechanism's income sorting: the largest CCS × m effect on SI is 0.006. Draw luck sorts only through H, negligibly. The baseline is unchanged.
 
 **2026-10-16 round (done; [§4](#round-2026-10-16-measurement-concepts-the-teacher-quality-route-and-a-simpler-comparison)).** The pre-registered selection, under the original targets, is **P·TB·Y·D0·ρ**. It is the first candidate of these rounds to meet every criterion (under the round's pre-registered A4 rule for fits without college and A5 rule for overidentified fits), and it becomes the development candidate in place of C4′. The September fit stays the reference.
 - *What it is.* The core model with the S1 split, the income taste Y, the D0 staffing closure and the simple 2026-10-02 teacher block TB in place of college and licensure, with CFR read at ρ = 0.3.
@@ -37,7 +49,7 @@ Companion to [spatial_calibration.md](spatial_calibration.md): target definition
 - *Checks passed.* The Nz = 13 grid, identification (condition number 22.4) and an 8-start multistart.
 - *Block removal.* Replacing M3 with TB improves the score by 19.1 with 7 fewer parameters, 14.1 of it in the teacher-pay block that TB targets (5.0 without that block). Removing TB costs 404.5, all of it in the teacher-pay block.
 - *Remaining misses.* V4 and V6z (z −5.3, +4.9), V1 (+3.2) and the gender gap (+5.7). Within race (concept R) the selection instead fits V4 and V6z but overshoots V1 (+8.8 SE) and V6a (−5.5 SE, by construction, since V6a is targeted at its O value). At a fixed workplace, teacher sorting by pay-relevant human capital is 3.4 times the PUMS.
-- *Open.* The race concept and household structure are the user's decisions; sample and payroll alignment, the in-equilibrium first stage and the full bootstrap remain before adoption.
+- *Open.* The race concept and household structure are the authors' decisions; sample and payroll alignment, the in-equilibrium first stage and the full bootstrap remain before adoption.
 
 **2026-10-05 round:** a pre-registered comparison of the 10-03 mechanisms selects **C4′** (residence/workplace split + college choice + priced suburban access; [§4](#model-experiments-2026-10-05)). Its validation score is about a third of the baseline's, but the household-sorting misses remain, so the 09-29 fit stays the reference until a specification is adopted.
 
@@ -55,7 +67,7 @@ Companion to [spatial_calibration.md](spatial_calibration.md): target definition
   - It fails A5's grid check: re-solved at Nz = 9 with the same parameters, the score gap moves 0.32 SE. Re-fitted at
     Nz = 9, its moments are unchanged. **C4′ therefore stays the development candidate.**
   - It is a reduced form. ζ_BA ≈ 1.39 utils is weakly identified, because V6a saturates. Earnings and scores overshoot (+5.3 and +3.4 SE). Teachers' residence and net-commuting gaps are 5 and 20 times the data.
-- *Hold-out.* B1, the BA share by residence, stays sealed until the user instructs otherwise (amendment 5). S1·R·E predicts +0.57.
+- *Hold-out.* B1, the BA share by residence, stays sealed until the authors instruct otherwise (amendment 5). S1·R·E predicts +0.57.
 
 - [External inputs and first stage](#1-external-inputs)
 - [Internal targets and validation](#2-internal-calibration)
@@ -67,7 +79,7 @@ Companion to [spatial_calibration.md](spatial_calibration.md): target definition
 
 | Issue | Evidence and implication |
 |---|---|
-| Household sorting | Earnings gap −0.010 versus 0.112; score gap 0.061 versus 0.289 SD; poverty +0.2 versus −8.9 pp. Tested parameter and weighting changes do not resolve these misses. C4′ reaches only 0.034, 0.082 and −2.3 pp. The own-AFQT sorting miss replicates in NLSY97 (2026-10-05). Local peer effects in school quality add no sorting (2026-10-07). Persistence does not help either: raising ρz to 0.90 moves V6a by −0.004, because school quality is worth only ≈0.002 utils to parents against σν = 0.25. A BA-graded suburban amenity reaches V6a only by also moving teachers (2026-10-15). With the non-pecuniary staffing closure R it reaches V6a, V6z and poverty with staffing matched (S1·R·E, $S_{1015}$ 105). But it does so as a weakly identified reduced form, with ζ_BA ≈ 1.4 utils. It overshoots earnings and scores, puts teachers' residences in the suburb at five times the data gap, and fails the Nz = 9 grid check (2026-10-15b). Income-graded sorting (Y) with a staffing closure matches V6a (targeted) and most of V3, and overshoots V1 by about 3 SE. V6z still misses by about 5 SE. V4 misses by 2.3–4.7 SE at ρ = 1 and by 5.3 SE in the selection (P·TB·Y·D0·ρ), where ρ = 0.3 trades V4 for growth. Within race (the R bound), the ρ = 0.3 fits come close on V4 and V6z (selection +0.7 and +1.3 SE), while V1 and V6a overshoot (+8.8 and −5.5 SE, the latter by construction). At ρ = 1 the closure fits instead overshoot V4 and growth by up to 5 and 7 SE (2026-10-16). |
+| Household sorting | Earnings gap −0.010 versus 0.112; score gap 0.061 versus 0.289 SD; poverty +0.2 versus −8.9 pp. Tested parameter and weighting changes do not resolve these misses. C4′ reaches only 0.034, 0.082 and −2.3 pp. The own-AFQT sorting miss replicates in NLSY97 (2026-10-05). Local peer effects in school quality add no sorting (2026-10-07). Persistence does not help either: raising ρz to 0.90 moves V6a by −0.004, because school quality is worth only ≈0.002 utils to parents against σν = 0.25. A BA-graded suburban amenity reaches V6a only by also moving teachers (2026-10-15). With the non-pecuniary staffing closure R it reaches V6a, V6z and poverty with staffing matched (S1·R·E, $S_{1015}$ 105). But it does so as a weakly identified reduced form, with ζ_BA ≈ 1.4 utils. It overshoots earnings and scores, puts teachers' residences in the suburb at five times the data gap, and fails the Nz = 9 grid check (2026-10-15b). Income-graded sorting (Y) with a staffing closure matches V6a (targeted) and most of V3, and overshoots V1 by about 3 SE. V6z still misses by about 5 SE. V4 misses by 2.3–4.7 SE at ρ = 1 and by 5.3 SE in the selection (P·TB·Y·D0·ρ), where ρ = 0.3 trades V4 for growth. Within race (the R bound), the ρ = 0.3 fits come close on V4 and V6z (selection +0.7 and +1.3 SE), while V1 and V6a overshoot (+8.8 and −5.5 SE, the latter by construction). At ρ = 1 the closure fits instead overshoot V4 and growth by up to 5 and 7 SE (2026-10-16). Stronger peer effects, and peer inputs of total ability or adults' human capital, amplify or create school-quality gaps but not ability sorting. The totals sort income only at magnitudes whose score, growth and staffing gaps miss by 6–50 SE (2026-10-25). |
 | Teacher allocation | Salary fit implies FTE/pupil +0.023 versus −0.018 and SEDA growth 0.012 versus 0.003 SD/grade. With a residence/workplace split and positively selected teachers (C4′): +0.020 and 0.013. The split's staffing-ratio response to suburban pay is ≈31. Audited on 2026-10-15: C4′'s workplace nest is hypersensitive, with a small-district elasticity ≈68 against 1.4–3.7 in the literature. The repair S1 (ρw = 1 plus a commuting friction) gives a full-GE own-location elasticity of 1.6. With realistic supply, however, a salary-matched δκ over-staffs the suburb (FTE +0.064), and an FTE-matched δκ cuts suburban pay (−0.040) and removes the suburb's school-quality edge. The model lacks a demand side or position rationing ([§4](#model-experiments-2026-10-15)). A non-pecuniary workplace taste $b_T$ (closure R) matches FTE and salary together. On its own, like SC, it removes the suburb's school-quality edge (2026-10-15b). With Y, teacher quality follows teachers' own predicted income. At a fixed workplace, the selected candidate's teacher pay contrast by residence is 3.4× the PUMS (0.073 versus 0.021), although growth is matched with CFR's ρ = 0.3 (2026-10-16). |
 | Teacher education and selection | Baseline: schooling ratio 0.76 versus 1.18; teacher pay well below market pay; teachers' ability −0.29 SD versus +0.61. The college choice with licensure (M3) gives 1.14, premia −0.10/+0.01 versus +0.06/+0.09, and ability +0.55 SD (−0.29 versus BA non-teachers, data −0.33), without a schooling floor or teacher utility costs. Still missed: MA premium 0.07 versus 0.16; non-BA teachers' schooling 0.37 versus 0.52. The regular Roy model ($\gamma=1$) brings baseline teacher pay to market pay (premia −0.09/+0.01) but removes selection (0.00 SD) and raises teachers' 90/10 to 3.75 versus 2.77. Under M3 it overpays teachers (+0.25/+0.37) (2026-10-07). Without college, the simple teacher block TB (schooling requirement plus ability-graded cost) matches both premia and teachers' latent z (+0.61 SD), all three of them TB's targets (2026-10-16). |
 | Occupational wages | Cell wage levels and dispersion are missed. The market gender log-wage gap is 0.30 versus 0.10, and 0.36 under M3. In the 2026-10-16 selection (TB, no college) it is 0.39, with a cell-wage correlation of 0.11. |
@@ -518,7 +530,7 @@ Five fits did not reach an exact fit and were stopped. Their best iterates were 
 - *U.* Moving costs in utils release poor households and give the best score (S1·U, 279). But they remove the rise of mobility with own ability, which the criterion written for this risk rejects.
 - *E.* The BA amenity matches V6a but carries BA teachers (87% BA) to the suburb, so it fails allocation by a wide margin.
 - *Outcome of round a.* No candidate meets the criteria, and C4′ stays the development candidate. In the follow-up round, S1·R·E meets every criterion except A5's grid check ([below](#follow-up-round-2026-10-15b-a-non-pecuniary-staffing-closure)).
-- *Hold-out.* The sealed B1 (BA share by residence) has not been opened: the repository's standing instruction requires the user's explicit go-ahead (amendment 5). Model counterparts range from +0.007 (C4′) to +0.30 (S1·E) and +0.57 (S1·R·E).
+- *Hold-out.* The sealed B1 (BA share by residence) has not been opened: the repository's standing instruction requires the authors' explicit go-ahead (amendment 5). Model counterparts range from +0.007 (C4′) to +0.30 (S1·E) and +0.57 (S1·R·E).
 
 **Persistence and family inputs** (exploratory, `exp-1015/explore/`). Raising $\rho_z$ from 0.58 to 0.90 at fixed ϑ, with $s_z$ held, moves V6a by −0.004 at C4′ and at S1, V6z by −0.008 and −0.012, and the score gap by 0.02–0.03. A family component known to parents works through the same predictable-ability term, so this bounds it from above. The suburb's school quality is worth about 0.002 utils to parents, against a taste scale $\sigma_\nu$ = 0.25. The reason is that λ is pinned by the BFM WTP and $\Delta\log Q$ by SEDA growth. No transmission mechanism that runs through school quality can amplify a force that small, so shared family inputs are not the next candidate.
 
@@ -565,7 +577,7 @@ Round b's PREREG writes the grid check into A5 "for a selected candidate". Round
 - *Teacher premia rise to +0.13/+0.24* (data +0.06/+0.09). The pay level offsets the suburban workplace penalty.
 - *Directional mobility by own AFQT becomes too sorted.* City→suburb is 0.12 and 0.57 for the bottom and top terciles (data 0.28 and 0.51). The own-AFQT move gap is +3.0 pp against +7.8.
 - *ζ_BA ≈ 1.39 utils* is 5.6 σν and weakly identified.
-- *The BA-share counterpart is +0.57,* against C4′'s +0.007. The sealed B1 tests exactly this; it has not been opened (amendment 5; A7 waits for the user's instruction).
+- *The BA-share counterpart is +0.57,* against C4′'s +0.007. The sealed B1 tests exactly this; it has not been opened (amendment 5; A7 waits for the authors' instruction).
 
 **Reading.** S1·R·E shows what the model needs: a sorting force that reaches V6a and V6z with poverty, together with staffing held by something other than pay. It also shows what the next mechanism must avoid. It should sort households by income without drawing teachers' residences five times past the data, and without overshooting earnings and scores.
 
@@ -716,7 +728,7 @@ Notes:
 
 **Block removal** (refits; the change in S_1015 when the block is removed):
 - *College and licensure (M3).* Replacing M3 with TB lowers S_1015 by 19.1 with 7 fewer parameters (M·Y·D0 at r_p = 0 → P·TB·Y·D0).
-  - So the simplification the user preferred costs little fit. TB targets the premia and teachers' latent z, which M3 produced untargeted, so most of the gain (−14.1) is in the teacher-pay block. Without that block, which is the comparison the PREREG requires for TB against M3, S_1015 still falls by 5.0 (135.3 → 130.3): seven fewer parameters (−14 in 2k) outweigh a rise of 9.0 in Σz² in the other blocks.
+  - So the preferred simplification costs little fit. TB targets the premia and teachers' latent z, which M3 produced untargeted, so most of the gain (−14.1) is in the teacher-pay block. Without that block, which is the comparison the PREREG requires for TB against M3, S_1015 still falls by 5.0 (135.3 → 130.3): seven fewer parameters (−14 in 2k) outweigh a rise of 9.0 in Σz² in the other blocks.
   - Without either block (P·TB·Y·D0 → P·Y·D0), S_1015 rises by 404.5. The teacher-pay block rises by more than that (+444.1); S without that block falls by 39.7 (130.3 → 90.6). Teachers are then negatively selected (latent z −0.29, A4 ✗) and their premia fall to −0.72/−0.63.
 - *Y.* +347.6 without college, +190.1 with it.
 - *D0.* +658.8: without a staffing closure, Y prices teachers out of the suburb (S1·Y·D0 → S1·Y).
@@ -781,14 +793,14 @@ Notes:
 
 The working log has the errata.
 
-**Decisions for the user.**
+**Open decisions.**
 1. *Race concept.* Under O the selection misses V4 and V6z by about 5 SE. Under R it fits them but overshoots V1 and V6a (V6a by construction, since it is targeted at its O value). A race-consistent target set needs a within-race first stage, or a group dimension in the model.
 2. *Teacher sorting.* The remaining untargeted teacher-sorting miss is the fixed-workplace pay contrast, at 3.4× the data. By the interpolation above (at the ρ = 1 fits; not a model run), teachers' location taste would have to be about 60–80% as income-graded as non-teachers'. Household structure, with spouses' income in the location choice, is the structural candidate; a partial-grading re-solve at fixed ϑ would be a cheap first check of it. The I2 sensitivity shows that the V6a target itself depends on household structure.
-3. *Adoption.* Three checks remain before P·TB·Y·D0·ρ could replace the September baseline: sample and payroll alignment, the in-equilibrium first stage (it holds the first stage's aggregates but misses the gender gap and cell wages; see *Checks*), and the full bootstrap. Opening B1 is the user's call.
+3. *Adoption.* Three checks remain before P·TB·Y·D0·ρ could replace the September baseline: sample and payroll alignment, the in-equilibrium first stage (it holds the first stage's aggregates but misses the gender gap and cell wages; see *Checks*), and the full bootstrap. Opening B1 is the authors' call.
 
 ### Fertility shock (2026-10-18)
 
-The user asked for a binary child shock: whether an adult has a child, drawn with an exogenous probability at the transition to adulthood together with the location taste shocks, acting as a 0/1 multiplier on the altruism term, with the probability set to the empirical fertility rate. The model was then re-estimated. The intent is a group of adults who choose a location only for taxes, amenities and their own tastes, not for their children's schooling.
+This round adds a binary child shock: whether an adult has a child, drawn with an exogenous probability at the transition to adulthood together with the location taste shocks, acting as a 0/1 multiplier on the altruism term, with the probability set to the empirical fertility rate. The model was then re-estimated. The intent is a group of adults who choose a location only for taxes, amenities and their own tastes, not for their children's schooling.
 - **Files.** `runs/fertility-20261018/` (untracked): `LOG.md` has the specification fixed before the runs, every command, job ID and output. The code before the change is frozen and hash-listed in `runs/_code/pre-fertility-20261018/`. The model spec note is unchanged under the 2026-10-18 policy; the switch is documented here and in the header and §3d of `spatial_continuous.jl`.
 - **Specification.** `Params.pkid` is an external input, with 1 (the default) as the old model.
   - At the transition to adulthood, after occupation and (s, e) and with the location taste shocks ν, each young adult draws d ~ Bernoulli(pkid). Parents value a location by μ log C + Λ(z, l′) + taste terms. The childless drop Λ and keep everything else: taxes, housing and moving costs, ΔB, and the income and education tastes where they are on.
@@ -851,10 +863,11 @@ The baseline column is `runs/exp-1016/reeval/c0`, the September fit re-evaluated
   - A data counterpart for the new untargeted moment, children per adult by location: the model predicts no gap (0.0003). It needs a district-level ACS table of children or households with children per adult. The table of adults 25+ that was first considered also feeds the sealed B1 hold-out, so it was not opened.
   - A variant in which the childless keep part of Λ.
 - **Decision.** None is needed for the baseline. Under the 2026-10-18 policy the September fit stays the baseline. This is a documented experiment and the model spec note is unchanged. Adopting pkid = 0.802 would change only λ.
+- **Parents vs childless (2026-10-26, for the paper's authors).** Re-solves of the four fertility fits split into parents and the childless (`runs/fertility-20261018/LOG.md`, jobs 6475216, 6475218, 6475221–2; no refit). Under the uniform shock the groups coincide: suburb share 0.5930 vs 0.5926 at the baseline and 0.5936 vs 0.5933 at the development candidate, identical ability, income, consumption and teacher share, and the same suburb share by own-income tercile. With the data's ability gradient (pkid_z = −0.15) the childless are 0.15 SD more able and earn and consume about 3.2 log points more. At the development candidate the income taste then puts them in the suburb 0.5 pp more often, but within an own-income tercile they still locate like parents. Any difference is composition, not a child-driven location motive.
 
 ### Ability-graded fertility shock (2026-10-18b)
 
-The user asked to make the fertility shock depend on ability (or income), to reflect the fertility literature's view that children are a normal good, and to see whether that could affect the calibration.
+This round makes the fertility shock depend on ability (or income), to reflect the fertility literature's view that children are a normal good, and asks whether that affects the calibration.
 - **Files.** `runs/fertgrad-20261018/` (untracked).
   - `LOG.md` has the specification fixed before the runs, the review, every command, job ID and result.
   - The code before the switch is frozen and hash-listed in `runs/_code/pre-fertgrad-20261018/`.
@@ -914,7 +927,7 @@ The young's mean log z moves by −0.040, +0.040 and +0.128 ergodic SDs. Conditi
 
 ### Factorial round: the six eligible mechanisms in every combination (2026-10-19)
 
-The user asked which combination of the six mechanisms eligible under the 2026-10-19 adoption scope fits untargeted moments best, and which combinations induce spatial sorting on income. The six are commuting (C), local housing costs (H), fertility shocks (F), an education-based salary schedule (S), licensure (L) and peer effects (P). All 2⁶ = 64 combinations were refitted. This is an experiment: the baseline, targets and model spec are unchanged, and no excluded mechanism is used (no tastes graded by income, ability or BA; no teaching costs; no college; no staffing closures R/D).
+This round asks which combination of the six mechanisms eligible under the 2026-10-19 adoption scope fits untargeted moments best, and which combinations induce spatial sorting on income. The six are commuting (C), local housing costs (H), fertility shocks (F), an education-based salary schedule (S), licensure (L) and peer effects (P). All 2⁶ = 64 combinations were refitted. This is an experiment: the baseline, targets and model spec are unchanged, and no excluded mechanism is used (no tastes graded by income, ability or BA; no teaching costs; no college; no staffing closures R/D).
 - **Files.** `runs/factorial-20261019/` (untracked): `PREREG.md` (design, magnitudes, scores, fixed before the fits), `LOG.md` (every job, command and result), `lit_memo.md` (the literature behind the magnitudes), `scores.md` and `scores.csv` (`factorial_score.py`), `gen_cases.py`, `tests/sched_check.jl`. Fits are in `runs/exp-factorial/<case>` (with `_nz13` re-solves). The code before the change is frozen in `runs/_code/pre-factorial-20261019/`; the run code is `runs/_code/factorial-r1/`.
 - **New switch.** `Params.schedT` (NaN = off) is the salary schedule without college. Teacher pay is κ_w h^γ (s/sBA)^{schedT − γφ}, so a teacher's pay elasticity in her schooling time share is schedT, and the rest of h is paid with the compression γ. With the switch off, the code is bit for bit the old code: 199 moments and the solution arrays agree, bundled and split (jobs 6198397–8). An Opus review found no bug. It confirmed that the time share is the numerical optimum, including at the licensure floor. The other five mechanisms are existing switches.
 - **Magnitudes** (fixed; none estimated):
@@ -990,7 +1003,329 @@ Teachers' latent z is −0.22 to −0.29 SD in every combination (data +0.61), a
   - Fertility and peer effects add nothing measurable.
   - Teacher selection on ability (+0.61 SD) and the gender gap are untouched by any of the six.
 - **Not done.** An endogenous housing market (rents, quantities), a staffing closure for C, and teacher ability selection are outside the current scope. Within-race targets (§5) would lower the sorting the model must produce.
-- **Decision.** None is needed. The baseline and the model spec are unchanged, and any adoption remains the user's decision.
+- **Decision.** None is needed. The baseline and the model spec are unchanged, and any adoption remains the authors' decision.
+
+### Peer-effect strength and specification (2026-10-25)
+
+This round asks three questions about local peer effects: (1) what a much stronger peer effect does, and whether it delivers the missing sorting; (2) what happens if the **total** ability of a location's students enters the human-capital technology instead of their mean; (3) what happens if the **total or mean human capital of the adults** in a location enters instead. Each alternative is a switch, off by default, and each was refitted to the September targets. This is an experiment: the baseline, targets and model spec are unchanged.
+- **Files.** `runs/peer-20261025/` (untracked): `DESIGN.md`, `LOG.md` (every job, command and result, the code review and the fact-check errata), `gen_cases.py` and the case lists, `peer_score.py` → `scan_scores.md`, `scan2_scores.md`, `refit_scores.md` (and `.csv`), `doc_tables.py` (the tables below, read from the fits), `tests/`, `trace/`. Fixed-ϑ evaluations are in `runs/exp-peer2/scan/` and `scan2/`, refits in `runs/exp-peer2/<case>` (with `_nz13` re-solves). The code before the change is frozen in `runs/_code/pre-peer-20261025/`; the runs used `runs/_code/peer-r1/`.
+- **Specifications.** School quality is $Q_l=Q_{T,l}\,P_l^{\psi_a}$, with $Q_{T,l}=(2\tilde H_{T,l}/M_l)^\sigma$ the teacher index and $P_l$ the peer input; the solver's fourth aggregate is $\log P_l$. Every mean is geometric, and "total" is number × mean relative to an average location's, so the four specifications differ by single terms:
+
+  | Spec | Switches | $\log P_l$ |
+  |---|---|---|
+  | A, mean ability (the 2026-10-07 default) | none | $\log\bar a_l$ = students' mean log $z$ minus its ergodic mean |
+  | B, total ability | `--external peer_total=1` | $\log(n_l/\bar n)+\log\bar a_l$, $n_l$ the students of $l$, $\bar n$ their mean over locations |
+  | C, mean adult human capital | `--external peer_input=hc` | $\log\tilde h_l$ = adult residents' mean log $h$ minus the economy-wide adult mean |
+  | D, total adult human capital | both | $\log(m_l/\bar m)+\log\tilde h_l$, $m_l$ the adult residents of $l$ |
+
+  - The Params fields are `peer_input` (`:ability`, `:hc`) and `peer_total`; ψa is ϑ entry `ψ_a` as before (`--fix psi_a=x`). Adults are every old agent residing in $l$ (teachers, market workers, home producers; by residence under the split), with the human capital they acquired where they grew up ($h_T$ for teachers, $h_O=Q(z\epsilon_{i^*})^\alpha s^\phi e^\eta$ for the others; `adult_log_h`).
+  - C's reference is the endogenous adult mean, so C moves quality across locations, like A. A level reference would feed Q back into its own level.
+  - The scale term of B and D adds $\psi_a$ times the pupils' log gap, a **targeted** moment (0.376), to $\Delta\log Q$: it creates a quality gap from enrollment rather than amplifying one. It also raises the economy-wide mean log Q by $0.0174\,\psi_a$ at the baseline shares; A and C leave the level unchanged.
+  - Adults and students have the same location distribution in a stationary equilibrium without the fertility shock. Hence D − C = B − A exactly: D is C plus B's scale term.
+  - A new solver keyword `la_start` (`--grid la_start=x`) starts the fixed point from a sorted peer input, to look for multiple equilibria.
+- **Code checks.**
+  - At ψa = 0 every switch setting reproduces the old code bit for bit at the baseline fit (all 296 moments), and so do A and D under the split (310). A at ψa = 0.1 (the factorial's P) does too, bundled and split.
+  - The adults' log h integral agrees with a pseudo-sample and a brute-force sum to within 1e−5.
+  - The counterfactual re-solve holds $P_l$ fixed in every specification.
+  - An independent review found no bug that changes results. It flagged the convergence limit below, that small `la_start` values are not sorted starts under B/D (starts of ±0.4 were added), and the level effect of B/D. Its nits were fixed in the main tree after the run snapshot; none changes a computed result.
+- **Estimation.**
+  - Fixed-ϑ scans at the Nz = 9 baseline fit: 31 specification–magnitude pairs (A at ψa 0.1–256, B 0.05–2, C 0.1–2, D 0.05–1.5), each from the unsorted start and two sorted starts (log P gap ±min(0.2, 4/ψa)): 93 runs, 80 converged. B and D also ran at ψa 0.25, 0.5 and 1 from la_start ±0.4, a log P gap of ±0.8, beyond the scale term's own 0.376. A further 12 runs were at the HS fit.
+  - Refits: the September eight parameters to the eight September targets, ψa fixed, by LM at Nz = 9. 19 refits started from the baseline fit and 10 from the HS fit (housing $r_p=0.020$, salary schedule 1.74).
+  - All 29 refits converge, with criterion ≤ 1e−16 except D at 0.1 (1.2e−10, residuals ≈ 1e−5 SE).
+  - The Nz = 13 re-solves of all 29 move no scored moment by more than 0.15 SE (largest 0.145, A at ψa 64).
+  - At HS + A, ψa 32, a 4-start multistart (±15%) returns to the fit ($|\Delta\vartheta|\le3\times10^{-10}$). The Jacobian's condition number is 63.5 (baseline 30.3, HSP 35.5).
+- **Results** (refits; scored as in the factorial round, every S13 moment untargeted; SI = mean of V1/0.112, V3/−0.089 and V6a/−0.187; gaps suburb − city):
+
+  | Fit | S13 | SI | V1 earnings | V3 poverty | V4 score | V6a | V2 FTE/pupil | V5 growth | Δlog Q: teachers / peers | Children's z gap (SD) | Adults' log h gap | δκ |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | Data | — | 1 | 0.112 | −0.089 | 0.289 | −0.187 | −0.018 | 0.0031 | | | | |
+  | Baseline (ψa = 0) | 864.1 | −0.06 | −0.010 | 0.002 | 0.061 | 0.011 | 0.023 | 0.0119 | 0.015 / 0.000 | −0.0050 | −0.008 | 0.0045 |
+  | A, mean ability, ψa 0.1 (factorial P) | 864.3 | −0.06 | −0.010 | 0.002 | 0.060 | 0.011 | 0.024 | 0.0119 | 0.015 / −0.000 | −0.0050 | — | 0.0045 |
+  | A, ψa 1 | 866.0 | −0.06 | −0.010 | 0.003 | 0.059 | 0.011 | 0.025 | 0.0117 | 0.016 / −0.001 | −0.0050 | −0.008 | 0.0048 |
+  | A, ψa 4 | 872.1 | −0.06 | −0.011 | 0.003 | 0.056 | 0.012 | 0.029 | 0.0111 | 0.018 / −0.004 | −0.0051 | −0.009 | 0.0057 |
+  | A, ψa 16 | 904.0 | −0.08 | −0.014 | 0.005 | 0.040 | 0.014 | 0.049 | 0.0083 | 0.027 / −0.017 | −0.0054 | −0.011 | 0.0095 |
+  | A, ψa 32 | 971.4 | −0.11 | −0.018 | 0.007 | 0.017 | 0.018 | 0.080 | 0.0041 | 0.042 / −0.037 | −0.0059 | −0.015 | 0.0154 |
+  | A, ψa 64 | 1263.1 | −0.19 | −0.030 | 0.014 | −0.048 | 0.028 | 0.162 | −0.0074 | 0.082 / −0.092 | −0.0073 | −0.026 | 0.0314 |
+  | C, mean adult h, ψa 0.5 | 873.1 | −0.07 | −0.011 | 0.003 | 0.055 | 0.012 | 0.030 | 0.0110 | 0.018 / −0.004 | −0.0051 | −0.009 | 0.0058 |
+  | C, mean adult h, ψa 1 | 885.8 | −0.07 | −0.012 | 0.004 | 0.049 | 0.013 | 0.038 | 0.0098 | 0.022 / −0.010 | −0.0052 | −0.010 | 0.0074 |
+  | C, mean adult h, ψa 1.75 | 917.3 | −0.09 | −0.015 | 0.005 | 0.035 | 0.015 | 0.056 | 0.0074 | 0.031 / −0.021 | −0.0055 | −0.012 | 0.0108 |
+  | B, total ability, ψa 0.1 | 830.5 | −0.00 | −0.002 | −0.002 | 0.105 | 0.004 | −0.033 | 0.0199 | −0.013 / 0.038 | −0.0040 | −0.000 | −0.0065 |
+  | B, total ability, ψa 0.25 | 921.8 | 0.08 | 0.010 | −0.010 | 0.172 | −0.007 | −0.119 | 0.0318 | −0.054 / 0.094 | −0.0026 | 0.011 | −0.0230 |
+  | B, total ability, ψa 0.5 | 1453.9 | 0.22 | 0.030 | −0.022 | 0.282 | −0.025 | −0.261 | 0.0518 | −0.123 / 0.188 | −0.0001 | 0.030 | −0.0506 |
+  | B, total ability, ψa 1 | 3949.2 | 0.50 | 0.071 | −0.047 | 0.493 | −0.060 | −0.547 | 0.0915 | −0.263 / 0.377 | 0.0047 | 0.068 | −0.1054 |
+  | D, total adult h, ψa 0.1 | 830.5 | −0.00 | −0.002 | −0.002 | 0.105 | 0.004 | −0.033 | 0.0199 | −0.013 / 0.038 | −0.0040 | −0.000 | −0.0065 |
+  | D, total adult h, ψa 0.25 | 931.5 | 0.08 | 0.011 | −0.010 | 0.175 | −0.008 | −0.123 | 0.0324 | −0.056 / 0.097 | −0.0025 | 0.012 | −0.0239 |
+  | D, total adult h, ψa 1 | 5671.0 | 0.62 | 0.089 | −0.058 | 0.580 | −0.076 | −0.675 | 0.1089 | −0.325 / 0.462 | 0.0068 | 0.085 | −0.1295 |
+  | HS (ψa = 0) | 364.1 | 0.10 | 0.012 | −0.012 | 0.069 | −0.012 | 0.023 | 0.0117 | 0.015 / 0.000 | 0.0045 | 0.015 | 0.0057 |
+  | HSP: HS + A, ψa 0.1 | 364.0 | 0.10 | 0.012 | −0.012 | 0.069 | −0.012 | 0.022 | 0.0117 | 0.015 / 0.000 | 0.0045 | — | 0.0057 |
+  | HS + A, ψa 16 | 343.6 | 0.12 | 0.015 | −0.014 | 0.089 | −0.015 | 0.000 | 0.0153 | 0.004 / 0.016 | 0.0050 | 0.018 | 0.0015 |
+  | HS + A, ψa 32 | 335.6 | 0.15 | 0.019 | −0.016 | 0.115 | −0.019 | −0.027 | 0.0199 | −0.010 / 0.035 | 0.0056 | 0.021 | −0.0037 |
+  | HS + C, ψa 1 | 341.3 | 0.13 | 0.016 | −0.014 | 0.093 | −0.016 | −0.003 | 0.0160 | 0.002 / 0.018 | 0.0051 | 0.018 | 0.0008 |
+  | HS + C, ψa 1.5 | 335.6 | 0.15 | 0.018 | −0.016 | 0.110 | −0.018 | −0.022 | 0.0190 | −0.007 / 0.031 | 0.0055 | 0.021 | −0.0026 |
+  | HS + B, ψa 0.1 | 336.2 | 0.16 | 0.020 | −0.017 | 0.119 | −0.020 | −0.031 | 0.0206 | −0.012 / 0.038 | 0.0056 | 0.022 | −0.0044 |
+  | HS + B, ψa 0.25 | 434.0 | 0.24 | 0.031 | −0.024 | 0.194 | −0.031 | −0.112 | 0.0341 | −0.052 / 0.094 | 0.0074 | 0.033 | −0.0197 |
+  | HS + D, ψa 0.1 | 336.9 | 0.16 | 0.020 | −0.017 | 0.122 | −0.020 | −0.034 | 0.0211 | −0.013 / 0.040 | 0.0057 | 0.022 | −0.0050 |
+
+  The children's z gap is the students' Δ mean log z in SDs of log z. The adults' log h gap for the baseline and HS rows comes from the new code at the same ϑ.
+
+**1. Strength.** A stronger mean-ability effect amplifies whatever ability sorting the rest of the model produces. It does not initiate sorting.
+- **No multiple equilibria found.** At the fixed baseline ϑ, every converged case returns the same equilibrium (to solver tolerance) from all three starts, at every ψa up to 64.
+  - Relative to its value at ψa 0.1, the students' log ā gap is 1.06× at ψa = 4, 1.28× at 16, 1.79× at 32 and 8.6× at 64.
+  - At 128 and 256 no stationary equilibrium is found from any start; at 128 the iteration oscillates (`trace/`). Unstable equilibria were not searched for.
+- **Sign.** At the baseline the students' ability is very slightly higher in the city (−0.005 SD), and so is the adults' human capital (−0.008). A peer effect therefore lowers the suburb's quality, and every sorting moment moves away from the data as ψa rises.
+- **Refits.** The refit holds the salary gap by raising δκ (0.0045 → 0.031 at ψa 64). That draws teachers to the suburb: the teacher part of Δlog Q rises to +0.082, offsetting most of the peer part (−0.092). The FTE gap overshoots (+0.16, z +13.7).
+  - S13 is 866 (ψa 1), 904 (16), 971 (32) and 1263 (64), against 864.
+  - At fixed ϑ, ψa 64 scores 15919. The refit keeps the total Q gap small (−0.009), so the loop stays weak.
+  - The children's ability gap stays between −0.005 and −0.007 SD.
+- **Under HS the sign flips.** At the HS fit, students are slightly abler in the suburb (+0.0045 SD) and adults' log h is higher there (+0.015), so strong peers move quality to the suburb.
+  - HS + A at ψa 32 scores S13 335.6 (HS 364.1; HSP, at ψa 0.1, 364.0), below all 64 factorial combinations at their registered magnitudes (the factorial's housing-charge sensitivities at r_p 0.035 and 0.058 scored 317.6 and 271.4).
+  - Of the 28.5-point gain, the sorting moments contribute 21.5 (V1, V3 and V6a each improve by 0.4–0.5 SE), the score gap 17.2 (z −6.8 → −5.3) and staffing 13.2 (FTE z +3.1 → −0.7, payroll per pupil +2.1 → −0.5). Growth costs 23.4 (z +2.9 → +5.6).
+  - Ability sorting barely moves: the children's ability gap is 0.0056 SD (HS 0.0045), and the Q-adjusted wage gap 0.0095 (0.0064). SI is 0.15 (HS 0.10).
+  - The magnitude is 200–1000 times the literature's school-grade and cohort range (0.03–0.16; factorial memo).
+- **Reading.** Parents value school quality far too little (λ is pinned by the BFM WTP) for the quality gaps this specification produces to sort households, so what a strong peer effect amplifies is school quality, not composition. SEDA growth bounds it, as in 2026-10-07.
+
+**2. Total ability (B).** The scale term creates a quality gap from enrollment. Even at ψa 0.1 it adds 0.038 to Δlog Q, 2.5 times the baseline's teacher part.
+- **Refits.** Suburban teachers grew up in better schools, so the refit holds the salary gap by lowering δκ: −0.0065 at ψa 0.1, −0.105 at 1. The suburb's teachers per pupil then fall: FTE −0.033, −0.12 (0.25), −0.55 (1). The teacher part of Δlog Q turns negative, and the scale term carries the suburb's quality.
+- **Fit.** S13 is 837.9 at ψa 0.05 and 830.5 at 0.1, slightly below the baseline's 864: at 0.1 FTE improves from z +3.1 to −1.2 and V4 from −7.0 to −5.6, against growth (+2.9 → +5.6). It then rises steeply: 922 (0.25), 1454 (0.5), 3949 (1).
+- **Sorting.** SI is 0.08 (ψa 0.25), 0.22 (0.5) and 0.50 (1).
+  - At ψa 1, V1 is 0.071, V3 −0.047 and V6a −0.060; only D at ψa 1 sorts more (§3 below).
+  - It comes with V4 at 0.49 (z +6.3), growth at 0.092 (z +29.5) and FTE at −0.55 (z −40).
+  - Ability barely sorts: the children's gap stays ≤ 0.005 SD. Income composition does sort once the quality gap is large: the Q-adjusted wage gap is 0.009 at ψa 0.5 and 0.038 at 1, about half of the market-wage gap (0.073), against at most 0.013 in any factorial combination. At ψa 1, Δlog Q is 0.11, almost eight times the baseline's.
+- **Uniqueness.** The ±0.4 starts return to the same equilibrium at ψa 0.25, 0.5 and 1. At ψa 2 the iteration oscillates from the unsorted and city-favoured starts and converges only from +0.1 (S13 16956).
+- **Reading.** Total ability buys sorting moments only through a quality gap that scales with enrollment. That has no independent support, and it overshoots scores, growth and staffing many times over before income sorting reaches half the data. Growth rises by about 0.08 SD/grade per unit ψa at small ψa, from a baseline already 2.9 SE above the data.
+
+**3. Adults' human capital (C, D).**
+- **Mean (C).** Adults carry the quality of the place where they grew up, so the adults' gap feeds back on itself. It is its ψa = 0 value multiplied by 1/(1 − κψa), with a net feedback κ ≈ 0.50: the scan's gaps imply 0.506, 0.505 and 0.503 at ψa 1, 1.5 and 1.75. κ combines the persistence of residence (1 − p12 − p21 = 0.55 at the baseline) with the response of the teacher index.
+  - Beyond ψa ≈ 2 the damped fixed point cannot converge, at any damping. At ψa 2 it drifts monotonically towards the city (log P gap −0.51 after 150 iterations).
+  - At the baseline the sign is A's, so the refits to ψa 1.75 repeat A's pattern: S13 868 (0.25), 873 (0.5), 886 (1) and 917 (1.75).
+  - Under HS, C moves quality to the suburb. HS + C at ψa 1.5 scores 335.6 and lands on the same point as HS + A at 32 and HS + B at 0.1: Δlog Q ≈ 0.024–0.026, FTE −0.02 to −0.03, growth 0.019–0.021.
+- **Total (D).** D is C plus B's scale term, so it behaves like B. D at ψa 0.1 refits to B at 0.1 to every printed digit (830.5). D scores 931.5 at 0.25, 1598 at 0.5 and 5671 at 1; at ψa 1 it gives the most income sorting of the round (SI 0.62, Q-adjusted wage gap 0.051), with V4 0.58, growth 0.109 and FTE −0.68.
+- **Reading.** Adults' human capital is a stronger amplifier than students' ability because it carries quality across generations. Ability sorting still barely changes.
+
+**Overall.**
+- No specification sorts households by ability. The children's ability gap is at most 0.008 SD in absolute value in every refit (0.0077 at HS + D, ψa 0.25), and V6z (the own-AFQT gradient) stays at z +6.1 to +6.3.
+- The mean specifications (A, C) change only the school-quality gap, and SEDA growth bounds it.
+- The totals (B, D) create a quality gap from enrollment. They reach moderate income sorting (SI ≥ 1/3) only at ψa ≈ 1 (B 0.50, D 0.62), where income composition sorts too (Q-adjusted wage gap 0.038, 0.051), but the score, growth and staffing gaps then miss by 6–50 SE.
+- Within HS, strong mean-ability (ψa 32) or mean adult-h (1.5) peers, and the totals at the literature's central ψa 0.1, all reach S13 ≈ 336 against 364. They shift suburban quality from teachers to peers, improving staffing, the score gap and income sorting at the cost of growth. The mean forms need magnitudes far outside the literature; the totals rest on the unsupported scale term, and at ψa 0.25 they are worse than HS (434, 462).
+- **Not done.** Unstable stationary equilibria beyond the convergence limits (they would need a Newton solve on log P; they are unstable across generations), and peer effects in combinations other than HS.
+- **Decision.** None is needed. The baseline and model spec are unchanged, and the switches are off by default.
+
+### Constant class size and random teacher assignment (2026-10-26)
+
+This round builds a version of the model without Proposition 1's efficient class sizes. Classes are equal-sized within a location, students are randomly assigned to teachers, the realized teacher draw is a state of the young, and parents value a location by its whole teacher distribution. It also asks how the warm-glow kernel interacts with this (log utility, CRRA > 1). This is an experiment: the baseline, targets and model spec are unchanged.
+- **Theory.** `notes/spatial_teachers_model_ccs.md`. This round ran the general code ($K_d$ draws, CFR noise when `ccs_rho` < 1). The note now treats $K_d=1$, ρ = 1 as the main model (§§1–5: one teacher for all of school, $q=h_T^\beta N_l^{-\sigma}$) and $K_d$, ρ as its extension (§6); see the 2026-11-01 subsection below.
+  - Class size $N_l=S_l/n_{T,l}$ (equal within a location, endogenous). In the general form (note §6) the school input is $q=\prod_t(\theta_{j_t}^\beta N_l^{-\sigma})^{1/K_d}$ over $K_d$ independent draws of effectiveness $\log\theta=\log h_T+\nu$, so $\log q=\log\bar Q_l+\log r$ with $\log\bar Q_l=\beta\bar\ell_l-\sigma\log N_l$, $\bar\ell_l=\mathbb E[\log h_T\mid l]$, and the cumulants of $\log r$ equal to $\beta^m\kappa_m(\log\theta\mid l)/K_d^{m-1}$, where $\mathrm{Var}(\log\theta\mid l)=\mathrm{Var}(\log h_T\mid l)/\rho^2$ (`ccs_rho` = ρ; θ = $h_T$ at ρ = 1).
+  - **Proposition 5:** the problem at a draw is the baseline problem at $\bar Q_l$ with effective shocks $\epsilon_T r^{1/\alpha}$, $X_O r$. Draws therefore shift the shock laws over which the same node solutions are integrated, and add no node dimension.
+  - Parents value a power mean of teacher human capital of order χβ in the simple model (of θ, order χβ/$K_d$, in the extension), with χ = (1 − ψ)/(1 − η) in the note's notation (not the bridge χ = log 1.12). Dispersion raises a location's value at ψ = 0, is irrelevant to first order at ψ = 1 and lowers it at ψ > 1.
+  - The model nests the baseline when $h^\beta$ is constant within a location.
+  - At $K_d=K=12$ the CFR bridge pins the draw: SD(log r) = √12 δ ≈ 0.043, whatever β and ρ are.
+- **Code.**
+  - `Params.ccs`, `ccs_nq` (Gauss nodes, 3), `ccs_draws` ($K_d$), `ccs_rho` (1); `--external ccs=1 --external ccs_draws=K`; `solve_ge`'s `ccs_pad` (`--grid ccs_pad=x`; `:auto` by default).
+  - Solver §3e: the rule from the teacher moments (Golub–Welsch), `ccs_law`, `MixedMaps`, `over_draws`, `ccs_teacher_moments`. Under CCS `gr.dT`/`gr.dO` are `nothing`, so a consumer not taught the draw throws.
+  - Calibration: every moment integrates over the draws. New keys: `ccs_sd_logq`, `ccs_lQeff_gap`, `class_size`, `dLambda_geo`/`_disp` and `ccs_score_draw_share`. The counterfactual and supply-audit scripts refuse CCS. `ccs && college` is rejected.
+  - Snapshots: `runs/_code/pre-ccs-20261026/` (before) and `runs/_code/ccs-r1/` (the runs).
+- **Code checks.**
+  - With `ccs` off the code is bit-for-bit inert. The September fit's `moments.toml` is byte-identical before and after (jobs 6475456, 6475536). The development candidate P·TB·Y·D0·ρ (split, Nz 9) reproduces its stored moments on all 156 keys, and a small-grid split check agrees on all 205 keys.
+  - `ccs_tests(quick = false)` passes 30/30 (job 6475535): Proposition 5 at α = 0.3; the Gauss rules; every consumer against per-draw baseline problems; β = 0 nesting to 4e−11; n_q 3 vs 5 to 3e−8; the pad; K_d; ρ; the split.
+  - Two independent reviews found no bug. Fixed after them: `sol.HT` is the measured H̃_T under CCS. The refits fix the pad, because `:auto` widens it in steps with the state.
+- **Runs** (`runs/ccs-20261026/LOG.md`; outputs `runs/exp-ccs/`; tables `ccs-20261026/{base,dev,refit}_table.md` from `ccs_table.py`):
+  - 14 fixed-ϑ evaluations at the September fit (`cases_ccs_base.tsv`, array 6475537);
+  - 4 at the development candidate (`cases_ccs_dev.tsv`, 6475538; CCS with `ccs_rho` = 0.3 = `cfr_rho`);
+  - 8 exact refits of the 8 September parameters to the 8 September targets (`cases_ccs_refit.tsv`, 6475560): CCS at $K_d$ = 1 and 12 × ψ = 0, 1, 2, and the efficient model at ψ = 1, 2;
+  - their Jacobians and consistency reports (6475591).
+- **Accuracy and cost.**
+  - n_q = 3 is within 2e−4 of n_q = 5 on every targeted moment (teacher 90/10; 0.0015 SE), and the CCS effects agree at Nz 5 and 9 to 7e−4.
+  - Mean field (n_q = 1) is identical at $K_d$ 1 and 12 and leaves ρ_pc at 0.576.
+  - An evaluation costs 1.3× the baseline's (1.9× under the split at Nz 9); a refit 10–11 min against 6.
+- **Results at the September fit (fixed ϑ).**
+  - $K_d$ = 1: SD(log q) 0.160/0.157 (predicted 0.15), log Q^eff − log Q̄ 0.023 (predicted 0.02), class size 24.6/24.0, criterion 2.22 (teacher 90/10 +1.3 SE).
+  - $K_d$ = 12: SD 0.044/0.043 (= √12 δ), criterion 0.13.
+  - The draw's share of the adult latent score variance is 0.70 / 0.15, so ρ_pc falls to 0.283 / 0.517.
+- **Results, exact refits** (all criteria ≤ 2e−17; condition numbers 28 at $K_d$ = 1 and 30 at 12, against 30.3; S13 untargeted):
+
+  | Fit | β | γ | λ (ψ 0 / 1 / 2) | S13 | sorting / allocation / pay / first stage | ρ_pc | wage slope | V1 earnings | V4 score | V2 FTE | V5 growth | Δlog Q̄_T (quality / staffing) | draw share of score var | ΔΛ disp (ψ 0 / 1 / 2) |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | Data | | | | | | 0.577 | 0.213 | 0.112 | 0.289 | −0.018 | 0.0031 | | | |
+  | Efficient (September) | 0.228 | 0.619 | 0.1245 / 0.1171 / 0.0740 | 864.1 | 379 / 23 / 446 / 16 | 0.576 | 0.214 | −0.010 | 0.061 | 0.023 | 0.0119 | 0.0149 (0.0018 / 0.0131) | — | — |
+  | CCS, $K_d$ = 12 | 0.226 | 0.614 | 0.1278 / 0.1171 / 0.0719 | 896.2 | 380 / 22 / 461 / 33 | 0.518 | 0.216 | −0.010 | 0.058 | 0.022 | 0.0118 | 0.0148 (0.0025 / 0.0123) | 0.146 | −3.4e−6 / +2.8e−7 / +4.6e−6 |
+  | CCS, $K_d$ = 1 | 0.211 | 0.569 | 0.1241 / 0.1171 / 0.0719 | 1472.8 | 393 / 16 / 620 / 445 | 0.298 | 0.258 | −0.012 | 0.042 | 0.017 | 0.0100 | 0.0125 (0.0029 / 0.0096) | 0.672 | −4.0e−5 / +3.9e−6 / +5.5e−5 |
+
+  S13 and its blocks are those of ψ = 0. ψ = 1, 2 add at most 1 point to S13 in every model.
+- **Reading.**
+  - **No sorting.** The locations' draw laws are almost the same (SD 0.151 vs 0.149 at $K_d$ = 1), so the dispersion premium is nearly common to both. Its part of the suburb's ΔΛ is ≤ 4e−5, 3% of the quality part. Income and location sorting moments move by ≈ 0.002 at most, and children's ability gap stays −0.005 SD. The SEDA score gap falls because the draw's variance enters its SD normalization.
+  - **The draw is luck that the first stage sees.** ρ_pc falls by 4.2 SE at $K_d$ = 12 and 20 SE at $K_d$ = 1. At $K_d$ = 1, two thirds of the adult latent score is teacher luck. The external block (s_z, ρz, c), read from NLSY scores as ability plus c log Q, would have to be re-estimated before taking that case seriously (2026-11-01: re-estimating ρz cannot repair it). `--consistency` compares against a first stage without the draw.
+  - **Teachers select on worse draws** (γ < 1). Teacher premia worsen (−18 SE at $K_d$ = 1 vs −15.5), and teachers' latent z gap falls from −0.29 to −0.34 SD.
+  - **$K_d$ = 12, the CFR-consistent case**, costs 32 S13 points (ρ_pc +17, premia +15) and changes no conclusion.
+  - **Warm glow.** In every model ψ moves only λ; every other parameter is identical to four digits. The dispersion part of ΔΛ flips sign at ψ = 1 as predicted, but is negligible.
+  - ψ does change the WTP income gradient, identically with and without CCS: income elasticity 1.09 / 1.02 / 0.94 (BFM 0.38), and the WTP share by parental-income tercile rises / is flat / falls. Sorting is unchanged (Σz² 379–393).
+- **Caveats.**
+  - href, C̄ and `lyref` stay at the baseline reference while mean h and ln ŷ shift under CCS.
+  - The pad is fixed in the refits (0.6 at $K_d$ = 1, 0.3 at 12, against max |x| ≈ 0.28 and 0.08).
+  - The development-candidate rows are fixed-ϑ only (`dev_table.md`). There, K_d = 12 with ρ = 0.3 gives S13 125.7 against 105.4 for the efficient model, and K_d = 1 with ρ = 0.3 gives 607.9; K_d = 1 is a bound, not a reading of the CFR bridge. Its intergenerational variance multiplier is ≈ 1.1, because the bridge pins β/ρ; ≈ 3 would need ρ = 0.3 at the September β.
+- **Decision.** None is needed. The switch is off by default and the baseline is unchanged. CCS at $K_d$ = 12 is a consistent alternative to Proposition 1 with no sorting payoff.
+
+### Simple constant-class-size baseline and the θ/K_d comparison (2026-11-01)
+
+This round makes the simple model the CCS version's baseline: one teacher per student for all of school, $q=h_T^\beta N_l^{-\sigma}$, with $h_T$ drawn from the human-capital distribution of the teachers who work in $l$ (scaled to unit mass), and no effectiveness noise θ or $K_d$ draws. The richer θ/$K_d$ model is kept as an extension for comparison. This is an experiment: the baseline (the September efficient fit), targets and model spec are unchanged.
+- **Theory.** `notes/spatial_teachers_model_ccs.md`, rewritten: §§1–5 are the simple model (Propositions 5 and 6, the Corollary, the relation to efficient class sizes, equilibrium); §6, "Extension: Noisy Effectiveness and Several Teachers", adds θ, with corr(log θ, log $h_T$ | l) = ρ, and $K_d$ independent draws. Its Table 1 compares efficient class sizes, the simple model and the extension.
+- **Code.** No change. The simple model is `--external ccs=1` at the defaults `ccs_draws` = 1 and `ccs_rho` = 1 (and ωz = 1, so effectiveness is $h_T$). The extension sets `--external ccs_rho=ρ` with the matching CFR concept `--measure cfr_rho=ρ`, and `--external ccs_draws=K_d`. Every job ran the frozen tree `runs/_code/ccs-r1`, byte-identical to the main tree's model and calibration `.jl` files on 2026-11-01.
+- **Runs** (`runs/ccs-simple-20261101/LOG.md`, with every command and configuration; outputs `runs/exp-ccs-simple/`; tables `ccs-simple-20261101/{compare,rhoz}_table.md` from `compare_table.py`):
+  - The simple model's exact refit already existed: `runs/exp-ccs/refit/ccs1_psi0` (job 6475560, `_code/ccs-r1`), with $K_d$ = 12 at ρ = 1 in `ccs12_psi0`.
+  - 3 exact refits of the 8 September parameters to the 8 September targets from the September fit, ψ = 0, default solver (`cases_ccs_simple_refit.tsv`, array 6774197, `refit/`): CCS + θ ($K_d$ 1, ρ 0.3), CCS + θ + K ($K_d$ 12, ρ 0.3) and the efficient model with the ρ = 0.3 CFR concept. They complete the 2×2 {$K_d$ 1, 12} × {ρ 1, 0.3}.
+  - Their Jacobians and consistency reports (6774209, `jac/`).
+  - 4 fixed-ϑ evaluations at `ccs1_psi0` with ρz = 0.5766 (control), 0.75, 0.90 and 0.97, holding $s_z$ (`--external rho_z`; `cases_ccs_simple_rhoz.tsv`, 6774212, `rhoz/`).
+  - Grid-pad checks at each converged point (`padcheck.jl`, `padcheck/`): 6774210 at the two CCS refits at ρ 0.3; 6774305 at `ccs1_psi0`, `ccs12_psi0` and the ρz points. 6774305 resubmits 6774211, which failed in seconds because `padcheck.jl` resolved the relative `CODE` path against its own directory (fixed with `abspath`).
+  - Apart from 6774211, every job COMPLETED 0:0 on econ-grad; none was preempted or requeued.
+- **Accuracy and pads.**
+  - The six refits are exact: criterion ≤ 1.5e−17, max |z| of the targets ≤ 3.1e−9.
+  - The fixed pads cover every rule, checked exactly at each converged point: max |x| 0.2722 against 0.6 (simple), 0.2616 against 0.6 (CCS + θ), 0.0768 against 0.3 (CCS + K), 0.0754 against 0.3 (CCS + θ + K), and 0.2721 against 0.6 at every ρz. At ρ 0.3 the draw is nearly Gaussian (max |x| ≈ √3 SD(ln r)); at ρ 1 it is skewed (1.80–1.81 SD).
+  - No ⚠ in any log or report, and no `cfr_rho`/`ccs_rho` warning (equal by construction). The only flag is `verify_solution`'s smooth-floor barrier in the pad checks: the September fit's known smooth consumption floor, with a population share ≤ 1.2e−23 in every case (min C ≈ −0.015 at ρ 0.3, the efficient model included; it comes with the higher r_m, not with CCS).
+  - The ρz control reproduces `ccs1_psi0`'s `moments.toml` byte for byte.
+- **Results, exact refits** (the 8 targets are matched in every row; every other column is untargeted; ψ = 0):
+
+  | Fit | β | γ | λ | r_m | cond. | S13 | sorting / allocation / pay / first stage | ρ_pc (z) | wage slope (z) | draw share of score var | SD(ln q) | ln Q^eff − ln Q̄ | Δlog Q̄_T (quality / staffing) |
+  |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+  | Data | | | | | | | | 0.577 | 0.213 | | | | |
+  | Efficient (September) | 0.2278 | 0.6194 | 0.1245 | 0.2059 | 30.3 | 864.1 | 379.2 / 23.2 / 446.0 / 15.7 | 0.576 (−0.0) | 0.214 (+0.1) | — | — | — | 0.0149 (0.0018 / 0.0131) |
+  | Efficient, ρ 0.3 | 0.0683 | 0.6194 | 0.0713 | 0.3594 | 18.7 | 866.2 | 380.5 / 24.0 / 446.0 / 15.7 | 0.576 (−0.0) | 0.214 (+0.1) | — | — | — | 0.0146 (0.0006 / 0.0140) |
+  | **Simple CCS** ($K_d$ 1, ρ 1) | 0.2108 | 0.5694 | 0.1241 | 0.2059 | 28.1 | 1472.8 | 393.0 / 15.8 / 619.5 / 444.6 | 0.298 (−19.9) | 0.258 (+5.9) | 0.672 | 0.1508 / 0.1487 | 0.0205 / 0.0199 | 0.0125 (0.0029 / 0.0096) |
+  | CCS + θ ($K_d$ 1, ρ 0.3) | 0.0631 | 0.5684 | 0.0706 | 0.3621 | 19.2 | 1479.6 | 395.5 / 16.8 / 622.7 / 444.7 | 0.298 (−19.9) | 0.258 (+5.9) | 0.672 | 0.1508 / 0.1487 | 0.0018 / 0.0018 | 0.0119 (0.0008 / 0.0111) |
+  | CCS + K ($K_d$ 12, ρ 1) | 0.2261 | 0.6145 | 0.1278 | 0.2007 | 30.2 | 896.2 | 380.4 / 22.2 / 460.6 / 33.1 | 0.518 (−4.2) | 0.216 (+0.4) | 0.146 | 0.0435 / 0.0429 | 0.0205 / 0.0199 | 0.0148 (0.0025 / 0.0123) |
+  | CCS + θ + K ($K_d$ 12, ρ 0.3) | 0.0678 | 0.6145 | 0.0714 | 0.3590 | 18.7 | 899.3 | 382.4 / 23.2 / 460.6 / 33.1 | 0.518 (−4.2) | 0.216 (+0.4) | 0.146 | 0.0435 / 0.0429 | 0.0018 / 0.0018 | 0.0144 (0.0007 / 0.0137) |
+
+  SD(ln q) and ln Q^eff − ln Q̄ are city / suburb. Δlog Q̄_T is the suburb − city gap in the log teacher index, split into teacher quality (β Δℓ̄) and staffing (−σ Δln N). cond. is the condition number of the scaled moment Jacobian.
+- **Reading.**
+  - **The simple model fits the targets, not the first stage.** S13 is 1472.8 against 864.1, mostly the first stage (444.6 against 15.7) and teacher pay (619.5 against 446.0: teachers select on worse draws, and the premia miss by −18.3 / −16.9 SE against −15.5 / −14.3). Sorting is unchanged: income and location sorting moments move by ≈ 0.002, children's ability gap stays −0.005 SD, and most of the sorting block's rise (379.2 → 393.0) is the SEDA score gap, whose SD normalization includes the draw's variance.
+  - **CFR fixes the draw's share of the score.** With one teacher for all of school, the CFR target (e = 0.0133 per year, K = 12, η = 0.08) pins SD(ln q) ≈ $K(1-\eta)e$ = 0.147 whatever β (model 0.151 / 0.149); with $K_d$ draws it is $K(1-\eta)e/\sqrt{K_d}$ (0.043 at 12). The score loading is $c=s_z/((1-\eta)\chi)$, χ = log 1.12 the bridge, so the draw's share of the adult latent score variance is ≈ $(Ke)^2/(K_d\chi^2+(Ke)^2)$, independent of $s_z$: 0.666 at $K_d$ = 1 and 0.143 at 12, against `ccs_score_draw_share` 0.672 and 0.146. The gap is the model's SD(ln q), 2% above the approximation; with it the formula gives 0.673 / 0.146. The share is fixed by data, not by a free parameter.
+  - **ρz cannot repair ρ_pc.** The draw is independent across generations, so at fixed $s_z$ ρ_pc ≈ $\rho_z\sqrt{(1-a)(1-b)}$ = 0.517 ρz, with a = 0.672 the adult draw share and b = 0.186 the child's at grade 4. The evaluations confirm it: ρ_pc 0.387 / 0.464 / 0.500 (z −13.5 / −8.0 / −5.4) at ρz 0.75 / 0.90 / 0.97, against the predicted 0.387 / 0.465 / 0.501. The ceiling at ρz → 1 is 0.517 (−4.3 SE); matching 0.577 would need ρz ≈ 1.12, and ρz² → 1 is far above the NLSY's latent sibling correlation of 0.606. The wage slope stays at 0.258 (+5.9 SE), the draw share at 0.672, and the targets hardly move (criterion ≤ 0.008 at the unchanged ϑ). At ρz 0.97 the first stage still contributes 77.1 and S13 is 1112.6.
+  - **θ is almost a relabelling.** At ρ = 0.3, β ↦ ≈ ρβ (ratios 0.299–0.300) and λ, r_m and log κ̃ re-fit, but SD(ln q), the draw share, ρ_pc, the wage slope and the sorting moments are those of ρ = 1 within 0.003, and S13 moves by ≤ 7. CFR pins SD(ln r) = $\beta\,\mathrm{SD}(\ln h_T)/(\rho\sqrt{K_d})$ whatever ρ. What ρ does change:
+    - ln Q^eff − ln Q̄ falls from 0.020 to 0.0018 (≈ ρ²);
+    - the teacher-quality part of Δlog Q̄_T falls (0.0029 → 0.0008 at $K_d$ 1; 0.0018 → 0.0006 in the efficient model), and staffing takes the rest;
+    - λ ≈ 0.125 → 0.071, r_m ≈ 0.205 → 0.36 and log κ̃ ≈ −1.2 → −1.0, in the efficient model too: they move with the CFR measurement concept, not with CCS;
+    - the condition number falls to ≈ 19 (19.2, 18.7, 18.7 against 28.1, 30.2, 30.3). With ∂cfr_effect/∂β ∝ 1/ρ, the β column is about 3.3× longer in box-width units, which breaks its near-collinearity with log κ̃. β's box is unchanged, so this is a parametrization effect, not new information.
+  - **Only $K_d$ moves the first stage.** CCS + K: ρ_pc 0.518 (−4.2 SE), wage slope 0.216 (+0.4 SE), first stage 33.1, S13 896.2 (+32.1 over the efficient model; 899.3 with θ).
+- **Caveats.**
+  - href, C̄ and `lyref` stay at the baseline reference, as in 2026-10-26.
+  - The ρz rows are fixed-ϑ diagnostics with $s_z$ held, not a re-estimation of the external block. The draw shares a and b do not depend on $s_z$ (above), so re-estimating $s_z$ as well should not raise the ceiling; that was not run.
+  - `rdmount` needs a password, which a non-interactive session cannot give; the stashed AD ticket was renewed with `kinit -R` before submission (`LOG.md`).
+- **Decision.** None is taken. The baseline (the September efficient fit) is unchanged, and the switch is off by default. The simple model is the transparent starting point for CCS, but at $K_d$ = 1 it cannot be reconciled with the NLSY first stage under the CFR/χ bridge; $K_d$ = 12 is the CCS variant consistent with it. Which to carry forward, if either, is the authors' decision.
+
+### CCS with the six eligible mechanisms (2026-11-02)
+
+This round asks whether constant class size with random teacher assignment works in combination with the other accepted mechanisms (peer effects, housing costs, etc.), in the simple version and with $K_d$ and θ. This is an experiment: the baseline, targets and model spec are unchanged.
+- **Design** (`runs/ccs-mech-20261102/`: `PREREG.md`, `LOG.md` with every job and command, `RESULTS.md`):
+  - 161 exact refits: the 8 September parameters to the 8 September targets, plus κ_c under C. LM, ≤ 60 iterations, Nz 9. The mechanism flags and magnitudes are the factorial's bit for bit.
+  - Simple CCS (`ccs1`, pad 0.6) and CCS + K (`ccs12`, $K_d$ 12, pad 0.3) × all 64 combinations.
+  - CCS + θ (`ccs1r03`), CCS + θ + K (`ccs12r03`) and the efficient model with the ρ 0.3 CFR concept (`effr03`) × 11 combinations: none, the six singles, HS, HSP, CHS, CHFSLP.
+  - Warm start: the factorial fit of the same combination plus the variant's shift without mechanisms (its Nz 5 refit minus the September fit).
+  - The CCS cost is ΔS13 = S13 − S13 of the efficient comparator: the factorial fit at ρ 1, `effr03` at ρ 0.3. Every S13 moment is untargeted.
+  - Pre-registered flags, from effect-coded OLS within `ccs1` and `ccs12`: m *mitigates* the CCS cost if its main effect on ΔS13 is < −10; CCS *amplifies* m's income sorting if m's main effect on ΔSI is ≥ +0.05.
+- **Code.**
+  - An audit found every mechanism correctly supported under `ccs = 1`:
+    - P: the peer factor multiplies the common Q̄_T.
+    - H: a fixed goods cost leaves Proposition 5's relabelling exact. Proposition 5b fails, but it is never used, and the baseline's r_m C̄ is already such a cost.
+    - S and L: the schedule and the floor act on the node's true $h_T$.
+    - F: Λ integrates the child's draw.
+    - C: n_T is counted by workplace.
+  - The only change is CCS-only keys in `spatial_moments.jl`, added to `model_moments` only when `p.ccs`:
+    - `ccs_max_abs_x` and `ccs_pad`: refits solve with `verbose = false`, so the pad is now recorded and scored.
+    - `ccs_draw_composition`: the adults' own draw by residence (`ccs_lr_adult`, `ccs_gap_lr_adult(_sd)`, `ccs_gap_lr_mkt`) and `ccs_gap_meanlog_mkt_Qbar_adj`, the market-wage gap net of $k\ln\bar Q$ only. `gap_meanlog_mkt_Qadj` also removes the worker's own $k\ln r$.
+  - Snapshots: `runs/_code/pre-ccs-mech-20261102/` (= `ccs-r1`), `ccs-mech-c1/` (the reviewed candidate) and `ccs-mech-r1/` (the runs, a copy of c1).
+- **Code checks.**
+  - *Inert with `ccs` off.*
+    - The September fit's `moments.toml` is byte-identical (6811590).
+    - The factorial none, P, HSP and CHFSLP are byte-identical to their `ccs-r1` re-evaluations (6811591), which equal the stored factorial moments on every common key (6811185).
+    - With CCS on, the stored CCS fits reproduce every old key (6811592).
+  - *β = 0 nesting* with each mechanism and with all six: 8/8 (max 7.8e−11, π 1.1e−10). The draw is degenerate there, so this tests only the Q̄/N plumbing.
+  - *Per-draw Proposition 5* with each mechanism: 120/120 on the run tree (6813362).
+    - The first run failed 110/120 (6811184) on two test artefacts: a single cold node sweep, and comparing h̄ and mean consumption as a mixture of per-draw ratios.
+    - They are now compared by numerator and denominator, at 1e−8.
+  - *Smoke solves* at the factorial ϑ: 16/16 converged with the pads covered (6811593).
+  - Independent reviews of phase 1 and of the results.
+- **Runs** (econ-grad, `_code/ccs-mech-r1`, outputs `runs/exp-ccs-mech/`):
+
+  | Run | Job | Tasks | Notes |
+  |---|---|---|---|
+  | Fits | 6813360 | 161 | all COMPLETED 0:0, 7–90 min; no retry |
+  | Nz 13 re-solves | 6822945 | 15 | |
+  | Pad checks | 6822946 | 15 | |
+  | Multistart | 6822947 | 8 | 4 starts × (1 ± 0.15) at the best-S13 fits of `ccs1` and `ccs12` |
+  | Jacobians | 6822948 | 2 | |
+  | Sensitivities | 6822949 | 10 | r_p, schedT and ψa at the factorial's low and high values |
+- **Accuracy.**
+  - All 161 fits are exact: criterion ≤ 9.7e−17. The one exception is ccs1/HFP at 2.6e−13: GE failed at every ΔB + h Jacobian point, so ΔB was frozen; its ϑ equals HF's to 9e−6.
+  - Every fit passes the numerics and the pad (max |x| ≤ 0.47 pad).
+  - Nz 13 moves no scored moment at the selections by more than 0.0055 SE.
+  - Pad checks: 15/15 pass. The only flag is the smooth-floor barrier of the fitted ϑ, present with CCS off too (6811875).
+  - The multistarts return to the same ϑ (≤ 1.1e−9).
+  - Condition numbers: 30.6 (ccs1/HSP) and 35.1 (ccs12/HSLP), against 35.5 for the factorial HSP.
+- **Results** (exact refits; untargeted; blocks are Σ z²; ΔS13 against the efficient comparator, and for the efficient ρ 0.3 rows against the factorial). HSP and HSLP are one fit wherever the licensure floor is slack at schedT 1.74 (|Δϑ| ≤ 4.5e−11). The registered rule resolves a 1e−8 difference to HSLP in `ccs12`.
+
+| Model | Case | S13 | ΔS13 | sorting / allocation / pay / first stage | SI | ρ_pc |
+|---|---|---|---|---|---|---|
+| Efficient (factorial) | none | 864.1 | — | 379.1 / 23.3 / 446.1 / 15.7 | −0.059 | 0.576 |
+| Efficient (factorial) | HSP (best) | 364.0 | — | 296.9 / 22.1 / 24.1 / 20.8 | 0.103 | 0.576 |
+| Efficient (factorial) | HS | 364.1 | — | 297.0 / 22.2 / 24.1 / 20.8 | 0.103 | 0.576 |
+| Efficient (factorial) | CHS | 512.3 | — | 167.6 / 299.5 / 24.0 / 21.2 | 0.319 | 0.569 |
+| Efficient (factorial) | CHFSLP | 509.9 | — | 167.5 / 297.2 / 24.0 / 21.2 | 0.318 | 0.569 |
+| Simple CCS ($K_d$ 1) | none | 1473.9 | +609.8 | 393.0 / 15.7 / 620.6 / 444.6 | −0.070 | 0.298 |
+| Simple CCS ($K_d$ 1) | HSP (best) | 827.1 | +463.1 | 304.2 / 21.9 / 62.8 / 438.2 | 0.099 | 0.295 |
+| Simple CCS ($K_d$ 1) | HS | 827.2 | +463.1 | 304.3 / 21.9 / 62.8 / 438.2 | 0.099 | 0.295 |
+| Simple CCS ($K_d$ 1) | CHS | 950.3 | +438.0 | 179.4 / 277.7 / 62.5 / 430.7 | 0.303 | 0.299 |
+| Simple CCS ($K_d$ 1) | CHFSLP | 948.6 | +438.7 | 179.3 / 276.1 / 62.6 / 430.7 | 0.301 | 0.299 |
+| CCS + K ($K_d$ 12) | none | 896.3 | +32.2 | 380.3 / 22.2 / 460.7 / 33.1 | −0.059 | 0.518 |
+| CCS + K ($K_d$ 12) | HSLP (best; = HSP) | 383.2 | +19.2 | 296.9 / 21.5 / 26.7 / 38.1 | 0.106 | 0.517 |
+| CCS + K ($K_d$ 12) | HS | 383.3 | +19.2 | 297.0 / 21.6 / 26.7 / 38.1 | 0.106 | 0.517 |
+| CCS + K ($K_d$ 12) | CHS | 529.9 | +17.6 | 167.4 / 295.6 / 26.5 / 40.4 | 0.322 | 0.513 |
+| CCS + K ($K_d$ 12) | CHFSLP | 527.5 | +17.7 | 167.3 / 293.4 / 26.5 / 40.3 | 0.321 | 0.513 |
+| Efficient, ρ 0.3 | none | 866.2 | +2.0 | 380.5 / 24.0 / 446.1 / 15.7 | −0.060 | 0.576 |
+| Efficient, ρ 0.3 | HSP (best) | 392.5 | +28.6 | 316.6 / 30.9 / 24.2 / 20.8 | 0.055 | 0.576 |
+| Efficient, ρ 0.3 | HS | 392.6 | +28.5 | 316.6 / 30.9 / 24.2 / 20.8 | 0.055 | 0.576 |
+| Efficient, ρ 0.3 | CHS | 558.6 | +46.3 | 189.0 / 324.1 / 24.2 / 21.3 | 0.261 | 0.569 |
+| Efficient, ρ 0.3 | CHFSLP | 556.0 | +46.2 | 188.9 / 321.7 / 24.2 / 21.3 | 0.260 | 0.569 |
+| CCS + θ ($K_d$ 1, ρ 0.3) | none | 1480.6 | +614.4 | 395.4 / 16.8 / 623.7 / 444.7 | −0.073 | 0.298 |
+| CCS + θ ($K_d$ 1, ρ 0.3) | HSP (best) | 854.9 | +462.4 | 325.2 / 29.1 / 63.3 / 437.3 | 0.050 | 0.296 |
+| CCS + θ ($K_d$ 1, ρ 0.3) | HS | 854.9 | +462.4 | 325.2 / 29.1 / 63.3 / 437.3 | 0.050 | 0.296 |
+| CCS + θ ($K_d$ 1, ρ 0.3) | CHS | 994.2 | +435.6 | 201.7 / 299.1 / 63.2 / 430.2 | 0.243 | 0.299 |
+| CCS + θ ($K_d$ 1, ρ 0.3) | CHFSLP | 992.4 | +436.3 | 201.6 / 297.4 / 63.2 / 430.2 | 0.242 | 0.299 |
+| CCS + θ + K ($K_d$ 12, ρ 0.3) | none | 899.4 | +33.2 | 382.3 / 23.3 / 460.7 / 33.1 | −0.061 | 0.518 |
+| CCS + θ + K ($K_d$ 12, ρ 0.3) | HSP (best) | 413.5 | +21.0 | 317.9 / 30.7 / 26.8 / 38.1 | 0.055 | 0.517 |
+| CCS + θ + K ($K_d$ 12, ρ 0.3) | HS | 413.5 | +21.0 | 318.0 / 30.7 / 26.8 / 38.1 | 0.055 | 0.517 |
+| CCS + θ + K ($K_d$ 12, ρ 0.3) | CHS | 579.2 | +20.6 | 190.2 / 321.7 / 26.7 / 40.5 | 0.260 | 0.513 |
+| CCS + θ + K ($K_d$ 12, ρ 0.3) | CHFSLP | 576.7 | +20.7 | 190.1 / 319.4 / 26.7 / 40.5 | 0.259 | 0.513 |
+
+- **Reading.**
+  - **CCS works technically with every mechanism.** Every fit is exact, and every check passes.
+  - **$K_d$ = 12 is nearly neutral and additive.**
+    - The CCS cost is +17.6 to +34.5 across the 64 combinations.
+    - Main effects are within 6.8 S13 points of the factorial's, and interactions within 10.8.
+    - Best fit: HS/HSP at 383 against 364. At the best fit the cost is the first stage, 17.3 of 19.2 (ρ_pc 0.517).
+  - **$K_d$ = 1's first-stage cost cannot be fixed by any mechanism.**
+    - ΔS13 is 423–629. The first-stage block alone is +406 to +429: ρ_pc 0.295–0.300 contributes 391–404 in z².
+    - S, L and C meet the pre-registered "mitigates" rule, with ΔS13 main effects of −86.9, −71.9 and −24.6. This is z² convexity.
+    - CCS lowers the teacher premia by 0.09–0.14 in every combination. That shift costs less once S or L has brought the premia near the data. With the none-shift held fixed, convexity alone gives pay main effects of −66.1 (S) and −52.1 (L), against −66.7 and −62.3.
+    - C's effect is the same in the allocation block (main effect −23.5), where CCS lowers the FTE, growth and payroll gaps that C over-predicts.
+    - In `ccs1` S×L is +524 against the factorial's +380.
+  - **θ adds nothing to CCS.** CCS + θ ≈ simple CCS (ΔS13 +436 to +622 against `effr03`), and CCS + θ + K ≈ CCS + K (+21 to +33).
+  - **The ρ 0.3 CFR concept, without CCS, acts through the recalibrated β** (0.228 → 0.07).
+    - Effect on S13: −30.0 at H, about +2 at none, F, P, S and L, +5 at C, +28.6 at HS/HSP and +46 at CHS/CHFSLP.
+    - At HS it roughly halves composition sorting: SI 0.103 → 0.055; Q-adjusted wage gap +0.0064 → −0.0025.
+    - At H it shrinks the suburb's teacher-quality deficit: Δlog Q −0.016 → −0.004.
+  - **No sorting amplification.**
+    - The largest CCS × m effect on SI is +0.0055 (L, `ccs1`) and +0.0031 (H, `ccs12`), against the +0.05 rule.
+    - Simple CCS slightly lowers sorting (mean ΔSI −0.012) and the SEDA score gap.
+    - The highest SI is CHSP: 0.303 (`ccs1`) and 0.322 (`ccs12`), against 0.320.
+  - **Draw luck sorts only through H, negligibly.**
+    - The adults' own-draw gap, suburb − city, is +0.002 to +0.010 SD of ln r with H (`ccs1`; ≤ +0.003 in `ccs12`) and −0.004 to −0.001 without.
+    - The wage gaps net of $k(\ln\bar Q+\ln r)$ and of $k\ln\bar Q$ differ by ≤ 0.0016.
+  - **F and P stay inert.** ψa 0.25 moves S13 by −0.2.
+  - **The sensitivities match the efficient model's.** The exception is schedT under $K_d$ = 1: +340 / −57 at HSP, against +271 / −9.
+- **Caveats.**
+  - The checks and sensitivities ran on HSP in `ccs1` and HSLP in `ccs12`. The licensure floor binds only in HSLP at schedT 0.96, so that contrast (+340 against +34) is partly the selection.
+  - In 3 of 179 LM runs, a Jacobian point failed to solve (GE not converged in 120 iterations); all three runs still ended exact.
+  - No multistart was run at `effr03`.
+  - href, C̄ and `lyref` stay at the baseline reference, as in the earlier CCS rounds.
+- **Decision.** None is taken. The baseline (the September efficient fit) is unchanged, the switch is off by default, and the theory note is not edited. CCS is compatible with every eligible mechanism. Under $K_d$ = 12 it leaves the factorial's ranking and sorting conclusions intact. Under $K_d$ = 1 the first-stage miss remains whatever the mechanisms.
 
 ### First internal fit, overidentified (2026-09-29)
 
@@ -1013,11 +1348,11 @@ For any remaining exact-baseline reruns: explicitly activate FTE when targeted; 
 
 ## 5. To-do
 
-The 2026-10-19 mechanism adoption scope and 2026-10-18 baseline policy control all plans below. Earlier permission to develop and test candidates does not authorize adopting mechanisms outside the current scope or changing the first-pass baseline or the restored model spec. Any proposed adoption requires evidence sufficient for confidence in the model changes and an explicit user decision.
+The 2026-10-19 mechanism adoption scope and 2026-10-18 baseline policy control all plans below. Earlier permission to develop and test candidates does not authorize adopting mechanisms outside the current scope or changing the first-pass baseline or the restored model spec. Any proposed adoption requires evidence sufficient for confidence in the model changes and an explicit decision by the authors.
 
 ### Mechanism adoption scope (2026-10-19)
 
-**User decision.** Following the review of likely referee objections, the user accepts the first group of mechanisms as the only additional mechanisms we are willing to adopt for now. The basis is an observable economic or institutional counterpart and independent evidence for the implementation, rather than improved calibration fit alone. Relative to the September first-pass model, the exclusive list is:
+**Decision.** Following the review of likely referee objections, we accept the first group of mechanisms as the only additional mechanisms we are willing to adopt for now. The basis is an observable economic or institutional counterpart and independent evidence for the implementation, rather than improved calibration fit alone. Relative to the September first-pass model, the exclusive list is:
 
 | Eligible mechanism | Evidence and implementation discipline |
 |---|---|
@@ -1028,9 +1363,9 @@ The 2026-10-19 mechanism adoption scope and 2026-10-18 baseline policy control a
 | Teacher education and licensure requirements | Use actual entry requirements; observed mean teacher schooling is not a minimum requirement. |
 | Peer effects | Independently support the magnitude, timing and functional form, and distinguish peer composition from teacher effectiveness. |
 
-**Eligibility is not adoption.** Keep the exactly identified 2026-09-29 fit in `runs/exact-polish-base/` (first-pass commit `d88afb4`, 2026-09-30) as the baseline, with its specification, parameters, inputs, targets and validation outcomes preserved. This decision changes no model code, configuration or fit, and does not approve a particular historical prototype. Changing the baseline or restored model spec still requires supporting evidence and an explicit user decision.
+**Eligibility is not adoption.** Keep the exactly identified 2026-09-29 fit in `runs/exact-polish-base/` (first-pass commit `d88afb4`, 2026-09-30) as the baseline, with its specification, parameters, inputs, targets and validation outcomes preserved. This decision changes no model code, configuration or fit, and does not approve a particular historical prototype. Changing the baseline or restored model spec still requires supporting evidence and an explicit decision by the authors.
 
-**Outside the current scope.** Every additional mechanism outside the six above remains ineligible for adoption unless the user revises this policy. This includes ability-, BA- and income-graded suburban tastes; general and ability-graded teaching costs; teacher-specific preference exemptions; endogenous college choice; fitted suburban teaching-job preferences and staffing closures; and other extensions in the lower-ranked groups of the review. Institutional licensure requirements do not approve the earlier fitted licensure-cost block. Parenthood heterogeneity does not by itself approve a special ability-fertility gradient or zero school valuation for childless households. The list also gives no blanket approval to richer housing/access specifications or other separately ranked extensions.
+**Outside the current scope.** Every additional mechanism outside the six above remains ineligible for adoption unless this policy is revised. This includes ability-, BA- and income-graded suburban tastes; general and ability-graded teaching costs; teacher-specific preference exemptions; endogenous college choice; fitted suburban teaching-job preferences and staffing closures; and other extensions in the lower-ranked groups of the review. Institutional licensure requirements do not approve the earlier fitted licensure-cost block. Parenthood heterogeneity does not by itself approve a special ability-fertility gradient or zero school valuation for childless households. The list also gives no blanket approval to richer housing/access specifications or other separately ranked extensions.
 
 **Historical work and calibration diagnostics.** Preserve all previous experiments, code switches, fitted outputs, candidate designations and run histories. C4′ and P·TB·Y·D0·ρ remain historical experimental candidates; neither is eligible for adoption as a package under this scope because each contains excluded mechanisms. Earlier plans below remain as provenance and are superseded where they propose a broader adoption scope. Measurement checks, sensitivity analysis and calibration validation remain distinct from adopting additional mechanisms; they do not change the baseline or its target definitions. B1 remains sealed. This documentation update launches no jobs.
 
@@ -1038,7 +1373,7 @@ The 2026-10-19 mechanism adoption scope and 2026-10-18 baseline policy control a
 
 Historical preferences and sequence, superseded on adoption scope by the October 19 decision above.
 
-**User decision.** The user provisionally accepts the recommendations following round 2026-10-15c, provided all previous work is preserved. The user prefers to err on the side of simplicity and is skeptical of several recent extensions, specifically college choice and licensure, because they substantially depart from the previous model structure. The user is nevertheless open to trying new mechanisms to make progress. This accepts an experimental direction, not any particular extension or final specification.
+**Decision.** The recommendations following round 2026-10-15c are provisionally accepted, provided all previous work is preserved. The preference is to err on the side of simplicity, with skepticism about several recent extensions, specifically college choice and licensure, because they substantially depart from the previous model structure. New mechanisms may nevertheless be tried to make progress. This accepts an experimental direction, not any particular extension or final specification.
 
 **Implications for model selection.**
 
@@ -1067,7 +1402,7 @@ Historical preferences and sequence, superseded on adoption scope by the October
 
 ### Next round (proposed after 2026-10-15c)
 
-Historical proposal, provisionally accepted on October 16 subject to the simplicity and preservation preferences above. Measurement diagnostics may proceed; explicit group structure remains an option to assess, not a selected model requirement. The original proposal is retained to distinguish its recommendations from the user's subsequent qualifications.
+Historical proposal, provisionally accepted on October 16 subject to the simplicity and preservation preferences above. Measurement diagnostics may proceed; explicit group structure remains an option to assess, not a selected model requirement. The original proposal is retained to distinguish its recommendations from the subsequent qualifications.
 
 1. **Decide how the model treats race before adding mechanisms.** Every sorting target mixes in between-race composition, and the model has no race ([round 2026-10-15c](#round-2026-10-15c-income-graded-sorting-y-and-teacher-demand-d)). A raceless model with the full income distribution should produce the part of the between-race location differences that runs through income, but not the rest: segregation, wealth, discrimination and preferences.
    - **(a) Race-consistent re-scoring: a diagnostic and data work only; first.**
@@ -1086,16 +1421,16 @@ Historical proposal, provisionally accepted on October 16 subject to the simplic
    - Discipline it with teacher-quality gaps by locale, such as the CRDC shares of novice and uncertified teachers.
 3. **Keep the demand closure.** Income-graded sorting without it prices teachers out of the suburb (S1·Y). D0 and R give the same sorting; D0 leaves FTE as validation.
 4. **B1.** It stays sealed.
-   - When the user instructs it to be opened, it is compared as sealed with the model's `ba_share_gap`, as an all-race moment.
+   - When it is opened, on the authors' instruction, it is compared as sealed with the model's `ba_share_gap`, as an all-race moment.
    - Under race-consistent targets, its between-race component is a stated caveat.
-   - A within-race B1 needs the user's instruction and a definition fixed before opening.
+   - A within-race B1 needs the authors' instruction and a definition fixed before opening.
 5. **Unchanged.** M3 with γ < 1 and S1; fits at Nz ≥ 9 with Nz = 13 checks; non-homothetic housing (CGHH-style quality tiers) as the structural successor to the reduced-form ζ_y once the concepts are settled.
 
 ### Accepted development plan (2026-10-15)
 
 Historical authorization and sequence. The October 19 exclusive mechanism list above controls adoption scope and supersedes the broader October 15 and 16 plans. Preserve this plan and its associated results as the record of that round.
 
-**Decision and scope.** After reviewing both October 15 rounds, the user provisionally accepted the recommendations on condition that previous work remains preserved. Development can proceed without another general approval request. This accepts a research direction, not a fitted specification: retain the September exact baseline, C4′ as the designated development candidate and S1·R·E as a diagnostic benchmark. The historical experiment scores and selection decisions stand. This documentation update launches no model runs.
+**Decision and scope.** After reviewing both October 15 rounds, the recommendations were provisionally accepted on condition that previous work remains preserved. Development can proceed without another general approval request. This accepts a research direction, not a fitted specification: retain the September exact baseline, C4′ as the designated development candidate and S1·R·E as a diagnostic benchmark. The historical experiment scores and selection decisions stand. This documentation update launches no model runs.
 
 **Preservation is a requirement of the accepted plan.** Before this update, current source, configuration, spatial notes and selected fit evidence were copied into the verified local archive [`runs/_code/accepted-direction-20261015/`](runs/_code/accepted-direction-20261015/README.md). It contains 505 files with a SHA-256 manifest, the Git HEAD and working-tree status, including uncommitted source changes. The archive is Git-ignored and local to ResearchDrive; it is not a separate off-site backup or a complete optimizer/raw-data checkpoint. All existing run directories, empirical inputs, preregistrations, working logs and earlier code snapshots remain in place. Sealed hold-out contents were not read or archived.
 
@@ -1112,9 +1447,9 @@ Historical authorization and sequence. The October 19 exclusive mechanism list a
 5. **Strengthen joint acceptance criteria.** Require explicit checks of teacher residence (+0.298 log gap per employed resident), teacher crossing (0.084), net commuting (+0.075) and both commuting directions, with sample/geography limitations recorded. Evaluate these alongside earnings, parental-income and own-AFQT location gradients, poverty, staffing, teacher selection, score levels and growth. Retain own-AFQT mobility, the gender wage gap, MA premium and non-BA schooling checks. Fix thresholds before new results; a lower aggregate score cannot offset a severe failure on the designated criteria. Report target status, component discrepancies and added parameters so fitted moments are not presented as independent validation.
 6. **Resolve numerics and identification before inference.** Estimate strongly sorted candidates at $N_z\ge9$ and re-solve at a finer grid, initially $N_z=13$, using a pre-specified fixed-parameter tolerance. Check equilibrium residuals, multistarts, Jacobians and profiles for weak parameters. After choosing a satisfactory specification, align samples/payroll definitions, recheck the first stage in equilibrium, and complete the full calibration bootstrap with Table 2 re-estimated and literature-input sensitivities. Parallel or potentially long computations go through SLURM, with refreshed ResearchDrive credentials, existing log directories and recorded jobs/configurations/output paths.
 
-**Hold-out.** B1 stays sealed for evaluation of the structural candidate. Acceptance of this plan is not an instruction to open it; explicit user instruction is still required. Previously used NLSY97 evidence is not a fresh hold-out, and overlapping ACS vintages are not automatically independent validation.
+**Hold-out.** B1 stays sealed for evaluation of the structural candidate. Acceptance of this plan is not an instruction to open it; explicit instruction from the authors is still required. Previously used NLSY97 evidence is not a fresh hold-out, and overlapping ACS vintages are not automatically independent validation.
 
-**Readiness.** Clear to proceed with design and implementation under this accepted plan. The next deliverable is the mechanism specification and pre-specified comparison, not another commuting audit or immediate adoption of S1·R·E. Exact parameterizations and numerical thresholds remain implementation work; their absence does not require repeating the user's general authorization. Joint empirical and numerical assessment informs any proposed change; under the 2026-10-18 instruction, new baseline adoption also requires an explicit user decision.
+**Readiness.** Clear to proceed with design and implementation under this accepted plan. The next deliverable is the mechanism specification and pre-specified comparison, not another commuting audit or immediate adoption of S1·R·E. Exact parameterizations and numerical thresholds remain implementation work; their absence does not require repeating the general authorization. Joint empirical and numerical assessment informs any proposed change; under the 2026-10-18 instruction, new baseline adoption also requires an explicit decision by the authors.
 
 ### Recommended sequence (2026-10-15)
 
@@ -1156,7 +1491,7 @@ Historical authorization and sequence. The October 19 exclusive mechanism list a
   - It must not raise the school-quality WTP income elasticity, already 1.14 against BFM's 0.38.
 - **A teacher-demand side** to replace b_T. In S1·R·E, b_T ≈ −0.35 is worth about 30 log points of pay. District hiring rules, budgets or class-size floors would make the staffing closure testable against FTE and salary together.
 - **Finer ability grids for sorted candidates.** Score any candidate with a large composition gap at Nz ≥ 9 (S1·R·E: 0.41 SD), and check it at a finer grid still.
-- **B1.** Keep it for the structural mechanism unless the user instructs otherwise. S1·R·E predicts +0.57.
+- **B1.** Keep it for the structural mechanism unless the authors instruct otherwise. S1·R·E predicts +0.57.
 
 ### Additional model experiments (2026-10-07)
 

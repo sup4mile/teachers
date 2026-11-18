@@ -22,10 +22,15 @@
 #   --consistency          external-block consistency report
 #   --out DIR              write report.txt and theta.toml to DIR
 #   --grid name=value      override a SOLVER setting (repeatable), e.g. Nz=9, nXO=96: the
-#                          §4 grid and quadrature checks; the frozen reference is unchanged
+#                          §4 grid and quadrature checks; the frozen reference is unchanged.
+#                          la_start=x (2026-10-25; `solve_ge`) starts the peer fixed point, without a warm
+#                          start, at log P = x·(−1, +1) (city, suburb) instead of 0: x > 0 starts from a
+#                          suburb-sorted state, to select that equilibrium when strong peers make it multiple
+#                          (every evaluation solves from scratch, so a --polish stays on that branch); inert at ψ_a = 0
 #   --free name            release an extension parameter of ϑ (r_p, ζ/zeta, c_T, c_Tz, ρw/rho_w and the M3 entries
 #                          rho_c, c_C, c_Cz, rho_T0, vartheta_s, s_z, sigma_eps, dlogphi, c_T0, the peer
-#                          effect psi_a, ψ_a in Q_l = (2H̃_T/M_l)^σ ā_l^ψ_a, and the switches of 2026-10-15
+#                          effect psi_a, ψ_a in Q_l = (2H̃_T/M_l)^σ P_l^ψ_a (P_l the peer input, by default the
+#                          students' mean ability ā_l; see --external peer_input below), and the switches of 2026-10-15
 #                          kappa_c (commuting friction; split), theta_nu (σν/μ) and zeta_BA (BA suburban
 #                          amenity; college), and b_T (teachers' suburban workplace taste, closure R; split))
 #                          to its EXTENSION_BOUNDS (repeatable); they are fixed at 0
@@ -50,6 +55,10 @@
 #                          them into the criterion (`--activate pooled_p9010` computes the pooled 90/10)
 #                          `--external move_util=1` (2026-10-15, candidate U): ϑ's r_m is a utility moving
 #                          cost (τmove, utils) instead of the goods cost r_m C̄
+#                          The peer specification (2026-10-25, `peer_log_input`; inert at ψ_a = 0), with
+#                          `--fix psi_a=…`: A (the default) the students' mean ability; B `--external peer_total=1`
+#                          their total (number × geometric mean); C `--external peer_input=hc` the adult
+#                          residents' mean human capital (by residence under the split); D both switches, their total
 # =============================================================================
 
 using Distributed

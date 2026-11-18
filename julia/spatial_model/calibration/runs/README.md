@@ -11,7 +11,7 @@ separation with commuting, local housing costs, fertility/parenthood shocks,
 education-based teacher salary schedules, teacher education/licensure requirements,
 and peer effects. The first-pass 2026-09-29 calibration in `exact-polish-base/`
 remains the baseline. Eligibility adopts no extension, implementation or candidate;
-a baseline change still needs supporting evidence and an explicit user decision.
+a baseline change still needs supporting evidence and an explicit decision by the authors.
 All other added mechanisms remain outside the current adoption scope. Earlier
 development plans and candidate designations below are historical evidence, not
 exceptions to this restriction. In particular, C4′ and P·TB·Y·D0·ρ contain excluded
@@ -22,50 +22,50 @@ all other historical evidence. See the [full decision and implementation qualifi
 
 The first-pass standard calibration in [`exact-polish-base/`](exact-polish-base/)
 (exactly identified 2026-09-29 fit; first-pass commit `d88afb4`, 2026-09-30)
-remains the baseline until the user definitively says otherwise. Preserve its
+remains the baseline until the authors decide otherwise. Preserve its
 parameters, inputs and moment definitions. All subsequent candidates and
 measurement alternatives remain experimental; passing checks does not authorize
 adoption. Changing the baseline or the restored model spec requires convincing
-evidence and an explicit user decision. This policy controls the earlier plans
+evidence and an explicit decision by the authors. This policy controls the earlier plans
 and candidate designations below.
 
 The [model spec](../../../../notes/spatial_teachers_model_eps0.md) is restored
 byte-for-byte from `d88afb4`, identical to its July 28 version. Keep experimental
 specifications in calibration or separate experimental notes. The four pre-edit
 documents, including the uncommitted spec additions, are hash-verified in
-[`_code/baseline-policy-20261018/`](_code/baseline-policy-20261018/README.md).
+`_code/baseline-policy-20261018/` (local, untracked).
 Code and historical outputs remain intact.
 
 ## Preservation for the accepted next phase (2026-10-15)
 
-**Update (2026-10-16).** The user provisionally accepts the next measurement and
-mechanism diagnostics, conditional on preserving previous work, and prefers
-simplicity. College choice and licensure are optional experimental benchmarks;
+**Update (2026-10-16).** The next measurement and mechanism diagnostics are
+provisionally accepted, conditional on preserving previous work, with a preference
+for simplicity. College choice and licensure are optional experimental benchmarks;
 new comparisons should include simpler alternatives close to the earlier model.
 The [current preferences and sequence](../calibration_log.md#accepted-preferences-and-next-sequence-2026-10-16)
 qualify the earlier plan below. Historical candidate designations are unchanged.
 
-[`_code/accepted-preferences-20261016/`](_code/accepted-preferences-20261016/README.md)
+`_code/accepted-preferences-20261016/` (local, untracked)
 holds the three pre-edit documentation files in a hash-verified local archive.
 It supplements the earlier source/evidence checkpoint; it is not a new full
 source or run backup. This documentation update changes no source or fit,
 launches no jobs, and leaves B1 sealed.
 
-The user accepted the [development plan](../calibration_log.md#accepted-development-plan-2026-10-15)
+The authors accepted the [development plan](../calibration_log.md#accepted-development-plan-2026-10-15)
 conditional on preserving previous work. Existing runs, including unsuccessful
 experiments, preregistrations, working logs and code snapshots must remain intact.
 New experiments use new named output directories; do not reuse historical paths.
 The September exact fit remains the reference, C4′ the designated development
 candidate and S1·R·E a diagnostic benchmark.
 
-[`_code/accepted-direction-20261015/`](_code/accepted-direction-20261015/README.md)
+`_code/accepted-direction-20261015/` (local, untracked)
 contains a verified local archive of 505 files: current source/configuration,
 pre-update spatial documentation and selected fit evidence, including uncommitted
 source work. Its manifest records SHA-256 hashes; Git HEAD and status are recorded
 separately. The archive is local and Git-ignored, not an off-site backup or a full
 optimizer/raw-data checkpoint. Existing empirical inputs and other run artifacts
 remain in their original locations. Sealed data were not read or archived; B1
-still requires explicit user instruction before opening.
+still requires explicit instruction from the authors before opening.
 
 ## Evidence inventory
 
@@ -159,7 +159,7 @@ candidates listed above are tracked.
   The selection is P·TB·Y·D0·ρ, the first candidate to meet every criterion (under the round's pre-registered A4 and
   A5 rules for fits without college and for overidentified fits), and it replaces C4′ as the development candidate. The September fit stays the reference.
   The new development candidate's files (`exp-1016/p_tb_y_d0_rho/report.txt`, `theta.toml`, `moments.toml`) are local
-  and untracked. Tracking them needs a `.gitignore` exception like C4′'s, which is the user's call.
+  and untracked; tracking them needs a `.gitignore` exception like C4′'s.
 
   The round's files are in `experiments-2026-10g/` (untracked):
   - the pre-registration and its amendments;
@@ -184,7 +184,7 @@ candidates listed above are tracked.
 
   The code before the switch is frozen in `_code/pre-fertility-20261018/`. The main tree adds it, off by default
   (pkid = 1 reproduces the old code bit for bit). Everything here is untracked; tracking `fit/` would need a
-  `.gitignore` exception, which is the user's call.
+  `.gitignore` exception.
 - `fertgrad-20261018/`: the ability-graded fertility shock (2026-10-18b, `--external pkid=0.802 --external pkid_z=…`;
   [log](../calibration_log.md#ability-graded-fertility-shock-2026-10-18b)):
   - `fixed_{m015,p015,p050}/`, `fit_{…}/`: the September problem at the uniform-shock refit's ϑ and refitted, at
@@ -207,7 +207,74 @@ candidates listed above are tracked.
     multistart and identification checks.
 
   The code before `Params.schedT` is frozen in `_code/pre-factorial-20261019/`; the runs used `_code/factorial-r1/`.
-  The main tree adds the switch, off by default (NaN reproduces the old code bit for bit). Everything here is untracked.
+  The main tree adds the switch, off by default (NaN reproduces the old code bit for bit). Tracked: `factorial-20261019/scores.md` and
+  `exp-factorial/{none,HS,HSP}/moments.toml`, cited in the calibration note; everything else here is untracked.
+- `peer-20261025/` and `exp-peer2/`: peer-effect strength and specification (2026-10-25;
+  [log](../calibration_log.md#peer-effect-strength-and-specification-2026-10-25)):
+  - `peer-20261025/`: `DESIGN.md` (specifications A–D, runs), `LOG.md` (jobs, commands, review), `gen_cases.py` and
+    the case lists `cases_*.tsv`, `panel_snap.sh`, `peer_score.py` → `scan_scores.md`, `scan2_scores.md`,
+    `refit_scores.md` (and `.csv`), `tests/` (the implementation tests, with the tested code in `tests/code-new/`),
+    `trace/` (verbose GE iterations where the scan did not converge), `starts/` (multistart starts);
+  - `exp-peer2/scan/<case>` and `exp-peer2/scan2/<case>`: fixed-ϑ evaluations at the Nz = 9 baseline and HS fits
+    (`<SPEC>_psi<ψa>`, `_sp`/`_sm` sorted starts, `_sp4`/`_sm4` the ±0.4 starts of B/D);
+  - `exp-peer2/<case>`: the exact refits (`<SPEC>_psi<ψa>` at the baseline, `HS_<SPEC>_psi<ψa>` with housing and the
+    salary schedule), `<case>_nz13` their Nz = 13 re-solves, `HS_A_psi32_ms1–4` and `HS_A_psi32_jac` the checks.
+
+  The code before the switches is frozen in `_code/pre-peer-20261025/`; the runs used `_code/peer-r1/`. The main tree
+  adds `Params.peer_input`, `Params.peer_total` and `solve_ge`'s `la_start`, inert at their defaults (bit for bit
+  whenever ψa = 0, and for the default specification at any ψa). Tracked: `peer-20261025/refit_scores.md`; everything else here is
+  untracked.
+- `ccs-20261026/` and `exp-ccs/`: constant class size with random teacher assignment (2026-10-26;
+  [log](../calibration_log.md#constant-class-size-and-random-teacher-assignment-2026-10-26), theory in
+  `notes/spatial_teachers_model_ccs.md`):
+  - `ccs-20261026/`: `LOG.md` (every job, command, configuration and result), `ge_checks.sh` (the solver checks
+    `ccs_tests(quick = false)`), `jac.sh` (Jacobians at the refits), `ccs_table.py` → `base_table.md`,
+    `dev_table.md`, `refit_table.md`, and `inert/pre`, `inert/post` (the bit-for-bit inertness check);
+  - `exp-ccs/base/<case>`: fixed-ϑ evaluations at the September fit (`eff`/`ccs1`/`ccs12` × ψ 0, 1, 2; n_q 1 and 5;
+    Nz 9), `exp-ccs/dev/<case>`: at the development candidate P·TB·Y·D0·ρ, `exp-ccs/refit/<case>`: the exact-ID
+    refits, `exp-ccs/jac/<case>`: their Jacobians and consistency reports.
+
+  The code before the switch is frozen in `_code/pre-ccs-20261026/`; the runs used `_code/ccs-r1/`
+  (`_code/ccs-a1/`, `ccs-a2/` are the solver at the two GE-check rounds). The main tree adds `Params.ccs`,
+  `ccs_nq`, `ccs_draws`, `ccs_rho` and `solve_ge`'s `ccs_pad`, bit-for-bit inert with `ccs` off. Case lists:
+  `slurm/cases_ccs_base.tsv`, `cases_ccs_dev.tsv`, `cases_ccs_refit.tsv`; `slurm/reeval_code.sh` and
+  `slurm/panel.sh`'s `CODE` run a frozen tree. Tracked: `ccs-20261026/refit_table.md`; everything else here is
+  untracked.
+- `ccs-simple-20261101/` and `exp-ccs-simple/`: the simple CCS model (one teacher for all of school, ρ = 1; its
+  refit is `exp-ccs/refit/ccs1_psi0`) as the CCS baseline, against the θ/$K_d$ extension and the efficient model
+  (2026-11-01; [log](../calibration_log.md#simple-constant-class-size-baseline-and-the-θk_d-comparison-2026-11-01)):
+  - `ccs-simple-20261101/`: `LOG.md` (every job, command, configuration and result), `jac.sh` (Jacobians at the
+    refits), `padcheck.jl`, `padcheck.sh` and `padcheck_cases.tsv` (the grid-pad check at a converged point),
+    `compare_table.py` → `compare_table.md` (the six exact refits, targeted and untargeted) and `rhoz_table.md` (the
+    ρz diagnostic);
+  - `exp-ccs-simple/refit/<case>`: the exact-ID refits at ρ = 0.3 in the draw and the CFR concept (`ccs1_rho03`,
+    `ccs12_rho03`, and `eff_rho03` with efficient class sizes), `exp-ccs-simple/jac/<case>`: their Jacobians and
+    consistency reports, `exp-ccs-simple/rhoz/<case>`: fixed-ϑ evaluations at `exp-ccs/refit/ccs1_psi0` with ρz
+    raised and $s_z$ held (`rhoz_05766` is the control), `exp-ccs-simple/padcheck/<case>.toml`: max |x| of the draw
+    rule against the pad.
+
+  No code changed; every job ran `_code/ccs-r1`, byte-identical to the main tree's model and calibration files on
+  2026-11-01. Case lists: `slurm/cases_ccs_simple_refit.tsv`, `cases_ccs_simple_rhoz.tsv`. Tracked:
+  `ccs-simple-20261101/compare_table.md` and `rhoz_table.md`; everything else here is untracked.
+- `ccs-mech-20261102/` and `exp-ccs-mech/`: CCS combined with the six eligible mechanisms of the factorial (2026-11-02;
+  [log](../calibration_log.md#ccs-with-the-six-eligible-mechanisms-2026-11-02)):
+  - `ccs-mech-20261102/`: `PREREG.md` (design, with the §9 amendments made before any fit), `LOG.md` (the phase-1
+    audit, every job, command, configuration and result), `RESULTS.md` (the interpretation), `gen_cases.py` (case
+    lists `cases_*.tsv` and warm starts in `starts/`; mechanism flags imported from the factorial), `submit.sh`
+    (the waves; dry run unless `GO=1`), `freeze_r1.sh`, `panel_snap.sh`, `preflight.sh`, `ccsmech_score.py` →
+    `scores.md`, `scores.csv`, `compare.md`, `selection.json`, and `tests/` (`ccs_mech_check.jl`: β = 0 nesting and
+    per-draw Proposition 5 with each mechanism; `smoke.jl`: smoke and pad checks; `compare_moments.py`);
+  - `exp-ccs-mech/<variant>/<case>`: the exact refits, variants `ccs1` (simple CCS) and `ccs12` (K_d 12) × the 64
+    combinations, `ccs1r03`, `ccs12r03` (ρ 0.3 in the draw and the CFR concept) and `effr03` (efficient, ρ 0.3) × 11
+    combinations; `<case>_nz13`, `_ms1–4`, `_jac` and `__<tag>` (sensitivities) are the checks;
+    `exp-ccs-mech/smoke/<code tree>/<case>`: smoke and pad checks; `exp-ccs-mech/inert/`, `reeval/`: the inertness
+    re-evaluations of phase 1.
+
+  The code before the round is frozen in `_code/pre-ccs-mech-20261102/` (= `ccs-r1`); the candidate in
+  `_code/ccs-mech-c1/` and the production runs in `_code/ccs-mech-r1/` (a copy of the candidate). The main tree adds
+  CCS-only diagnostic keys to `spatial_moments.jl` (`ccs_max_abs_x`, `ccs_pad`, and `ccs_draw_composition`: the
+  adults' own draw by residence and the market-wage gap net of k ln Q̄ only), bit-for-bit inert with `ccs` off.
+  Tracked: `ccs-mech-20261102/RESULTS.md` and `scores.md`; everything else here is untracked.
 - The other experiment directories (`exp-teacher/`, `exp-round3/`, …) hold the original
   Levenberg–Marquardt runs; `exp-final/` reproduces their estimates.
 

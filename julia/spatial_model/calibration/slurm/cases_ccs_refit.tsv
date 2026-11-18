@@ -1,0 +1,13 @@
+# CCS round, 2026-10-26: exactly identified refits (8 parameters, 8 targets, default solver) from the September fit
+# (runs/exact-polish-base), panel.sh with --polish (PANEL_MAX_ITER=30), PANEL_OUT=…/runs/exp-ccs/refit. Six CCS cases
+# (K_d = 1, 12 × ψ = 0, 1, 2) and the efficient model at ψ = 1, 2 (the efficient ψ = 0 fit is the September fit).
+# The CCS cases fix the grid pad (--grid ccs_pad; :auto widens it in 0.05 steps with the state, which would put grid
+# jumps into the LM Jacobian): 0.6 at K_d = 1 and 0.3 at K_d = 12, against max |x| ≈ 0.28 and 0.08 at the September fit.
+ccs1_psi0	--external ccs=1 --external ccs_draws=1 --grid ccs_pad=0.6
+ccs1_psi1	--external ccs=1 --external ccs_draws=1 --external psi=1 --grid ccs_pad=0.6
+ccs1_psi2	--external ccs=1 --external ccs_draws=1 --external psi=2 --grid ccs_pad=0.6
+ccs12_psi0	--external ccs=1 --external ccs_draws=12 --grid ccs_pad=0.3
+ccs12_psi1	--external ccs=1 --external ccs_draws=12 --external psi=1 --grid ccs_pad=0.3
+ccs12_psi2	--external ccs=1 --external ccs_draws=12 --external psi=2 --grid ccs_pad=0.3
+eff_psi1	--external psi=1
+eff_psi2	--external psi=2

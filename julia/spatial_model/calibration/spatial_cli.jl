@@ -190,7 +190,8 @@ split=1` and ζ_BA `--external college=1` (a fixed zero is the off value and is 
 external `--external theta_nu` while nonzero; a freed θ_ν starts at the external block's value. Two diagnostic switches of
 round 2026-10-16 are off by default: `--external lyT_fixed=x` (a `Params` field: every teacher node's income-graded taste
 is graded at ln ŷ = x, inert while By = 0) and `--measure cfr_rho=ρ` (a `Measurement` field, 0 < ρ ≤ 1: the CFR
-bridge's SD of teacher effectiveness is sd(log h_eff)/ρ); each is an error under the other option. `floor_tol` is the largest
+bridge's SD of teacher effectiveness is sd(log h_eff)/ρ); each is an error under the other option. Under constant class
+size (`--external ccs=1`, 2026-10-26) a `ccs_rho` other than `cfr_rho` prints a warning. `floor_tol` is the largest
 population share
 allowed at the consumption floor, `--floor-tol` (default `FLOOR_MASS_TOL`), which the caller
 hands to `SpatialModel`. With `--district`, the payroll-per-pupil validation target is the
@@ -214,6 +215,11 @@ function problem_setup(opts, ref)
     (0 < meas.cfr_rho ≤ 1) ||
         error("--measure cfr_rho=$(meas.cfr_rho): the correlation of teachers' log effectiveness with log h_eff must lie in (0, 1]")
     isinf(base.lyT_fixed) && error("--external lyT_fixed=$(base.lyT_fixed): must be finite (NaN: off)")
+    # 2026-10-26, constant class size (model §3e): the draw's CFR noise ρ and the CFR bridge's are one object; a
+    # warning, not an error, since a deliberate mismatch (a sensitivity) is allowed
+    (base.ccs && base.ccs_rho != meas.cfr_rho) &&
+        @printf("  ⚠ constant class size: --external ccs_rho=%.4g differs from --measure cfr_rho=%.4g; the teacher draw and the CFR bridge then use different effectiveness concepts\n",
+                base.ccs_rho, meas.cfr_rho)
     targets = default_targets()
     opts["wtp-consumption"] === nothing || (targets = with_wtp_target(targets, opts["wtp-consumption"]))
     scheme  = get(opts, "district", nothing)

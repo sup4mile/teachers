@@ -1,0 +1,19 @@
+# Constant class size (CCS) round, 2026-10-26: fixed-ϑ re-evaluations at the September fit (runs/exact-polish-base),
+# panel.sh with PANEL_MAX_ITER=0 and PANEL_OUT=julia/spatial_model/calibration/runs/exp-ccs/base. eff = efficient class
+# sizes (the baseline), ccsK = CCS with K_d = K independent teacher draws; psiX = warm-glow curvature ψ = X (0 is the
+# calibration's linear kernel; ψ ≠ 0 rows hold λ at its ψ = 0 value, a partial comparison). eff_psi0 is also the
+# post-change bit-for-bit inertness check against runs/ccs-20261026/inert/pre.
+eff_psi0	--external psi=0
+eff_psi1	--external psi=1
+eff_psi2	--external psi=2
+ccs1_psi0	--external ccs=1 --external ccs_draws=1
+ccs1_psi1	--external ccs=1 --external ccs_draws=1 --external psi=1
+ccs1_psi2	--external ccs=1 --external ccs_draws=1 --external psi=2
+ccs12_psi0	--external ccs=1 --external ccs_draws=12
+ccs12_psi1	--external ccs=1 --external ccs_draws=12 --external psi=1
+ccs12_psi2	--external ccs=1 --external ccs_draws=12 --external psi=2
+ccs1_nq1	--external ccs=1 --external ccs_draws=1 --external ccs_nq=1
+ccs1_nq5	--external ccs=1 --external ccs_draws=1 --external ccs_nq=5
+ccs12_nq1	--external ccs=1 --external ccs_draws=12 --external ccs_nq=1
+eff_nz9	--grid Nz=9
+ccs1_nz9	--external ccs=1 --external ccs_draws=1 --grid Nz=9

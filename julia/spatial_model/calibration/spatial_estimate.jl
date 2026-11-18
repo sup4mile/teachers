@@ -44,9 +44,16 @@
 #                          costs this share of consumption-relevant income), jobs_city=0.45 (non-teachers' job
 #                          share of location 1; the baseline population shares 0.407/0.593 if not given). σw is not
 #                          an external input (σw = ρw σν): fix or free ρw. move_util=1 (2026-10-15, candidate U)
-#                          reads ϑ's r_m as a utility moving cost (τmove, utils) instead of the goods cost r_m C̄
+#                          reads ϑ's r_m as a utility moving cost (τmove, utils) instead of the goods cost r_m C̄.
+#                          The peer specification (2026-10-25, `peer_log_input`; inert while ψ_a = 0): A (the default)
+#                          the students' mean ability; B peer_total=1, their total (number × geometric mean); C
+#                          peer_input=hc, the adult residents' mean human capital; D both, their total
 #   --measure name=value   override a `Measurement` field (repeatable), e.g. chi=0.10, K=3,
 #                          income=log_median_market
+#   --grid name=value      override a setting of the evaluations' solver (repeatable; spatial_diagnose.jl), e.g. Nz=9;
+#                          la_start=x (2026-10-25) starts the peer fixed point at log P = x·(−1, +1) instead of 0, the
+#                          suburb-sorted branch for x > 0 (every evaluation solves from scratch). The frozen reference,
+#                          --freeze-reference and --calibrate-phi keep the default solver
 #   --wtp-consumption X    mean monthly consumption, 1990 dollars, for the BFM target [3,309]
 #   --target key=value     override a target's value (repeatable; NaN drops it); --target-se key=value its scale
 #   --activate key         put a validation target in the criterion (repeatable); --deactivate key the reverse
@@ -107,7 +114,7 @@ const OPTS = parse_cli(ARGS, Dict{String,Any}(
     ints    = ("workers", "max-evals", "n-samples", "n-local", "local-max-evals", "seed"),
     floats  = ("max-seconds", "wtp-consumption", "floor-tol"),
     strings = ("run-dir", "reference", "problem-id", "district"),
-    lists   = ("fix", "external", "measure", "target", "target-se"),
+    lists   = ("fix", "external", "measure", "target", "target-se", "grid"),
     multi   = ("warm-start", "activate", "deactivate", "free"),
     script  = "spatial_estimate.jl")
 OPTS["workers"] > 0 && !OPTS["freeze-reference"] && !OPTS["calibrate-phi"] &&
@@ -170,6 +177,8 @@ function main(opts)
                 " and left out of the criterion: $(t.note)")
     end
 
+    grid      = NamedTuple(k => (k in (:Nz, :nϵT, :nXO, :maxit, :hh_maxit) ? Int(v) : v) for (k, v) in opts["grid"])
+    solver    = merge(solver, grid)          # --grid: the evaluations' solver (the reference above keeps the default)
     model     = SpatialModel(base, [t.key for t in active]; meas, solver, verbose = opts["verbose"], floor_tol)
     objective = MomentObjective(model, [t.value for t in active]; scales = [t.se for t in active])
     pid       = something(opts["problem-id"], "spatial-" * problem_fingerprint(model, active, bounds))

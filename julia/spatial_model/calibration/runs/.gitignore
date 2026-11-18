@@ -72,3 +72,25 @@
 !/exp-1015b/s1_r_e_fit/report.txt
 !/exp-1015b/s1_r_e_fit/theta.toml
 !/exp-1015b/s1_r_e_fit/moments.toml
+
+# Summary tables and saved moments cited as sources in spatial_calibration.md (factorial, peer and
+# constant-class-size rounds). The rest of each round (fits, case lists, working logs) stays local.
+!/exp-factorial/
+!/exp-factorial/none/
+!/exp-factorial/none/moments.toml
+!/exp-factorial/HS/
+!/exp-factorial/HS/moments.toml
+!/exp-factorial/HSP/
+!/exp-factorial/HSP/moments.toml
+!/factorial-20261019/
+!/factorial-20261019/scores.md
+!/peer-20261025/
+!/peer-20261025/refit_scores.md
+!/ccs-20261026/
+!/ccs-20261026/refit_table.md
+!/ccs-simple-20261101/
+!/ccs-simple-20261101/compare_table.md
+!/ccs-simple-20261101/rhoz_table.md
+!/ccs-mech-20261102/
+!/ccs-mech-20261102/RESULTS.md
+!/ccs-mech-20261102/scores.md

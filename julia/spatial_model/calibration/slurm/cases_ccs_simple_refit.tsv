@@ -1,0 +1,13 @@
+# CCS simple-baseline round, 2026-11-01 (runs/ccs-simple-20261101/LOG.md): exactly identified refits (8 parameters,
+# 8 targets, default solver) from the September fit (runs/exact-polish-base), ψ = 0, panel.sh with --polish
+# (PANEL_MAX_ITER=30) on the frozen tree CODE=…/runs/_code/ccs-r1, PANEL_OUT=…/runs/exp-ccs-simple/refit. They complete
+# the 2×2 {K_d 1, 12} × {ρ 1, 0.3} of runs/exp-ccs/refit (ccs1_psi0 and ccs12_psi0 are the ρ = 1 corners; ccs1_psi0 is
+# the simple model) and add the efficient comparator with the same CFR effectiveness concept. Under CCS the draw's CFR
+# noise and the CFR bridge use the same ρ (--external ccs_rho = --measure cfr_rho = 0.3: no problem_setup warning).
+# The CCS cases fix the grid pad as cases_ccs_refit.tsv does (0.6 at K_d = 1, 0.3 at K_d = 12): ρ = 0.3 leaves SD(ln r)
+# pinned by the CFR target and makes the draw nearly Gaussian (its standardized skewness × ρ³), so max |x| ≈ √3 SD(ln r);
+# at the development candidate SD(ln r) is (0.149, 0.168) at K_d 1 and (0.041, 0.046) at K_d 12 (runs/exp-ccs/dev),
+# max |x| ≈ 0.29 and 0.08. The pad check at the converged refits is runs/ccs-simple-20261101/padcheck.sh.
+ccs1_rho03	--external ccs=1 --external ccs_draws=1 --external ccs_rho=0.3 --measure cfr_rho=0.3 --grid ccs_pad=0.6
+ccs12_rho03	--external ccs=1 --external ccs_draws=12 --external ccs_rho=0.3 --measure cfr_rho=0.3 --grid ccs_pad=0.3
+eff_rho03	--measure cfr_rho=0.3

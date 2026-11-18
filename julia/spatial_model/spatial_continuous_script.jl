@@ -29,16 +29,22 @@
 #   6  mechanism analyses and parameter sweeps
 #   7  figures
 #   8  run
+#   9  constant class size (§3e of the solver): `ccs_tests(; quick)`
 #
 # Run:  julia --project=.. spatial_continuous_script.jl
+# Including the file (2026-10-26) defines everything and runs `main_test()` only when it is the program itself, so that
+# e.g. `include("spatial_continuous_script.jl"); ccs_tests(quick = true)` runs the CCS checks alone. Plots is loaded
+# when the active environment has it (the repository's julia/ project); without it (the calibration's estimation
+# environment) everything but the figures runs.
 # =============================================================================
 
 using Printf
-using Plots
+const HAVE_PLOTS = Base.find_package("Plots") !== nothing
+HAVE_PLOTS && @eval using Plots
 
 include(joinpath(@__DIR__, "spatial_continuous.jl"))
 
-gr()  # Plots.jl GR backend (unrelated to the solver's `gr` grids NamedTuple)
+HAVE_PLOTS && gr()  # Plots.jl GR backend (unrelated to the solver's `gr` grids NamedTuple)
 
 const FIGDIR = joinpath(@__DIR__, "figures")
 
@@ -149,15 +155,19 @@ end
 # -----------------------------------------------------------------------------
 
 "Residual of the aggregate fixed point: re-evaluate the GE map at `sol` and
- compare to the stored aggregates (and the peer ability log ā with peer effects).
- Zero only at a true fixed point."
+ compare to the stored aggregates (and the peer input log P with peer effects, `peer_log_input`).
+ Zero only at a true fixed point. Under constant class size (§3e, 2026-10-26) H̃_T is not a state (rH = 0) and
+ the ln Q̄ term rQ = max |ln Q̄ implied by the solution's teachers − ln Q̄ of its grid| (`sol.ccs`) takes its place."
 function ge_map_residual(sol)
     HTn, Mn, tn = aggregates(sol.Φ, sol.Pi_T, sol.Pi_O, sol.hh, sol.p, sol.gr)
-    rH = maximum(abs, (HTn .- sol.HT) ./ sol.HT)
+    ccs = hasproperty(sol, :ccs)
+    rH = ccs ? 0.0 : maximum(abs, (HTn .- sol.HT) ./ sol.HT)
     rM = maximum(abs, (Mn  .- sol.M ) ./ sol.M )
     rt = maximum(abs,  tn  .- sol.t)
-    ra = iszero(sol.p.ψa) ? 0.0 : maximum(abs, peer_log_ability(sol.Φ, sol.gr) .- sol.la)
-    return (; res = max(rH, rM, rt, ra), rH, rM, rt, ra, HTn, Mn, tn)
+    ra = iszero(sol.p.ψa) ? 0.0 : maximum(abs, peer_log_input(sol.Φ, sol_probs(sol)..., sol.hh, sol.p, sol.gr) .- sol.la)
+    ccs || return (; res = max(rH, rM, rt, ra), rH, rM, rt, ra, HTn, Mn, tn)
+    rQ = maximum(abs, filter(isfinite, sol.ccs.lQT_now .- sol.ccs.lQT); init = 0.0)
+    return (; res = max(rH, rM, rt, ra, rQ), rH, rM, rt, ra, rQ, HTn, Mn, tn)
 end
 
 "Residual of the Φ eigen-problem: rebuild the joint kernel K from π̄ and Πz and
@@ -214,9 +224,15 @@ function household_residual(sol)
 end
 
 "Consistency of the school-quality shifter: the teacher index Q_T,l = (2 H̃_T,l / M_l)^σ, and
- Q_l = Q_T,l ā_l^ψa at the peer ability the grid was built at (Q = Q_T without peer effects)."
+ Q_l = Q_T,l P_l^ψa at the peer input the grid was built at (Q = Q_T without peer effects). Not a condition under
+ constant class size, where Q_T = Q̄ (`ccs_q_consistency_dev`)."
 q_consistency_dev(sol) =
     max(maximum(abs, sol.gr.QT .- (2 .* sol.HT ./ sol.M) .^ sol.p.σ),
+        maximum(abs, sol.gr.Q .- sol.gr.QT .* exp.(sol.p.ψa .* sol.gr.la)))
+
+"Under constant class size (§3e): Q_T = Q̄ = exp(ln Q̄) of the state, and Q = Q̄ P^ψa."
+ccs_q_consistency_dev(sol) =
+    max(maximum(abs, sol.gr.QT .- exp.(sol.ccs.lQT)),
         maximum(abs, sol.gr.Q .- sol.gr.QT .* exp.(sol.p.ψa .* sol.gr.la)))
 
 "Worst non-monotonicity (largest backward step) in W_T(ε_T) and W_O(X_O*)
@@ -270,8 +286,13 @@ function report_checks(sol)
     @printf("    Σ_l M_l = Mtot               : %.2e   [%s]\n", Mtot_dev, mark(Mtot_dev < 1e-8))
     pir = pi_rowsum_dev(sol)
     @printf("    Σ_{l'} π_{l'|l} = 1  (softmax)  : %.2e   [%s]\n", pir, mark(pir < 1e-6))
-    qd = q_consistency_dev(sol)
-    @printf("    Q_l = (2H̃_T,l/M_l)^σ         : %.2e   [%s]\n", qd, mark(qd < 1e-10))
+    if hasproperty(sol, :ccs)               # §3e: Q_T is Q̄, not the efficient index (which `report_ge` reports)
+        qd = ccs_q_consistency_dev(sol)
+        @printf("    Q̄_l = exp(ln Q̄_l)  (CCS)       : %.2e   [%s]\n", qd, mark(qd < 1e-10))
+    else
+        qd = q_consistency_dev(sol)
+        @printf("    Q_l = (2H̃_T,l/M_l)^σ         : %.2e   [%s]\n", qd, mark(qd < 1e-10))
+    end
     cvm = choice_value_monotonicity(sol)
     @printf("    W_T, W_O increasing in shock  : %.2e   [%s]\n", cvm, mark(cvm < 1e-6))
 
@@ -292,7 +313,8 @@ function report_checks(sol)
     hh = household_residual(sol)
     println("\n  Convergence-sensitive equilibrium conditions:")
     @printf("    GE-map residual              : %.2e   (H̃_T %.1e, M %.1e, t %.1e%s)  [%s]\n",
-            gm.res, gm.rH, gm.rM, gm.rt, iszero(sol.p.ψa) ? "" : @sprintf(", log ā %.1e", gm.ra),
+            gm.res, gm.rH, gm.rM, gm.rt, (iszero(sol.p.ψa) ? "" : @sprintf(", log P %.1e", gm.ra)) *
+            (hasproperty(gm, :rQ) ? @sprintf(", ln Q̄ %.1e; H̃_T not a state (CCS)", gm.rQ) : ""),
             mark(gm.res < 5e-3))
     @printf("    M_l = 2 ∫ Φ_l                : %.2e   [%s]\n", Ml_dev, mark(Ml_dev < 5e-3))
     @printf("    household policy residual    : %.2e   [%s]\n", hh, mark(hh < 1e-3))
@@ -2146,7 +2168,361 @@ function main_test()
     return sol
 end
 
+# -----------------------------------------------------------------------------
+# 9. Constant class size (`Params.ccs`, §3e of the solver, 2026-10-26): checks.
+#
+# `ccs_tests(; quick = true)` runs, in seconds and without a GE solve:
+#   (a) Proposition 5 at the node (α = 0.3, so an x vs x/α mix-up shows): the node at quality Q̄ r and shock ϵ_T equals
+#       the node at Q̄ and r^{1/α} ϵ_T (e, s, V̄, consumption, W, h_T), and the non-teaching node at X equals the one at
+#       r X (with the capacity), plain and nested (split) nodes;
+#   (a′) the shifted laws: under draw x the effective shocks' CDFs and `argmax_mean` at (ϵ e^{x/α}, X e^x) are the true
+#       ones at (ϵ, X) (three occupations, so the max over the non-teaching ones is live);
+#   (b) `gauss_from_moments`: the 3-point Gauss–Hermite rule from standard-normal moments, E[e^{aX}] for a normal and a
+#       skewed normal mixture, and the exact 2-point rule of a two-point law asked for 3 nodes;
+#   (c) `draw_moments` against the exact K_d-fold convolution of a discrete law (and with the CFR ν, a normal);
+#   (d) with `ccs` off `build_grids` is the frozen pre-CCS one (`_code/pre-ccs-20261026`), and with `ccs` on at pad 0
+#       and a degenerate draw its grids, laws and Q equal the baseline's;
+#   (e) the pipeline in partial equilibrium (λ = 0, two-node rule, a pad): the CCS household block at Q̄ on the
+#       effective grids against the baseline block solved separately at each q = Q̄ e^{x_k} on the true-shock grids
+#       (the effective ones shifted back), node values and every integral consumer mixed over the draws;
+#   (f) smoke: `ccs_start`, `ccs_implied`, `ccs_regrid_warm`, `ccs_solution`, `verify_solution`, `report_ge`,
+#       `report_checks` on that partial-equilibrium CCS block.
+# `quick = false` adds small GE solves (Nz = 3, 28 shock nodes; a SLURM job): β = 0 nesting at pad 0 (CCS = baseline),
+# n_q = 1/2/3/5 at K_d = 1, pad :auto vs 1.0, K_d = 1 vs 12, ccs_rho 1 vs 0.3, and CCS with the split.
+# -----------------------------------------------------------------------------
+"Largest |a − b| / max(1, |b|) over the entries (numbers, arrays, tuples)."
+_ccs_dev(a, b) = maximum(abs.(collect(Iterators.flatten((a,))) .- collect(Iterators.flatten((b,)))) ./
+                         max.(1.0, abs.(collect(Iterators.flatten((b,))))); init = 0.0)
 
+"Structural equality of two grid NamedTuples (floats bit for bit; `dO` only at the non-teaching entries)."
+function _ccs_same(a, b)
+    a === b && return true
+    if a isa NamedTuple
+        keys(a) == keys(b) || return false
+        return all(k == :dO ? all(a.dO[i, g] === b.dO[i, g] for i in a.nonteach, g in 1:2) : _ccs_same(a[k], b[k])
+                   for k in keys(a))
+    elseif a isa AbstractArray
+        return size(a) == size(b) && all(_ccs_same(x, y) for (x, y) in zip(a, b))
+    elseif a isa AbstractFloat
+        return a === b || (isnan(a) && isnan(b))
+    end
+    return isequal(a, b)
+end
 
-@time sol = main_test()
+"""
+(a) Proposition 5 at the node, over cells, two draws, plain and nested (split) nodes: `prim` the node primitives (income
+coefficients c; every other field must be identical) and `val`, at common policies (s, e), the consumption, the location
+values W and h_T / the capacity, all exact up to rounding; `pol` the solved (e, s) and the inclusive value V̄ at them,
+which agree only to the solver's tolerances (the Newton step on log e stops at |∂V̄/∂log e| < 1e-10, where V̄ is flat, so
+e is pinned to about 1e-8; s to its fixed-point tolerance 1e-10, and V̄ alone is first order in s).
+"""
+function _ccs_node_identity()
+    prim = val = pol = 0.0
+    fields(nd) = Tuple(getfield(nd, k) for k in fieldnames(typeof(nd)) if k != :c)
+    for p in (Params(; α = 0.3), Params(2, 2; α = 0.3, split = true, τk = 0.03))
+        gr = build_grids(p; H̃T = [0.8, 1.2], M = [0.9, 1.1], t = [0.10, 0.12], Nz = 3, nϵT = 8, nXO = 8)
+        Λ  = [0.05 * zi - 0.1 * l for zi in 1:gr.Nz, l in 1:gr.L]
+        for r in (0.7, 1.35), g in 1:2, l in 1:gr.L, zi in 1:gr.Nz
+            grr = merge(gr, (; Q = gr.Q .* r))
+            ϵ, X = gr.ϵTgrid[5], gr.XOgrid[4, g]
+            for teach in (true, false)
+                nd1 = teach ? teach_node(ϵ, zi, l, g, Λ, p, grr) : nonteach_node(X, zi, l, g, Λ, p, grr)
+                nd0 = teach ? teach_node(r^(1 / p.α) * ϵ, zi, l, g, Λ, p, gr) : nonteach_node(r * X, zi, l, g, Λ, p, gr)
+                prim = max(prim, _ccs_dev(nd1.c, nd0.c), isequal(fields(nd1), fields(nd0)) ? 0.0 : Inf)
+                e1, V1, s1 = solve_node(nd1, p, log(1e-2), NaN)
+                e0, V0, s0 = solve_node(nd0, p, log(1e-2), NaN)
+                C1, C0 = consumption(nd1, s0, e0, p), consumption(nd0, s0, e0, p)
+                h1 = teach ? teacher_h(ϵ, zi, l, s0, e0, p, grr) : nonteach_cap(X, zi, l, s0, e0, p, grr)
+                h0 = teach ? teacher_h(r^(1 / p.α) * ϵ, zi, l, s0, e0, p, gr) : nonteach_cap(r * X, zi, l, s0, e0, p, gr)
+                val = max(val, _ccs_dev(C1, C0), abs(h1 / h0 - 1),
+                          _ccs_dev(location_values(nd1, C1, p), location_values(nd0, C0, p)))
+                pol = max(pol, _ccs_dev(e1, e0), _ccs_dev(s1, s0), _ccs_dev(V1, V0))
+            end
+        end
+    end
+    return (; prim, val, pol)
+end
+
+"(a′) The shifted laws of draw x against the true laws at the unshifted points (three occupations)."
+function _ccs_law_shift()
+    p  = Params(3, 2; α = 0.3, A = [NaN, 1.5, 1.2])
+    gr = build_grids(p; H̃T = [1.0, 1.0], M = [1.0, 1.0], t = [0.1, 0.1], Nz = 3, nϵT = 12, nXO = 12)
+    worst = 0.0
+    for x in (-0.25, 0.4), g in 1:2, (ϵ, X) in ((0.7, 0.9), (1.3, 1.6))
+        law = ccs_law(gr, x, p)
+        worst = max(worst, abs(cdf(law.dT, ϵ * exp(x / p.α)) - cdf(gr.dT, ϵ)),
+                    abs(pdf(law.dT, ϵ * exp(x / p.α)) * exp(x / p.α) - pdf(gr.dT, ϵ)),
+                    abs(Fxo(law, g, X * exp(x)) - Fxo(gr, g, X)),
+                    abs(fxo(law, g, X * exp(x)) * exp(x) - fxo(gr, g, X)),
+                    abs(argmax_mean(identity, law, g, X * exp(x)) - argmax_mean(identity, gr, g, X)),
+                    abs(EΘpow(law, g, X * exp(x), 0.0) - EΘpow(gr, g, X, 0.0)))
+    end
+    return worst
+end
+
+"Raw moments of N(m, s²), orders 0..n."
+_normal_moments(m, s, n) = [sum(binomial(j, i) * m^(j - i) * (iseven(i) ? s^i * prod(1:2:i-1; init = 1) : 0.0)
+                                for i in 0:j) for j in 0:n]
+
+"(b) `gauss_from_moments`: Gauss–Hermite, E[e^{aX}] for a normal and a skewed mixture, an exact two-point law."
+function _ccs_gauss_checks()
+    x, w = gauss_from_moments([1.0, 0.0, 1.0, 0.0, 3.0, 0.0, 15.0], 3)
+    i = sortperm(x)
+    gh = max(maximum(abs, x[i] .- [-sqrt(3), 0.0, sqrt(3)]), maximum(abs, w[i] .- [1 / 6, 2 / 3, 1 / 6]))
+    a  = 1.1                                        # the truncation error of the n-point rule is ≈ (aσ)^{2n} n!/(2n)! ≈ 1.7e-7 at n = 3
+    en = [(r = gauss_from_moments(_normal_moments(0.0, 0.15, 10), n); abs(sum(r[2] .* exp.(a .* r[1])) / exp(a^2 * 0.15^2 / 2) - 1))
+          for n in (3, 5)]
+    mix = [(0.7, -0.06, 0.08), (0.3, 0.14, 0.2)]                    # (weight, mean, sd): mean zero, skewed
+    mm  = sum(q .* _normal_moments(m, s, 10) for (q, m, s) in mix)
+    exact = sum(q * exp(a * m + a^2 * s^2 / 2) for (q, m, s) in mix)
+    em = [abs(sum(w .* exp.(a .* x)) / exact - 1) for (x, w) in (gauss_from_moments(mm, n) for n in (3, 5))]
+    x2, w2 = gauss_from_moments([sum(q * v^j for (q, v) in ((0.6, -0.2), (0.4, 0.3))) for j in 0:6], 3)
+    i2 = sortperm(x2)
+    tp = length(x2) == 2 ? max(maximum(abs, x2[i2] .- [-0.2, 0.3]), maximum(abs, w2[i2] .- [0.6, 0.4])) : Inf
+    return (; gh, en, em3 = em[1], em5 = em[2], tp, n2 = length(x2))
+end
+
+"(c) `draw_moments` against the exact K_d-fold convolution of a three-point law (and the CFR ν: plus a normal)."
+function _ccs_cumulant_checks(; β = 0.25, K = 3, ρ = 0.6)
+    v, q = [-0.5, 0.1, 0.8], [0.3, 0.5, 0.2]
+    μ = sum(q .* v)
+    c = [sum(q .* (v .- μ) .^ j) for j in 0:6]
+    vals, wts = Float64[], Float64[]
+    for idx in Iterators.product(ntuple(_ -> 1:3, K)...)
+        push!(vals, β / K * sum(v[i] - μ for i in idx)); push!(wts, prod(q[i] for i in idx))
+    end
+    mex = [sum(wts .* vals .^ j) for j in 0:6]
+    e1  = maximum(abs, draw_moments(c, β, K, 1.0) .- mex)
+    sν  = sqrt(β^2 * c[3] * (1 / ρ^2 - 1) / K)                   # (β/K) Σ_t ν_t ~ N(0, β² Var ν / K)
+    my  = _normal_moments(0.0, sν, 6)
+    mexν = [sum(binomial(n, j) * mex[j + 1] * my[n - j + 1] for j in 0:n) for n in 0:6]
+    e2  = maximum(abs, draw_moments(c, β, K, ρ) .- mexν)
+    return max(e1, e2)
+end
+
+"Frozen pre-CCS solver (`_code/pre-ccs-20261026`), for (d); found from a frozen tree too, through its `data` link to the repository."
+const CCS_FROZEN = let data = joinpath(@__DIR__, "..", "..", "data")
+    root = ispath(data) ? dirname(realpath(data)) : normpath(joinpath(@__DIR__, "..", ".."))
+    joinpath(root, "julia", "spatial_model", "calibration", "runs", "_code", "pre-ccs-20261026", "julia", "spatial_model",
+             "spatial_continuous.jl")
+end
+
+"(d) `build_grids` with `ccs` off against the frozen copy; with `ccs` on at pad 0 and a degenerate draw against off."
+function _ccs_grid_checks()
+    kw = (; H̃T = [1.0, 1.0], M = [1.0, 1.0], t = [0.1, 0.1])
+    g  = build_grids(Params(); kw...)
+    frozen = nothing
+    if isfile(CCS_FROZEN)
+        m = Module(:PreCCS)
+        Base.include(m, CCS_FROZEN)
+        old = Base.invokelatest(mod -> mod.build_grids(mod.Params(); H̃T = [1.0, 1.0], M = [1.0, 1.0], t = [0.1, 0.1]), m)
+        frozen = _ccs_same(g, old)
+    end
+    kw2 = (; H̃T = [0.7, 1.3], M = [0.9, 1.1], t = [0.12, 0.08], Nz = 3, nϵT = 24, nXO = 32)
+    p   = Params()
+    gb  = build_grids(p; kw2...)
+    gc  = build_grids(with_params(p; ccs = true); kw2..., pad = 0.0)
+    same_grids = all(_ccs_same(gb[k], gc[k]) for k in (:z, :Πz, :ϵTgrid, :XOgrid, :lϵT, :lXO, :nϵT, :nXO, :t, :PT, :pk, :logΘ))
+    law0 = gc.ccs.laws[1][1]
+    same_laws = gc.ccs.x == [[0.0], [0.0]] && law0.dT === gb.dT && all(law0.dO[i, g] === gb.dO[i, g] for i in gb.nonteach, g in 1:2)
+    dQ = maximum(abs, log.(gc.QT) .- log.(gb.QT))
+    return (; frozen, same_grids, same_laws, dQ, safety = gc.dT === nothing && gc.dO === nothing)
+end
+
+"(e) and (f): the CCS household block against per-draw baseline blocks, in partial equilibrium (λ = 0)."
+function _ccs_pe_checks(; Nz = 2, n = 16, pad = 0.3, v = 0.64)
+    pb  = Params(3, 2; α = 0.3, β = 0.25, λ = 0.0, A = [NaN, 1.5, 1.2])
+    pc  = with_params(pb; ccs = true, ccs_nq = 2)
+    agg = (; H̃T = [0.8, 1.2], M = [0.9, 1.1], t = [0.10, 0.12])
+    c   = [1.0, 0.0, v, 0.0, 3 * v^2]                                 # normal central moments of ln h_eff, orders 0..4
+    lQT = pb.σ .* log.(2 .* agg.H̃T ./ agg.M)
+    grc = build_grids(pc; agg..., Nz, nϵT = n, nXO = n, ccs = (; lQT, c = [c, c]), pad)
+    grb = build_grids(pb; agg..., Nz, nϵT = n, nXO = n)
+    x, w = grc.ccs.x[1], grc.ccs.w[1]
+    hhc = solve_household(pc, grc; tol = 1e-10)
+    # the per-draw baseline problems: q = Q̄ e^{x_k} on the true-shock grids (the effective grids shifted back), true laws
+    grk = [merge(grb, (; Q = grc.Q .* exp(xk), QT = grc.QT .* exp(xk),
+                       ϵTgrid = grc.ϵTgrid .* exp(-xk / pb.α), lϵT = log.(grc.ϵTgrid .* exp(-xk / pb.α)),
+                       XOgrid = grc.XOgrid .* exp(-xk), lXO = log.(grc.XOgrid .* exp(-xk)), nϵT = grc.nϵT, nXO = grc.nXO))
+           for xk in x]
+    hhk = [solve_household(pb, g; tol = 1e-10) for g in grk]
+    mix(f) = sum(w[k] .* f(k) for k in eachindex(w))
+    # Proposition 5 on the whole block: the same node values and policies for every draw
+    nodes = maximum(max(_ccs_dev(hhk[k].WT, hhc.WT), _ccs_dev(hhk[k].WO, hhc.WO)) for k in eachindex(w))
+    pols  = maximum(max(_ccs_dev(hhk[k].eT, hhc.eT), _ccs_dev(hhk[k].eO, hhc.eO), _ccs_dev(hhk[k].hT, hhc.hT),
+                        _ccs_dev(hhk[k].capO, hhc.capO)) for k in eachindex(w))
+    # cell integrals and the parents' warm glow
+    cells = 0.0
+    for g in 1:2, l in 1:2, zi in 1:Nz
+        cm = choice_maps(hhc, g, l, zi, grc)
+        Ic = integrate_choice(ones(grc.nϵT), hhc.capO[g, l, zi, :], cm, grc)
+        Ik = mix(k -> collect(integrate_choice(ones(grc.nϵT), hhk[k].capO[g, l, zi, :], choice_maps(hhk[k], g, l, zi, grk[k]), grk[k])))
+        cells = max(cells, _ccs_dev(collect(Ic), Ik),
+                    _ccs_dev(child_Ef(l, g, zi, hhc, pc, grc), mix(k -> child_Ef(l, g, zi, hhk[k], pb, grk[k]))))
+    end
+    # the consumers that take a solution, on pseudo-solutions with a common Φ
+    Φ = [0.2 + 0.1 * zi + 0.05 * l for zi in 1:Nz, l in 1:2]
+    PTc, POc = location_probs(hhc, pc, grc)
+    Pk  = [location_probs(hhk[k], pb, grk[k]) for k in eachindex(w)]
+    solc = (; hh = hhc, Φ, gr = grc, p = pc, Pi_T = PTc, Pi_O = POc)
+    solk = [(; hh = hhk[k], Φ, gr = grk[k], p = pb, Pi_T = Pk[k][1], Pi_O = Pk[k][2]) for k in eachindex(w)]
+    sac, sak = student_ability_moments(solc), [student_ability_moments(s) for s in solk]
+    num(sa) = vcat(sa.massT, sa.massO, sa.mean_a_teach .* sa.massT, sa.mean_a_non .* sa.massO)
+    adc, adk = adult_log_h(Φ, PTc, POc, hhc, pc, grc), [adult_log_h(Φ, Pk[k]..., hhk[k], pb, grk[k]) for k in eachindex(w)]
+    agrid = range(0.4, 2.5; length = 7)
+    dc, dk = student_ability_density(solc, 1, agrid), [student_ability_density(s, 1, agrid) for s in solk]
+    tc  = ccs_teacher_moments(Φ, PTc, POc, hhc, pc, grc)
+    tk  = [ccs_teacher_moments(Φ, Pk[k]..., hhk[k], pb, grk[k]) for k in eachindex(w)]
+    # independently: n, μ, Var by workplace from `integrate_teach` (cubic splines of π, π ln h, π (ln h)²; MixedMaps)
+    I0, I1, I2 = zeros(2), zeros(2), zeros(2)
+    for l in 1:2, zi in 1:Nz, g in 1:2
+        cm = choice_maps(hhc, g, l, zi, grc)
+        lh = log.(hhc.hT[g, l, zi, :])
+        for wk in 1:2
+            πv = PTc[g, l, zi, :, wk]
+            I0[wk] += Φ[zi, l] / 2 * integrate_teach(πv, cm, grc)
+            I1[wk] += Φ[zi, l] / 2 * integrate_teach(πv .* lh, cm, grc)
+            I2[wk] += Φ[zi, l] / 2 * integrate_teach(πv .* lh .^ 2, cm, grc)
+        end
+    end
+    indep = max(_ccs_dev(tc.n, I0), _ccs_dev(tc.μ, I1 ./ I0), _ccs_dev(getindex.(tc.c, 3), I2 ./ I0 .- (I1 ./ I0) .^ 2))
+    hankel = all(isposdef(Symmetric([v[i + j - 1] / v[3]^((i + j - 2) / 2) for i in 1:pc.ccs_nq + 1, j in 1:pc.ccs_nq + 1]))
+                 for v in tc.c)
+    nmix = mix(k -> tk[k].n)
+    μmix = mix(k -> tk[k].n .* tk[k].μ) ./ nmix
+    vmix = mix(k -> tk[k].n .* (getindex.(tk[k].c, 3) .+ (tk[k].μ .- μmix) .^ 2)) ./ nmix
+    consumers = (; ability = _ccs_dev(num(sac), mix(k -> num(sak[k]))),
+                   adults = max(_ccs_dev(adc.m, mix(k -> adk[k].m)), _ccs_dev(adc.H .* adc.m, mix(k -> adk[k].H .* adk[k].m))),
+                   density = max(_ccs_dev(dc[1], mix(k -> dk[k][1])), _ccs_dev(dc[2], mix(k -> dk[k][2]))),
+                   teachers = max(_ccs_dev(tc.n, nmix), _ccs_dev(tc.μ, μmix)),
+                   # c is centred at the vector pass's own mean, μ comes from integrate_teach (≈ 1e-6 apart), so the
+                   # mixture variance built from the per-draw (μ, c) agrees only to about that × the spread of μ
+                   teachers_var = _ccs_dev(getindex.(tc.c, 3), vmix),
+                   aggregates = _ccs_dev(aggregates(Φ, PTc, POc, hhc, pc, grc)[1], mix(k -> aggregates(Φ, Pk[k]..., hhk[k], pb, grk[k])[1])),
+                   migration = _ccs_dev(migration_probs(PTc, POc, hhc, pc, grc), mix(k -> migration_probs(Pk[k]..., hhk[k], pb, grk[k]))),
+                   hbar = _ccs_dev(mean_child_h(solc), mix(k -> mean_child_h(solk[k]))))
+    # (f) smoke of the solver's CCS pieces on this block
+    hhb  = solve_household(pb, grb; tol = 1e-10)
+    PTb, POb = location_probs(hhb, pb, grb)
+    init = (; HT = agg.H̃T, M = agg.M, t = agg.t, Φ, hh = hhb, gr = grb, p = pb, Pi_T = PTb, Pi_O = POb)
+    cs   = ccs_start(pc, agg.H̃T, agg.M, init)
+    rg   = ccs_regrid_warm(hhb, grb, grc)
+    imp  = ccs_implied(tc, Φ, trues(2), lQT, [c, c], [NaN, NaN], pc)
+    sol  = ccs_solution(hhc, pc, grc, agg.H̃T, agg.M, agg.t, zeros(2), false, 0, lQT, [c, c], imp.μ, pad)
+    vok  = redirect_stdout(devnull) do
+        ok = verify_solution(sol)
+        report_ge(sol)
+        report_checks(sol)
+        ok
+    end
+    smoke = all(length(v) == 2 * pc.ccs_nq + 1 && all(isfinite, v) for v in cs.c) &&
+            size(rg.eT, 4) == grc.nϵT && size(rg.eO, 4) == grc.nXO && all(isfinite, imp.lQT) &&
+            isfinite(ccs_rule_change(grc.ccs, imp.c, pc)) && ccs_auto_pad(imp.c, pc) > 0.0 &&
+            all(isfinite, sol.ccs.N) && all(isfinite, sol.ccs.lQeff) && maximum(maximum(abs, x) for x in sol.ccs.x) ≤ sol.ccs.pad
+    return (; nodes, pols, cells, consumers, smoke, vok, x, w, pad, indep, hankel)
+end
+
+"Aggregates compared across solutions: M, t, log Q (the grid's), and the young's Φ."
+_ccs_sol_dev(a, b) = max(_ccs_dev(a.M, b.M), _ccs_dev(a.t, b.t), _ccs_dev(log.(a.gr.Q), log.(b.gr.Q)), _ccs_dev(a.Φ, b.Φ))
+
+"The small GE solves of `ccs_tests(quick = false)` (meant for a SLURM job)."
+function _ccs_solver_tests!(add; Nz = 3, n = 28, damping = 0.5, maxit = 600)
+    kw = (; Nz, nϵT = n, nXO = n, damping, maxit, hh_tol = 1e-9, verbose = false)
+    quiet(f) = redirect_stdout(f, devnull)
+    # β = 0: h^β constant, so CCS (pad 0, degenerate draws) is the efficient model up to rounding
+    pb = Params(; β = 0.0)
+    sb = solve_ge(pb; kw..., tol = 1e-11)
+    sc = solve_ge(with_params(pb; ccs = true); kw..., tol = 1e-11, ccs_pad = 0.0)
+    d  = _ccs_sol_dev(sc, sb)
+    add("GE: β = 0 nesting (CCS pad 0 = baseline)", sb.converged && sc.converged && d < 1e-8, @sprintf("max dev %.2e", d))
+    # n_q convergence at K_d = 1 (each solve warm-started from the last)
+    sols = Dict{Int, Any}()
+    prev = nothing
+    for q in (1, 2, 3, 5)
+        prev = solve_ge(Params(; ccs = true, ccs_nq = q); kw..., tol = 1e-9, init = prev)
+        sols[q] = prev
+    end
+    d15, d25, d35 = (_ccs_sol_dev(sols[q], sols[5]) for q in (1, 2, 3))
+    add("GE: n_q = 1/2/3/5 convergence (K_d = 1)", all(s.converged for s in values(sols)) && (d35 ≤ d25 || d25 < 1e-6) && d35 < 1e-3,
+        @sprintf("dev to n_q=5: n_q=1 %.1e, 2 %.1e, 3 %.1e; SD(ln r) %s", d15, d25, d35, fmtvec(sols[3].ccs.sd)))
+    # pad :auto vs a fixed wide pad
+    s1 = solve_ge(Params(; ccs = true); kw..., tol = 1e-9, init = sols[3], ccs_pad = 1.0)
+    dp = _ccs_sol_dev(sols[3], s1)
+    add("GE: pad :auto vs 1.0", s1.converged && dp < 1e-4, @sprintf("max dev %.2e (auto pad %.2f)", dp, sols[3].ccs.pad))
+    # K_d = 12 and ρ = 0.3. At each solution SD(ln r) = β SD_T/(ρ √K_d), SD_T the teachers' SD(ln h_eff) at the state the
+    # rule was built at (`id`: rule vs cumulants). Across solutions the naive ratios (√12, 1/ρ) are off by the change in
+    # SD_T: teachers carry their own draw, so a wider draw widens the teachers it is drawn from (feedback, reported).
+    sdT(s) = sqrt.(getindex.(s.ccs.c, 3))
+    id(s)  = maximum(abs, s.ccs.sd .* s.p.ccs_rho .* sqrt(s.p.ccs_draws) ./ (s.p.β .* sdT(s)) .- 1)
+    s12 = solve_ge(Params(; ccs = true, ccs_draws = 12); kw..., tol = 1e-9, init = sols[3])
+    rk  = maximum(abs, s12.ccs.sd .* sqrt(12) ./ sols[3].ccs.sd .- 1)
+    add("GE: K_d = 1 vs 12", s12.converged && max(id(sols[3]), id(s12)) < 1e-8,
+        @sprintf("SD(ln r) %s vs %s; |ratio·√12 − 1| %.3f, SD_T ×%s; identity %.1e", fmtvec(sols[3].ccs.sd),
+                 fmtvec(s12.ccs.sd), rk, fmtvec(sdT(s12) ./ sdT(sols[3])), max(id(sols[3]), id(s12))))
+    s03 = solve_ge(Params(; ccs = true, ccs_rho = 0.3); kw..., tol = 1e-9, init = sols[3])
+    rρ  = maximum(abs, s03.ccs.sd .* 0.3 ./ sols[3].ccs.sd .- 1)
+    add("GE: ccs_rho 1 vs 0.3", s03.converged && id(s03) < 1e-8,
+        @sprintf("SD(ln r) %s vs %s; |ratio·ρ − 1| %.3f, SD_T ×%s; identity %.1e", fmtvec(sols[3].ccs.sd),
+                 fmtvec(s03.ccs.sd), rρ, fmtvec(sdT(s03) ./ sdT(sols[3])), id(s03)))
+    # CCS with the residence/workplace split (σw ≤ σν, as `check_params` requires)
+    ss = solve_ge(Params(2, 2; split = true, τk = 0.03, σw = 0.15, ccs = true); kw..., tol = 1e-8)
+    vk = quiet(() -> verify_solution(ss))
+    add("GE: CCS + split smoke", ss.converged && vk,
+        @sprintf("N = %s, ln Q̄ = %s, SD(ln r) = %s, |ln Q̄ − implied| %.1e", fmtvec(ss.ccs.N), fmtvec(ss.ccs.lQT),
+                 fmtvec(ss.ccs.sd), maximum(abs, ss.ccs.lQT_now .- ss.ccs.lQT)))
+    return nothing
+end
+
+"""
+    ccs_tests(; quick = true) -> Bool
+
+The checks of constant class size (`Params.ccs`, §3e of the solver; see the section header for (a)–(f)). `quick = true`
+runs in seconds with no GE solve; `quick = false` adds the small GE solves (run it on SLURM). Prints a PASS/FAIL table
+and returns whether everything passed.
+"""
+function ccs_tests(; quick::Bool = true)
+    println("\n========== Constant class size (CCS) checks ==========")
+    rows = Tuple{String, Bool, String}[]
+    add(name, ok, info) = (push!(rows, (name, ok, info)); @printf("  %-44s %-4s  %s\n", name, ok ? "PASS" : "FAIL", info); flush(stdout))
+    a = _ccs_node_identity()
+    add("(a) Prop. 5 node identity (α = 0.3)", a.prim < 1e-14 && a.val < 1e-12,
+        @sprintf("node primitives %.1e, C/W/h at common (s, e) %.1e", a.prim, a.val))
+    add("(a) Prop. 5: solved e, s, V̄ agree to solver tol", a.pol < 1e-6, @sprintf("max dev %.1e (Newton gtol on log e)", a.pol))
+    a′ = _ccs_law_shift()
+    add("(a′) shifted laws, argmax_mean (I = 3)", a′ < 1e-12, @sprintf("max dev %.2e", a′))
+    b = _ccs_gauss_checks()
+    add("(b) Gauss–Hermite from N(0,1) moments", b.gh < 1e-12, @sprintf("max dev %.2e", b.gh))
+    add("(b) E[e^{aX}], normal, n = 3 / 5", b.en[1] < 1e-6 && b.en[2] < 1e-10, @sprintf("rel err %.2e / %.2e", b.en[1], b.en[2]))
+    add("(b) E[e^{aX}], skewed mixture, n = 3 / 5", b.em3 < 1e-5 && b.em5 < 1e-8, @sprintf("rel err %.2e / %.2e", b.em3, b.em5))
+    add("(b) two-point law, 3 nodes asked", b.n2 == 2 && b.tp < 1e-10, @sprintf("%d nodes, max dev %.2e", b.n2, b.tp))
+    c = _ccs_cumulant_checks()
+    add("(c) draw_moments vs K_d-fold convolution", c < 1e-13, @sprintf("max dev %.2e (K_d = 3, ρ = 1 and 0.6)", c))
+    d = _ccs_grid_checks()
+    add("(d) ccs off: build_grids = frozen pre-CCS", d.frozen === true,
+        d.frozen === nothing ? "frozen copy not found: $CCS_FROZEN" : "identical: $(d.frozen)")
+    add("(d) ccs on, pad 0, degenerate = baseline", d.same_grids && d.same_laws && d.dQ < 1e-14 && d.safety,
+        @sprintf("grids %s, laws %s, |Δlog Q| %.1e, gr.dT/dO nothing %s", d.same_grids, d.same_laws, d.dQ, d.safety))
+    e = _ccs_pe_checks()
+    # (e): the policies agree to the node solver's tolerance (as in (a)), so the integrals to about that
+    add("(e) PE: node values W_T, W_O across draws", e.nodes < 1e-10, @sprintf("max dev %.2e (x = %s, pad %.2f)", e.nodes, fmtvec(e.x), e.pad))
+    add("(e) PE: policies, h_T, capacity across draws", e.pols < 1e-6, @sprintf("max dev %.2e (solver tol)", e.pols))
+    add("(e) PE: cell integrals and child_Ef", e.cells < 1e-8, @sprintf("max dev %.2e", e.cells))
+    for (k, v) in pairs(e.consumers)
+        add("(e) PE: $(k)", v < (k in (:hbar, :teachers_var) ? 1e-6 : 1e-8), @sprintf("max dev %.2e", v))
+    end
+    add("(e) teacher moments vs integrate_teach", e.indep < 1e-5, @sprintf("n, μ, Var max dev %.2e (linear vs cubic π)", e.indep))
+    add("(e) teacher moments: Hankel PD", e.hankel, "orders 0..2n_q, standardized")
+    add("(f) smoke: start/implied/regrid/solution/reports", e.smoke && e.vok, "verify_solution $(e.vok)")
+    quick || _ccs_solver_tests!(add)
+    npass = count(r -> r[2], rows)
+    println("  ----------------------------------------------------------------------")
+    @printf("  %d/%d PASS%s\n", npass, length(rows), npass == length(rows) ? "" : "   <-- FAIL: " *
+            join((r[1] for r in rows if !r[2]), "; "))
+    println("======================================================")
+    return npass == length(rows)
+end
+
+if abspath(PROGRAM_FILE) == @__FILE__
+    @time sol = main_test()
+end
 

@@ -1,0 +1,392 @@
+M = [0.8139909317619751, 1.1860090682380249]
+Q = [0.09335482509117904, 0.09472803522717077]
+QT = [0.09335967103290868, 0.09472464552341595]
+active = ["male_teach_share", "female_teach_share", "teacher_p9010", "gap_salary", "gap_pupils", "cfr_effect", "wtp_share", "move_rate"]
+adult_share = [0.40699546588098756, 0.5930045341190124]
+c2s_by_own_z = [0.20581558689583596, 0.265859190291982, 0.3232517279088514]
+c2s_by_parent_income = [0.2516246451627042, 0.2662148575720094, 0.2771445997633063]
+cfr_analytic = 0.013665006992055981
+cfr_effect = 0.013344419827420408
+cfr_nonteach = 0.013481478734304738
+cfr_rho = 1.0
+cfr_sd_eff = 0.6143471606988382
+city_share_by_own_z = [0.4082118646613604, 0.40694939280910514, 0.40582514017249705]
+city_share_by_parent_income = [0.41482631434069867, 0.40363155923039507, 0.40253061531870954]
+city_share_gradient = -0.012295699021989126
+city_share_gradient_z = -0.0023867244888633454
+dLambda_mean = 0.0009236076346697263
+dLambda_quality = [0.0011615159174843855, 0.001265305376622082, 0.0013779413953879036, 0.0015001643202662241, 0.0016327921997850471, 0.0017767291574670128, 0.0019329736174130696, 0.0021026264659376945, 0.002286899316010657]
+dLambda_quality_mean = 0.0016441375858801657
+dLambda_z = [0.001043236274615559, 0.0009939775202100036, 0.0009523797448843258, 0.0009219551431565824, 0.0009060712920313831, 0.0009078413179690204, 0.0009300577745920795, 0.0009751700196862084, 0.0010453021157383405]
+decomp_resid_max = 1.0178607223303832e-8
+dz_adult_sd = 0.007775270510693066
+dz_young_sd = 0.004483220976465671
+female_teach_share = 0.05986896329377724
+fert_tilt_sd = 4.808313693367126e-6
+floor_mass = 5.267628909919795e-36
+gap_Heff_teacher_res = 0.003472754842022141
+gap_Heff_teacher_work = 0.003472754842022141
+gap_adults = 0.37639999999866836
+gap_income = 0.012233403416668676
+gap_income_log_mean = 0.010746446468826498
+gap_income_log_median = 0.01194063158568115
+gap_income_log_median_market = 0.012233403416668676
+gap_income_mean_log = 0.015906177375176522
+gap_income_mean_log_market = 0.016479705144936574
+gap_logQ = 0.014602442078250899
+gap_logQ_peer = 8.769167707518693e-5
+gap_logQ_teach = 0.014514750401176002
+gap_logQ_teach_check = 6.704486566616596e-10
+gap_logQ_teach_quality = 0.0019447427115323991
+gap_logQ_teach_staffing = 0.012570007019194947
+gap_logh_teacher = 0.007885210627348815
+gap_logh_teacher_res = 0.007885210627348815
+gap_logh_teacher_res_Q = 0.009228029014508365
+gap_logh_teacher_res_e = 0.00048511972845544094
+gap_logh_teacher_res_eps = -0.0010917417100103632
+gap_logh_teacher_res_s = -0.0011145790311504755
+gap_logh_teacher_res_z = 0.0003783766419440879
+gap_logh_teacher_work = 0.007885210627348815
+gap_logh_teacher_work_Q = 0.009228029014508365
+gap_logh_teacher_work_e = 0.00048511972845544094
+gap_logh_teacher_work_eps = -0.0010917417100103632
+gap_logh_teacher_work_s = -0.0011145790311504755
+gap_logh_teacher_work_z = 0.0003783766419440879
+gap_logheff_teacher_res = 0.007885210627348815
+gap_logheff_teacher_work = 0.007885210627348815
+gap_logpay_teacher_res = 0.009886299244919794
+gap_logpay_teacher_work = 0.009886299244919794
+gap_logy_mkt_nonteach_res = 0.01714692821440833
+gap_lyhat_mkt_nonteach_res = 0.017497542234858443
+gap_lyhat_teacher_res = 0.009825200410372048
+gap_lyhat_teacher_work = 0.009825200410372048
+gap_meanlog_mkt = 0.016479705144936574
+gap_meanlog_mkt_Qadj = 0.006422191748615691
+gap_parent_share = 0.0
+gap_pupils = 0.37639999999866836
+gap_salary = 0.008600000001798058
+gap_salary_res = 0.008600000001798058
+gap_teach_res_emp = 0.023109547742008907
+gap_teachers_pp = 0.02244644110570526
+gender_gap_market = 0.3281154614297286
+hp_share_f = 0.3411344980482315
+hp_share_m = 0.2262516880796973
+infeasible_mass = 0.0
+log_abar = [-0.0005190758575292886, 0.0003578421654673967]
+male_teach_share = 0.019446616564416323
+mean_C = 0.04546311474047942
+mean_h = 0.10071445008615916
+mean_log_yhat = -3.1232062602406923
+mean_log_yhat_mkt = -3.176688796802112
+mean_log_yhat_nonteach_mkt = -3.166219388237154
+mean_log_yhat_teach = -3.3553204146003743
+minC = -0.010359182138430628
+move_rate = 0.2156000000044521
+move_rate_by_own_z = [0.16898915426164945, 0.2162871023938607, 0.26151891325168924]
+move_rate_by_parent_income = [0.20567953259452632, 0.2163043383723022, 0.22482920003970336]
+mover_premium = [0.3887274009075896, 0.32408749732200803]
+n_binding = 885.0
+n_teach_res = [0.01592602463465753, 0.023731445469429863]
+n_teach_work = [0.01592602463465753, 0.023731445469429863]
+nonteach_mkt_logy_res = [-3.137967515008024, -3.1208205867936156]
+nonteach_mkt_lyhat_res = [-3.176587001815812, -3.1590894595809536]
+nonteach_mkt_mass_res = [0.27572066826185965, 0.40092481734754565]
+option_value_gap = 0.0
+option_value_nonteach = 0.0
+option_value_teach = 0.0
+p12 = 0.26486495744206895
+p21 = 0.18178809275872126
+parent_share_l = [1.0000058476551636, 1.0000058476551636]
+payroll_pp_gap = 0.031046441107504208
+peer_resid = 8.171517334315537e-10
+pk_z = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+pkid = 1.0
+pkid_z = 0.0
+pop_share = [0.40699546588098756, 0.5930045341190124]
+poverty_gap = -0.01182915068476642
+poverty_share_l = [0.18701473174888306, 0.17518558106411664]
+psi_a = 0.1
+rho_pc = 0.5761170855254236
+s2c_by_own_z = [0.14358650450114874, 0.18227089732499624, 0.21935501528946524]
+s2c_by_parent_income = [0.17309756679075547, 0.18251452096643, 0.18957466471212425]
+s_O_mean = 0.5541296598327399
+s_T_mean = 0.6665699640885123
+s_ratio = 1.2029133475542741
+score_gap = 0.06863607997574475
+score_gap_noQ = 0.004480681698943949
+score_loading = 1.8760360192675376
+seda_growth_gap = 0.011671228403232195
+share_born_suburb_res = [0.2156217527666731, 0.8475728308848627]
+share_born_suburb_work = [0.2156217527666731, 0.8475728308848627]
+stationarity_dev = 5.847620968845237e-6
+students_per_teacher = [25.555370861056034, 24.988133777308388]
+suburb_share_by_own_income = [0.584538917353384, 0.5963133429872749, 0.5976818018840593]
+t = [0.029053971473944784, 0.02964907455830304]
+t_market = 0.043965667531997675
+t_market_l = [0.043437758887873094, 0.044324076874232975]
+teach_share = 0.03965770200729722
+teacher_Heff_res = [0.3702379743098671, 0.3715259551542858]
+teacher_Heff_work = [0.3702379743098671, 0.3715259551542858]
+teacher_district_elasticity = [4.5816209648286605, 4.6066469913862065]
+teacher_logh_res = [-2.349457471838232, -2.3415722612108834]
+teacher_logh_work = [-2.349457471838232, -2.3415722612108834]
+teacher_logpay_res = [-3.310131965883888, -3.3002456666389683]
+teacher_logpay_work = [-3.310131965883888, -3.3002456666389683]
+teacher_lyhat_res = [-3.36119991743182, -3.351374717021448]
+teacher_lyhat_work = [-3.36119991743182, -3.351374717021448]
+teacher_p9010 = 2.772777699016605
+teacher_p9010_g = [2.6106987306643155, 2.8252019066368654]
+teacher_premium_f = -0.04966365424180985
+teacher_premium_m = -0.14899353714582597
+teacher_rw_mass = [0.015926024634657532, 0.0, 0.0, 0.023731445469429867]
+teacher_sd = 0.6143471606988382
+teacher_z_gap_market_sd = -0.22534455722182253
+teacher_z_gap_sd = -0.22451237617870037
+wage_slope = 0.205794894947501
+wtp_income_elasticity = 1.1075743755884537
+wtp_income_elasticity_z = 1.0574478815414372
+wtp_income_slope_z = 0.005367174734104757
+wtp_share = 0.005953610194710924
+wtp_share_by_parent_income = [0.005478706698874805, 0.005823509559363861, 0.006155542498724134]
+wtp_share_l = [0.00599076061741279, 0.005928849459638173]
+wtp_share_parents = 0.005953610194710924
+
+[targets.ba_premium]
+active = false
+se = 0.02
+value = 0.361
+
+[targets.ba_share]
+active = false
+se = 0.017
+value = 0.3391
+
+[targets.ba_share_nonteach]
+active = false
+se = 0.0162
+value = 0.3231
+
+[targets.ba_share_score_gap]
+active = false
+se = 0.05
+value = 0.6243
+
+[targets.ba_share_teach]
+active = false
+se = 0.01
+value = 0.8744
+
+[targets.ba_share_z_gap]
+active = false
+se = 0.05
+value = 0.653
+
+[targets.ba_z_gap_sd]
+active = false
+se = 0.019
+value = 1.2189
+
+[targets.cfr_effect]
+active = true
+se = 0.00406841661811708
+value = 0.013344419827570272
+
+[targets.city_share_gradient]
+active = false
+se = 0.037
+value = -0.295
+
+[targets.city_share_gradient_z]
+active = false
+se = 0.036
+value = -0.222
+
+[targets.commute_share_all]
+active = false
+se = 0.03
+value = 0.107
+
+[targets.commute_share_teach]
+active = false
+se = 0.03
+value = 0.084
+
+[targets.female_teach_share]
+active = true
+se = 0.0059868963292999035
+value = 0.05986896329299903
+
+[targets.gap_income]
+active = false
+se = 0.0168
+value = 0.1122
+
+[targets.gap_pupils]
+active = true
+se = 0.1154
+value = 0.3764
+
+[targets.gap_salary]
+active = true
+se = 0.0092
+value = 0.0086
+
+[targets.gap_teach_res_emp]
+active = false
+se = 0.041
+value = 0.298
+
+[targets.gap_teachers_pp]
+active = false
+se = 0.0131
+value = -0.0177
+
+[targets.gender_gap_market]
+active = false
+se = 0.05
+value = 0.1046
+
+[targets.ma_premium_implied]
+active = false
+se = 0.0068
+value = 0.1564
+
+[targets.male_teach_share]
+active = true
+se = 0.0019446616564039254
+value = 0.019446616564039253
+
+[targets.move_rate]
+active = true
+se = 0.05
+value = 0.2156
+
+[targets.net_commute_gap]
+active = false
+se = 0.038
+value = 0.075
+
+[targets.payroll_pp_gap]
+active = false
+se = 0.018816589276486852
+value = -0.0091
+
+[targets.pooled_p9010]
+active = false
+se = 0.18687
+value = 3.7374
+
+[targets.s_O_mean]
+active = false
+se = 0.005
+value = 0.5456759999999999
+
+[targets.s_T_mean_ba]
+active = false
+se = 0.01
+value = 0.6573
+
+[targets.s_T_mean_nonba]
+active = false
+se = 0.01
+value = 0.519512
+
+[targets.s_ratio]
+active = false
+se = 0.0588030259714556
+value = 1.1760605194291118
+
+[targets.teacher_ba_wage_gap]
+active = false
+se = 0.0094
+value = 0.4819
+
+[targets.teacher_ba_wage_gap_f]
+active = false
+se = 0.0095
+value = 0.5664
+
+[targets.teacher_ba_wage_gap_m]
+active = false
+se = 0.0219
+value = 0.2017
+
+[targets.teacher_p9010]
+active = true
+se = 0.13863888495552912
+value = 2.7727776991105824
+
+[targets.teacher_p9010_ba]
+active = false
+se = 0.12082999999999999
+value = 2.4166
+
+[targets.teacher_premium_ba_f]
+active = false
+se = 0.05
+value = -0.2081
+
+[targets.teacher_premium_ba_m]
+active = false
+se = 0.05
+value = -0.261
+
+[targets.teacher_premium_f]
+active = false
+se = 0.05
+value = 0.086
+
+[targets.teacher_premium_m]
+active = false
+se = 0.05
+value = 0.0557
+
+[targets.teacher_premium_within_ba_f]
+active = false
+se = 0.05
+value = -0.1368
+
+[targets.teacher_premium_within_ba_m]
+active = false
+se = 0.05
+value = -0.2374
+
+[targets.teacher_slope_ratio]
+active = false
+se = 0.3188
+value = 0.5565
+
+[targets.teacher_supply_elasticity]
+active = false
+se = 1.0
+value = 3.7
+
+[targets.teacher_z_gap_ba_sd]
+active = false
+se = 0.0625
+value = -0.3335
+
+[targets.teacher_z_gap_market_sd]
+active = false
+se = 0.062
+value = 0.614
+
+[targets.teacher_z_gap_within_ba_sd]
+active = false
+se = 0.0617
+value = -0.2384
+
+[targets.wage_slope]
+active = false
+se = 0.0077
+value = 0.21266
+
+[targets.wage_slope_ba]
+active = false
+se = 0.0083
+value = 0.1608
+
+[targets.wtp_share]
+active = true
+se = 0.0022363814944468233
+value = 0.005953610194676002

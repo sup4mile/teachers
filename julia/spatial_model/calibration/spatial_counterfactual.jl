@@ -4,8 +4,9 @@
 #
 # At a fitted ϑ, solve the general equilibrium and then re-solve the household block in
 # partial equilibrium with the teacher-quality index Q_T,l replaced, holding taxes, the
-# teacher stocks and, with peer effects (ψa ≠ 0), the peer factor ā_l^ψa of the solution
-# fixed (school quality is Q_l = Q_T,l ā_l^ψa):
+# teacher stocks and, with peer effects (ψa ≠ 0), the peer factor P_l^ψa of the solution
+# fixed (school quality is Q_l = Q_T,l P_l^ψa, log P = `gr.la` in every peer specification: the students'
+# mean or total ability, the adult residents' mean or total human capital, `peer_log_input`):
 #   q_base   Q_T,l of a reference solution (--q-from, default the exactly identified
 #            baseline, runs/exp-final/p0_baseline of the repository, also when run from a code
 #            snapshot; its moments.toml "QT", or "Q" for runs that predate peer effects): teacher
@@ -24,6 +25,8 @@
 # directory with moments.toml), --out DIR, and the problem options of spatial_diagnose.jl
 # (--external, --measure, --fix, --floor-tol, …; --fix overrides the read ϑ; --floor-tol is the
 # largest population share at the consumption floor, for the equilibrium and the re-solves alike).
+# Not CCS-aware (2026-10-26): under constant class size (`--external ccs=1`, model §3e) Q_T is the geometric-mean index
+# of a teacher-draw law, which `fixed_q_solution` does not hold or equalize, so the script stops with an error.
 # =============================================================================
 
 using Printf
@@ -61,16 +64,22 @@ function read_run_theta(spec)
     return pad_theta(parse.(Float64, split(spec, ',')))
 end
 
+"The error of this script under constant class size (2026-10-26): it is not CCS-aware."
+const CCS_UNSUPPORTED = "spatial_counterfactual.jl is not CCS-aware: under constant class size (--external ccs=1, model §3e) " *
+    "school quality is Q̄_l times a teacher draw r with a location-specific law, and fixing or equalizing Q_T here would " *
+    "leave the draw laws at the equilibrium's; run it without ccs"
+
 """
     fixed_q_solution(sol, QT; hh_tol, hh_maxit) -> sol′
 
 The household block, location choices and stationary distribution re-solved at the
-aggregates of `sol` (taxes, teacher stocks, peer ability) with the teacher-quality index
+aggregates of `sol` (taxes, teacher stocks, the peer input log P) with the teacher-quality index
 replaced by `QT`, so that school quality is `QT` times the solution's peer factor; under
 the split (`sol.p.split`) the teachers' positions stay at the pupils' shares of `sol`.
 """
 function fixed_q_solution(sol, QT; hh_tol = SOLVER.hh_tol, hh_maxit = SOLVER.hh_maxit)
     (; p, gr) = sol
+    (p.ccs || ccs_on(gr)) && error(CCS_UNSUPPORTED)
     QT  = collect(Float64, QT)
     gr2 = merge(gr, (; QT, Q = iszero(p.ψa) ? copy(QT) : QT .* exp.(p.ψa .* gr.la)))
     hh  = solve_household(p, gr2; tol = hh_tol, maxit = hh_maxit, hh0 = sol.hh)
@@ -94,6 +103,7 @@ const ROWS = [(:gap_income, "earnings gap (median, market)", 0.1122), (:gap_mean
 function main(opts)
     ref = frozen_reference(something(opts["reference"], REFERENCE_FILE), SOLVER)
     (; base, meas, floor_tol) = problem_setup(opts, ref)
+    base.ccs && error(CCS_UNSUPPORTED)
     θ = read_run_theta(opts["theta"])
     for (name, v) in opts["fix"]
         θ[theta_index(name)] = v
@@ -115,8 +125,8 @@ function main(opts)
     @printf(io, "spatial_counterfactual.jl  %s\n  theta %s\n  ϑ = %s\n  Q: equilibrium %s, reference %s (%s), equal %s\n",
             Libc.strftime("%Y-%m-%d %H:%M:%S", time()), opts["theta"], fmtvec(θ), fmtvec(sol.gr.QT), fmtvec(Qb),
             opts["q-from"], fmtvec(Qeq))
-    iszero(sol.p.ψa) || @printf(io, "  (teacher index Q_T; peers held at the equilibrium: ψa = %.3f, log ā = %s)\n",
-                                sol.p.ψa, fmtvec(sol.gr.la))
+    iszero(sol.p.ψa) || @printf(io, "  (teacher index Q_T; peers held at the equilibrium: ψa = %.3f, specification %s, log P = %s)\n",
+                                sol.p.ψa, peer_spec(sol.p), fmtvec(sol.gr.la))
     println(io)
     foreach(c -> println(io, "  ", c), checks)
     @printf(io, "\n  %-30s %9s %15s %15s %15s\n", "outcome", "data (locale)", cases[1][1], cases[2][1], cases[3][1])

@@ -18,6 +18,14 @@
 #   - With `Params.college` (spatial_continuous.jl §3c) every cell is a mixture of two education
 #     branches, d = 1 (BA) and d = 0, with weights P(d | g, l, z): the integrals loop over
 #     `cell_branches`, `micro_sample` carries d, and §6b adds the education moments.
+#   - With constant class size (`Params.ccs`, spatial_continuous.jl §3e, 2026-10-26) a child of l draws school
+#     quality q = Q̄_l r, and the solver's nodes are at the effective shocks (Proposition 5 of
+#     notes/spatial_teachers_model_ccs.md). `choice_maps` returns a `MixedMaps`, whose integrals mix the draws of
+#     R_l for any quantity given at the effective nodes that does not depend on the draw; whatever does (the
+#     argmax probabilities, a point's weight, the true shock, the draw x = ln r itself) goes through `over_draws`
+#     or the draws of the `MixedMaps` (`micro_sample` carries `lr` = ln r). `gr.Q` is Q̄_l. Every such change is
+#     guarded by `ccs_on(gr)` or `p.ccs`, so that without the switch the moments are those of the model without
+#     it, bit for bit, and `model_moments` adds the CCS keys only with it (`ccs_moments`).
 #
 # Layout
 #   1  Measurement assumptions
@@ -225,6 +233,37 @@ function argmax_prob(gr, g, x, i)
 end
 
 """
+    argmax_probs(gr, g, i) -> Vector
+
+P(i* = i | X_O*) (`argmax_prob`) at the nodes `gr.XOgrid[:, g]`. Under constant class size (§3e of the model,
+2026-10-26) `gr` is a draw's law (`ccs_law`, the `law` of `over_draws`): at an effective node X̃_O* = x the
+probability depends on the draw r through the shifted laws, P(i* = i | X̃_O* = x, r) ∝ f_i(x/r)/F_i(x/r), so it is
+taken per draw (the top-level grid of a CCS solution has no laws, `gr.dO` = nothing).
+"""
+argmax_probs(gr, g, i) = [argmax_prob(gr, g, gr.XOgrid[k, g], i) for k in 1:gr.nXO]
+
+"""
+    argmax_group_probs(gr, g, x, groups) -> Vector
+
+P(i* ∈ groups[k] | X_O* = x) for every group k: `argmax_prob` summed over the occupations of each group, in one
+pass over the occupations (2026-10-26; the group probabilities of a CCS pseudo-sample, `micro_sample`, are taken
+per draw, and with one group per occupation, `pooled_p9010`, the pass per occupation of `argmax_prob` would cost
+a factor of the number of occupations). `gr` may be a draw's law (`ccs_law`).
+"""
+function argmax_group_probs(gr, g, x, groups)
+    wj  = zeros(size(gr.logΘ, 1))
+    den = 0.0
+    for j in gr.nonteach
+        wj[j] = pdf(gr.dO[j, g], x) / max(cdf(gr.dO[j, g], x), 1e-300)
+        den  += wj[j]
+    end
+    return [den > 0.0 ? sum(wj[i] for i in grp) / den : 0.0 for grp in groups]
+end
+
+"`argmax_group_probs` at the points `xm`, as an n × G matrix (the `pg` of `micro_sample` under CCS)."
+argmax_group_matrix(gr, g, xm, groups) = permutedims(reduce(hcat, [argmax_group_probs(gr, g, x, groups) for x in xm]))
+
+"""
     home_production_stats(sol, hp; stats = location_stats(sol))
 
 Occupation `hp` (home production in the calibration) integrated over non-teachers
@@ -243,6 +282,8 @@ compensation over market labour income. Returns
 Under the split the locations are residences: `Pi_Or` stands in for `Pi_O`, so that `income_l`
 and `n_l` are by residence, and `t_market_l` is the pay of the teachers who work in l′ over the
 market income of the residents of l′, the budget the tax rate balances.
+Under constant class size (§3e of the model, 2026-10-26) P(i* = hp | X̃_O*) is taken under each draw's law
+(`over_draws`, `argmax_probs`).
 """
 function home_production_stats(sol, hp::Int; stats = location_stats(sol))
     sol.Pi_O === nothing &&
@@ -250,12 +291,27 @@ function home_production_stats(sol, hp::Int; stats = location_stats(sol))
     (; hh, Φ, Pi_T, Pi_O, gr, p) = sol
     (; Nz, L, nXO) = gr
     hp in gr.nonteach || throw(ArgumentError("occupation $hp is not a non-teaching occupation"))
-    pHP = [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:nXO] for g in 1:2]
+    ccs = ccs_on(gr)                                 # §3e: the argmax probabilities by draw, below
+    pHP = ccs ? nothing : [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:nXO] for g in 1:2]
     nHP = zeros(2); yHP = zeros(L); nHPl = zeros(L)
     for l in 1:L, zi in 1:Nz, g in 1:2, br in cell_branches(hh, Pi_T, Pi_O, p, g, l, zi)
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
         cm = choice_maps(br.h, g, l, zi, gr)
+        if ccs
+            capO = br.h.capO[g, l, zi, :]
+            πOs  = [br.πO[g, l, zi, :, lp] for lp in 1:L]
+            v = over_draws(cm, gr) do cmk, law, _
+                ph = argmax_probs(law, g, hp)
+                vcat(integrate_nonteach(ph, cmk, law),
+                     [integrate_nonteach(ph .* capO .* πOs[lp], cmk, law) for lp in 1:L],
+                     [integrate_nonteach(ph .* πOs[lp], cmk, law) for lp in 1:L])
+            end
+            nHP[g] += mass * v[1]
+            yHP   .+= mass .* v[2:L+1]
+            nHPl  .+= mass .* v[L+2:2L+1]
+            continue
+        end
         nHP[g] += mass * integrate_nonteach(pHP[g], cm, gr)
         for lp in 1:L
             yHP[lp] += mass * integrate_nonteach(pHP[g] .* br.h.capO[g, l, zi, :] .* br.πO[g, l, zi, :, lp], cm, gr)
@@ -303,6 +359,12 @@ The integrals are those of `location_stats` (`integrate_teach` of the same integ
 so that the sums over r and over w reproduce its `nT`, `logh` and `pay` up to the order of the additions. The pieces
 of the decomposition are integrated separately and sum to the total up to the quadrature tolerance, not exactly
 (`sorting_moments`, `decomp_resid_max`).
+Under constant class size (§3e of the model, 2026-10-26) the nodes are at the effective shock ϵ̃_T = ϵ_T r^{1/α}, so
+log h_T = (log Q̄_l + x) + α log z + (α log ϵ̃_T − x) + φ log s + η log e with x = ln r the teacher's own draw when she
+was a student: `dQ` and `dϵ` are integrated per draw (`over_draws`), the draw in the school-quality term and the true
+shock α log ϵ_T = α log ϵ̃_T − x in the ϵ term, so the decomposition separates the teacher's own draw from her
+occupational shock. The other sums are of quantities at the effective nodes that do not depend on the draw (the
+`MixedMaps` integrals), and the non-teachers' P(i* = hp | X̃_O*) is taken under each draw's law.
 """
 function teacher_sorting_stats(sol, meas::Measurement)
     (; hh, Φ, gr, p) = sol
@@ -311,7 +373,9 @@ function teacher_sorting_stats(sol, meas::Measurement)
     pairs_rw = p.split ? [(r, w) for r in 1:L for w in 1:L] : [(w, w) for w in 1:L]
     expo = p.β / p.σ
     hp_ok = meas.hp != 0 && meas.hp in gr.nonteach
-    wmkt = [hp_ok ? [1 - argmax_prob(gr, g, XOgrid[k, g], meas.hp) for k in 1:nXO] : ones(nXO) for g in 1:2]
+    ccs  = ccs_on(gr)                                 # §3e: dQ, dϵ and the market weights by draw, below
+    wmkt = ccs ? nothing :
+           [hp_ok ? [1 - argmax_prob(gr, g, XOgrid[k, g], meas.hp) for k in 1:nXO] : ones(nXO) for g in 1:2]
     m = zeros(L, L); lh = zeros(L, L); le = zeros(L, L); hb = zeros(L, L)
     lpay = zeros(L, L); pay = zeros(L, L); yh = zeros(L, L)
     dQ = zeros(L, L); dz = zeros(L, L); dϵ = zeros(L, L); ds = zeros(L, L); de = zeros(L, L); born = zeros(L, L)
@@ -343,9 +407,18 @@ function teacher_sorting_stats(sol, meas::Measurement)
             lpay[r, w] += mass * integrate_teach(πT .* lyT, cm, gr)
             pay[r, w]  += mass * integrate_teach(πT .* exp.(lyT), cm, gr)
             yh[r, w]   += mass * integrate_teach(πT .* qyh, cm, gr)
-            dQ[r, w]   += cQ * mT
+            if ccs          # §3e: log Q̄_l + x in the quality term and the true shock α log ϵ̃_T − x in the ϵ term, by draw
+                vQ, vϵ = over_draws(cm, gr) do cmk, law, x
+                    mk = integrate_teach(πT, cmk, law)
+                    ((cQ + x) * mk, integrate_teach(πT .* t_ϵ, cmk, law) - x * mk)
+                end
+                dQ[r, w] += mass * vQ
+                dϵ[r, w] += mass * vϵ
+            else
+                dQ[r, w] += cQ * mT
+                dϵ[r, w] += mass * integrate_teach(πT .* t_ϵ, cm, gr)
+            end
             dz[r, w]   += cz * mT
-            dϵ[r, w]   += mass * integrate_teach(πT .* t_ϵ, cm, gr)
             ds[r, w]   += mass * integrate_teach(πT .* t_s, cm, gr)
             de[r, w]   += mass * integrate_teach(πT .* t_e, cm, gr)
             l == 2 && (born[r, w] += mT)
@@ -354,6 +427,15 @@ function teacher_sorting_stats(sol, meas::Measurement)
         qyhO = [predicted_log_income(nonteach_node(XOgrid[k, g], zi, l, g, hbr.Λ, p, gr; d), p, gr) for k in 1:nXO]
         for r in 1:L
             πO = p.split ? vec(sum(br.πO[g, l, zi, :, r, :]; dims = 2)) : br.πO[g, l, zi, :, r]
+            if ccs          # §3e: the market weight 1 − P(i* = hp | X̃_O*) under each draw's law
+                v = over_draws(cm, gr) do cmk, law, _
+                    qk = hp_ok ? πO .* (1 .- argmax_probs(law, g, meas.hp)) : πO .* ones(nXO)
+                    [integrate_nonteach(qk, cmk, law), integrate_nonteach(qk .* lyOk, cmk, law),
+                     integrate_nonteach(qk .* qyhO, cmk, law)]
+                end
+                mO[r] += mass * v[1]; lyO[r] += mass * v[2]; yhO[r] += mass * v[3]
+                continue
+            end
             q  = πO .* wmkt[g]
             mO[r]  += mass * integrate_nonteach(q, cm, gr)
             lyO[r] += mass * integrate_nonteach(q .* lyOk, cm, gr)
@@ -393,7 +475,9 @@ by workplace (`_work`):
   n_w the teachers working at w and M_w = 2 S_w the pupils there (the normalisation of `QT` in `build_grids`; the
   second is σ times `gap_teachers_pp`): the two parts of Δ log Q_T = `gap_logQ_teach`, and
   `gap_logQ_teach_check` = `gap_logQ_teach` − quality − staffing, which is at the GE tolerance (the grid is built at the
-  aggregates of the last iteration, the sums here are at the choices);
+  aggregates of the last iteration, the sums here are at the choices). Under constant class size (§3e of the model,
+  2026-10-26) Q_T is the geometric-mean index, log Q̄_T,w = β μ_w − σ log(S_w/n_w), so the quality term is
+  β Δ mean log h_eff by workplace (β Δμ) and the staffing term is unchanged; `gap_logQ_teach_check` still closes it;
 - the (r, w) cells flattened column-major, element (w − 1) L + r: `teacher_rw_mass`, `teacher_rw_logh`, `teacher_rw_logpay`;
 - `gap_logpay_teacher_res_fixedw`, `gap_logh_teacher_res_fixedw`: the residence contrast at a given workplace,
   Σ_w m_w (x[2, w] − x[1, w]) / Σ_w m_w over the workplaces with teachers of both residences (m_w the teacher mass at w);
@@ -432,7 +516,7 @@ function sorting_moments(ts, sol)
     # the teacher-quality index: quality of the teachers and staffing (QT = (2 H̃_T/M)^σ with H̃_T = n E[h_eff^{β/σ}])
     S    = vec(sum(Φ; dims = 1))
     stf  = [slog(2 * mw[w] / (2 * S[w])) for w in 1:L]
-    g_q  = p.σ * gap(slog.(He_w))
+    g_q  = p.ccs ? p.β * gap(le_w) : p.σ * gap(slog.(He_w))   # §3e: CCS quality is β μ_w (geometric mean)
     g_s  = p.σ * gap(stf)
     g_QT = log(gr.QT[2]) - log(gr.QT[1])
     nm_ly, nm_yh = avg(ts.lyO, ts.mO), avg(ts.yhO, ts.mO)
@@ -491,6 +575,12 @@ workplace marginal of the joint probabilities.
 Under `p.college` both education branches are re-solved with P(d | g, l, z) held fixed (§3c);
 a teacher's income carries her pay factor, which moves with her time share (`pay_factor`), and
 the SD of teacher quality is that of the effectiveness `effective_h` (h_T unless ωz ≠ 1).
+Under constant class size (§3e of the model, 2026-10-26) the experiment is a better draw for the child: the node at
+(Q̄_l r e^δ, ϵ) is the node at (Q̄_l e^δ, ϵ̃) (Proposition 5), so the re-solve at `gr.Q` e^δ on the effective-shock
+nodes is exact for every draw, and the integrands (incomes and their ratios at the effective nodes) do not depend on
+the draw, so the `MixedMaps` integrals mix the draws as they should; nothing here changes. With K_d = K (`ccs_draws`)
+the experiment is one block's draw one SD better; `meas.cfr_rho` should equal the draw's `ccs_rho` (`problem_setup`
+warns when they differ).
 """
 function teacher_intervention(sol, meas::Measurement; stats = location_stats(sol))
     0 < meas.cfr_rho ≤ 1 || throw(ArgumentError("cfr_rho must lie in (0, 1], got $(meas.cfr_rho)"))
@@ -781,7 +871,7 @@ function wtp_by_parent_income(sol, ms, meas::Measurement; nq = 3, msk = nothing)
 end
 
 """
-    quality_value(sol) -> (; dΛ, dΛ_equal, dΛ_quality)
+    quality_value(sol) -> (; dΛ, dΛ_equal, dΛ_quality)    (CCS: also dΛ_equal_geo, dΛ_geo, dΛ_disp)
 
 The value of the suburb's school quality to a parent of ability z, Λ(z, 2) − Λ(z, 1) over
 the z nodes, and the part of it that school quality alone accounts for. `dΛ` is the gap in
@@ -792,17 +882,71 @@ Q̄/Q_l. `dΛ_quality = dΛ − dΛ_equal` is the part due to Q alone. `dΛ` als
 what differs between the locations' children besides Q, chiefly the Ξ (moving-cost) offset
 in their schooling (children born in different locations face different goods costs and
 choose different (e, s)) and their occupational choices; that rest is `dΛ_equal`. With peer
-effects Q includes the peer factor ā_l^{ψa} (`build_grids`), so "school quality" here is teachers
-and peers together.
+effects Q includes the peer factor P_l^{ψa} (`build_grids`, `peer_log_input`; any specification), so "school
+quality" here is teachers and peers together.
+
+Under constant class size (§3e of the model, 2026-10-26) a location's school quality is its geometric mean Q̄_l (`gr.Q`)
+AND the law R_l of the teacher draw r, and parents value both (`child_Ef` mixes the draws). `dΛ_quality` then
+equalizes both: the children's h′ is rescaled to the pupil-weighted mean of Q̄ as above, and every location's rule is
+replaced by the pooled rule (`ccs_pooled_rule`: the n_q-point Gauss rule of the pupil-weighted mixture of the
+locations' centred draw laws), with `dΛ_equal` the gap re-evaluated so. `dΛ_geo` equalizes Q̄ alone (each location
+keeps its own draw law), the part due to the geometric-mean quality, and `dΛ_disp = dΛ_quality − dΛ_geo` is the part
+due to the dispersion of the draw; `dΛ_equal_geo` is the gap re-evaluated at equal Q̄ only. Equalizing the law is a
+change of the draw's distribution at the solution's values: the effective-shock values W_T, W_O stay as solved, so the
+occupation (teach) weights at a true shock move with the law, which the rescaling of Q̄ at fixed weights does not do.
+Without CCS the fields are the three above.
 """
 function quality_value(sol)
     (; hh, Φ, gr, p) = sol
     w  = vec(sum(Φ; dims = 1))                         # population by location
     r  = reshape(dot(w, gr.Q) / sum(w) ./ gr.Q, 1, gr.L, 1, 1)   # Q̄/Q_l for the cells born in l
     scale(b) = merge(b, (; hT = b.hT .* r, capO = b.capO .* r))  # both education branches under college
-    Λe = compute_lambda(p.college ? merge(hh, (; br1 = scale(hh.br1), br0 = scale(hh.br0))) : scale(hh), p, gr)
+    hs = p.college ? merge(hh, (; br1 = scale(hh.br1), br0 = scale(hh.br0))) : scale(hh)
+    Λe = compute_lambda(hs, p, gr)
     dΛ, dΛe = hh.Λ[:, 2] .- hh.Λ[:, 1], Λe[:, 2] .- Λe[:, 1]
-    return (; dΛ, dΛ_equal = dΛe, dΛ_quality = dΛ .- dΛe)
+    ccs_on(gr) || return (; dΛ, dΛ_equal = dΛe, dΛ_quality = dΛ .- dΛe)
+    # §3e: Q̄ and the draw law equalized together (the pooled rule in every location)
+    Λp  = compute_lambda(hs, p, ccs_pooled_grid(gr, w, p))
+    dΛp = Λp[:, 2] .- Λp[:, 1]
+    dΛq, dΛg = dΛ .- dΛp, dΛ .- dΛe
+    return (; dΛ, dΛ_equal = dΛp, dΛ_quality = dΛq, dΛ_equal_geo = dΛe, dΛ_geo = dΛg, dΛ_disp = dΛq .- dΛg)
+end
+
+"""
+    ccs_pooled_rule(gr, wl) -> (; x, w)
+
+The pooled rule of the teacher draw under constant class size (§3e of the model, 2026-10-26): the mixture of the
+locations' draw laws with the weights `wl` (the pupils by location in `quality_value`), each represented by its rule
+R_l (`gr.ccs.x[l]`, `gr.ccs.w[l]`, centred), re-reduced to `gr.ccs.nq` nodes by `gauss_from_moments` on the moments of
+orders 0..2n_q − 1 of the mixture, which the rules give exactly (a Gauss rule matches them). The nodes lie in the hull of
+the locations' nodes, so the grid pad covers them.
+"""
+function ccs_pooled_rule(gr, wl)
+    nq = gr.ccs.nq
+    J  = 2 * nq - 1
+    m  = zeros(J + 1)
+    W  = sum(wl)
+    for l in 1:gr.L, k in eachindex(gr.ccs.x[l])
+        m .+= (wl[l] / W * gr.ccs.w[l][k]) .* gr.ccs.x[l][k] .^ (0:J)
+    end
+    x, w = gauss_from_moments(m, nq)
+    return (; x, w)
+end
+
+"""
+    ccs_pooled_grid(gr, wl, p) -> gr′
+
+The CCS grid `gr` with every location's draw rule and laws replaced by the pooled rule (`ccs_pooled_rule`, weights
+`wl`) and its laws (`ccs_law` from the true-shock law `gr.ccs.base`); Q̄, the nodes and everything else as in `gr`.
+"""
+function ccs_pooled_grid(gr, wl, p::Params)
+    R = ccs_pooled_rule(gr, wl)
+    maximum(abs, R.x) ≤ gr.ccs.pad + 1e-12 ||
+        @warn @sprintf("pooled CCS rule: max |x| = %.4f exceeds the grid pad %.4f", maximum(abs, R.x), gr.ccs.pad)
+    laws = [ccs_law(gr.ccs.base, x, p) for x in R.x]
+    L = gr.L
+    return merge(gr, (; ccs = merge(gr.ccs, (; x = [copy(R.x) for _ in 1:L], w = [copy(R.w) for _ in 1:L],
+                                               laws = [laws for _ in 1:L]))))
 end
 
 # -----------------------------------------------------------------------------
@@ -887,18 +1031,27 @@ parents (1/pkid per parent): the sample of children by their parent's characteri
 weights also sum to sum(Φ). With the ability gradient (`pkid_z`) those arrays carry P(child | z)/pkid
 (`parent_probs`), so the children of the more fertile abilities weigh more. The two samples have the same points in the same order; without the shock they
 are the same sample.
+Constant class size (§3e of the model, 2026-10-26): the solver's nodes are at the effective shocks ϵ̃_T = ϵ_T r^{1/α},
+X̃_O* = r X_O*, and the points are midpoints in the log effective shock between the ends of the (padded) solver grids, as
+above. A cell born in l has one point set per draw k of its rule R_l: the points' values (`logw`, `lo`, `hi`, `C`) are
+those at the effective shock, the same for every draw (Proposition 5), and their weights carry the draw's weight w_k,
+the density of the effective shock under the draw's law (`pdf(law.dT, ·)`, `fxo(law, g, ·)`), the occupation weights
+of the draw's `ChoiceMaps` (`teach_wt`, `nonteach_wt`) and its group probabilities (`argmax_group_probs` under its law,
+cached by (l, k, g)). The new field `lr` is the draw x_k = ln r of the point (the person's own school-quality draw,
+log q = log Q̄_l + lr); it is 0 without CCS, where nothing else changes.
 """
 function micro_sample(sol; n = 600, groups = nothing, who::Symbol = :all)
     sol.p.split && return micro_sample_split(sol; n, groups, who)
     (; hh, Φ, gr) = sol
     Pi_T, Pi_O = sample_probs(sol, who)
     (; Nz, L, ϵTgrid, XOgrid, dT) = gr
+    ccs = ccs_on(gr)                                 # §3e: one point set per draw of the birth location's rule
     groups = something(groups, [gr.nonteach])
     G   = length(groups)
     out = (; g = Int[], l = Int[], zi = Int[], lp = Int[], grp = Int[],
-             logw = Float64[], lo = Float64[], hi = Float64[], C = Float64[], w = Float64[], d = Int[])
-    # a slice's log wage runs from e[j] to e[j+1] (edges), with midpoint value mid[j]
-    function push_pts!(g, l, zi, lp, k, shift, mid, e, C, w, d)
+             logw = Float64[], lo = Float64[], hi = Float64[], C = Float64[], w = Float64[], d = Int[], lr = Float64[])
+    # a slice's log wage runs from e[j] to e[j+1] (edges), with midpoint value mid[j]; `lr` the draw ln r (§3e)
+    function push_pts!(g, l, zi, lp, k, shift, mid, e, C, w, d, lr = 0.0)
         m = length(mid)
         append!(out.g, fill(g, m)); append!(out.l, fill(l, m)); append!(out.zi, fill(zi, m))
         append!(out.lp, fill(lp, m)); append!(out.grp, fill(k, m)); append!(out.w, w); append!(out.d, fill(d, m))
@@ -906,36 +1059,62 @@ function micro_sample(sol; n = 600, groups = nothing, who::Symbol = :all)
         append!(out.lo, shift .+ min.(view(e, 1:m), view(e, 2:m+1)))
         append!(out.hi, shift .+ max.(view(e, 1:m), view(e, 2:m+1)))
         append!(out.C, C)
+        append!(out.lr, fill(lr, m))
     end
 
     luT = log.(ϵTgrid)
     uT  = collect(range(luT[1], luT[end]; length = n + 1))
     umT = (uT[1:end-1] .+ uT[2:end]) ./ 2
     ϵm  = exp.(umT)
-    fT  = pdf.(dT, ϵm) .* ϵm .* (uT[2] - uT[1])          # density of log ϵ_T is f(ϵ)·ϵ
+    fT  = ccs ? nothing : pdf.(dT, ϵm) .* ϵm .* (uT[2] - uT[1])          # density of log ϵ_T is f(ϵ)·ϵ
+    # §3e: the densities of the effective shocks by (birth location l, draw k), from the draw's law
+    fTd = ccs ? [[pdf.(law.dT, ϵm) .* ϵm .* (uT[2] - uT[1]) for law in gr.ccs.laws[l]] for l in 1:L] : nothing
     for g in 1:2
         lx = log.(XOgrid[:, g])
         v  = collect(range(lx[1], lx[end]; length = n + 1))
         vm = (v[1:end-1] .+ v[2:end]) ./ 2
         xm = exp.(vm)
-        fO = [fxo(gr, g, x) * x * (v[2] - v[1]) for x in xm]
-        pg = G == 1 ? ones(n, 1) :
+        fO = ccs ? nothing : [fxo(gr, g, x) * x * (v[2] - v[1]) for x in xm]
+        pg = ccs ? nothing : G == 1 ? ones(n, 1) :
              [sum(argmax_prob(gr, g, xm[j], i) for i in groups[k]) for j in 1:n, k in 1:G]
+        if ccs      # §3e: f_{X̃_O*} and the group probabilities by (l, draw k), each once (pg is the hot spot)
+            fOd = [[[fxo(law, g, x) * x * (v[2] - v[1]) for x in xm] for law in gr.ccs.laws[l]] for l in 1:L]
+            pgd = [[G == 1 ? ones(n, 1) : argmax_group_matrix(law, g, xm, groups) for law in gr.ccs.laws[l]] for l in 1:L]
+        end
         for l in 1:L, zi in 1:Nz, br in cell_branches(hh, Pi_T, Pi_O, sol.p, g, l, zi)
             mass = Φ[zi, l] / 2 * br.w
             iszero(mass) && continue
             hb, d = br.h, br.d
             cm   = choice_maps(hb, g, l, zi, gr)
-            wT   = mass .* fT .* [teach_wt(cm, ϵ) for ϵ in ϵm]
+            wT   = ccs ? nothing : mass .* fT .* [teach_wt(cm, ϵ) for ϵ in ϵm]
             splT = Spline1D(luT, log.(hb.hT[g, l, zi, :]))
             lwT, lwTe = sol.p.γ .* splT(umT), sol.p.γ .* splT(uT)
             lwT  = lwT .+ teacher_logpay_shift(hb, g, l, zi, luT, umT, sol.p, d)
             lwTe = lwTe .+ teacher_logpay_shift(hb, g, l, zi, luT, uT, sol.p, d)
-            wO   = mass .* fO .* [nonteach_wt(cm, x) for x in xm]
+            wO   = ccs ? nothing : mass .* fO .* [nonteach_wt(cm, x) for x in xm]
             splO = Spline1D(lx, log.(hb.capO[g, l, zi, :]))
             lcO, lcOe = splO(vm), splO(v)
             CT, CO = cell_consumption(sol, g, l, zi; hb, d)
             hi = sample_prob_cap(sol, who, zi)
+            if ccs  # §3e: the same points (values at the effective shocks) once per draw k, weighted by the draw's law
+                πT = [clamp.(Spline1D(luT, br.πT[g, l, zi, :, lp]; k = 1)(umT), 0.0, hi) for lp in 1:L]
+                πO = [clamp.(Spline1D(lx, br.πO[g, l, zi, :, lp]; k = 1)(vm), 0.0, hi) for lp in 1:L]
+                cT = [Spline1D(luT, CT[:, lp])(umT) for lp in 1:L]
+                cO = [Spline1D(lx, CO[:, lp])(vm) for lp in 1:L]
+                for j in eachindex(cm.w)
+                    cmk, mj, xj = cm.maps[j], mass * cm.w[j], cm.x[j]
+                    wTj = mj .* fTd[l][j] .* [teach_wt(cmk, ϵ) for ϵ in ϵm]
+                    wOj = mj .* fOd[l][j] .* [nonteach_wt(cmk, x) for x in xm]
+                    for lp in 1:L
+                        push_pts!(g, l, zi, lp, 0, log((1 - sol.p.τω[sol.p.T, g]) * sol.p.κ[lp]), lwT, lwTe, cT[lp],
+                                  wTj .* πT[lp], d, xj)
+                        for k in 1:G
+                            push_pts!(g, l, zi, lp, k, 0.0, lcO, lcOe, cO[lp], wOj .* πO[lp] .* view(pgd[l][j], :, k), d, xj)
+                        end
+                    end
+                end
+                continue
+            end
             for lp in 1:L
                 πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, lp]; k = 1)(umT), 0.0, hi)
                 πO = clamp.(Spline1D(lx, br.πO[g, l, zi, :, lp]; k = 1)(vm), 0.0, hi)
@@ -989,17 +1168,18 @@ function logz_sd(sol)
     return sqrt(dot(w, (lz .- dot(w, lz)) .^ 2))
 end
 
-"`micro_sample` under the split: one point set per (residence, workplace) pair, with the field `lw` (and `d`, `who`, as `micro_sample`)."
+"`micro_sample` under the split: one point set per (residence, workplace) pair, with the field `lw` (and `d`, `who`, `lr` and the draws of §3e, as `micro_sample`)."
 function micro_sample_split(sol; n = 600, groups = nothing, who::Symbol = :all)
     (; hh, Φ, gr) = sol
     Pi_TW, Pi_OW = sample_probs(sol, who)
     (; Nz, L, ϵTgrid, XOgrid, dT) = gr
+    ccs = ccs_on(gr)                                 # §3e: one point set per draw of the birth location's rule
     groups = something(groups, [gr.nonteach])
     G   = length(groups)
     out = (; g = Int[], l = Int[], zi = Int[], lp = Int[], lw = Int[], grp = Int[],
-             logw = Float64[], lo = Float64[], hi = Float64[], C = Float64[], w = Float64[], d = Int[])
-    # a slice's log wage runs from e[j] to e[j+1] (edges), with midpoint value mid[j]
-    function push_pts!(g, l, zi, r, w, k, shift, mid, e, C, wt, d)
+             logw = Float64[], lo = Float64[], hi = Float64[], C = Float64[], w = Float64[], d = Int[], lr = Float64[])
+    # a slice's log wage runs from e[j] to e[j+1] (edges), with midpoint value mid[j]; `lr` the draw ln r (§3e)
+    function push_pts!(g, l, zi, r, w, k, shift, mid, e, C, wt, d, lr = 0.0)
         m = length(mid)
         append!(out.g, fill(g, m)); append!(out.l, fill(l, m)); append!(out.zi, fill(zi, m))
         append!(out.lp, fill(r, m)); append!(out.lw, fill(w, m)); append!(out.grp, fill(k, m)); append!(out.w, wt)
@@ -1008,36 +1188,63 @@ function micro_sample_split(sol; n = 600, groups = nothing, who::Symbol = :all)
         append!(out.lo, shift .+ min.(view(e, 1:m), view(e, 2:m+1)))
         append!(out.hi, shift .+ max.(view(e, 1:m), view(e, 2:m+1)))
         append!(out.C, C)
+        append!(out.lr, fill(lr, m))
     end
 
     luT = log.(ϵTgrid)
     uT  = collect(range(luT[1], luT[end]; length = n + 1))
     umT = (uT[1:end-1] .+ uT[2:end]) ./ 2
     ϵm  = exp.(umT)
-    fT  = pdf.(dT, ϵm) .* ϵm .* (uT[2] - uT[1])          # density of log ϵ_T is f(ϵ)·ϵ
+    fT  = ccs ? nothing : pdf.(dT, ϵm) .* ϵm .* (uT[2] - uT[1])          # density of log ϵ_T is f(ϵ)·ϵ
+    # §3e: the densities of the effective shocks by (birth location l, draw k), from the draw's law
+    fTd = ccs ? [[pdf.(law.dT, ϵm) .* ϵm .* (uT[2] - uT[1]) for law in gr.ccs.laws[l]] for l in 1:L] : nothing
     for g in 1:2
         lx = log.(XOgrid[:, g])
         v  = collect(range(lx[1], lx[end]; length = n + 1))
         vm = (v[1:end-1] .+ v[2:end]) ./ 2
         xm = exp.(vm)
-        fO = [fxo(gr, g, x) * x * (v[2] - v[1]) for x in xm]
-        pg = G == 1 ? ones(n, 1) :
+        fO = ccs ? nothing : [fxo(gr, g, x) * x * (v[2] - v[1]) for x in xm]
+        pg = ccs ? nothing : G == 1 ? ones(n, 1) :
              [sum(argmax_prob(gr, g, xm[j], i) for i in groups[k]) for j in 1:n, k in 1:G]
+        if ccs      # §3e: f_{X̃_O*} and the group probabilities by (l, draw k), each once (pg is the hot spot)
+            fOd = [[[fxo(law, g, x) * x * (v[2] - v[1]) for x in xm] for law in gr.ccs.laws[l]] for l in 1:L]
+            pgd = [[G == 1 ? ones(n, 1) : argmax_group_matrix(law, g, xm, groups) for law in gr.ccs.laws[l]] for l in 1:L]
+        end
         for l in 1:L, zi in 1:Nz, br in cell_branches(hh, Pi_TW, Pi_OW, sol.p, g, l, zi)
             mass = Φ[zi, l] / 2 * br.w
             iszero(mass) && continue
             hb, d = br.h, br.d
             cm   = choice_maps(hb, g, l, zi, gr)
-            wT   = mass .* fT .* [teach_wt(cm, ϵ) for ϵ in ϵm]
+            wT   = ccs ? nothing : mass .* fT .* [teach_wt(cm, ϵ) for ϵ in ϵm]
             splT = Spline1D(luT, log.(hb.hT[g, l, zi, :]))
             lwT, lwTe = sol.p.γ .* splT(umT), sol.p.γ .* splT(uT)
             lwT  = lwT .+ teacher_logpay_shift(hb, g, l, zi, luT, umT, sol.p, d)
             lwTe = lwTe .+ teacher_logpay_shift(hb, g, l, zi, luT, uT, sol.p, d)
-            wO   = mass .* fO .* [nonteach_wt(cm, x) for x in xm]
+            wO   = ccs ? nothing : mass .* fO .* [nonteach_wt(cm, x) for x in xm]
             splO = Spline1D(lx, log.(hb.capO[g, l, zi, :]))
             lcO, lcOe = splO(vm), splO(v)
             CT, CO = cell_consumption(sol, g, l, zi; hb, d)
             hi = sample_prob_cap(sol, who, zi)
+            if ccs  # §3e: the same points once per draw k, weighted by the draw's law (`micro_sample`)
+                prs = [(r, w) for r in 1:L for w in 1:L]
+                πT  = [clamp.(Spline1D(luT, br.πT[g, l, zi, :, r, w]; k = 1)(umT), 0.0, hi) for (r, w) in prs]
+                πO  = [clamp.(Spline1D(lx, br.πO[g, l, zi, :, r, w]; k = 1)(vm), 0.0, hi) for (r, w) in prs]
+                cT  = [Spline1D(luT, CT[:, (r - 1) * L + w])(umT) for (r, w) in prs]
+                cO  = [Spline1D(lx, CO[:, (r - 1) * L + w])(vm) for (r, w) in prs]
+                for j in eachindex(cm.w)
+                    cmk, mj, xj = cm.maps[j], mass * cm.w[j], cm.x[j]
+                    wTj = mj .* fTd[l][j] .* [teach_wt(cmk, ϵ) for ϵ in ϵm]
+                    wOj = mj .* fOd[l][j] .* [nonteach_wt(cmk, x) for x in xm]
+                    for (i, (r, w)) in enumerate(prs)
+                        push_pts!(g, l, zi, r, w, 0, log((1 - sol.p.τω[sol.p.T, g]) * sol.p.κ[w]), lwT, lwTe, cT[i],
+                                  wTj .* πT[i], d, xj)
+                        for k in 1:G
+                            push_pts!(g, l, zi, r, w, k, 0.0, lcO, lcOe, cO[i], wOj .* πO[i] .* view(pgd[l][j], :, k), d, xj)
+                        end
+                    end
+                end
+                continue
+            end
             for r in 1:L, w in 1:L
                 dest = (r - 1) * L + w
                 πT = clamp.(Spline1D(luT, br.πT[g, l, zi, :, r, w]; k = 1)(umT), 0.0, hi)
@@ -1172,6 +1379,26 @@ function wls_slope(X, y, w; ba = nothing)
 end
 
 """
+    ccs_grade_var(g, K, K_d, v) -> Float64
+
+The variance of the teacher-draw part of the school input of a score taken at grade g, in units of log q, under
+constant class size (§3e of the model, 2026-10-26). The composite ln r = (1/K_d) Σ_j d_j of K_d iid block draws, block
+j covering the grades ((j − 1)K/K_d, jK/K_d], has Var(d_j) = K_d v with v = Var(ln r | l) (the variance of the
+location's rule, `ccs_sds`); by grade g the input is Σ_j (e_j/K) d_j, with e_j = clamp(g − (j − 1)K/K_d, 0, K/K_d)
+the exposure to block j, so its variance is K_d v Σ_j (e_j/K)². At g ≥ K it is v (the full composite); with K_d = 1 it
+is (g/K)² v, the variance of the projection (g/K) ln r; with K_d = K it is about (g/K) v, the partial sum of g of the
+K yearly draws.
+"""
+function ccs_grade_var(g, K, K_d, v)
+    b = K / K_d
+    s = 0.0
+    for j in 1:K_d
+        s += (clamp(g - (j - 1) * b, 0.0, b) / K)^2
+    end
+    return v * K_d * s
+end
+
+"""
     ability_moments(sol, ms, meas; hpgrp)
 
 Moments of the latent score signal S_g = log z + (g/K) c log Q_l for a score taken at
@@ -1195,6 +1422,14 @@ by its SD over the cohort:
 - `teacher_slope_ratio` (`p.college`; NaN otherwise): the slope among all teachers (with the BA
   indicator) over the slope among BA non-teacher market workers, the NLSY79 check of γ
   (closed form γ(1−η)/(1−γη) without selection on the education margin).
+Constant class size (§3e of the model, 2026-10-26): log q = log Q̄_l + ln r, so a score also carries the person's own
+teacher draw, S_g = log z + (g/K) c log Q̄_l + c D_g with D_g the draw part of the grade-g input (`ccs_grade_var`), mean
+0 and independent of z given l. Means are unchanged (`gr.Q` = Q̄), and every SD normalization (`sd_S`, the SEDA
+grade's) adds the cohort mean of c² Var(D_g | l) exactly. A sample point's draw `ms.lr` enters a score by its
+projection min(g/K, 1) c lr, which is exact for the adult scores used here (g = K: D_K = ln r) and would be exact at
+g < K only with K_d = 1; the children's draws are not in the sample and enter `rho_pc` only through their variance
+c² Var(D_{child_grade} | l′) in their schooling location l′, independent of the parent's own draw, which `parent_child`
+keeps point by point (it is correlated with the parent's location through her occupation and income).
 """
 function ability_moments(sol, ms, meas::Measurement; hpgrp::Int, msk = ms)
     # `msk`: the parents' pseudo-sample (§3d of the model, `micro_sample(sol; who = :parents)`), over which the
@@ -1207,11 +1442,18 @@ function ability_moments(sol, ms, meas::Measurement; hpgrp::Int, msk = ms)
     w  = Φ ./ sum(Φ)
     wsd(X) = (m = sum(w .* X); sqrt(sum(w .* (X .- m) .^ 2)))
     mS = sum(w .* S)
-    sd = wsd(S)
+    # §3e: c² Var(D_g | l) by location, and the cohort SD of a grade-g score with the draw (without CCS: wsd)
+    ccs = ccs_on(gr)
+    vr  = ccs ? ccs_sds(gr) .^ 2 : zeros(L)
+    dv(g) = [c^2 * ccs_grade_var(g, meas.K, p.ccs_draws, vr[l]) for l in 1:L]
+    wl  = vec(sum(w; dims = 1))
+    csd(X, g) = ccs ? sqrt(wsd(X)^2 + dot(wl, dv(g))) : wsd(X)
+    sd = csd(S, meas.K)
     ES(l) = sum(Φ[:, l] .* Ss[:, l]) / sum(Φ[:, l])
 
     mkt = market_workers(ms, hpgrp)
-    x   = [(S[ms.zi[k], ms.l[k]] - mS) / sd for k in eachindex(ms.w)][mkt]
+    x   = ccs ? [(S[ms.zi[k], ms.l[k]] + c * ms.lr[k] - mS) / sd for k in eachindex(ms.w)][mkt] :   # §3e: g = K, D_K = lr
+                [(S[ms.zi[k], ms.l[k]] - mS) / sd for k in eachindex(ms.w)][mkt]
     X   = hcat(ones(length(x)), x, Float64.(ms.g[mkt] .== 2))
     wk  = ms.w[mkt]
     β   = (X' * (wk .* X)) \ (X' * (wk .* ms.logw[mkt]))
@@ -1240,13 +1482,41 @@ function ability_moments(sol, ms, meas::Measurement; hpgrp::Int, msk = ms)
         end
         return (s12 - m1 * m2) / sqrt((s11 - m1^2) * (s22 - m2^2))
     end
+    # §3e: `parent_child` with the draws. The parent's adult score is a = S + c lr with her own draw lr (kept by the
+    # sums Σ w lr and Σ w lr² per (zi, l, l′)); the child's is b = Sc + c D, D her own draw at `meas.child_grade` in l′,
+    # independent of the parent's, mean 0, which adds c² Var(D | l′) to E[b²] only
+    function parent_child_draw(sel)
+        P = zeros(Nz, L, L); PL = zeros(Nz, L, L); PL2 = zeros(Nz, L, L)
+        for k in findall(sel)
+            i, wt, lr = (msk.zi[k], msk.l[k], msk.lp[k]), msk.w[k], msk.lr[k]
+            P[i...] += wt; PL[i...] += wt * lr; PL2[i...] += wt * lr^2
+        end
+        tot = sum(P)
+        P ./= tot; PL ./= tot; PL2 ./= tot
+        vc = dv(meas.child_grade)
+        m1 = m2 = s11 = s22 = s12 = 0.0
+        for zi in 1:Nz, l in 1:L, lp in 1:L, zj in 1:Nz
+            pz = Πz[zi, zj]
+            q, ql, ql2 = P[zi, l, lp] * pz, PL[zi, l, lp] * pz, PL2[zi, l, lp] * pz
+            a, b = S[zi, l], Sc[zj, lp]
+            ea  = q * a + c * ql                       # Σ mass × a
+            m1 += ea; m2 += q * b
+            s11 += q * a^2 + 2 * a * c * ql + c^2 * ql2
+            s22 += q * (b^2 + vc[lp])
+            s12 += ea * b
+        end
+        return (s12 - m1 * m2) / sqrt((s11 - m1^2) * (s22 - m2^2))
+    end
+    pc = ccs ? parent_child_draw : parent_child
     # the score gap's composition part: the same gap with the c log Q term removed, in
     # the same SD units, so score_gap − score_gap_noQ is the school-quality part (teachers and,
     # with ψa ≠ 0, peers)
     EZ(l) = sum(Φ[:, l] .* log.(z)) / sum(Φ[:, l])
-    return (; score_gap = (ES(2) - ES(1)) / wsd(Ss), score_gap_noQ = (EZ(2) - EZ(1)) / wsd(Ss),
-              wage_slope = β[2], rho_pc = parent_child(msk.g .== 2), rho_pc_all = parent_child(trues(length(msk.w))),
-              c, sd_S = sd, wage_slope_ba = slope_ba, teacher_slope_ratio = slope_T / slope_C)
+    sdSs = csd(Ss, meas.seda_grade)                    # §3e: with the draw variance at the SEDA grade
+    return (; score_gap = (ES(2) - ES(1)) / sdSs, score_gap_noQ = (EZ(2) - EZ(1)) / sdSs,
+              wage_slope = β[2], rho_pc = pc(msk.g .== 2), rho_pc_all = pc(trues(length(msk.w))),
+              c, sd_S = sd, wage_slope_ba = slope_ba, teacher_slope_ratio = slope_T / slope_C,
+              draw_share = ccs ? dot(wl, dv(meas.K)) / sd^2 : 0.0)   # §3e: the draw's share of the adult score variance
 end
 
 """
@@ -1397,13 +1667,16 @@ non-teachers (home production included) and against non-teacher market workers
 latent AFQT against other workers at 25–34. `T`, `O`, `H` are the masses of teachers,
 non-teachers and home producers by ability node and education branch, `[zi, d = 1 / d = 0]`
 (the second column is empty without `p.college`), which `college_stats` uses.
+Under constant class size (§3e of the model, 2026-10-26) P(i* = hp | X̃_O*) is taken under each draw's law
+(`over_draws`, `argmax_probs`); the masses are the `MixedMaps` integrals.
 """
 function teacher_selection(sol, hp::Int)
     (; hh, Φ, gr, p) = sol
     s_z = logz_sd(sol)                                     # SD of log z (§3d: the tilted one with pkid_z ≠ 0)
     lz  = log.(gr.z)
     Tb = zeros(gr.Nz, 2); Ob = zeros(gr.Nz, 2); Hb = zeros(gr.Nz, 2)
-    pHP = hp == 0 ? nothing : [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:gr.nXO] for g in 1:2]
+    ccs = ccs_on(gr)                                       # §3e: the home producers by draw, below
+    pHP = hp == 0 || ccs ? nothing : [[argmax_prob(gr, g, gr.XOgrid[k, g], hp) for k in 1:gr.nXO] for g in 1:2]
     for l in 1:gr.L, zi in 1:gr.Nz, g in 1:2, br in cell_branches(hh, p, g, l, zi)
         mass = Φ[zi, l] / 2 * br.w
         iszero(mass) && continue
@@ -1412,6 +1685,8 @@ function teacher_selection(sol, hp::Int)
         mT, mO = integrate_choice(ones(gr.nϵT), ones(gr.nXO), cm, gr)
         Tb[zi, j] += mass * mT; Ob[zi, j] += mass * mO
         pHP === nothing || (Hb[zi, j] += mass * integrate_nonteach(pHP[g], cm, gr))
+        (ccs && hp != 0) &&
+            (Hb[zi, j] += mass * over_draws((cmk, law, _) -> integrate_nonteach(argmax_probs(law, g, hp), cmk, law), cm, gr))
     end
     T, O, H = vec(sum(Tb; dims = 2)), vec(sum(Ob; dims = 2)), vec(sum(Hb; dims = 2))
     mean_lz(x) = dot(x, lz) / sum(x)
@@ -1435,6 +1710,8 @@ Residential composition behind the spatial gaps (calibration experiments, 2026-1
   (flows; selection of movers);
 - `teacher_premium[g]`: mean log wage of teachers minus non-teacher market workers of
   gender g; `gender_gap_market`: men minus women among non-teacher market workers.
+Under constant class size (§3e of the model, 2026-10-26) a worker's own school quality is log q = log Q̄_birth + lr, her
+teacher draw (`ms.lr`), and the Q adjustment removes k (log Q̄_birth + lr).
 """
 function composition_stats(sol, ms, hpgrp::Int)
     (; Φ, πbar, gr, p) = sol
@@ -1446,7 +1723,8 @@ function composition_stats(sol, ms, hpgrp::Int)
     adult = [dot(A[:, lp], lz) / sum(A[:, lp]) for lp in 1:L]
     mkt = market_workers(ms, hpgrp)
     k   = ifelse.(ms.grp .== 0, p.γ / (1 - p.γ * p.η), 1 / (1 - p.η))
-    adj = ms.logw .- k .* log.(Q[ms.l])
+    adj = ccs_on(gr) ? ms.logw .- k .* (log.(Q[ms.l]) .+ ms.lr) :    # §3e: the worker's own draw
+                       ms.logw .- k .* log.(Q[ms.l])
     mean_at(x, sel) = wmean(x[sel], ms.w[sel])
     raw  = [mean_at(ms.logw, mkt .& (ms.lp .== lp)) for lp in 1:L]
     qadj = [mean_at(adj, mkt .& (ms.lp .== lp)) for lp in 1:L]
@@ -1728,10 +2006,22 @@ Validation and diagnostics:
   `gap_salary + gap_teachers_pp` (district data −0.0091, an inactive target);
 - `seda_growth_gap`, `gap_logQ`: the SEDA growth mapping of §3 and the quality gap;
 - `gap_logQ_teach`, `gap_logQ_peer`, `psi_a`: the two parts of `gap_logQ`, the teacher-quality index
-  Δlog Q_T and the peer factor ψa Δlog ā (`build_grids`; zero without peer effects, ψa = 0);
-  `log_abar`: the students' log ā_l at the solution (`peer_log_ability`, also without peers; its
-  gap is s_z times `dz_young_sd`) and `peer_resid`, its largest distance from the log ā_l the grid
-  was built at (the convergence of the peer fixed point; 0 without peers);
+  Δlog Q_T and the peer factor ψa Δlog P at the log P the grid was built at (`build_grids`; zero without peer
+  effects, ψa = 0; in the default specification A, P = ā, the students' mean ability);
+  `log_abar`: the students' log ā_l at the solution (`peer_log_ability`, also without peers and in every
+  specification; its gap is s_z times `dz_young_sd`) and `peer_resid`, the largest distance of the peer input log P_l
+  recomputed at the solution (`log_peer_input`) from the one the grid was built at (the convergence of the peer fixed
+  point; 0 without peers);
+- the peer specification (2026-10-25; `peer_log_input`, `peer_terms`, `adult_log_h` of the model): `peer_input_hc`
+  (1: `Params.peer_input = :hc`, the adults' human capital by residence; 0: `:ability`, the students' ability) and
+  `peer_total` (1: the peer group's total, number × geometric mean; 0: its mean), so that A = (0, 0), B = (0, 1),
+  C = (1, 0), D = (1, 1); `log_peer_input`: log P_l recomputed at the solution, in the specification of `p`, also
+  without peers (where it does not enter Q); `log_hbar_adult`: the adult residents' mean log h by residence minus
+  the mean over all adults (`adult_log_h`: every adult, each with her own human capital, by residence r under the
+  split), in every specification and also without peers: how much adult human capital sorts across locations, and
+  `gap_log_hbar_adult` its gap; `gap_log_peer_mass`: Δlog of the peer group's mass, the students (Σ_z Φ, equal to
+  `gap_pupils`) for :ability and the adult residents for :hc, so that with `peer_total` the peer part of Δlog Q is
+  ψa (Δ mean term + `gap_log_peer_mass`);
 - `score_gap`: SEDA score-level gap in cohort SDs of log z + c log Q (`ability_moments`);
 - `poverty_gap`, `poverty_share_l`: Δ share of children below the `meas.pov_rate`
   income line, and the shares by location (`poverty_gap`);
@@ -1884,6 +2174,18 @@ unchanged by them). Gaps are suburb minus city (index 2 minus 1); `_res` is by r
 - non-teaching market workers by residence (home producers out): `gap_lyhat_mkt_nonteach_res`, `gap_logy_mkt_nonteach_res`;
 - levels: `teacher_logh_res/_work`, `teacher_logpay_res/_work`, `teacher_lyhat_res/_work`, `teacher_Heff_res/_work`,
   `nonteach_mkt_logy_res`, `nonteach_mkt_lyhat_res`, `nonteach_mkt_mass_res`.
+
+Constant class size (`Params.ccs`, §3e of the model, 2026-10-26; diagnostics, appended last and present only with the
+switch, `ccs_moments`): `ccs`, `ccs_draws`, `ccs_nq`, `ccs_rho`, `ccs_sd_logq` (SD of ln q by location),
+`ccs_lQeff_gap` (ln Q^eff − ln Q̄), `class_size`, `class_size_sd` (0), and the split of `dLambda_quality` into the
+geometric-mean part `dLambda_geo(_mean)` and the dispersion part `dLambda_disp(_mean)` (`quality_value`, which under CCS
+equalizes Q̄ and the draw law); `ccs_score_draw_share` (`ability_moments`); and (2026-11-02) `ccs_max_abs_x`, `ccs_pad`
+(the pad check) and the adults' own draws by residence, `ccs_lr_adult`, `ccs_gap_lr_adult(_sd)`, `ccs_gap_lr_mkt`, with
+the market-wage gap with only Q̄ removed, `ccs_gap_meanlog_mkt_Qbar_adj` (`ccs_draw_composition`). Every other key keeps
+its meaning with Q = Q̄ (the geometric-mean quality); the moments built on scores, the market workers' Q adjustment,
+the sorting decomposition and the argmax probabilities take the teacher draw into account (`ability_moments`,
+`composition_stats`, `teacher_sorting_stats`, `sorting_moments`, `micro_sample`), and `gap_logQ_teach_quality` is β Δμ
+(`sorting_moments`).
 """
 function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh_maxit = 1000)
     (; Φ, πbar, gr, p) = sol
@@ -1937,12 +2239,21 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
     kids    = fert ? [sum(Φ[zi, l] * sol.πbar_kid[l, zi, lp] for l in 1:L, zi in 1:Nz) for lp in 1:L] : S
     parents = p.pkid .* kids
     gap_logQ = gap(gr.Q)
-    la = peer_log_ability(Φ, gr)                # the students' log ā_l, the peer input at this Φ
+    la = peer_log_ability(Φ, gr)                # the students' log ā_l at this Φ (the peer input of specification A)
+    PT, PO = sol_probs(sol)                      # 2026-10-25: the adults' location probabilities (joint under the split)
+    ad = adult_log_h(Φ, PT, PO, sol.hh, p, gr)  # the adult residents and their mean log h, every specification
+    pt = peer_terms(Φ, PT, PO, sol.hh, p, gr; adults = ad)
+    lP = peer_log_input(Φ, PT, PO, sol.hh, p, gr; adults = ad)   # the peer input log P_l at this Φ (A: `la` itself)
     ss = s_summary(sol)
     dΛ = sol.hh.Λ[:, 2] .- sol.hh.Λ[:, 1]       # value of the suburb's school quality, by z
     qv = quality_value(sol)
     edu = college_stats(sol, ms, ss, tsel, hpg; teacher_weights = meas.teacher_weights)    # `cs` is the commuting shares
     tsm = sorting_moments(teacher_sorting_stats(sol, meas), sol)                          # round 2026-10-16 diagnostics
+    # §3e (2026-10-26): the constant-class-size keys, only with the switch, so that without it the moments (and
+    # moments.toml, which writes every finite entry) are those of the model without it; 2026-11-02: the adults' own
+    # draws by residence (`ccs_draw_composition`), also only with the switch
+    ccsm = p.ccs ? (; ccs_moments(sol, qv)..., ccs_score_draw_share = ab.draw_share,
+                      ccs_draw_composition(sol, ms, hpg)...) : (;)
 
     return (;
         male_teach_share   = sum(st.nT[1, :]) / sum(st.nT[1, :] .+ st.nO[1, :]),
@@ -1957,7 +2268,10 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
         seda_growth_gap    = seda_growth(gap_logQ, meas.χ, meas.K, p.η),
         gap_logQ,
         gap_logQ_teach = gap(gr.QT), gap_logQ_peer = p.ψa * (gr.la[2] - gr.la[1]), psi_a = p.ψa,
-        log_abar = la, peer_resid = iszero(p.ψa) ? 0.0 : maximum(abs, la .- gr.la),
+        log_abar = la, peer_resid = iszero(p.ψa) ? 0.0 : maximum(abs, lP .- gr.la),
+        peer_input_hc = p.peer_input === :hc ? 1.0 : 0.0, peer_total = p.peer_total ? 1.0 : 0.0,
+        log_peer_input = lP, log_hbar_adult = ad.H .- ad.Hbar, gap_log_hbar_adult = ad.H[2] - ad.H[1],
+        gap_log_peer_mass = gap(pt.mass),
         score_gap          = ab.score_gap,
         poverty_gap        = pov.gap,
         teacher_p9010_g    = tw.p9010_g,
@@ -2024,7 +2338,80 @@ function model_moments(sol, meas::Measurement = Measurement(); hh_tol = 1e-7, hh
         move_rate_by_own_z = mz.move, c2s_by_own_z = mz.c2s, s2c_by_own_z = mz.s2c,
         teacher_shadow_b = p.split ? p.BT[2] - p.BT[1] : NaN, mean_log_yhat = mean_predicted_log_income(sol),
         cfr_rho = meas.cfr_rho, cfr_sd_eff = cfr.sd_eff, lyT_fixed = p.lyT_fixed,
-        tsm...)
+        tsm..., ccsm...)
+end
+
+"""
+    ccs_moments(sol, qv) -> NamedTuple
+
+The `model_moments` keys of constant class size (§3e of the model, 2026-10-26), present only when `sol.p.ccs` (the
+CCS solution's `sol.ccs`, `ccs_solution`; `qv` = `quality_value(sol)`):
+- `ccs` = 1, and the switches `ccs_draws` (K_d), `ccs_nq` (n_q) and `ccs_rho` (ρ of the draw's CFR noise);
+- `ccs_sd_logq`: SD(ln q | l) = SD(ln r | l) of the rules R_l by location (`sol.ccs.sd`);
+- `ccs_lQeff_gap`: ln Q^eff − ln Q̄ by location, the efficient-allocation teacher index σ ln(H̃_T/S) of the same
+  teachers (Proposition 1) minus β μ − σ ln N at the solution (`lQeff`, `lQT_now`; both without the peer factor);
+- `class_size`: N_l = S_l/n_T,l, and `class_size_sd` = 0, its SD within a location (equal classes; the data's
+  district SD within CZ × location is about 1.4, the efficient allocation's 7.1);
+- `dLambda_geo`, `dLambda_geo_mean`: the part of the suburb's ΔΛ due to the geometric-mean quality Q̄ alone, and
+  `dLambda_disp`, `dLambda_disp_mean` the part due to the dispersion of the draw, by z and Φ-weighted
+  (`quality_value`; they sum to `dLambda_quality`);
+- `ccs_max_abs_x`, `ccs_pad` (2026-11-02): max_l,k |x_k| over the nodes of the rules R_l and the grid pad, so that every
+  run records whether the pad covers the draws (`verify_solution` checks the same; with a fixed `--grid ccs_pad` a
+  refit's evaluations do not print it).
+`model_moments` adds `ccs_score_draw_share`, the draw's share c² E_l[Var(ln r | l)]/sd_S² of the adult latent score's
+variance (`ability_moments`): under CCS part of what the NLSY scores read as ability is teacher luck, so the
+first-stage rows (ρ_pc, the wage slope) move with K_d although s_z, ρz and the loading c do not.
+The existing keys keep their meaning, with Q = Q̄ (`gr.Q`) and Q_T = Q̄_T = exp(ln Q̄_T) (`gr.QT`).
+"""
+function ccs_moments(sol, qv)
+    (; Φ, p) = sol
+    hasproperty(sol, :ccs) ||
+        throw(ArgumentError("p.ccs is on but the solution has no `ccs` field: pass a solution of `solve_ge` under CCS"))
+    cc = sol.ccs
+    wz = vec(sum(Φ; dims = 2))
+    return (; ccs = 1.0, ccs_draws = Float64(p.ccs_draws), ccs_nq = Float64(p.ccs_nq), ccs_rho = p.ccs_rho,
+              ccs_sd_logq = collect(Float64, cc.sd), ccs_lQeff_gap = cc.lQeff .- cc.lQT_now,
+              class_size = collect(Float64, cc.N), class_size_sd = 0.0,
+              dLambda_geo = qv.dΛ_geo, dLambda_geo_mean = dot(qv.dΛ_geo, wz) / sum(Φ),
+              dLambda_disp = qv.dΛ_disp, dLambda_disp_mean = dot(qv.dΛ_disp, wz) / sum(Φ),
+              ccs_max_abs_x = maximum(maximum(abs, x) for x in cc.x), ccs_pad = Float64(cc.pad))   # 2026-11-02
+end
+
+"""
+    ccs_draw_composition(sol, ms, hpgrp) -> NamedTuple
+
+Draw-luck composition under constant class size (§3e of the model; 2026-11-02, round runs/ccs-mech-20261102): the
+adults' OWN teacher draws by residence, from the adults' pseudo-sample `ms` (`micro_sample`, `who = :all`): `ms.lr` is
+x = ln r, the draw a person had as a student in her birth location, and `ms.lp` her residence (the location in the
+bundled model). The draw is independent of (g, z, ϵ) and mean zero in every birth location, so the residents' mean draws
+differ across locations only because the location choice depends on it: through income where a goods cost does not
+scale with it (the moving cost r_m C̄, the residence cost r_p C̄; Ξ), commuting, or the occupation. The keys, present
+only with `p.ccs` (`model_moments`):
+- `ccs_lr_adult[r]`, `ccs_gap_lr_adult`: the mean ln r of all adult residents of r (teachers, market non-teachers, home
+  producers) and its suburb − city gap; `ccs_gap_lr_adult_sd`: that gap in units of the SD of ln r over all adults;
+- `ccs_gap_lr_mkt`: the same gap among the market workers (teachers included, home producers, group `hpgrp`, out: the
+  population of `gap_meanlog_mkt`);
+- `ccs_gap_meanlog_mkt_Qbar_adj`: the market workers' mean-log-wage gap with only the birth location's common school
+  quality removed, k log Q̄_birth (`gr.Q`, Q̄ times the peer factor; k as in `composition_stats`), so that the worker's own
+  draw stays in it: the composition part of the earnings gap including draw luck. `gap_meanlog_mkt_Qadj` removes
+  k (log Q̄_birth + ln r), so the difference of the two is the gap in the market workers' mean k ln r.
+"""
+function ccs_draw_composition(sol, ms, hpgrp::Int)
+    (; gr, p) = sol
+    L    = gr.L
+    mkt  = market_workers(ms, hpgrp)
+    k    = ifelse.(ms.grp .== 0, p.γ / (1 - p.γ * p.η), 1 / (1 - p.η))
+    ever = trues(length(ms.w))
+    mean_at(x, sel) = wmean(x[sel], ms.w[sel])
+    lr   = [mean_at(ms.lr, ms.lp .== r) for r in 1:L]
+    lrm  = [mean_at(ms.lr, mkt .& (ms.lp .== r)) for r in 1:L]
+    m1   = mean_at(ms.lr, ever)
+    sd   = sqrt(max(mean_at(ms.lr .^ 2, ever) - m1^2, 0.0))
+    adj  = ms.logw .- k .* log.(gr.Q[ms.l])
+    qb   = [mean_at(adj, mkt .& (ms.lp .== r)) for r in 1:L]
+    return (; ccs_lr_adult = lr, ccs_gap_lr_adult = lr[2] - lr[1],
+              ccs_gap_lr_adult_sd = sd > 0 ? (lr[2] - lr[1]) / sd : NaN,
+              ccs_gap_lr_mkt = lrm[2] - lrm[1], ccs_gap_meanlog_mkt_Qbar_adj = qb[2] - qb[1])
 end
 
 # -----------------------------------------------------------------------------

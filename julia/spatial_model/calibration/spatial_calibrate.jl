@@ -35,8 +35,11 @@
 # external φ). External inputs of M3: college, sBA, Fc, σd (`--external college=1`, …), ωz and
 # sT0, the non-BA teachers' schooling floor (`--external sT0=0.52`; 0: none).
 # The 23rd entry (2026-10-07) is the local peer effect ψ_a (`Params.ψa`): school quality
-# Q_l = (2H̃_T/M_l)^σ ā_l^{ψ_a} with ā_l the students' mean ability in l. Like the other extensions
-# it is 0 (off) unless fixed (`--fix psi_a=0.25`) or freed (`--free psi_a`).
+# Q_l = (2H̃_T/M_l)^σ P_l^{ψ_a} with P_l the peer input of l, by default the students' mean ability ā_l. Like the
+# other extensions it is 0 (off) unless fixed (`--fix psi_a=0.25`) or freed (`--free psi_a`). What P is, is external
+# (2026-10-25; `peer_log_input` of the model): `--external peer_input=hc` (the adults' human capital by residence;
+# `ability`, the default, the students' ability) and `--external peer_total=1` (the group's total, number × geometric
+# mean, instead of its mean), so specifications A (neither), B (peer_total=1), C (peer_input=hc), D (both).
 # Three further entries (2026-10-15) are switches, off at 0 and bounded by `EXTENSION_BOUNDS`: the
 # 24th, κ_c, is the utility friction of commuting (`Params.κc`; needs `--external split=1`), the 25th,
 # θ_ν, is the location-taste scale σν = θ_ν μ (0: the external block's θν; it replaces `--external
@@ -45,6 +48,11 @@
 # The 27th (2026-10-15, closure R), b_T, is teachers' non-pecuniary value of a suburban teaching job
 # (`Params.BT = (0, b_T)`, utils; needs `--external split=1`): with δκ on the salary gap it lets the FTE gap be
 # matched as well, a reduced form of rationed suburban positions at near-equal pay.
+# Constant class size with random teacher assignment (2026-10-26; `Params.ccs`, model §3e,
+# notes/spatial_teachers_model_ccs.md) is an external switch with no entry in ϑ: `--external ccs=1` (1 or 0, as
+# `split`), `--external ccs_draws=12` (K_d, the independent teacher draws; 1 by default), `--external ccs_nq=3` (the
+# Gauss nodes of the draw rule) and `--external ccs_rho=0.3` (the reliability ρ of the draw's teacher effectiveness,
+# which should equal `--measure cfr_rho`: `problem_setup` warns when it does not).
 #
 # Layout
 #   1  External inputs (§1), the occupational block (Table 2) and the calculations behind them
@@ -277,6 +285,30 @@ function parse_flag(v, name)
 end
 
 """
+    parse_int(v, name) -> Int
+
+An integer option of the external block (`ccs_nq`, `ccs_draws`; 2026-10-26) as an Int: the command line passes
+`ccs_draws=12` as the Float64 12.0 (`parse_assignment`), which is converted only if it is an exact integer; a
+fractional or non-finite number, or a symbol, is an error.
+"""
+function parse_int(v, name)
+    v isa Integer && return Int(v)
+    (v isa Real && isfinite(v) && isinteger(v)) && return Int(v)
+    throw(ArgumentError("$name must be an integer, got $(repr(v))"))
+end
+
+"""
+The peer input `peer_input` (2026-10-25) as a Symbol, `:ability` (the default, the students' ability) or `:hc` (the
+adults' human capital by residence): the command line passes `peer_input=hc` as the symbol :hc. Anything else, a
+misspelling or a number, is an error and not the default.
+"""
+function parse_peer_input(v)
+    s = v isa Symbol ? v : v isa AbstractString ? Symbol(v) : nothing
+    s in (:ability, :hc) || throw(ArgumentError("peer_input must be ability or hc, got $(repr(v))"))
+    return s
+end
+
+"""
     external_params(; kwargs...) -> Params
 
 The fixed block of §1 as a 21-occupation, two-location `Params`: 19 market
@@ -296,6 +328,11 @@ split on and no `jobs_city` the jobs are the baseline population shares (`BASELI
 workplace scale σw is in ϑ (ρw = σw/σν) and may not be passed: `theta_to_params` would overwrite it, so
 it is an error. `move_util` (1 or 0, as `split`; 2026-10-15, PREREG amendment 2, candidate U) makes ϑ's r_m a
 utility cost of moving (`τmove`, utils) instead of a goods cost (`mcost` = r_m C̄): see `theta_to_params`.
+The peer specification (2026-10-25) is external too: `peer_input` (`ability` or `hc`, `parse_peer_input`) and
+`peer_total` (1 or 0, as `split`) select what P_l of Q_l = Q_T,l P_l^{ψa} is (`peer_log_input`), inert while ϑ's ψ_a is 0.
+Constant class size (2026-10-26, model §3e) is external too: `ccs` (1 or 0, as `split`), and the integers `ccs_nq` and
+`ccs_draws` (the command line passes `ccs_draws=12` as 12.0: `parse_int` takes an exact integer, anything else is an
+error); `ccs_rho` passes through as a number.
 """
 function external_params(; kwargs...)
     x = merge(EXTERNAL, (; occ_sample = :acs2009_13), NamedTuple(kwargs))
@@ -308,6 +345,11 @@ function external_params(; kwargs...)
     split = haskey(x, :split) && parse_split(x.split)
     haskey(x, :split) && (rest = merge(rest, (; split)))
     haskey(x, :move_util) && (rest = merge(rest, (; move_util = parse_flag(x.move_util, "move_util"))))
+    haskey(x, :peer_total) && (rest = merge(rest, (; peer_total = parse_flag(x.peer_total, "peer_total"))))
+    haskey(x, :peer_input) && (rest = merge(rest, (; peer_input = parse_peer_input(x.peer_input))))
+    haskey(x, :ccs) && (rest = merge(rest, (; ccs = parse_flag(x.ccs, "ccs"))))                       # model §3e
+    haskey(x, :ccs_nq) && (rest = merge(rest, (; ccs_nq = parse_int(x.ccs_nq, "ccs_nq"))))
+    haskey(x, :ccs_draws) && (rest = merge(rest, (; ccs_draws = parse_int(x.ccs_draws, "ccs_draws"))))
     haskey(x, :jobs_city) && (rest = merge(rest, (; jobs = [x.jobs_city, 1 - x.jobs_city])))
     split && !haskey(x, :jobs_city) && !haskey(x, :jobs) && (rest = merge(rest, (; jobs = collect(BASELINE_POP_SHARES))))
     return Params(N_OCC, 2; T = T_OCC, A, τω, τmove_off = 0.0, mcost_off = 0.0, rest...,
@@ -822,7 +864,8 @@ which re-estimate the stationary SD of log ability, the ability-shock dispersion
 the non-pecuniary cost of teaching without a BA (appended after the first review: it frees
 `ρ_T0` to carry the BA–non-BA teacher pay gap while `c_T0` carries the track's size).
 `ψ_a` (2026-10-07; ϑ vectors saved before it have twenty-two values) is the elasticity of human capital
-in local peer ability, Q_l = (2H̃_T/M_l)^σ ā_l^{ψ_a} (`Params.ψa`; `build_grids`, `peer_log_ability`).
+in the local peer input, Q_l = (2H̃_T/M_l)^σ P_l^{ψ_a} (`Params.ψa`; `build_grids`, `peer_log_input`: by default P = ā,
+the students' mean ability, `peer_log_ability`; the external `peer_input`, `peer_total` choose the specification).
 Three switches were added on 2026-10-15 (ϑ vectors saved before them have twenty-three values; all are
 0, off, unless fixed or freed): `κ_c`, the utility friction of commuting (`Params.κc`, utils per commuting
 pair; it needs `split`), `θ_ν`, the location-taste scale relative to μ, σν = θ_ν μ (0: the external block's
@@ -1227,8 +1270,20 @@ moment_table(m, targets) = moment_table(stdout, m, targets)
 function diagnostics_table(io::IO, m)
     @printf(io, "  validation: SEDA growth gap %.4f SD/grade [data 0.0031 (0.0030)];  Δlog Q = %.4f\n",
             m.seda_growth_gap, m.gap_logQ)
-    iszero(m.psi_a) || @printf(io, "  peer effect ψa = %.3f: Δlog Q = teachers %.4f + peers %.4f (Δlog ā = %+.4f, log ā %s);  fixed-point residual %.1e\n",
-                               m.psi_a, m.gap_logQ_teach, m.gap_logQ_peer, m.log_abar[2] - m.log_abar[1], fmtvec(m.log_abar), m.peer_resid)
+    if !iszero(m.psi_a) && hasproperty(m, :peer_input_hc)    # 2026-10-25: the specification, and the peer part's mean and scale terms
+        spec = ("A", "B", "C", "D")[1 + 2 * Int(m.peer_input_hc) + Int(m.peer_total)]
+        scale_part = iszero(m.peer_total) ? 0.0 : m.psi_a * m.gap_log_peer_mass
+        @printf(io, "  peer effect ψa = %.3f, specification %s (%s %s): Δlog Q = teachers %.4f + peers %.4f (mean term %.4f + scale term %.4f; Δlog P = %+.4f, log P %s);  fixed-point residual %.1e\n",
+                m.psi_a, spec, iszero(m.peer_total) ? "mean" : "total", iszero(m.peer_input_hc) ? "ability of the students" : "human capital of the adult residents",
+                m.gap_logQ_teach, m.gap_logQ_peer, m.gap_logQ_peer - scale_part, scale_part,
+                m.log_peer_input[2] - m.log_peer_input[1], fmtvec(m.log_peer_input), m.peer_resid)
+        @printf(io, "              students' Δlog ā %+.4f (log ā %s);  adult residents' Δ mean log h %+.4f;  Δlog peer-group mass %+.4f (%s)\n",
+                m.log_abar[2] - m.log_abar[1], fmtvec(m.log_abar), m.gap_log_hbar_adult, m.gap_log_peer_mass,
+                iszero(m.peer_input_hc) ? "students" : "adult residents")
+    elseif !iszero(m.psi_a)
+        @printf(io, "  peer effect ψa = %.3f: Δlog Q = teachers %.4f + peers %.4f (Δlog ā = %+.4f, log ā %s);  fixed-point residual %.1e\n",
+                m.psi_a, m.gap_logQ_teach, m.gap_logQ_peer, m.log_abar[2] - m.log_abar[1], fmtvec(m.log_abar), m.peer_resid)
+    end
     @printf(io, "              score-level gap %.4f SD [0.2887];  child-poverty gap %+.4f [−0.0888] (poor shares %s;\n",
             m.score_gap, m.poverty_gap, fmtvec(m.poverty_share_l))
     println(io, "              provisional: relative line, home-production output counted as income)")
@@ -1279,6 +1334,13 @@ function diagnostics_table(io::IO, m)
             m.wtp_income_elasticity_z, m.wtp_income_slope_z, fmtvec(m.wtp_share_by_parent_income))
     @printf(io, "              value of the suburb's school quality ΔΛ: mean %.2e, by z %s; due to Q alone: mean %.2e, by z %s\n",
             m.dLambda_mean, fmtvec(m.dLambda_z), m.dLambda_quality_mean, fmtvec(m.dLambda_quality))
+    if hasproperty(m, :ccs)                  # 2026-10-26: constant class size with random teacher assignment (model §3e)
+        @printf(io, "  constant class size: K_d = %d teacher draws, n_q = %d nodes, ρ = %.3f;  class size N_l %s (SD within a location %.1f) [district SD within CZ × location ≈ 1.4];  SD(ln q | l) %s;  ln Q^eff − ln Q̄ %s\n",
+                Int(m.ccs_draws), Int(m.ccs_nq), m.ccs_rho, fmtvec(m.class_size), m.class_size_sd, fmtvec(m.ccs_sd_logq),
+                fmtvec(m.ccs_lQeff_gap))
+        @printf(io, "              ΔΛ due to quality (Q̄ and the draw law equalized) mean %.2e = geometric mean Q̄ %.2e + dispersion of the draw %.2e;  by z: Q̄ %s, dispersion %s  (equalizing the law also moves the teach weights at the solved values)\n",
+                m.dLambda_quality_mean, m.dLambda_geo_mean, m.dLambda_disp_mean, fmtvec(m.dLambda_geo), fmtvec(m.dLambda_disp))
+    end
     if isfinite(m.commute_share_all)         # the residence/workplace split
         @printf(io, "  residence/workplace: crossing share all %.4f [0.107], teachers %.4f [0.084], non-teachers %.4f;  net commuting gap %+.4f [+0.075 (0.038); national PUMS cross-check +0.108];  teachers per employed resident gap %+.4f [+0.298 (0.041)];  payroll per pupil gap %+.4f [−0.0091]\n",
                 m.commute_share_all, m.commute_share_teach, m.commute_share_nonteach, m.net_commute_gap, m.gap_teach_res_emp,
@@ -1326,9 +1388,15 @@ function diagnostics_table(io::IO, m)
                 join((sg(m[Symbol("gap_logh_teacher_res_", t)]) for t in (:Q, :z, :eps, :s, :e)), " + "),
                 join((sg(m[Symbol("gap_logh_teacher_work_", t)]) for t in (:Q, :z, :eps, :s, :e)), " + "),
                 m.decomp_resid_max, fmtvec(m.share_born_suburb_res), fmtvec(m.share_born_suburb_work))
-        isfinite(m.gap_logQ_teach_quality) && isfinite(m.gap_logQ_teach_staffing) &&
-            @printf(io, "              Δ log Q_T = %+.4f = quality σ Δlog E[h_eff^(β/σ)] %+.4f + staffing σ Δlog(teachers per pupil) %+.4f  (check %.1e)\n",
-                    m.gap_logQ_teach, m.gap_logQ_teach_quality, m.gap_logQ_teach_staffing, m.gap_logQ_teach_check)
+        if isfinite(m.gap_logQ_teach_quality) && isfinite(m.gap_logQ_teach_staffing)
+            if hasproperty(m, :ccs)          # 2026-10-26, constant class size: the geometric-mean index ln Q̄_T = β μ − σ ln N
+                @printf(io, "              Δ log Q̄_T = %+.4f = quality β Δ mean log h_eff %+.4f + staffing σ Δlog(teachers per pupil) %+.4f  (check %.1e; constant class size)\n",
+                        m.gap_logQ_teach, m.gap_logQ_teach_quality, m.gap_logQ_teach_staffing, m.gap_logQ_teach_check)
+            else
+                @printf(io, "              Δ log Q_T = %+.4f = quality σ Δlog E[h_eff^(β/σ)] %+.4f + staffing σ Δlog(teachers per pupil) %+.4f  (check %.1e)\n",
+                        m.gap_logQ_teach, m.gap_logQ_teach_quality, m.gap_logQ_teach_staffing, m.gap_logQ_teach_check)
+            end
+        end
         isfinite(m.gap_logpay_teacher_res_fixedw) && isfinite(m.gap_logh_teacher_res_fixedw) &&
             @printf(io, "              at a given workplace, suburban − city residents: mean log pay %+.4f, mean log h_T %+.4f;  (r, w) cells 11, 21, 12, 22: teachers %s, mean log h_T %s, mean log pay %s\n",
                     m.gap_logpay_teacher_res_fixedw, m.gap_logh_teacher_res_fixedw, fmtvec(m.teacher_rw_mass),

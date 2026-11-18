@@ -68,6 +68,9 @@
 # minutes on one core, including Julia's start-up: the equilibrium and moments 105 s, the household margins 3 s per
 # shock (six shocks), each of the four GE solves 37 s and the zero-shock re-solve 8 s; the bundled model takes about two
 # minutes. Run it on a compute node (srun or sbatch), not on the login node.
+# Not CCS-aware (2026-10-26): it has not been taught constant class size (`--external ccs=1`, model §3e), where the
+# GE margin (f) moves the teacher-draw laws and the analytic margin is derived for one school quality per location,
+# so the script stops with an error rather than report unvalidated numbers.
 # =============================================================================
 
 using Printf
@@ -444,6 +447,10 @@ function timed(f, label)
     return val
 end
 
+"The error of this script under constant class size (2026-10-26): it is not CCS-aware."
+const CCS_UNSUPPORTED = "spatial_supply_audit.jl is not CCS-aware: under constant class size (--external ccs=1, model §3e) " *
+    "its margins and their analytic counterpart have not been derived or validated with teacher draws; run it without ccs"
+
 """
     run_audit(sol, m, meas; step, ge_step, ge_tol, ge, two_sided, solver) -> NamedTuple
 
@@ -456,6 +463,7 @@ margin (a) (`pay`), the crossing shares and the consistency checks.
 """
 function run_audit(sol, m, meas; step, ge_step, ge_tol, ge, two_sided, solver)
     (; hh, Φ, gr, p) = sol
+    (p.ccs || ccs_on(gr)) && error(CCS_UNSUPPORTED)
     L = gr.L
     hh_tol, hh_maxit = get(solver, :hh_tol, 1e-7), get(solver, :hh_maxit, 1000)
     n0 = teacher_counts(hh, Φ, sol_probs(sol)[1], gr, p)
@@ -829,6 +837,7 @@ end
 function main(opts)
     ref = frozen_reference(something(opts["reference"], REFERENCE_FILE), SOLVER)
     (; base, meas, floor_tol) = problem_setup(opts, ref)
+    base.ccs && error(CCS_UNSUPPORTED)
     meas = with_measurement(meas; pooled_p9010 = false)       # not used here (a second pseudo-sample)
     opts["step"] > 0 || error("--step must be positive, got $(opts["step"])")
     opts["ge-step"] > 0 || error("--ge-step must be positive, got $(opts["ge-step"])")
